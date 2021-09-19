@@ -7,7 +7,7 @@ This project is based on Google Benchmark.
 Clone the project:
 
 ```
-$ git clone https://github.com/buddy-compiler/buddy-benchmark.git
+$ git clone git@github.com:buddy-compiler/buddy-benchmark.git
 ```
 
 ## Image Processing Benchmark
@@ -23,8 +23,7 @@ Run the image processing benchmark:
 
 ```
 $ cd buddy-benchmark
-$ mkdir build
-$ cd build
+$ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
     -DOpenCV_DIR=/path/to/opencv/build/ \
@@ -32,8 +31,7 @@ $ cmake -G Ninja .. \
     -DBUDDY_CONV_OPT_STRIP_MINING=<strip mining size, default: 256> \
     -DBUDDY_CONV_OPT_ATTR=<ISA vector extension, default: avx512f>
 $ ninja image-processing-benchmark
-$ cd bin
-$ ./image-processing-benchmark
+$ cd bin && ./image-processing-benchmark
 ```
 
 Note : The convolution implementation in buddy mlir is not feature complete at the moment and it may produce output which differs to some extent from the frameworks used in comparison. 
