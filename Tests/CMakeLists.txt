@@ -1,5 +1,3 @@
-add_executable(Tests TestImageGenerator.cpp)
-
-target_link_libraries(Tests
-  ${OpenCV_LIBS}
-  )
+if(IMAGE_PROCESSING_TESTS)
+  add_subdirectory(ImageProcessing)
+endif()

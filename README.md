@@ -34,4 +34,14 @@ $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark
 ```
 
+Run image processing tests:
+
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. -DIMAGE_PROCESSING_TESTS=ON
+$ ninja Tests
+$ cd bin && mkdir TestImages && ./Tests 7 7 TestImages
+```
+
 Note : The convolution implementation in buddy mlir is not feature complete at the moment and it may produce output which differs to some extent from the frameworks used in comparison. 
