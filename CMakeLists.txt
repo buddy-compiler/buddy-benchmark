@@ -83,3 +83,4 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_subdirectory(lib)
 add_subdirectory(benchmarks)
+add_subdirectory(Tests)
