@@ -18,8 +18,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "ImageProcessing/BuddyContainer.h"
 #include "ImageProcessing/Kernels.h"
+#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
 
@@ -28,7 +28,8 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_conv_2d(MemRef *input, MemRef *kernel, MemRef *output);
+void _mlir_ciface_conv_2d(MemRef<2> *input, MemRef<2> *kernel,
+                          MemRef<2> *output);
 }
 
 // Read input image
@@ -52,10 +53,10 @@ intptr_t stridesKernel[2] = {kernelRows, kernelCols};
 intptr_t stridesOutput[2] = {outputRows, outputCols};
 
 // Define input, kernel, and output.
-MemRef input(inputImageBuddy, 0, sizesInput, stridesInput);
-MemRef kernel(laplacianKernelRows, laplacianKernelCols, laplacianKernelAlign, 0,
-              sizesKernel, stridesKernel);
-MemRef output(outputRows, outputCols, 0, sizesOutput, stridesOutput);
+MemRef<2> input(inputImageBuddy, 0, sizesInput, stridesInput);
+MemRef<2> kernel(laplacianKernelRows, laplacianKernelCols, laplacianKernelAlign,
+                 0, sizesKernel, stridesKernel);
+MemRef<2> output(outputRows, outputCols, 0, sizesOutput, stridesOutput);
 
 static void BM_Buddy(benchmark::State &state) {
   for (auto _ : state) {

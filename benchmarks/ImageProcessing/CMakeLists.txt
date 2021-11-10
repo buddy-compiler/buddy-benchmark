@@ -18,5 +18,5 @@ target_link_libraries(image-processing-benchmark
   GoogleBenchmark
   ${OpenCV_LIBS}
   Conv2D
-  BuddyContainer
+  Container
   )
