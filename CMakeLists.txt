@@ -18,6 +18,8 @@ project(buddy-mlir LANGUAGES CXX C)
   
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_FLAGS "-no-pie")
+set(CMAKE_C_FLAGS "-no-pie")
 
 #-------------------------------------------------------------------------------
 # BUDDY configuration
@@ -34,6 +36,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 # Add BUDDY files to the include path
 include_directories(${BUDDY_MAIN_INCLUDE_DIR})
 include_directories(${BUDDY_INCLUDE_DIR})
+include_directories(${BUDDY_SOURCE_DIR}/lib) # For template inclusion model.
 
 #-------------------------------------------------------------------------------
 # Deploy google/benchmark
