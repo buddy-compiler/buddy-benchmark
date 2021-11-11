@@ -27,7 +27,7 @@ using namespace std;
 
 // Declare the mobilenet C interface.
 extern "C" {
-void _mlir_ciface_mobilenet(MemRef<2> *output, MemRef<4> *input);
+void _mlir_ciface_mobilenet(MemRef<float, 2> *output, MemRef<float, 4> *input);
 }
 
 // TODO: Add input image preprocessing, the current preprocessing only has
@@ -52,8 +52,8 @@ intptr_t stridesInput[4] = {1, image.rows, image.cols, 3};
 intptr_t sizesOutnput[2] = {1, 1001};
 intptr_t stridesOutput[2] = {1, 1001};
 
-MemRef<4> input(image, 0, sizesInput, stridesInput);
-MemRef<2> output(1001, 0, sizesOutnput, stridesOutput);
+MemRef<float, 4> input(image, 0, sizesInput, stridesInput);
+MemRef<float, 2> output(1001, 0, sizesOutnput, stridesOutput);
 
 // Define benchmark function.
 static void BM_MobileNet(benchmark::State &state) {
