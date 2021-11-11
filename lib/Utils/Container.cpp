@@ -21,14 +21,14 @@
 #ifndef UTILS_CONTAINER_DEF
 #define UTILS_CONTAINER_DEF
 
-#include <memory>
 #include "Utils/Container.h"
+#include <memory>
 
-template <int Dim>
-MemRef<Dim>::MemRef(intptr_t rows, intptr_t cols, float *aligned,
-                    intptr_t offset, intptr_t sizes[Dim],
-                    intptr_t strides[Dim]) {
-  auto ptr = new float[rows * cols];
+template <typename T, size_t Dim>
+MemRef<T, Dim>::MemRef(intptr_t rows, intptr_t cols, T *aligned,
+                       intptr_t offset, intptr_t sizes[Dim],
+                       intptr_t strides[Dim]) {
+  auto ptr = new T[rows * cols];
   this->allocated = ptr;
   this->aligned = ptr;
   int k = 0;
@@ -45,25 +45,25 @@ MemRef<Dim>::MemRef(intptr_t rows, intptr_t cols, float *aligned,
     this->strides[j] = strides[j];
 }
 
-template <int Dim>
-MemRef<Dim>::MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
-                    intptr_t strides[Dim]) {
+template <typename T, size_t Dim>
+MemRef<T, Dim>::MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
+                       intptr_t strides[Dim]) {
   // Copy image pixels for image processing memref.
   if (Dim == 2) {
-    auto ptr = new float[image.rows * image.cols];
+    auto ptr = new T[image.rows * image.cols];
     this->allocated = ptr;
     this->aligned = ptr;
     int k = 0;
     for (int i = 0; i < image.rows; i++) {
       for (int j = 0; j < image.cols; j++) {
-        this->aligned[k] = (float)image.at<uchar>(i, j);
+        this->aligned[k] = (T)image.at<uchar>(i, j);
         k++;
       }
     }
   }
   // Copy image pixels for deep learning tensors.
   if (Dim == 4) {
-    auto ptr = new float[image.rows * image.cols * 3];
+    auto ptr = new T[image.rows * image.cols * 3];
     this->allocated = ptr;
     this->aligned = ptr;
     int k = 0;
@@ -72,7 +72,7 @@ MemRef<Dim>::MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
       for (int j = 0; j < image.cols; j++) {
         for (int color = 0; color < 3; color++) {
           // Reorder to RGB layout.
-          this->aligned[k] = (float)image.at<cv::Vec3b>(i, j)[2 - color];
+          this->aligned[k] = (T)image.at<cv::Vec3b>(i, j)[2 - color];
           k++;
         }
       }
@@ -85,10 +85,10 @@ MemRef<Dim>::MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
     this->strides[j] = strides[j];
 }
 
-template <int Dim>
-MemRef<Dim>::MemRef(intptr_t rows, intptr_t cols, intptr_t offset,
-                    intptr_t sizes[Dim], intptr_t strides[Dim]) {
-  auto ptr = new float[rows * cols];
+template <typename T, size_t Dim>
+MemRef<T, Dim>::MemRef(intptr_t rows, intptr_t cols, intptr_t offset,
+                       intptr_t sizes[Dim], intptr_t strides[Dim]) {
+  auto ptr = new T[rows * cols];
   this->allocated = ptr;
   this->aligned = ptr;
   this->offset = offset;
@@ -99,10 +99,10 @@ MemRef<Dim>::MemRef(intptr_t rows, intptr_t cols, intptr_t offset,
 }
 
 // Constructor for deep learning output.
-template <int Dim>
-MemRef<Dim>::MemRef(intptr_t results, intptr_t offset, intptr_t sizes[Dim],
-                    intptr_t strides[Dim]) {
-  auto ptr = new float[results];
+template <typename T, size_t Dim>
+MemRef<T, Dim>::MemRef(intptr_t results, intptr_t offset, intptr_t sizes[Dim],
+                       intptr_t strides[Dim]) {
+  auto ptr = new T[results];
   this->allocated = ptr;
   this->aligned = ptr;
   for (int i = 0; i < results; i++) {
@@ -115,6 +115,8 @@ MemRef<Dim>::MemRef(intptr_t results, intptr_t offset, intptr_t sizes[Dim],
     this->strides[j] = strides[j];
 }
 
-template <int Dim> MemRef<Dim>::~MemRef() { delete[] this->allocated; }
+template <typename T, size_t Dim> MemRef<T, Dim>::~MemRef() {
+  delete[] this->allocated;
+}
 
 #endif // UTILS_CONTAINER_DEF

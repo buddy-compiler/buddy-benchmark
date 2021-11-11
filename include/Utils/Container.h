@@ -25,9 +25,9 @@
 #include <opencv2/opencv.hpp>
 #include <stdint.h>
 
-template <int Dim> struct MemRef {
+template <typename T, size_t Dim> struct MemRef {
 public:
-  MemRef(intptr_t rows, intptr_t cols, float *aligned, intptr_t offset,
+  MemRef(intptr_t rows, intptr_t cols, T *aligned, intptr_t offset,
          intptr_t sizes[Dim], intptr_t strides[Dim]);
   MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
          intptr_t strides[Dim]);
@@ -36,8 +36,8 @@ public:
   MemRef(intptr_t results, intptr_t offset, intptr_t sizes[Dim],
          intptr_t strides[Dim]);
   ~MemRef();
-  float *allocated;
-  float *aligned;
+  T *allocated;
+  T *aligned;
   intptr_t offset;
   intptr_t sizes[Dim];
   intptr_t strides[Dim];
