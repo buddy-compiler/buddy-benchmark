@@ -30,12 +30,11 @@ extern "C" {
 void _mlir_ciface_mobilenet(MemRef<2> *output, MemRef<4> *input);
 }
 
-// Read input image.
-Mat inputImage = imread("../../benchmarks/DeepLearning/Images/curtain.png");
-
 // TODO: Add input image preprocessing, the current preprocessing only has
 // resize step.
-Mat imagePreprocessing(Mat inputImage) {
+Mat imagePreprocessing() {
+  Mat inputImage = imread("../../benchmarks/DeepLearning/Images/curtain.png");
+  assert(!inputImage.empty() && "Could not read the image.");
   Mat resizedImage;
   int imageWidth = 224;
   int imageHeight = 224;
@@ -44,7 +43,7 @@ Mat imagePreprocessing(Mat inputImage) {
   return resizedImage;
 }
 
-Mat image = imagePreprocessing(inputImage);
+Mat image = imagePreprocessing();
 
 // TODO: figure out the correct strides layout.
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
