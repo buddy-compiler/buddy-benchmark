@@ -25,6 +25,8 @@
 using namespace cv;
 using namespace std;
 
+namespace{
+
 // Declare the mobilenet C interface.
 extern "C" {
 void _mlir_ciface_mobilenet(MemRef<float, 2> *output, MemRef<float, 4> *input);
@@ -32,7 +34,7 @@ void _mlir_ciface_mobilenet(MemRef<float, 2> *output, MemRef<float, 4> *input);
 
 // TODO: Add input image preprocessing, the current preprocessing only has
 // resize step.
-Mat imagePreprocessing() {
+const Mat imagePreprocessing() {
   Mat inputImage = imread("../../benchmarks/DeepLearning/Images/curtain.png");
   assert(!inputImage.empty() && "Could not read the image.");
   Mat resizedImage;
@@ -56,17 +58,13 @@ MemRef<float, 4> input(image, 0, sizesInput, stridesInput);
 MemRef<float, 2> output(1001, 0, sizesOutnput, stridesOutput);
 
 // Define benchmark function.
-static void BM_MobileNet(benchmark::State &state) {
+void BM_MobileNet(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_mobilenet(&output, &input);
     }
   }
 }
-
-// Register benchmarking function with different arguments.
-BENCHMARK(BM_MobileNet)->Arg(1);
-BENCHMARK(BM_MobileNet)->Arg(4);
 
 // Softmax function.
 void softmax(float *input, size_t size) {
@@ -90,6 +88,12 @@ void softmax(float *input, size_t size) {
     input[i] = exp(input[i] - constant);
   }
 }
+
+} // namespace
+
+// Register benchmarking function with different arguments.
+BENCHMARK(BM_MobileNet)->Arg(1);
+BENCHMARK(BM_MobileNet)->Arg(4);
 
 // Print result function.
 void printResult() {
