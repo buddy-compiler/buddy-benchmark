@@ -1,5 +1,5 @@
 // generate from iree mhlo.convolution when c&f dim equals to 1
-func @conv_2d_input_nchw_filter_fchw(%input: memref<?x?x?x?xf32>, %filter: memref<?x?x?x?xf32>, %output: memref<?x?x?x?x?xf32>)
+func @depthwise_conv2D_nhwc(%input: memref<?x?x?x?xf32>, %filter: memref<?x?x?x?xf32>, %output: memref<?x?x?x?x?xf32>)
   -> memref<?x?x?x?x?xf32> {
     linalg.depthwise_conv2D_nhwc 
     { 
