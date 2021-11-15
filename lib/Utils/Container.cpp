@@ -46,6 +46,26 @@ MemRef<T, Dim>::MemRef(intptr_t rows, intptr_t cols, T *aligned,
 }
 
 template <typename T, size_t Dim>
+MemRef<T, Dim>::MemRef(T init, intptr_t sizes[Dim], intptr_t strides[Dim]) {
+  // Calculate the total size of the memref.
+  intptr_t size = 1;
+  for (int dim = 0; dim < Dim; ++dim)
+    size *= sizes[dim];
+  auto ptr = new T[size];
+  this->allocated = ptr;
+  this->aligned = ptr;
+  for (int i = 0; i < size; i++) {
+    // Set the aligned member as the initial value.
+    this->aligned[i] = init;
+  }
+  this->offset = 0;
+  for (int i = 0; i < Dim; i++)
+    this->sizes[i] = sizes[i];
+  for (int j = 0; j < Dim; j++)
+    this->strides[j] = strides[j];
+}
+
+template <typename T, size_t Dim>
 MemRef<T, Dim>::MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
                        intptr_t strides[Dim]) {
   // Copy image pixels for image processing memref.

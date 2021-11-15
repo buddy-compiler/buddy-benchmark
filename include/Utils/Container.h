@@ -29,6 +29,7 @@ template <typename T, size_t Dim> struct MemRef {
 public:
   MemRef(intptr_t rows, intptr_t cols, T *aligned, intptr_t offset,
          intptr_t sizes[Dim], intptr_t strides[Dim]);
+  MemRef(T init, intptr_t sizes[Dim], intptr_t strides[Dim]);
   MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
          intptr_t strides[Dim]);
   MemRef(intptr_t rows, intptr_t cols, intptr_t offset, intptr_t sizes[Dim],
