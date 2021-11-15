@@ -71,8 +71,8 @@ MemRef<T, Dim>::MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
     for (int i = 0; i < image.rows; i++) {
       for (int j = 0; j < image.cols; j++) {
         for (int color = 0; color < 3; color++) {
-          // Reorder to RGB layout.
-          this->aligned[k] = (T)image.at<cv::Vec3b>(i, j)[2 - color];
+          // Reorder to RGB layout and normalize the element.
+          this->aligned[k] = (T)image.at<cv::Vec3b>(i, j)[2 - color] / 255.0f;
           k++;
         }
       }
