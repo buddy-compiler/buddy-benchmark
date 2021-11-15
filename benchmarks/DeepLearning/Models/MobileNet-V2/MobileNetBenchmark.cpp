@@ -20,12 +20,11 @@
 
 #include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <fstream>
 #include <opencv2/opencv.hpp>
+#include <string>
 
-using namespace cv;
-using namespace std;
-
-namespace{
+namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
@@ -34,18 +33,19 @@ void _mlir_ciface_mobilenet(MemRef<float, 2> *output, MemRef<float, 4> *input);
 
 // TODO: Add input image preprocessing, the current preprocessing only has
 // resize step.
-const Mat imagePreprocessing() {
-  Mat inputImage = imread("../../benchmarks/DeepLearning/Images/curtain.png");
+const cv::Mat imagePreprocessing() {
+  cv::Mat inputImage = cv::imread(
+      "../../benchmarks/DeepLearning/Models/MobileNet-V2/Images/dog.png");
   assert(!inputImage.empty() && "Could not read the image.");
-  Mat resizedImage;
+  cv::Mat resizedImage;
   int imageWidth = 224;
   int imageHeight = 224;
-  cv::resize(inputImage, resizedImage, Size(imageWidth, imageHeight),
-             INTER_LINEAR);
+  cv::resize(inputImage, resizedImage, cv::Size(imageWidth, imageHeight),
+             cv::INTER_LINEAR);
   return resizedImage;
 }
 
-Mat image = imagePreprocessing();
+cv::Mat image = imagePreprocessing();
 
 // TODO: figure out the correct strides layout.
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
@@ -89,6 +89,18 @@ void softmax(float *input, size_t size) {
   }
 }
 
+std::string getLabel(int idx) {
+  std::ifstream in(
+      "../../benchmarks/DeepLearning/Models/MobileNet-V2/Labels.txt");
+  assert(in.is_open() && "Could not read the label file.");
+  std::string label;
+  for (int i = 0; i < idx; ++i)
+    std::getline(in, label);
+  std::getline(in, label);
+  in.close();
+  return label;
+}
+
 } // namespace
 
 // Register benchmarking function with different arguments.
@@ -110,5 +122,6 @@ void printResult() {
     }
   }
   std::cout << "Classification Index: " << maxIdx << std::endl;
+  std::cout << "Classification: " << getLabel(maxIdx) << std::endl;
   std::cout << "Probability: " << maxVal << std::endl;
 }
