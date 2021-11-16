@@ -38,14 +38,6 @@ Note : The convolution implementation in buddy mlir is not feature complete at t
 
 ## Deep Learning Benchmark
 
-The deep learning benchmark includes the following e2e models:
-
-- MobileNet
-
-NOTE: We generated the model code with IREE and made appropriate modifications, and then compiled it with the MLIR tool chain.
-
-Run the image processing benchmark:
-
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
@@ -55,5 +47,24 @@ $ cmake -G Ninja .. \
     -DBUDDY_CONV_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
     -DBUDDY_CONV_OPT_ATTR=<ISA vector extension, default: avx512f>
 $ ninja deep-learning-benchmark
-$ cd bin && ./deep-learning-benchmark
+```
+
+The deep learning benchmark includes the following e2e models and operations:
+
+- MobileNet
+
+NOTE: We generated the model code with IREE and made appropriate modifications, and then compiled it with the MLIR tool chain.
+
+Run the MobileNet benchmark:
+
+```
+$ cd <path to build>/bin && ./mobilenet-benchmark
+```
+
+- DepthwiseConv2DNhwcHwc Operation
+
+Run the DepthwiseConv2DNhwcHwc operation benchmark:
+
+```
+$ cd <path to build>/bin && ./depthwise-conv-2d-nhwc-hwc-benchmark
 ```
