@@ -46,7 +46,7 @@ namespace
     MemRef<float, 4> outputMemRef(0.0, sizesOutput, stridesOutput);
 
     // Define benchmark function.
-    void BM_DepthwiseConv2DNhw(benchmark::State &state)
+    void BM_Conv2DNchwFchw(benchmark::State &state)
     {
         for (auto _ : state)
         {
@@ -61,8 +61,8 @@ namespace
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_DepthwiseConv2DNhw)->Arg(1);
-BENCHMARK(BM_DepthwiseConv2DNhw)->Arg(4);
+BENCHMARK(BM_Conv2DNchwFchw)->Arg(1);
+BENCHMARK(BM_Conv2DNchwFchw)->Arg(4);
 
 // Print result function.
 void printResult()
