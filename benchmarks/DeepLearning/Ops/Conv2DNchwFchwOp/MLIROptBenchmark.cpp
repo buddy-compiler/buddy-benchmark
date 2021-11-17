@@ -32,8 +32,8 @@ namespace
                                             MemRef<float, 4> *output);
     }
 
-    intptr_t sizesInput[4] = {1, 3, 3, 2};
-    intptr_t stridesInput[4] = {18, 6, 2, 1};
+    intptr_t sizesInput[4] = {1, 2, 3, 3};
+    intptr_t stridesInput[4] = {18, 9, 3, 1};
 
     intptr_t sizesFilter[4] = {2, 2, 2, 2};
     intptr_t stridesFilter[4] = {8, 4, 2, 1};
