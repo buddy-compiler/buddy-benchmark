@@ -19,4 +19,5 @@ target_link_libraries(depthwise-conv-2d-nhwc-hwc-benchmark
   GoogleBenchmark
   DepthwiseConv2DNhwcHwc
   Container
+  -lpng
   )
