@@ -24,24 +24,62 @@
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <stdint.h>
+#include <vector>
 
-template <typename T, size_t Dim> struct MemRef {
+#include "Utils/PNGImage.h"
+
+// MemRef descriptor
+// - T represents the type of the elements
+// - N represents the number of dimensions
+// - The storage order is NCHW
+template <typename T, size_t N> class MemRef {
 public:
-  MemRef(intptr_t rows, intptr_t cols, T *aligned, intptr_t offset,
-         intptr_t sizes[Dim], intptr_t strides[Dim]);
-  MemRef(T init, intptr_t sizes[Dim], intptr_t strides[Dim]);
-  MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
-         intptr_t strides[Dim]);
-  MemRef(intptr_t rows, intptr_t cols, intptr_t offset, intptr_t sizes[Dim],
-         intptr_t strides[Dim]);
-  MemRef(intptr_t results, intptr_t offset, intptr_t sizes[Dim],
-         intptr_t strides[Dim]);
+   // Constructor from data
+  MemRef(const T *data, intptr_t sizes[N], intptr_t strides[N], intptr_t offset = 0);
+  MemRef(const T *data, intptr_t sizes[N], intptr_t offset = 0);
+   // Constructor from shape and strides
+  MemRef(intptr_t sizes[N], intptr_t strides[N], T init = T(0));
+   // Constructor from shape
+  MemRef(intptr_t sizes[N], T init = T(0));
+   // Constructor for deep learning output
+  MemRef(intptr_t results, intptr_t sizes[N],
+         intptr_t strides[N], intptr_t offset = 0);
+   // Create a memref from an opencv image
+  MemRef(cv::Mat image, intptr_t sizes[N], intptr_t strides[N]);
+  // Constructor from an image
+   MemRef(const PNGImage &img, intptr_t sizes[N]);
+  // Constructor from images
+  // Assume that all the images have the same shape
+  MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
+  // Desctrutor
   ~MemRef();
+  // Permute the dimensions of the  tensor
+  MemRef<T, N> transpose(const std::vector<size_t> &dims = {0,1});
+  // Get the data pointer
+  T *getData() { return allocated; }
+  // Get the sizes
+  const intptr_t *getSizes() { return sizes; }
+  // Get the strides
+  const intptr_t *getStrides() { return strides; }
+  // Get the element at index
+  T at(size_t index) const { return allocated[index + offset]; }
+  T &at(size_t index) { return allocated[index + offset]; }
+
+private:
+   // Set the strides
+   void setStrides();
+   // Compute the product of array elements
+   size_t product(intptr_t sizes[N]) const;
+
+   // Data
   T *allocated;
   T *aligned;
-  intptr_t offset;
-  intptr_t sizes[Dim];
-  intptr_t strides[Dim];
+   // Offset
+  intptr_t offset = 0;
+   // Shape
+  intptr_t sizes[N];
+   // Strides
+  intptr_t strides[N];
 };
 
 #include "Utils/Container.cpp"

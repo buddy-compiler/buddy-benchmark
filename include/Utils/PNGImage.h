@@ -47,7 +47,7 @@ public:
   // Destructor
   ~PNGImage(){};
 
-  template <typename T, std::size_t> friend class Tensor;
+  template <typename T, std::size_t> friend class MemRef;
 };
 
 #include "Utils/PNGImage.cpp"
