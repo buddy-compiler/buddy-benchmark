@@ -49,13 +49,10 @@ cv::Mat image = imagePreprocessing();
 
 // TODO: figure out the correct strides layout.
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
-intptr_t stridesInput[4] = {1, image.rows, image.cols, 3};
-
 intptr_t sizesOutnput[2] = {1, 1001};
-intptr_t stridesOutput[2] = {1, 1001};
 
-MemRef<float, 4> input(image, sizesInput, stridesInput);
-MemRef<float, 2> output(1001, sizesOutnput, stridesOutput);
+MemRef<float, 4> input(image, sizesInput);
+MemRef<float, 2> output(sizesOutnput);
 
 // Define benchmark function.
 void BM_MobileNet(benchmark::State &state) {

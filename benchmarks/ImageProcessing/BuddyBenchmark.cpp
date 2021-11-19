@@ -48,14 +48,11 @@ int outputCols = inputImageBuddy.cols - kernelCols + 1;
 intptr_t sizesInput[2] = {inputImageBuddy.rows, inputImageBuddy.cols};
 intptr_t sizesKernel[2] = {kernelRows, kernelCols};
 intptr_t sizesOutput[2] = {outputRows, outputCols};
-intptr_t stridesInput[2] = {inputImageBuddy.rows, inputImageBuddy.cols};
-intptr_t stridesKernel[2] = {kernelRows, kernelCols};
-intptr_t stridesOutput[2] = {outputRows, outputCols};
 
 // Define input, kernel, and output.
-MemRef<float, 2> input(inputImageBuddy, sizesInput, stridesInput);
-MemRef<float, 2> kernel(laplacianKernelAlign, sizesKernel, stridesKernel);
-MemRef<float, 2> output(sizesOutput, stridesOutput);
+MemRef<float, 2> input(inputImageBuddy, sizesInput);
+MemRef<float, 2> kernel(laplacianKernelAlign, sizesKernel);
+MemRef<float, 2> output(sizesOutput);
 
 static void BM_Buddy(benchmark::State &state) {
   for (auto _ : state) {
