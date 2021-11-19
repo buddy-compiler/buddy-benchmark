@@ -34,14 +34,14 @@
 // - The storage order is NCHW
 template <typename T, size_t N> class MemRef {
 public:
-   // Constructor from data
+  // Constructor from data
   MemRef(const T *data, intptr_t sizes[N], intptr_t offset = 0);
-   // Constructor from shape
+  // Constructor from shape
   MemRef(intptr_t sizes[N], T init = T(0));
-   // Create a memref from an opencv image
+  // Create a memref from an opencv image
   MemRef(cv::Mat image, intptr_t sizes[N]);
   // Constructor from a png image
-   MemRef(const PNGImage &img, intptr_t sizes[N]);
+  MemRef(const PNGImage &img, intptr_t sizes[N]);
   // Constructor from a vector of png images
   // Assume that all the images have the same shape
   MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
@@ -62,20 +62,20 @@ public:
   T &operator[](size_t index) { return allocated[index + offset]; }
 
 private:
-   // Set the strides
-   // Computes the strides of the transposed tensor for transpose=true
-   void setStrides(const bool transpose = false);
-   // Compute the product of array elements
-   size_t product(intptr_t sizes[N]) const;
+  // Set the strides
+  // Computes the strides of the transposed tensor for transpose=true
+  void setStrides(const bool transpose = false);
+  // Compute the product of array elements
+  size_t product(intptr_t sizes[N]) const;
 
-   // Data
+  // Data
   T *allocated;
   T *aligned;
-   // Offset
+  // Offset
   intptr_t offset = 0;
-   // Shape
+  // Shape
   intptr_t sizes[N];
-   // Strides
+  // Strides
   intptr_t strides[N];
 };
 
