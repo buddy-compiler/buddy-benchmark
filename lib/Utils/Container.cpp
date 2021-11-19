@@ -261,7 +261,7 @@ MemRef<T, N> MemRef<T, N>::transpose(const std::vector<size_t> &dims) {
       for (std::size_t w = 0; w < sizes[1]; w++) {
         size_t oldOffset = h * strides[0] + w * strides[1];
         size_t newOffset = w * newStrides[0] + h * newStrides[1];
-        res.at(newOffset) = this->at(oldOffset);
+        res[newOffset] = (*this)[oldOffset];
       }
     }
   } else if (N == 3) {
@@ -280,7 +280,7 @@ MemRef<T, N> MemRef<T, N>::transpose(const std::vector<size_t> &dims) {
           size_t newOffset = getNewDim(0, c, h, w) * newStrides[0] +
                              getNewDim(1, c, h, w) * newStrides[1] +
                              getNewDim(2, c, h, w) * newStrides[2];
-          res.at(newOffset) = this->at(oldOffset);
+          res[newOffset] = (*this)[oldOffset];
         }
       }
     }

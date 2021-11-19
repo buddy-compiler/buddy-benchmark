@@ -69,6 +69,6 @@ void printResult() {
   // Print the output.
   std::cout << "Output: [ ";
   for (int i = 0; i < 8; ++i)
-    std::cout << outputMemRef.at(i) << " ";
+    std::cout << outputMemRef[i] << " ";
   std::cout << "]" << std::endl;
 }

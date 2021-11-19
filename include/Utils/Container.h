@@ -62,8 +62,8 @@ public:
   // Get the strides
   const intptr_t *getStrides() { return strides; }
   // Get the element at index
-  T at(size_t index) const { return allocated[index + offset]; }
-  T &at(size_t index) { return allocated[index + offset]; }
+  const T &operator[](size_t index) const { return allocated[index + offset]; }
+  T &operator[](size_t index) { return allocated[index + offset]; }
 
 private:
    // Set the strides
