@@ -31,17 +31,13 @@ void _mlir_ciface_depthwise_conv_2d_nhwc_hwc(MemRef<float, 4> *input,
 }
 
 intptr_t sizesInput[4] = {1, 3, 3, 2};
-intptr_t stridesInput[4] = {18, 6, 2, 1};
-
 intptr_t sizesFilter[3] = {2, 2, 2};
-intptr_t stridesFilter[3] = {4, 2, 1};
-
 intptr_t sizesOutput[4] = {1, 2, 2, 2};
-intptr_t stridesOutput[4] = {8, 4, 2, 1};
+
 // Create input, filter, and output.
-MemRef<float, 4> inputMemRef(sizesInput, stridesInput, 2.0);
-MemRef<float, 3> filterMemRef(sizesFilter, stridesFilter, 1.0);
-MemRef<float, 4> outputMemRef(sizesOutput, stridesOutput);
+MemRef<float, 4> inputMemRef(sizesInput, 2.0);
+MemRef<float, 3> filterMemRef(sizesFilter, 1.0);
+MemRef<float, 4> outputMemRef(sizesOutput);
 
 // Define benchmark function.
 void BM_DepthwiseConv2DNhw(benchmark::State &state) {
@@ -62,7 +58,7 @@ BENCHMARK(BM_DepthwiseConv2DNhw)->Arg(4);
 // Print result function.
 void printResult() {
   // Clear the output memref.
-  MemRef<float, 4> outputMemRef(sizesOutput, stridesOutput);
+  MemRef<float, 4> outputMemRef(sizesOutput);
   // Run the mlir function.
   _mlir_ciface_depthwise_conv_2d_nhwc_hwc(&inputMemRef, &filterMemRef,
                                           &outputMemRef);
