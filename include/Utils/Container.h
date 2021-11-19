@@ -35,26 +35,22 @@
 template <typename T, size_t N> class MemRef {
 public:
    // Constructor from data
-  MemRef(const T *data, intptr_t sizes[N], intptr_t strides[N], intptr_t offset = 0);
   MemRef(const T *data, intptr_t sizes[N], intptr_t offset = 0);
-   // Constructor from shape and strides
-  MemRef(intptr_t sizes[N], intptr_t strides[N], T init = T(0));
    // Constructor from shape
   MemRef(intptr_t sizes[N], T init = T(0));
-   // Constructor for deep learning output
-  MemRef(intptr_t results, intptr_t sizes[N],
-         intptr_t strides[N], intptr_t offset = 0);
    // Create a memref from an opencv image
-  MemRef(cv::Mat image, intptr_t sizes[N], intptr_t strides[N]);
-  // Constructor from an image
+  MemRef(cv::Mat image, intptr_t sizes[N]);
+  // Constructor from a png image
    MemRef(const PNGImage &img, intptr_t sizes[N]);
-  // Constructor from images
+  // Constructor from a vector of png images
   // Assume that all the images have the same shape
   MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
   // Desctrutor
   ~MemRef();
-  // Permute the dimensions of the  tensor
-  MemRef<T, N> transpose(const std::vector<size_t> &dims = {0,1});
+  // Permute the dimensions
+  // Reorder the dimensions from {0, 1, ..., N-1} to {N-1, ..., 1, 0} when axes
+  // is empty
+  MemRef<T, N> transpose(const std::vector<size_t> &axes = {});
   // Get the data pointer
   T *getData() { return allocated; }
   // Get the sizes
@@ -67,7 +63,8 @@ public:
 
 private:
    // Set the strides
-   void setStrides();
+   // Computes the strides of the transposed tensor for transpose=true
+   void setStrides(const bool transpose = false);
    // Compute the product of array elements
    size_t product(intptr_t sizes[N]) const;
 
