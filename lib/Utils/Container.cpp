@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <memory>
 #include <numeric>
+#include <stdexcept>
 
 #include "Utils/Container.h"
 
@@ -101,15 +102,15 @@ MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N]) {
 
 template <typename T, std::size_t N>
 MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
-  static_assert(N >= 1 && N <= 4, "Image size not supported.");
+  static_assert(N == 3, "MemRef size not supported.");
 
-  // Set the shape
+  // Set the shape.
   for (size_t i = 0; i < N; i++) {
     this->sizes[i] = sizes[i];
   }
-  // Set the strides
+  // Set the strides.
   setStrides();
-  // Set the data
+  // Set the data.
   size_t channels = img.channels;
   size_t height = img.height;
   size_t width = img.width;
@@ -124,7 +125,7 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
       }
     }
   }
-  // Normalize image data to [0,1] range
+  // Normalize image data to [0,1] range.
   if (img.color_type == PNG_COLOR_TYPE_RGB) {
     for (size_t i = 0; i < size; i++) {
       data[i] /= 255.0f;
@@ -136,15 +137,15 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
 
 template <typename T, std::size_t N>
 MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
-  static_assert(N == 4, "Images size not supported.");
+  static_assert(N == 4, "MemRef size not supported.");
 
-  // Set the shape
+  // Set the shape.
   for (size_t i = 0; i < N; i++) {
     this->sizes[i] = sizes[i];
   }
-  // Set the strides
+  // Set the strides.
   setStrides();
-  // Set the data
+  // Set the data.
   size_t batch = imgs.size();
   size_t channels = imgs[0].channels;
   size_t height = imgs[0].height;
@@ -167,15 +168,7 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
 }
 
 template <typename T, std::size_t N> MemRef<T, N>::~MemRef() {
-  if (allocated == aligned) {
-    if (allocated)
-      delete[] allocated;
-  } else {
-    if (allocated)
-      delete[] allocated;
-    if (aligned)
-      delete[] aligned;
-  }
+  delete[] allocated;
 }
 
 template <typename T, std::size_t N>
@@ -195,6 +188,8 @@ void MemRef<T, N>::setStrides(const bool transpose) {
 
 template <typename T, std::size_t N>
 MemRef<T, N> MemRef<T, N>::transpose(const std::vector<size_t> &axes) {
+  // Check the size of the memref.
+  // Currently transpose is implemented for 2d, 3d and 4d memref.
   static_assert(N >= 2 && N <= 4, "MemRef size not supported.");
 
   std::vector<size_t> dims = axes;
@@ -219,7 +214,7 @@ MemRef<T, N> MemRef<T, N>::transpose(const std::vector<size_t> &axes) {
   }
   MemRef<T, N> res(newSizes);
   const auto newStrides = res.getStrides();
-  // Copy the data
+  // Copy the data.
   if (N == 2) {
     for (std::size_t h = 0; h < sizes[0]; h++) {
       for (std::size_t w = 0; w < sizes[1]; w++) {
@@ -248,7 +243,7 @@ MemRef<T, N> MemRef<T, N>::transpose(const std::vector<size_t> &axes) {
         }
       }
     }
-  } else { // N=4
+  } else { // N=4.
     auto getNewDim = [&dims](size_t index, size_t n, size_t c, size_t h,
                              size_t w) {
       if (dims[index] == 0)

@@ -34,6 +34,7 @@ void _mlir_ciface_mobilenet(MemRef<float, 2> *output, MemRef<float, 4> *input);
 // TODO: Add input image preprocessing, the current preprocessing only has
 // resize step.
 const cv::Mat imagePreprocessing() {
+
   cv::Mat inputImage = cv::imread(
       "../../benchmarks/DeepLearning/Models/MobileNet-V2/Images/dog.png");
   assert(!inputImage.empty() && "Could not read the image.");
@@ -108,7 +109,7 @@ BENCHMARK(BM_MobileNet)->Arg(4);
 void printResult() {
   // Run the model and activation function.
   _mlir_ciface_mobilenet(&output, &input);
-   auto out = output.getData();
+  auto out = output.getData();
   softmax(out, 1001);
   // Find the classification and print the result.
   float maxVal = 0;

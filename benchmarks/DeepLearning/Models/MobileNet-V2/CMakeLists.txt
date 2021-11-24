@@ -23,5 +23,5 @@ target_link_libraries(mobilenet-benchmark
   ${OpenCV_LIBS}
   MobileNetDefault
   Container
-  -lpng
+  PNGImage
   )

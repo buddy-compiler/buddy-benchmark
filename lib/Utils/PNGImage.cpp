@@ -18,9 +18,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef UTILS_PNGIMAGE_DEF
-#define UTILS_PNGIMAGE_DEF
-
 #include "Utils/PNGImage.h"
 
 #include <fstream>
@@ -59,14 +56,14 @@ bool PNGImage::readpng(const std::string &filePath) {
   png_init_io(png_ptr, file);
   png_read_info(png_ptr, info_ptr);
 
-  // read width
+  // read width.
   width = png_get_image_width(png_ptr, info_ptr);
-  // read height
+  // read height.
   height = png_get_image_height(png_ptr, info_ptr);
-  // read channels
+  // read channels.
   channels = png_get_channels(png_ptr, info_ptr);
 
-  // [TODO] Support other color types (RGBA, GRAY, ...)
+  // [TODO] Support other color types (RGBA, GRAY, ...).
   color_type = png_get_color_type(png_ptr, info_ptr);
   if (color_type != PNG_COLOR_TYPE_RGB) {
     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
@@ -74,13 +71,15 @@ bool PNGImage::readpng(const std::string &filePath) {
     return false;
   }
 
+  // Allocate an array of pointers.
   row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
+  // Allocate memory for each element of row_pointers.
   for (size_t h = 0; h < height; h++) {
     row_pointers[h] = (png_byte *)malloc(png_get_rowbytes(png_ptr, info_ptr));
   }
   png_read_image(png_ptr, row_pointers);
 
-  // Clean
+  // Clean.
   fclose(file);
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 
@@ -93,4 +92,9 @@ PNGImage::PNGImage(const std::string &filepath) {
   }
 }
 
-#endif // UTILS_PNGIMAGE_DEF
+PNGImage::~PNGImage() {
+  for (size_t h = 0; h < height; h++) {
+    free(row_pointers[h]);
+  }
+  free(row_pointers);
+}

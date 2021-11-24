@@ -45,11 +45,9 @@ public:
   PNGImage() = delete;
   PNGImage(const std::string &filePath);
   // Destructor
-  ~PNGImage(){};
+  ~PNGImage();
 
   template <typename T, std::size_t> friend class MemRef;
 };
-
-#include "Utils/PNGImage.cpp"
 
 #endif // UTILS_PNGIMAGE

@@ -19,5 +19,5 @@ target_link_libraries(image-processing-benchmark
   ${OpenCV_LIBS}
   Conv2D
   Container
-  -lpng
+  PNGImage
   )
