@@ -4,7 +4,7 @@
 
 The coefficients broadcasting algorithm has been proved to be a high performance implementation of 2D convolution.[[Ref]](https://ieeexplore.ieee.org/abstract/document/8324097)
 Currently, this algorithm is implemented in the buddy-mlir project.
-For more details, please see the [document about conv-opt tool in buddy-mlir](https://github.com/buddy-compiler/buddy-mlir/blob/main/docs/conv-opt.md).
+For more details, please see the [document about ConvOpt tool in buddy-mlir](https://github.com/buddy-compiler/buddy-mlir/blob/main/docs/conv-opt.md).
 
 ![Graph of the Coefficients Broadcasting Algorithm](./Images/CoefficientsBroadcasting.png)
 

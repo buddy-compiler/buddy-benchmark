@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for conv-opt tool in buddy-mlir project.
+// This file implements the benchmark for buddy-opt tool in buddy-mlir project.
 //
 //===----------------------------------------------------------------------===//
 

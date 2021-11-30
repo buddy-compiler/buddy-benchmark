@@ -14,10 +14,13 @@ $ git clone git@github.com:buddy-compiler/buddy-benchmark.git
 
 Currently, the image processing benchmark includes the following frameworks or optimizers:
 
-- OpenCV
-- Buddy MLIR
+- OpenCV ([link](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html))
 
-NOTE: Please make sure the `conv-opt` tool of buddy-mlir project can work well.
+*NOTE: Please build OpenCV from source to achieve the best performance.*
+
+- Buddy MLIR ([link](https://github.com/buddy-compiler/buddy-mlir))
+
+*NOTE: Please make sure the `buddy-opt` tool of buddy-mlir project can work well.*
 
 Run the image processing benchmark:
 
@@ -27,9 +30,9 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
     -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_CONV_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
-    -DBUDDY_CONV_OPT_STRIP_MINING=<strip mining size, default: 256> \
-    -DBUDDY_CONV_OPT_ATTR=<ISA vector extension, default: avx512f>
+    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
+    -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
+    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
 $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark
 ```
@@ -44,9 +47,9 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DDEEP_LEARNING_BENCHMARKS=ON \
     -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_CONV_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
-    -DBUDDY_CONV_OPT_ATTR=<ISA vector extension, default: avx512f>
-$ ninja deep-learning-benchmark
+    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
+    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
+$ ninja
 ```
 
 The deep learning benchmark includes the following e2e models and operations:
