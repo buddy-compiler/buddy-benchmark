@@ -117,11 +117,11 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
   size_t size = channels * height * width;
   T *data = new T[size];
   for (size_t h = 0; h < height; h++) {
-    for (size_t w = 0; w < width * channels; w += channels) {
+    for (size_t w = 0; w < width; w++) {
       for (size_t c = 0; c < channels; c++) {
-        size_t offset =
-            c * strides[0] + h * strides[1] + (w / channels) * strides[2];
-        data[offset] = static_cast<T>(img.row_pointers[h][w + c]);
+        size_t offset = c * strides[0] + h * strides[1] + w * strides[2];
+        data[offset] =
+            static_cast<T>(img.data[h * width * channels + w * channels + c]);
       }
     }
   }
@@ -154,11 +154,12 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
   T *data = new T[size];
   for (size_t b = 0; b < batch; b++) {
     for (size_t h = 0; h < height; h++) {
-      for (size_t w = 0; w < width * channels; w += channels) {
+      for (size_t w = 0; w < width; w++) {
         for (size_t c = 0; c < channels; c++) {
-          size_t offset = b * strides[0] + c * strides[1] + h * strides[2] +
-                          (w / channels) * strides[3];
-          data[offset] = static_cast<T>(imgs[b].row_pointers[h][w + c]);
+          size_t offset =
+              b * strides[0] + c * strides[1] + h * strides[2] + w * strides[3];
+          data[offset] = static_cast<T>(
+              imgs[b].data[h * width * channels + w * channels + c]);
         }
       }
     }
@@ -224,47 +225,29 @@ MemRef<T, N> MemRef<T, N>::transpose(const std::vector<size_t> &axes) {
       }
     }
   } else if (N == 3) {
-    auto getNewDim = [&dims](size_t index, size_t c, size_t h, size_t w) {
-      if (dims[index] == 0)
-        return c;
-      else if (dims[index] == 1)
-        return h;
-      else
-        return w;
-    };
     for (std::size_t c = 0; c < sizes[0]; c++) {
       for (std::size_t h = 0; h < sizes[1]; h++) {
         for (std::size_t w = 0; w < sizes[2]; w++) {
           size_t oldOffset = c * strides[0] + h * strides[1] + w * strides[2];
-          size_t newOffset = getNewDim(0, c, h, w) * newStrides[0] +
-                             getNewDim(1, c, h, w) * newStrides[1] +
-                             getNewDim(2, c, h, w) * newStrides[2];
+          std::size_t arr[] = {c, h, w};
+          size_t newOffset = arr[dims[0]] * newStrides[0] +
+                             arr[dims[1]] * newStrides[1] +
+                             arr[dims[2]] * newStrides[2];
           res[newOffset] = (*this)[oldOffset];
         }
       }
     }
   } else { // N=4.
-    auto getNewDim = [&dims](size_t index, size_t n, size_t c, size_t h,
-                             size_t w) {
-      if (dims[index] == 0)
-        return n;
-      else if (dims[index] == 1)
-        return c;
-      else if (dims[index] == 2)
-        return h;
-      else
-        return w;
-    };
     for (std::size_t n = 0; n < sizes[0]; n++) {
       for (std::size_t c = 0; c < sizes[1]; c++) {
         for (std::size_t h = 0; h < sizes[2]; h++) {
           for (std::size_t w = 0; w < sizes[3]; w++) {
             size_t oldOffset = n * strides[0] + c * strides[1] +
                                h * strides[2] + w * strides[3];
-            size_t newOffset = getNewDim(0, n, c, h, w) * newStrides[0] +
-                               getNewDim(1, n, c, h, w) * newStrides[1] +
-                               getNewDim(2, n, c, h, w) * newStrides[2] +
-                               getNewDim(3, n, c, h, w) * newStrides[3];
+            std::size_t arr[] = {n, c, h, w};
+            size_t newOffset =
+                arr[dims[0]] * newStrides[0] + arr[dims[1]] * newStrides[1] +
+                arr[dims[2]] * newStrides[2] + arr[dims[3]] * newStrides[3];
             res[newOffset] = (*this)[oldOffset];
           }
         }

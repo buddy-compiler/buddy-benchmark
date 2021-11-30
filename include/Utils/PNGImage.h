@@ -35,7 +35,7 @@ private:
   size_t height;
   size_t width;
   // Data
-  png_bytep *row_pointers = nullptr;
+  png_bytep data = nullptr;
 
   // Read a png image
   bool readpng(const std::string &filePath);

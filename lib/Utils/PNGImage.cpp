@@ -70,18 +70,24 @@ bool PNGImage::readpng(const std::string &filePath) {
     fclose(file);
     return false;
   }
-
   // Allocate an array of pointers.
-  row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
-  // Allocate memory for each element of row_pointers.
+  png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
+  // Update the info struct
+  png_read_update_info(png_ptr, info_ptr);
+  // Get the value of the number of channels
+  png_uint_32 row_bytes = png_get_rowbytes(png_ptr, info_ptr);
+  // Allocate the data
+  data = (png_bytep)malloc(row_bytes * height);
   for (size_t h = 0; h < height; h++) {
-    row_pointers[h] = (png_byte *)malloc(png_get_rowbytes(png_ptr, info_ptr));
+    row_pointers[h] = data + h * row_bytes;
   }
+  // Read the data of the image
   png_read_image(png_ptr, row_pointers);
-
+  png_read_end(png_ptr, NULL);
   // Clean.
   fclose(file);
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+  free(row_pointers);
 
   return true;
 }
@@ -92,9 +98,4 @@ PNGImage::PNGImage(const std::string &filepath) {
   }
 }
 
-PNGImage::~PNGImage() {
-  for (size_t h = 0; h < height; h++) {
-    free(row_pointers[h]);
-  }
-  free(row_pointers);
-}
+PNGImage::~PNGImage() { free(data); }
