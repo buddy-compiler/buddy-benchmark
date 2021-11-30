@@ -1,5 +1,5 @@
-set(BUDDY_CONV_OPT_ATTR avx512f)
-set(LLVM_MLIR_BINARY_DIR ${BUDDY_CONV_OPT_BUILD_DIR}/../llvm/build/bin)
+set(BUDDY_OPT_ATTR avx512f)
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 
 add_custom_command(OUTPUT mobilenet-default.o
   COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Models/MobileNet-V2/MobileNet.mlir 
@@ -8,7 +8,7 @@ add_custom_command(OUTPUT mobilenet-default.o
               --lower-affine --convert-vector-to-llvm -std-expand -arith-expand --convert-memref-to-llvm --convert-math-to-llvm 
               --convert-std-to-llvm='emit-c-wrappers=1' --reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=x86_64-unknown-linux-gnu -mattr=${BUDDY_CONV_OPT_ATTR} 
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=x86_64-unknown-linux-gnu -mattr=${BUDDY_OPT_ATTR} 
               --filetype=obj -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V2/mobilenet-default.o
 )
 
