@@ -71,7 +71,7 @@ bool PNGImage::readpng(const std::string &filePath) {
     return false;
   }
   // Allocate an array of pointers.
-  png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
+  png_bytep row_pointers[height];
   // Update the info struct
   png_read_update_info(png_ptr, info_ptr);
   // Get the value of the number of channels
@@ -87,7 +87,6 @@ bool PNGImage::readpng(const std::string &filePath) {
   // Clean.
   fclose(file);
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-  free(row_pointers);
 
   return true;
 }
