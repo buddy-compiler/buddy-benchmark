@@ -34,6 +34,7 @@ void _mlir_ciface_mobilenet(MemRef<float, 2> *output, MemRef<float, 4> *input);
 // TODO: Add input image preprocessing, the current preprocessing only has
 // resize step.
 const cv::Mat imagePreprocessing() {
+
   cv::Mat inputImage = cv::imread(
       "../../benchmarks/DeepLearning/Models/MobileNet-V2/Images/dog.png");
   assert(!inputImage.empty() && "Could not read the image.");
@@ -49,13 +50,10 @@ cv::Mat image = imagePreprocessing();
 
 // TODO: figure out the correct strides layout.
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
-intptr_t stridesInput[4] = {1, image.rows, image.cols, 3};
-
 intptr_t sizesOutnput[2] = {1, 1001};
-intptr_t stridesOutput[2] = {1, 1001};
 
-MemRef<float, 4> input(image, 0, sizesInput, stridesInput);
-MemRef<float, 2> output(1001, 0, sizesOutnput, stridesOutput);
+MemRef<float, 4> input(image, sizesInput);
+MemRef<float, 2> output(sizesOutnput);
 
 // Define benchmark function.
 void BM_MobileNet(benchmark::State &state) {
@@ -111,13 +109,14 @@ BENCHMARK(BM_MobileNet)->Arg(4);
 void printResult() {
   // Run the model and activation function.
   _mlir_ciface_mobilenet(&output, &input);
-  softmax(output.aligned, 1001);
+  auto out = output.getData();
+  softmax(out, 1001);
   // Find the classification and print the result.
   float maxVal = 0;
   float maxIdx = 0;
   for (int i = 0; i < 1001; ++i) {
-    if (output.aligned[i] > maxVal) {
-      maxVal = output.aligned[i];
+    if (out[i] > maxVal) {
+      maxVal = out[i];
       maxIdx = i;
     }
   }

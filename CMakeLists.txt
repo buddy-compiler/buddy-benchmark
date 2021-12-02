@@ -74,6 +74,19 @@ find_package(Threads)
 target_link_libraries(GoogleBenchmark INTERFACE Threads::Threads)
 
 #-------------------------------------------------------------------------------
+# Deploy GoogleTest
+#-------------------------------------------------------------------------------
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+#-------------------------------------------------------------------------------
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
@@ -81,8 +94,16 @@ find_package(OpenCV REQUIRED CONFIG)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 #-------------------------------------------------------------------------------
+# Find PNG
+#-------------------------------------------------------------------------------
+
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+
+#-------------------------------------------------------------------------------
 # Subdirectory
 #-------------------------------------------------------------------------------
 
 add_subdirectory(lib)
 add_subdirectory(benchmarks)
+add_subdirectory(tests)
