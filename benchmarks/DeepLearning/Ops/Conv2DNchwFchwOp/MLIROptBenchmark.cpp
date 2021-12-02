@@ -33,17 +33,13 @@ namespace
     }
 
     intptr_t sizesInput[4] = {1, 2, 3, 3};
-    intptr_t stridesInput[4] = {18, 9, 3, 1};
-
     intptr_t sizesFilter[4] = {2, 2, 2, 2};
-    intptr_t stridesFilter[4] = {8, 4, 2, 1};
-
     intptr_t sizesOutput[4] = {1, 2, 2, 2};
-    intptr_t stridesOutput[4] = {8, 4, 2, 1};
+
     // Create input, filter, and output.
-    MemRef<float, 4> inputMemRef(2.0, sizesInput, stridesInput);
-    MemRef<float, 4> filterMemRef(3.0, sizesFilter, stridesFilter);
-    MemRef<float, 4> outputMemRef(0.0, sizesOutput, stridesOutput);
+    MemRef<float, 4> inputMemRef(sizesInput, 2.0);
+    MemRef<float, 4> filterMemRef(sizesFilter, 3.0);
+    MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
 
     // Define benchmark function.
     void BM_Conv2DNchwFchw(benchmark::State &state)
@@ -68,13 +64,13 @@ BENCHMARK(BM_Conv2DNchwFchw)->Arg(4);
 void printResult()
 {
     // Clear the output memref.
-    MemRef<float, 4> outputMemRef(0.0, sizesOutput, stridesOutput);
+    MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
     // Run the mlir function.
     _mlir_ciface_conv_2d_nchw_fchw(&inputMemRef, &filterMemRef,
                                    &outputMemRef);
     // Print the output.
     std::cout << "Output: [ ";
     for (int i = 0; i < 8; ++i)
-        std::cout << outputMemRef.aligned[i] << " ";
+        std::cout << outputMemRef[i] << " ";
     std::cout << "]" << std::endl;
 }
