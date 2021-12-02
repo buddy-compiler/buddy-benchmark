@@ -24,24 +24,59 @@
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <stdint.h>
+#include <vector>
 
-template <typename T, size_t Dim> struct MemRef {
+#include "Utils/PNGImage.h"
+
+// MemRef descriptor.
+// - T represents the type of the elements.
+// - N represents the number of dimensions.
+// - The storage order is NCHW.
+template <typename T, size_t N> class MemRef {
 public:
-  MemRef(intptr_t rows, intptr_t cols, T *aligned, intptr_t offset,
-         intptr_t sizes[Dim], intptr_t strides[Dim]);
-  MemRef(T init, intptr_t sizes[Dim], intptr_t strides[Dim]);
-  MemRef(cv::Mat image, intptr_t offset, intptr_t sizes[Dim],
-         intptr_t strides[Dim]);
-  MemRef(intptr_t rows, intptr_t cols, intptr_t offset, intptr_t sizes[Dim],
-         intptr_t strides[Dim]);
-  MemRef(intptr_t results, intptr_t offset, intptr_t sizes[Dim],
-         intptr_t strides[Dim]);
+  // Constructor from data.
+  MemRef(const T *data, intptr_t sizes[N], intptr_t offset = 0);
+  // Constructor from shape.
+  MemRef(intptr_t sizes[N], T init = T(0));
+  // Create a memref from an opencv image.
+  MemRef(cv::Mat image, intptr_t sizes[N]);
+  // Constructor from a png image.
+  MemRef(const PNGImage &img, intptr_t sizes[N]);
+  // Constructor from a vector of png images.
+  // Assume that all the images have the same shape.
+  MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
+  // Desctrutor.
   ~MemRef();
+  // Permute the dimensions.
+  // Reorder the dimensions from {0, 1, ..., N-1} to {N-1, ..., 1, 0} when axes
+  // is empty.
+  MemRef<T, N> transpose(const std::vector<size_t> &axes = {});
+  // Get the data pointer.
+  T *getData() { return aligned; }
+  // Get the sizes.
+  const intptr_t *getSizes() { return sizes; }
+  // Get the strides.
+  const intptr_t *getStrides() { return strides; }
+  // Get the element at index.
+  const T &operator[](size_t index) const { return aligned[index + offset]; }
+  T &operator[](size_t index) { return aligned[index + offset]; }
+
+private:
+  // Set the strides.
+  // Computes the strides of the transposed tensor for transpose=true.
+  void setStrides(const bool transpose = false);
+  // Compute the product of array elements.
+  size_t product(intptr_t sizes[N]) const;
+
+  // Data.
   T *allocated;
   T *aligned;
-  intptr_t offset;
-  intptr_t sizes[Dim];
-  intptr_t strides[Dim];
+  // Offset.
+  intptr_t offset = 0;
+  // Shape.
+  intptr_t sizes[N];
+  // Strides.
+  intptr_t strides[N];
 };
 
 #include "Utils/Container.cpp"
