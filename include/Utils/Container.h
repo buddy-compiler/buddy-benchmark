@@ -38,6 +38,7 @@ public:
   MemRef(const T *data, intptr_t sizes[N], intptr_t offset = 0);
   // Constructor from shape.
   MemRef(intptr_t sizes[N], T init = T(0));
+  MemRef(std::vector<size_t> sizes, T init = T(0));
   // Create a memref from an opencv image.
   MemRef(cv::Mat image, intptr_t sizes[N]);
   // Constructor from a png image.

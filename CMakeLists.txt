@@ -31,6 +31,8 @@ set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_EXAMPLES_DIR ${BUDDY_SOURCE_DIR}/examples)
 set(BUDDY_INCLUDE_DIR ${BUDDY_SOURCE_DIR}/include)
 
+set(BUILD_TESTS OFF CACHE BOOL "Build tests")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 
 # Add BUDDY files to the include path
@@ -76,15 +78,16 @@ target_link_libraries(GoogleBenchmark INTERFACE Threads::Threads)
 #-------------------------------------------------------------------------------
 # Deploy GoogleTest
 #-------------------------------------------------------------------------------
+if (BUILD_TESTS)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+  )
 
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-)
-
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+endif()
 
 #-------------------------------------------------------------------------------
 # Find OpenCV
@@ -106,4 +109,8 @@ include_directories(${PNG_INCLUDE_DIR})
 
 add_subdirectory(lib)
 add_subdirectory(benchmarks)
-add_subdirectory(tests)
+
+if (BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

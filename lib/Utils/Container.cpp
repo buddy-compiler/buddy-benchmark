@@ -61,6 +61,25 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
   std::fill(data, data + size, init);
 }
 
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(std::vector<size_t> sizes, T init) {
+  if (sizes.size() != N) {
+    throw
+      std::runtime_error("Invalid number of dimensions.");
+  }
+  static_assert(N >= 1 && N <= 4, "MemRef size not supported.");
+
+  for (size_t i = 0; i < N; i++) {
+    this->sizes[i] = sizes[i];
+  }
+  setStrides();
+  size_t size = product(this->sizes);
+  T *data = new T[size];
+  aligned = data;
+  allocated = data;
+  std::fill(data, data + size, init);
+}
+
 template <typename T, size_t N>
 MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N]) {
   static_assert(N == 2 || N == 4, "Currently only support 2d and 4d memref.");
