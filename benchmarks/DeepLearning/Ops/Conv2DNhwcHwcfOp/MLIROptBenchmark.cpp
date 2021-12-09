@@ -21,38 +21,33 @@
 #include "Utils/Container.h"
 #include <benchmark/benchmark.h>
 
-namespace
-{
+namespace {
 
-    // Declare the mobilenet C interface.
-    extern "C"
-    {
-        void _mlir_ciface_conv_2d_nhwc_hwcf(MemRef<float, 4> *input,
-                                            MemRef<float, 4> *filter,
-                                            MemRef<float, 4> *output);
+// Declare the mobilenet C interface.
+extern "C" {
+void _mlir_ciface_conv_2d_nhwc_hwcf(MemRef<float, 4> *input,
+                                    MemRef<float, 4> *filter,
+                                    MemRef<float, 4> *output);
+}
+
+intptr_t sizesInput[4] = {1, 3, 3, 2};
+intptr_t sizesFilter[4] = {2, 2, 2, 2};
+intptr_t sizesOutput[4] = {1, 2, 2, 2};
+
+// Create input, filter, and output.
+MemRef<float, 4> inputMemRef(sizesInput, 2.0);
+MemRef<float, 4> filterMemRef(sizesFilter, 3.0);
+MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
+
+// Define benchmark function.
+void BM_Conv2DNhwcHwcf(benchmark::State &state) {
+  for (auto _ : state) {
+    for (int i = 0; i < state.range(0); ++i) {
+      _mlir_ciface_conv_2d_nhwc_hwcf(&inputMemRef, &filterMemRef,
+                                     &outputMemRef);
     }
-
-    intptr_t sizesInput[4] = {1, 3, 3, 2};
-    intptr_t sizesFilter[4] = {2, 2, 2, 2};
-    intptr_t sizesOutput[4] = {1, 2, 2, 2};
-
-    // Create input, filter, and output.
-    MemRef<float, 4> inputMemRef(sizesInput, 2.0);
-    MemRef<float, 4> filterMemRef(sizesFilter, 3.0);
-    MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
-
-    // Define benchmark function.
-    void BM_Conv2DNhwcHwcf(benchmark::State &state)
-    {
-        for (auto _ : state)
-        {
-            for (int i = 0; i < state.range(0); ++i)
-            {
-                _mlir_ciface_conv_2d_nhwc_hwcf(&inputMemRef, &filterMemRef,
-                                               &outputMemRef);
-            }
-        }
-    }
+  }
+}
 
 } // namespace
 
@@ -61,16 +56,14 @@ BENCHMARK(BM_Conv2DNhwcHwcf)->Arg(1);
 BENCHMARK(BM_Conv2DNhwcHwcf)->Arg(4);
 
 // Print result function.
-void printResult()
-{
-    // Clear the output memref.
-    MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
-    // Run the mlir function.
-    _mlir_ciface_conv_2d_nhwc_hwcf(&inputMemRef, &filterMemRef,
-                                   &outputMemRef);
-    // Print the output.
-    std::cout << "Output: [ ";
-    for (int i = 0; i < 8; ++i)
-        std::cout << outputMemRef[i] << " ";
-    std::cout << "]" << std::endl;
+void printResult() {
+  // Clear the output memref.
+  MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
+  // Run the mlir function.
+  _mlir_ciface_conv_2d_nhwc_hwcf(&inputMemRef, &filterMemRef, &outputMemRef);
+  // Print the output.
+  std::cout << "Output: [ ";
+  for (int i = 0; i < 8; ++i)
+    std::cout << outputMemRef[i] << " ";
+  std::cout << "]" << std::endl;
 }
