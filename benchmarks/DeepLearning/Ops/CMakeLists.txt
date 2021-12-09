@@ -1,1 +1,3 @@
 add_subdirectory(DepthwiseConv2DNhwcHwcOp)
+add_subdirectory(Conv2DNhwcHwcfOp)
+add_subdirectory(Conv2DNchwFchwOp)
