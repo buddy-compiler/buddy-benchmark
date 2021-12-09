@@ -1,5 +1,5 @@
-set(BUDDY_CONV_OPT_ATTR avx512f)
-set(LLVM_MLIR_BINARY_DIR ${BUDDY_CONV_OPT_BUILD_DIR}/../llvm/build/bin)
+set(BUDDY_OPT_ATTR avx512f)
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 
 add_custom_command(OUTPUT conv-2d-nchw-fchw.o
   COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/Conv2DNchwFchwOp/Conv2DNchwFchw.mlir 
@@ -11,7 +11,7 @@ add_custom_command(OUTPUT conv-2d-nchw-fchw.o
               -convert-std-to-llvm='emit-c-wrappers=1' 
               -reconcile-unrealized-casts| 
                 ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-                ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=x86_64-unknown-linux-gnu -mattr=${BUDDY_CONV_OPT_ATTR} 
+                ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=x86_64-unknown-linux-gnu -mattr=${BUDDY_OPT_ATTR} 
               --filetype=obj -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNchwFchwOp/conv-2d-nchw-fchw.o
 )
 

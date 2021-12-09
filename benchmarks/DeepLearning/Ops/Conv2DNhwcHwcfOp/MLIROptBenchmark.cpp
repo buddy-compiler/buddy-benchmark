@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for depthwise conv2d(nhw) operation.
+// This file implements the benchmark for conv2d(nhwc-hwcf) operation.
 //
 //===----------------------------------------------------------------------===//
 
