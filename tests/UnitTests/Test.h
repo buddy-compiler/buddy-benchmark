@@ -22,22 +22,20 @@
 
 // Test if:
 // - two arrays of integral type (intptr_t, int, size_t, ..) are equal
-// - two arrays of float or double are approximatively eqaul, to within 4 ulps (unit in the last space) from each other.
-template <typename T> void ASSERT_ARRAY_EQ(const T *x, const T *y) {
-  size_t size = sizeof(x) / sizeof(T);
-  size_t size_y = sizeof(y) / sizeof(T);
-  ASSERT_EQ(size, size_y);
-
+// - two arrays of float or double are approximatively eqaul, to within 4 ulps
+// (unit in the last space) from each other.
+template <typename T>
+void ASSERT_ARRAY_EQ(const T *x, const T *y, const size_t n) {
   if (std::is_integral<T>::value) {
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < n; i++) {
       ASSERT_EQ(x[i], y[i]);
     }
   } else if (std::is_same<T, float>::value) {
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < n; i++) {
       ASSERT_FLOAT_EQ(x[i], y[i]);
     }
   } else if (std::is_same<T, double>::value) {
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < n; i++) {
       ASSERT_DOUBLE_EQ(x[i], y[i]);
     }
   }

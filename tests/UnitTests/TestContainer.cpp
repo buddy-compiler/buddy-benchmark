@@ -1,4 +1,4 @@
-//===- TestContainer.h ----------------------------------------------------===//
+//===- TestContainer.cpp --------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,13 +44,17 @@ protected:
 // 1 dimensional memref.
 TEST_F(MemRefTest, 1DMemref) {
   intptr_t true_strides[] = {1};
-  ASSERT_ARRAY_EQ(m1.getStrides(), true_strides);
+  size_t n_sizes = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(m1.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(m1.getStrides(), true_strides, n_sizes);
 }
 
 // 2 dimensional memref.
 TEST_F(MemRefTest, 2DMemref) {
   intptr_t true_strides[] = {3, 1};
-  ASSERT_ARRAY_EQ(m2.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(m2.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(m2.getStrides(), true_strides, n_strides);
 }
 
 // Transpose a 2d memref.
@@ -58,19 +62,27 @@ TEST_F(MemRefTest, Transpose2DMemref) {
   MemRef<float, 2> transposed = m2.transpose();
   // Sizes.
   intptr_t true_sizes[] = {3, 2};
-  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes);
+  size_t n_sizes = sizeof(true_sizes) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes, n_sizes);
   // Strides.
   intptr_t true_strides[] = {2, 1};
-  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides, n_strides);
   // Data.
   float true_data[] = {0., 3., 1., 4., 2., 5.};
-  ASSERT_ARRAY_EQ(transposed.getData(), true_data);
+  size_t n_data = sizeof(true_data) / sizeof(float);
+  ASSERT_EQ(transposed.getSize(), n_data);
+  ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
 }
 
 // 3 dimensional memref.
 TEST_F(MemRefTest, 3DMemref) {
   intptr_t true_strides[] = {12, 4, 1};
-  ASSERT_ARRAY_EQ(m3.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(m3.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(m3.getStrides(), true_strides, n_strides);
 }
 
 // Transpose a 3d memref.
@@ -78,14 +90,20 @@ TEST_F(MemRefTest, Transpose3DMemRef) {
   MemRef<float, 3> transposed = m3.transpose();
   // Sizes.
   intptr_t true_sizes[] = {4, 3, 2};
-  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes);
+  size_t n_sizes = sizeof(true_sizes) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes, n_sizes);
   // Strides.
   intptr_t true_strides[] = {6, 2, 1};
-  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides, n_strides);
   // Data.
   float true_data[] = {0., 12., 4., 16., 8.,  20., 1., 13., 5., 17., 9.,  21.,
                        2., 14., 6., 18., 10., 22., 3., 15., 7., 19., 11., 23.};
-  ASSERT_ARRAY_EQ(transposed.getData(), true_data);
+  size_t n_data = sizeof(true_data) / sizeof(float);
+  ASSERT_EQ(transposed.getSize(), n_data);
+  ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
 }
 
 // Convert a 3d memref from CHW to HWC.
@@ -93,20 +111,28 @@ TEST_F(MemRefTest, TransposeCHWToHWC) {
   MemRef<float, 3> transposed = m3.transpose({1, 2, 0});
   // Sizes.
   intptr_t true_sizes[] = {3, 4, 2};
-  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes);
+  size_t n_sizes = sizeof(true_sizes) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes, n_sizes);
   // Strides.
   intptr_t true_strides[] = {8, 2, 1};
-  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides, n_strides);
   // Data.
   float true_data[] = {0., 12., 1., 13., 2., 14., 3., 15., 4.,  16., 5.,  17.,
                        6., 18., 7., 19., 8., 20., 9., 21., 10., 22., 11., 23.};
-  ASSERT_ARRAY_EQ(transposed.getData(), true_data);
+  size_t n_data = sizeof(true_data) / sizeof(float);
+  ASSERT_EQ(transposed.getSize(), n_data);
+  ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
 }
 
 // 4 dimensional memref.
 TEST_F(MemRefTest, 4DMemref) {
   intptr_t true_strides[] = {60, 20, 5, 1};
-  ASSERT_ARRAY_EQ(m4.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(m4.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(m4.getStrides(), true_strides, n_strides);
 }
 
 // Transpose a 4d memref.
@@ -114,10 +140,14 @@ TEST_F(MemRefTest, Transpose4DMemRef) {
   MemRef<float, 4> transposed = m4.transpose();
   // Sizes.
   intptr_t true_sizes[] = {5, 4, 3, 2};
-  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes);
+  size_t n_sizes = sizeof(true_sizes) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes, n_sizes);
   // Strides.
   intptr_t true_strides[] = {24, 6, 2, 1};
-  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides);
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides, n_strides);
   // Data.
   float true_data[] = {
       0.,  60., 20., 80., 40., 100., 5.,  65., 25., 85., 45., 105.,
@@ -130,18 +160,24 @@ TEST_F(MemRefTest, Transpose4DMemRef) {
       13., 73., 33., 93., 53., 113., 18., 78., 38., 98., 58., 118.,
       4.,  64., 24., 84., 44., 104., 9.,  69., 29., 89., 49., 109.,
       14., 74., 34., 94., 54., 114., 19., 79., 39., 99., 59., 119.};
-  ASSERT_ARRAY_EQ(transposed.getData(), true_data);
+  size_t n_data = sizeof(true_data) / sizeof(float);
+  ASSERT_EQ(transposed.getSize(), n_data);
+  ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
 }
 
 // Convert a 4d memref from NCHW to NHWC.
 TEST_F(MemRefTest, TransposeNCHWToNHWC) {
   MemRef<float, 4> transposed = m4.transpose({0, 2, 3, 1});
   // Sizes.
-  intptr_t true_sizes[] = {2, 4, 3, 5};
-  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes);
+  intptr_t true_sizes[] = {2, 4, 5, 3};
+  size_t n_sizes = sizeof(true_sizes) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(transposed.getSizes(), true_sizes, n_sizes);
   // Strides.
-  intptr_t true_strides[] = {60, 15, 5, 1};
-  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides);
+  intptr_t true_strides[] = {60, 15, 3, 1};
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(transposed.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(transposed.getStrides(), true_strides, n_strides);
   // Data.
   float true_data[] = {
       0.,  20., 40.,  1.,  21., 41.,  2.,  22., 42.,  3.,  23., 43.,
@@ -154,7 +190,9 @@ TEST_F(MemRefTest, TransposeNCHWToNHWC) {
       68., 88., 108., 69., 89., 109., 70., 90., 110., 71., 91., 111.,
       72., 92., 112., 73., 93., 113., 74., 94., 114., 75., 95., 115.,
       76., 96., 116., 77., 97., 117., 78., 98., 118., 79., 99., 119.};
-  ASSERT_ARRAY_EQ(transposed.getData(), true_data);
+  size_t n_data = sizeof(true_data) / sizeof(float);
+  ASSERT_EQ(transposed.getSize(), n_data);
+  ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
 }
 
 int main(int argc, char **argv) {

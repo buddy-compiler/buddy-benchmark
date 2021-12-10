@@ -54,10 +54,14 @@ public:
   MemRef<T, N> transpose(const std::vector<size_t> &axes = {});
   // Get the data pointer.
   T *getData() { return aligned; }
-  // Get the sizes.
+  // Get the sizes (shape).
   const intptr_t *getSizes() { return sizes; }
   // Get the strides.
   const intptr_t *getStrides() { return strides; }
+  // Get the rank of the memref.
+  size_t getRank() const { return N; }
+  // Get the size (number of elements).
+  size_t getSize() const { return size; }
   // Get the element at index.
   const T &operator[](size_t index) const { return aligned[index + offset]; }
   T &operator[](size_t index) { return aligned[index + offset]; }
@@ -78,6 +82,8 @@ private:
   intptr_t sizes[N];
   // Strides.
   intptr_t strides[N];
+  // Number of elements.
+  size_t size;
 };
 
 #include "Utils/Container.cpp"

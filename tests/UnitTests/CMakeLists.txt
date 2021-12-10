@@ -1,11 +1,11 @@
 add_executable(
-  TestContainer
+  test-container
   TestContainer.cpp
 )
 target_link_libraries(
-  TestContainer
+  test-container
   gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(TestContainer)
+gtest_discover_tests(test-container)
