@@ -37,7 +37,7 @@ MemRef<T, N>::MemRef(const T *data, intptr_t sizes[N], intptr_t offset) {
     this->sizes[i] = sizes[i];
   }
   setStrides();
-  size_t size = product(sizes);
+  size = product(sizes);
   T *ptr = new T[size];
   for (size_t i = 0; i < size; i++) {
     ptr[i] = data[i];
@@ -54,7 +54,25 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
     this->sizes[i] = sizes[i];
   }
   setStrides();
-  size_t size = product(sizes);
+  size = product(sizes);
+  T *data = new T[size];
+  aligned = data;
+  allocated = data;
+  std::fill(data, data + size, init);
+}
+
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(std::vector<size_t> sizes, T init) {
+  if (sizes.size() != N) {
+    throw std::runtime_error("Invalid number of dimensions.");
+  }
+  static_assert(N >= 1 && N <= 4, "MemRef size not supported.");
+
+  for (size_t i = 0; i < N; i++) {
+    this->sizes[i] = sizes[i];
+  }
+  setStrides();
+  size = product(this->sizes);
   T *data = new T[size];
   aligned = data;
   allocated = data;
@@ -67,6 +85,7 @@ MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N]) {
 
   for (size_t i = 0; i < N; i++)
     this->sizes[i] = sizes[i];
+  size = product(this->sizes);
   if (N == 2) {
     // Copy image pixels for image processing memref.
     auto ptr = new T[image.rows * image.cols];
@@ -114,7 +133,7 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
   size_t channels = img.channels;
   size_t height = img.height;
   size_t width = img.width;
-  size_t size = channels * height * width;
+  size = channels * height * width;
   T *data = new T[size];
   for (size_t h = 0; h < height; h++) {
     for (size_t w = 0; w < width; w++) {
@@ -150,7 +169,7 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
   size_t channels = imgs[0].channels;
   size_t height = imgs[0].height;
   size_t width = imgs[0].width;
-  size_t size = batch * channels * height * width;
+  size = batch * channels * height * width;
   T *data = new T[size];
   for (size_t b = 0; b < batch; b++) {
     for (size_t h = 0; h < height; h++) {
