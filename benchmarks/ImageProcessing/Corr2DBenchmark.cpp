@@ -56,7 +56,7 @@ MemRef<float, 2> inputCorr2D(inputImageCorr2D, sizesInputCorr2D);
 MemRef<float, 2> kernelCorr2D(laplacianKernelAlign, sizesKernelCorr2D);
 MemRef<float, 2> outputCorr2D(sizesOutputCorr2D);
 
-static void BM_Corr2D(benchmark::State &state) {
+static void BM_Corr2D_Buddy(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_corr_2d(&inputCorr2D, &kernelCorr2D, &outputCorr2D,
@@ -67,11 +67,11 @@ static void BM_Corr2D(benchmark::State &state) {
 }
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_Corr2D)->Arg(1);
-BENCHMARK(BM_Corr2D)->Arg(2);
-BENCHMARK(BM_Corr2D)->Arg(4);
-BENCHMARK(BM_Corr2D)->Arg(8);
-BENCHMARK(BM_Corr2D)->Arg(16);
+BENCHMARK(BM_Corr2D_Buddy)->Arg(1);
+BENCHMARK(BM_Corr2D_Buddy)->Arg(2);
+BENCHMARK(BM_Corr2D_Buddy)->Arg(4);
+BENCHMARK(BM_Corr2D_Buddy)->Arg(8);
+BENCHMARK(BM_Corr2D_Buddy)->Arg(16);
 
 // Generate result image.
 void generateResultCorr2D() {
