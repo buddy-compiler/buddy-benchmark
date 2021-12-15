@@ -1,4 +1,4 @@
-//===- OpenCVBenchmark.cpp ------------------------------------------------===//
+//===- Filter2DBenchmark.cpp ----------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for OpenCV.
+// This file implements the benchmark for OpenCV filter2D.
 //
 //===----------------------------------------------------------------------===//
 
@@ -26,25 +26,25 @@ using namespace cv;
 using namespace std;
 
 // Read input image and specify kernel.
-Mat inputImage = imread("../../benchmarks/ImageProcessing/Images/YuTu.png",
-                        IMREAD_GRAYSCALE);
-Mat kernelOpencv = Mat(3, 3, CV_32FC1, laplacianKernelAlign);
+Mat inputImageFilter2D = imread(
+    "../../benchmarks/ImageProcessing/Images/YuTu.png", IMREAD_GRAYSCALE);
+Mat kernelFilter2D = Mat(3, 3, CV_32FC1, laplacianKernelAlign);
 
 // Declare output image.
-Mat outputOpencv;
+Mat outputFilter2D;
 
 // Benchmarking function.
-static void BM_OpenCV(benchmark::State &state) {
+static void BM_Filter2D_OpenCV(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      filter2D(inputImage, outputOpencv, CV_32FC1, kernelOpencv);
+      filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D);
     }
   }
 }
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_OpenCV)->Arg(1);
-BENCHMARK(BM_OpenCV)->Arg(2);
-BENCHMARK(BM_OpenCV)->Arg(4);
-BENCHMARK(BM_OpenCV)->Arg(8);
-BENCHMARK(BM_OpenCV)->Arg(16);
+BENCHMARK(BM_Filter2D_OpenCV)->Arg(1);
+BENCHMARK(BM_Filter2D_OpenCV)->Arg(2);
+BENCHMARK(BM_Filter2D_OpenCV)->Arg(4);
+BENCHMARK(BM_Filter2D_OpenCV)->Arg(8);
+BENCHMARK(BM_Filter2D_OpenCV)->Arg(16);
