@@ -37,7 +37,8 @@ Mat outputFilter2D;
 static void BM_Filter2D_OpenCV(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D);
+      filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
+               cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
     }
   }
 }
