@@ -1,6 +1,9 @@
-set(BUDDY_OPT_STRIP_MINING 256)
-set(BUDDY_OPT_ATTR avx512f)
+set(BUDDY_OPT_STRIP_MINING 256 CACHE STRING "Stride Size")
+set(BUDDY_OPT_ATTR avx512f CACHE STRING "Taget Architecture")
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
+
+message(STATUS "Configuring Stride Size: ${BUDDY_OPT_STRIP_MINING}")
+message(STATUS "Configuring Taget Architecture: ${BUDDY_OPT_ATTR}")
 
 #-------------------------------------------------------------------------------
 # MLIR Linalg Dialect Conv2D Operation + CB Algorithm
@@ -28,7 +31,8 @@ set_target_properties(Conv2D PROPERTIES LINKER_LANGUAGE CXX)
 add_custom_command(OUTPUT corr2d.o
   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/Corr2D.mlir 
-            -lower-dip -lower-affine -convert-scf-to-std -convert-vector-to-llvm 
+            -lower-dip="DIP-strip-mining=${BUDDY_OPT_STRIP_MINING}" 
+            -lower-affine -convert-scf-to-std -convert-vector-to-llvm 
             -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
