@@ -56,10 +56,8 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
   setStrides();
   size = product(sizes);
   T *data = new T[size];
-
   aligned = data;
   allocated = data;
-
   std::fill(data, data + size, init);
 }
 
@@ -203,8 +201,6 @@ MemRef<T, N>::MemRef(MemRef &&other) noexcept
 template <typename T, std::size_t N>
 MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) noexcept {
   if (this != &rhs) {
-    // intptr_t sizes[N]{};
-    // intptr_t strides[N]{};
     // // method 1
     // allocated = aligned = nullptr;
     // std::swap(strides, rhs.strides);

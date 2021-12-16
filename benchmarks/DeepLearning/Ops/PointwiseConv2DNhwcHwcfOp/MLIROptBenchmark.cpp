@@ -60,7 +60,6 @@ void BM_PointwiseConv2DNhwcHwcf(benchmark::State &state) {
 
 MemRef<float, 4> outputMemReturn(sizesOutput, 0.0);
 void BM_PointwiseConv2DNhwcHwcfReturn(benchmark::State &state) {
-
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       // MemRef<float, 4> outputMemReturn(sizesOutput, 0);

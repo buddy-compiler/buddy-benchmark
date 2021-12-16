@@ -1,28 +1,28 @@
 // Generated from Mobilenet.mlir file
-// func @pointwise_conv_2d_nhwc_hwcf(%input: tensor<1x4x5x2xf32>, %filter: tensor<1x1x2x7xf32>, %output: tensor<1x4x5x7xf32>) {
-//     // %0 = linalg.init_tensor [1, 4, 5, 7] : tensor<1x4x5x7xf32>
-//     linalg.conv_2d_nhwc_hwcf 
-//     {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
-//     ins(%input, %filter : tensor<1x4x5x2xf32>, tensor<1x1x2x7xf32>) 
-//     outs(%output : tensor<1x4x5x7xf32>)
-//     return
-// }
+func @pointwise_conv_2d_nhwc_hwcf_with_specified_shape(%input: tensor<1x4x5x2xf32>, %filter: tensor<1x1x2x7xf32>, %output: tensor<1x4x5x7xf32>) {
+    // %0 = linalg.init_tensor [1, 4, 5, 7] : tensor<1x4x5x7xf32>
+    linalg.conv_2d_nhwc_hwcf 
+    {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
+    ins(%input, %filter : tensor<1x4x5x2xf32>, tensor<1x1x2x7xf32>) 
+    outs(%output : tensor<1x4x5x7xf32>)
+    return
+}
 
-// func @pointwise_conv_2d_nhwc_hwcf(%input: tensor<?x?x?x?xf32>, %filter: tensor<1x1x?x?xf32>, %output: tensor<?x?x?x?xf32>) {
-//     linalg.conv_2d_nhwc_hwcf 
-//     {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
-//     ins(%input, %filter : tensor<?x?x?x?xf32>, tensor<1x1x?x?xf32>) 
-//     outs(%output : tensor<?x?x?x?xf32>) 
-//     return
-// }
-//pointwise_conv_2d_nhwc_hwcf_with_return
-// func @pointwise_conv_2d_nhwc_hwcf_with_return(%input: tensor<1x4x5x2xf32>, %filter: tensor<1x1x2x7xf32>) -> tensor<1x4x5x7xf32> {
-//     %1 = linalg.conv_2d_nhwc_hwcf {
-//         dilations = dense<1> : tensor<2xi64>,
-//         strides = dense<1> : tensor<2xi64>
-//     } ins(%input, %filter : tensor<1x4x5x2xf32>, tensor<1x1x2x7xf32>) outs(%0 : tensor<1x4x5x7xf32>) -> tensor<1x4x5x7xf32>
-//     return %1 : tensor<1x4x5x7xf32>
-// }
+func @pointwise_conv_2d_nhwc_hwcf_with_tensor(%input: tensor<?x?x?x?xf32>, %filter: tensor<1x1x?x?xf32>, %output: tensor<?x?x?x?xf32>) {
+    linalg.conv_2d_nhwc_hwcf 
+    {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
+    ins(%input, %filter : tensor<?x?x?x?xf32>, tensor<1x1x?x?xf32>) 
+    outs(%output : tensor<?x?x?x?xf32>) 
+    return
+}
+
+func @pointwise_conv_2d_nhwc_hwcf_with_return_origin(%input: tensor<1x4x5x2xf32>, %filter: tensor<1x1x2x7xf32>) -> tensor<1x4x5x7xf32> {
+    %1 = linalg.conv_2d_nhwc_hwcf {
+        dilations = dense<1> : tensor<2xi64>,
+        strides = dense<1> : tensor<2xi64>
+    } ins(%input, %filter : tensor<1x4x5x2xf32>, tensor<1x1x2x7xf32>) outs(%0 : tensor<1x4x5x7xf32>) -> tensor<1x4x5x7xf32>
+    return %1 : tensor<1x4x5x7xf32>
+}
 
 func @pointwise_conv_2d_nhwc_hwcf_with_return(%arg0: tensor<1x4x5x2xf32>, %arg1: tensor<1x1x2x7xf32>) -> tensor<1x4x5x7xf32> {
     %0 = linalg.init_tensor [1, 4, 5, 7] : tensor<1x4x5x7xf32>
