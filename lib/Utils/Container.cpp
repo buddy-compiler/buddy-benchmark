@@ -56,8 +56,10 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
   setStrides();
   size = product(sizes);
   T *data = new T[size];
+
   aligned = data;
   allocated = data;
+
   std::fill(data, data + size, init);
 }
 
@@ -134,7 +136,7 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
   size_t height = img.height;
   size_t width = img.width;
   size = channels * height * width;
-  T *data = new T[size];
+  T *data = new T[size]{0};
   for (size_t h = 0; h < height; h++) {
     for (size_t w = 0; w < width; w++) {
       for (size_t c = 0; c < channels; c++) {
@@ -185,6 +187,59 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
   }
   aligned = data;
   allocated = data;
+}
+
+// Move Assignment and Move Constructor
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(MemRef &&other) noexcept
+    : size(std::move(other.size)), sizes{}, strides{},
+      allocated(other.allocated), aligned(other.allocated) {
+  std::swap(sizes, other.sizes);
+  std::swap(strides, other.strides);
+  other.allocated = other.aligned = nullptr;
+  std::cout << "move ctor" << std::endl;
+}
+
+template <typename T, std::size_t N>
+MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) noexcept {
+  if (this != &rhs) {
+    // intptr_t sizes[N]{};
+    // intptr_t strides[N]{};
+    // // method 1
+    // allocated = aligned = nullptr;
+    // std::swap(strides, rhs.strides);
+    // std::swap(sizes, rhs.sizes);
+    // aligned = allocated = std::move(rhs.allocated);
+    // rhs.allocated = rhs.aligned = nullptr;
+    // rhs.sizes
+
+    // method 2 handle by std::swap
+    std::swap(strides, rhs.strides);
+    std::swap(offset, rhs.offset);
+    std::swap(sizes, rhs.sizes);
+    std::swap(size, rhs.size);
+    std::swap(allocated, rhs.allocated);
+    std::swap(aligned, rhs.aligned);
+    rhs.allocated = rhs.aligned = nullptr;
+    std::fill(rhs.strides, rhs.strides + N, 0);
+    std::fill(rhs.sizes, rhs.sizes + N, 0);
+  }
+  // std::cout << "move assign ctor" << std::endl;
+  return *this;
+}
+
+template <typename T, std::size_t N>
+std::ostream &operator<<(std::ostream &os, const MemRef<T, N> &memref) {
+  os << "[ ";
+  size_t size =
+      std::accumulate(memref.sizes, memref.sizes + N, 1, std::multiplies<T>());
+  for (int i = 0; i < size; ++i)
+    os << memref.allocated[i] << " ";
+  os << "] of shape: [ ";
+  for (auto s : memref.sizes)
+    os << s << " ";
+  os << "]";
+  return os;
 }
 
 template <typename T, std::size_t N> MemRef<T, N>::~MemRef() {
