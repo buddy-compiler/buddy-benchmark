@@ -28,18 +28,10 @@ func @pointwise_conv_2d_nhwc_hwcf(%input: memref<?x?x?x?xf32>, %filter: memref<1
 }
 
 // test for specific shape
-// func @pointwise_conv_2d_nhwc_hwcf(%input: memref<1x4x5x2xf32>, %filter: memref<1x1x2x7xf32>, %output: memref<1x4x5x7xf32>) {
-//     linalg.conv_2d_nhwc_hwcf 
-//     {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
-//     ins(%input, %filter : memref<1x4x5x2xf32>, memref<1x1x2x7xf32>) 
-//     outs(%output : memref<1x4x5x7xf32>) 
-//     return
-// }
-
-// func @pointwise_conv_2d_nhwc_hwcf(%output: tensor<1x4x5x7xf32>, %input: tensor<1x4x5x2xf32>, %filter: tensor<1x1x2x7xf32>) {
-//     linalg.conv_2d_nhwc_hwcf 
-//     {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
-//     ins(%input, %filter : tensor<1x4x5x2xf32>, tensor<1x1x2x7xf32>) 
-//     outs(%output : tensor<1x4x5x7xf32>) 
-//     return
-// }
+func @pointwise_conv_2d_nhwc_hwcf_spec(%input: memref<1x4x5x2xf32>, %filter: memref<1x1x2x7xf32>, %output: memref<1x4x5x7xf32>) {
+    linalg.conv_2d_nhwc_hwcf 
+    {dilations = dense<1> : tensor<2xi64>, strides = dense<1> : tensor<2xi64>} 
+    ins(%input, %filter : memref<1x4x5x2xf32>, memref<1x1x2x7xf32>) 
+    outs(%output : memref<1x4x5x7xf32>) 
+    return
+}

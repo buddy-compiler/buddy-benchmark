@@ -23,6 +23,7 @@
 
 // kNanosecond, kMicrosecond, kMillisecond, kSecond.
 #define UNIT benchmark::kMillisecond
+#define ITERATION 100
 
 namespace {
 
@@ -83,7 +84,10 @@ void BM_PointwiseConv2DNhwcHwcfReturnOrigin(benchmark::State &state) {
     }
   }
 }
-
+// Register benchmarking function with different arguments.
+BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(ITERATION)->Unit(UNIT);
+BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(ITERATION)->Unit(UNIT);
+BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(ITERATION)->Unit(UNIT);
 } // namespace
 
 // Print result function.
@@ -97,16 +101,16 @@ void printResult() {
   std::cout << "inputMemRef: " << inputMemRef << std::endl;
   std::cout << "filterMemRef: " << filterMemRef << std::endl;
   std::cout << "outputMemRef: " << outputMemRef << std::endl;
-  // Clear the output memref.
+
   MemRef<float, 4> outputMemReturn(sizesOutput, 0);
   // Run the mlir function.
   outputMemReturn = _mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(
       &inputMemReturn, &filterMemReturn);
+
   std::cout << "inputMemReturn: " << inputMemReturn << std::endl;
   std::cout << "filterMemReturn: " << filterMemReturn << std::endl;
   std::cout << "outputMemReturn: " << outputMemReturn << std::endl;
 
-  // Clear the output memref.
   MemRef<float, 4> outputMemReturnOrigin(sizesOutput, 0);
   // Run the mlir function.
   outputMemReturnOrigin = _mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(
@@ -115,14 +119,3 @@ void printResult() {
   std::cout << "filterMemReturn: " << filterMemReturn << std::endl;
   std::cout << "outputMemReturnOrigin: " << outputMemReturnOrigin << std::endl;
 }
-
-// Register benchmarking function with different arguments.
-// BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(1)->Unit(UNIT);
-// BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(10)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(100)->Unit(UNIT);
-// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(1)->Unit(UNIT);
-// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(10)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(100)->Unit(UNIT);
-// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(1)->Unit(UNIT);
-// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(10)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(100)->Unit(UNIT);

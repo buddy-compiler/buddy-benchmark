@@ -55,7 +55,7 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
   }
   setStrides();
   size = product(sizes);
-  T *data = new T[size];
+  auto data = new T[size]{};
   aligned = data;
   allocated = data;
   std::fill(data, data + size, init);
@@ -134,7 +134,7 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
   size_t height = img.height;
   size_t width = img.width;
   size = channels * height * width;
-  T *data = new T[size]{0};
+  T *data = new T[size];
   for (size_t h = 0; h < height; h++) {
     for (size_t w = 0; w < width; w++) {
       for (size_t c = 0; c < channels; c++) {
@@ -195,21 +195,11 @@ MemRef<T, N>::MemRef(MemRef &&other) noexcept
   std::swap(sizes, other.sizes);
   std::swap(strides, other.strides);
   other.allocated = other.aligned = nullptr;
-  // std::cout << "move ctor" << std::endl;
 }
 
 template <typename T, std::size_t N>
 MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) noexcept {
   if (this != &rhs) {
-    // // method 1
-    // allocated = aligned = nullptr;
-    // std::swap(strides, rhs.strides);
-    // std::swap(sizes, rhs.sizes);
-    // aligned = allocated = std::move(rhs.allocated);
-    // rhs.allocated = rhs.aligned = nullptr;
-    // rhs.sizes
-
-    // method 2 handle by std::swap
     std::swap(strides, rhs.strides);
     std::swap(offset, rhs.offset);
     std::swap(sizes, rhs.sizes);
@@ -218,7 +208,6 @@ MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) noexcept {
     std::swap(aligned, rhs.aligned);
     rhs.allocated = rhs.aligned = nullptr;
   }
-  // std::cout << "move assign ctor" << std::endl;
   return *this;
 }
 
