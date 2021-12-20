@@ -55,7 +55,7 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
   }
   setStrides();
   size = product(sizes);
-  auto data = new T[size]{};
+  T* data = new T[size]{};
   aligned = data;
   allocated = data;
   std::fill(data, data + size, init);
