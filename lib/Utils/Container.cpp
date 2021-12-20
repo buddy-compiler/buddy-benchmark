@@ -195,7 +195,7 @@ MemRef<T, N>::MemRef(MemRef &&other) noexcept
   std::swap(sizes, other.sizes);
   std::swap(strides, other.strides);
   other.allocated = other.aligned = nullptr;
-  std::cout << "move ctor" << std::endl;
+  // std::cout << "move ctor" << std::endl;
 }
 
 template <typename T, std::size_t N>
@@ -217,8 +217,6 @@ MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) noexcept {
     std::swap(allocated, rhs.allocated);
     std::swap(aligned, rhs.aligned);
     rhs.allocated = rhs.aligned = nullptr;
-    std::fill(rhs.strides, rhs.strides + N, 0);
-    std::fill(rhs.sizes, rhs.sizes + N, 0);
   }
   // std::cout << "move assign ctor" << std::endl;
   return *this;

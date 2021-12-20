@@ -22,31 +22,34 @@
 #include <benchmark/benchmark.h>
 
 // kNanosecond, kMicrosecond, kMillisecond, kSecond.
-#define UNIT benchmark::kNanosecond
+#define UNIT benchmark::kMillisecond
 
 namespace {
 
 // Declare the mobilenet C interface.
 extern "C" void
-_mlir_ciface_pointwise_conv_2d_nhwc_hwcf(MemRef<float, 4> *input,
-                                         MemRef<float, 4> *filter,
+_mlir_ciface_pointwise_conv_2d_nhwc_hwcf(const MemRef<float, 4> *input,
+                                         const MemRef<float, 4> *filter,
                                          MemRef<float, 4> *output);
 extern "C" MemRef<float, 4>
-_mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(MemRef<float, 4> *input,
-                                                     MemRef<float, 4> *filter);
+_mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(
+    const MemRef<float, 4> *input, const MemRef<float, 4> *filter);
+extern "C" MemRef<float, 4>
+_mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return_origin(
+    const MemRef<float, 4> *input, const MemRef<float, 4> *filter);
 
 intptr_t sizesInput[4] = {1, 4, 5, 2};
 intptr_t sizesFilter[4] = {1, 1, 2, 7};
 intptr_t sizesOutput[4] = {1, 4, 5, 7};
 
 // Create input, filter, and output.
-MemRef<float, 4> inputMemRef(sizesInput, 2.0);
-MemRef<float, 4> filterMemRef(sizesFilter, 3.0);
+MemRef<float, 4> inputMemRef(sizesInput, 2);
+MemRef<float, 4> filterMemRef(sizesFilter, 3);
 
-MemRef<float, 4> inputMemReturn(sizesInput, 2.0);
-MemRef<float, 4> filterMemReturn(sizesFilter, 3.0);
+MemRef<float, 4> inputMemReturn(sizesInput, 2);
+MemRef<float, 4> filterMemReturn(sizesFilter, 3);
 
-MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
+MemRef<float, 4> outputMemRef(sizesOutput, 0);
 // Define benchmark function.void
 void BM_PointwiseConv2DNhwcHwcf(benchmark::State &state) {
   for (auto _ : state) {
@@ -58,7 +61,7 @@ void BM_PointwiseConv2DNhwcHwcf(benchmark::State &state) {
   }
 }
 
-MemRef<float, 4> outputMemReturn(sizesOutput, 0.0);
+MemRef<float, 4> outputMemReturn(sizesOutput, 0);
 void BM_PointwiseConv2DNhwcHwcfReturn(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
@@ -69,15 +72,19 @@ void BM_PointwiseConv2DNhwcHwcfReturn(benchmark::State &state) {
   }
 }
 
-} // namespace
+MemRef<float, 4> outputMemReturnOrigin(sizesOutput, 0);
+void BM_PointwiseConv2DNhwcHwcfReturnOrigin(benchmark::State &state) {
+  for (auto _ : state) {
+    for (int i = 0; i < state.range(0); ++i) {
+      // MemRef<float, 4> outputMemReturn(sizesOutput, 0);
+      outputMemReturnOrigin =
+          _mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return_origin(
+              &inputMemReturn, &filterMemReturn);
+    }
+  }
+}
 
-// Register benchmarking function with different arguments.
-BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(1)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(10)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(100)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(1)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(10)->Unit(UNIT);
-BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(100)->Unit(UNIT);
+} // namespace
 
 // Print result function.
 void printResult() {
@@ -89,13 +96,33 @@ void printResult() {
 
   std::cout << "inputMemRef: " << inputMemRef << std::endl;
   std::cout << "filterMemRef: " << filterMemRef << std::endl;
-
   std::cout << "outputMemRef: " << outputMemRef << std::endl;
   // Clear the output memref.
-  MemRef<float, 4> outputMemReturn2(sizesOutput, 0);
+  MemRef<float, 4> outputMemReturn(sizesOutput, 0);
   // Run the mlir function.
-  outputMemReturn2 = _mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(
+  outputMemReturn = _mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(
       &inputMemReturn, &filterMemReturn);
+  std::cout << "inputMemReturn: " << inputMemReturn << std::endl;
+  std::cout << "filterMemReturn: " << filterMemReturn << std::endl;
+  std::cout << "outputMemReturn: " << outputMemReturn << std::endl;
 
-  std::cout << "outputMemReturn: " << outputMemReturn2 << std::endl;
+  // Clear the output memref.
+  MemRef<float, 4> outputMemReturnOrigin(sizesOutput, 0);
+  // Run the mlir function.
+  outputMemReturnOrigin = _mlir_ciface_pointwise_conv_2d_nhwc_hwcf_with_return(
+      &inputMemReturn, &filterMemReturn);
+  std::cout << "inputMemReturn: " << inputMemReturn << std::endl;
+  std::cout << "filterMemReturn: " << filterMemReturn << std::endl;
+  std::cout << "outputMemReturnOrigin: " << outputMemReturnOrigin << std::endl;
 }
+
+// Register benchmarking function with different arguments.
+// BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(1)->Unit(UNIT);
+// BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(10)->Unit(UNIT);
+BENCHMARK(BM_PointwiseConv2DNhwcHwcf)->Arg(100)->Unit(UNIT);
+// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(1)->Unit(UNIT);
+// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(10)->Unit(UNIT);
+BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturn)->Arg(100)->Unit(UNIT);
+// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(1)->Unit(UNIT);
+// BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(10)->Unit(UNIT);
+BENCHMARK(BM_PointwiseConv2DNhwcHwcfReturnOrigin)->Arg(100)->Unit(UNIT);
