@@ -187,6 +187,63 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
   allocated = data;
 }
 
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(const MemRef<T, N> &rhs)
+    : offset(rhs.offset), size(rhs.size) {
+  for (size_t i = 0; i < N; i++) {
+    this->sizes[i] = rhs.sizes[i];
+  }
+  setStrides();
+  T *ptr = new T[size];
+  for (size_t i = 0; i < size; i++) {
+    ptr[i] = rhs.aligned[i];
+  }
+  aligned = ptr;
+  allocated = ptr;
+}
+
+template <typename T, std::size_t N>
+MemRef<T, N> &MemRef<T, N>::operator=(const MemRef<T, N> &rhs) {
+  if (this != &rhs) {
+    this->offset = rhs.offset;
+    this->size = rhs.size;
+    for (size_t i = 0; i < N; i++) {
+      this->sizes[i] = rhs.sizes[i];
+    }
+    setStrides();
+    T *ptr = new T[size];
+    for (size_t i = 0; i < size; i++) {
+      ptr[i] = rhs.aligned[i];
+    }
+    aligned = ptr;
+    allocated = ptr;
+  }
+  return *this;
+}
+
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(MemRef<T, N> &&rhs)
+    : allocated(rhs.allocated), aligned(rhs.aligned), offset(rhs.offset),
+      size(rhs.size) {
+  std::swap(this->sizes, rhs.sizes);
+  std::swap(this->strides, rhs.strides);
+  rhs.allocated = rhs.aligned = nullptr;
+}
+
+template <typename T, std::size_t N>
+MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) {
+  if (this != &rhs) {
+    std::swap(strides, rhs.strides);
+    std::swap(offset, rhs.offset);
+    std::swap(sizes, rhs.sizes);
+    std::swap(size, rhs.size);
+    std::swap(allocated, rhs.allocated);
+    std::swap(aligned, rhs.aligned);
+    rhs.allocated = rhs.aligned = nullptr;
+  }
+  return *this;
+}
+
 template <typename T, std::size_t N> MemRef<T, N>::~MemRef() {
   delete[] allocated;
 }

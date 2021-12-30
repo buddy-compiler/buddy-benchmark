@@ -195,6 +195,27 @@ TEST_F(MemRefTest, TransposeNCHWToNHWC) {
   ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
 }
 
+// Copy constructor.
+TEST_F(MemRefTest, Copy2DMemref) {
+  MemRef<float, 2> copyTemp = m2;
+  MemRef<float, 2> copy(copyTemp);
+  // Sizes.
+  intptr_t true_sizes[] = {2, 3};
+  size_t n_sizes = sizeof(true_sizes) / sizeof(intptr_t);
+  ASSERT_EQ(copy.getRank(), n_sizes);
+  ASSERT_ARRAY_EQ(copy.getSizes(), true_sizes, n_sizes);
+  // Strides.
+  intptr_t true_strides[] = {3, 1};
+  size_t n_strides = sizeof(true_strides) / sizeof(intptr_t);
+  ASSERT_EQ(copy.getRank(), n_strides);
+  ASSERT_ARRAY_EQ(copy.getStrides(), true_strides, n_strides);
+  // Data.
+  float true_data[] = {0., 1., 2., 3., 4., 5.};
+  size_t n_data = sizeof(true_data) / sizeof(float);
+  ASSERT_EQ(copy.getSize(), n_data);
+  ASSERT_ARRAY_EQ(copy.getData(), true_data, n_data);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
