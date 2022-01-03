@@ -7,5 +7,7 @@ target_link_libraries(
   gtest_main
 )
 
+add_dependencies(test-container Container)
+
 include(GoogleTest)
 gtest_discover_tests(test-container)

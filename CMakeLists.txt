@@ -14,7 +14,7 @@ endif()
 # Project setup and globals
 #-------------------------------------------------------------------------------
 
-project(buddy-mlir LANGUAGES CXX C)
+project(buddy-benchmark LANGUAGES CXX C)
   
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
