@@ -46,6 +46,14 @@ public:
   // Constructor from a vector of png images.
   // Assume that all the images have the same shape.
   MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
+  // Copy constructor.
+  MemRef(const MemRef<T, N> &other);
+  // Copy assignment operator.
+  MemRef<T, N> &operator=(const MemRef<T, N> &other);
+  // Move constructor.
+  MemRef(MemRef<T, N> &&other) noexcept;
+  // Move assignment operator.
+  MemRef<T, N> &operator=(MemRef<T, N> &&other) noexcept;
   // Desctrutor.
   ~MemRef();
   // Permute the dimensions.
