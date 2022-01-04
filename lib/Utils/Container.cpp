@@ -188,32 +188,32 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
 }
 
 template <typename T, std::size_t N>
-MemRef<T, N>::MemRef(const MemRef<T, N> &rhs)
-    : offset(rhs.offset), size(rhs.size) {
+MemRef<T, N>::MemRef(const MemRef<T, N> &other)
+    : offset(other.offset), size(other.size) {
   for (size_t i = 0; i < N; i++) {
-    this->sizes[i] = rhs.sizes[i];
+    this->sizes[i] = other.sizes[i];
   }
   setStrides();
   T *ptr = new T[size];
   for (size_t i = 0; i < size; i++) {
-    ptr[i] = rhs.aligned[i];
+    ptr[i] = other.aligned[i];
   }
   aligned = ptr;
   allocated = ptr;
 }
 
 template <typename T, std::size_t N>
-MemRef<T, N> &MemRef<T, N>::operator=(const MemRef<T, N> &rhs) {
-  if (this != &rhs) {
-    this->offset = rhs.offset;
-    this->size = rhs.size;
+MemRef<T, N> &MemRef<T, N>::operator=(const MemRef<T, N> &other) {
+  if (this != &other) {
+    this->offset = other.offset;
+    this->size = other.size;
     for (size_t i = 0; i < N; i++) {
-      this->sizes[i] = rhs.sizes[i];
+      this->sizes[i] = other.sizes[i];
     }
     setStrides();
     T *ptr = new T[size];
     for (size_t i = 0; i < size; i++) {
-      ptr[i] = rhs.aligned[i];
+      ptr[i] = other.aligned[i];
     }
     aligned = ptr;
     allocated = ptr;
@@ -222,24 +222,24 @@ MemRef<T, N> &MemRef<T, N>::operator=(const MemRef<T, N> &rhs) {
 }
 
 template <typename T, std::size_t N>
-MemRef<T, N>::MemRef(MemRef<T, N> &&rhs)
-    : allocated(rhs.allocated), aligned(rhs.aligned), offset(rhs.offset),
-      size(rhs.size) {
-  std::swap(this->sizes, rhs.sizes);
-  std::swap(this->strides, rhs.strides);
-  rhs.allocated = rhs.aligned = nullptr;
+MemRef<T, N>::MemRef(MemRef<T, N> &&other) noexcept
+    : allocated(other.allocated), aligned(other.aligned), offset(other.offset),
+      size(other.size) {
+  std::swap(this->sizes, other.sizes);
+  std::swap(this->strides, other.strides);
+  other.allocated = other.aligned = nullptr;
 }
 
 template <typename T, std::size_t N>
-MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) {
-  if (this != &rhs) {
-    std::swap(strides, rhs.strides);
-    std::swap(offset, rhs.offset);
-    std::swap(sizes, rhs.sizes);
-    std::swap(size, rhs.size);
-    std::swap(allocated, rhs.allocated);
-    std::swap(aligned, rhs.aligned);
-    rhs.allocated = rhs.aligned = nullptr;
+MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&other) noexcept {
+  if (this != &other) {
+    std::swap(strides, other.strides);
+    std::swap(offset, other.offset);
+    std::swap(sizes, other.sizes);
+    std::swap(size, other.size);
+    std::swap(allocated, other.allocated);
+    std::swap(aligned, other.aligned);
+    other.allocated = other.aligned = nullptr;
   }
   return *this;
 }
