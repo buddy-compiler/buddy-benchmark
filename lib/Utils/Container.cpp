@@ -55,7 +55,7 @@ MemRef<T, N>::MemRef(intptr_t sizes[N], T init) {
   }
   setStrides();
   size = product(sizes);
-  T *data = new T[size];
+  T* data = new T[size]{};
   aligned = data;
   allocated = data;
   std::fill(data, data + size, init);
@@ -185,6 +185,44 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
   }
   aligned = data;
   allocated = data;
+}
+
+// Move Assignment and Move Constructor
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(MemRef &&other) noexcept
+    : size(std::move(other.size)), sizes{}, strides{},
+      allocated(other.allocated), aligned(other.allocated) {
+  std::swap(sizes, other.sizes);
+  std::swap(strides, other.strides);
+  other.allocated = other.aligned = nullptr;
+}
+
+template <typename T, std::size_t N>
+MemRef<T, N> &MemRef<T, N>::operator=(MemRef<T, N> &&rhs) noexcept {
+  if (this != &rhs) {
+    std::swap(strides, rhs.strides);
+    std::swap(offset, rhs.offset);
+    std::swap(sizes, rhs.sizes);
+    std::swap(size, rhs.size);
+    std::swap(allocated, rhs.allocated);
+    std::swap(aligned, rhs.aligned);
+    rhs.allocated = rhs.aligned = nullptr;
+  }
+  return *this;
+}
+
+template <typename T, std::size_t N>
+std::ostream &operator<<(std::ostream &os, const MemRef<T, N> &memref) {
+  os << "[ ";
+  size_t size =
+      std::accumulate(memref.sizes, memref.sizes + N, 1, std::multiplies<T>());
+  for (int i = 0; i < size; ++i)
+    os << memref.allocated[i] << " ";
+  os << "] of shape: [ ";
+  for (auto s : memref.sizes)
+    os << s << " ";
+  os << "]";
+  return os;
 }
 
 template <typename T, std::size_t N> MemRef<T, N>::~MemRef() {

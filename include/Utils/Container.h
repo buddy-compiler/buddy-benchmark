@@ -21,6 +21,7 @@
 #ifndef UTILS_CONTAINER
 #define UTILS_CONTAINER
 
+#include <iostream>
 #include <memory>
 #include <opencv2/opencv.hpp>
 #include <stdint.h>
@@ -46,6 +47,19 @@ public:
   // Constructor from a vector of png images.
   // Assume that all the images have the same shape.
   MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
+
+  // Copy assignment and copy constructor
+  MemRef &operator=(const MemRef &rhs) = delete;
+  MemRef(const MemRef &) = delete;
+
+  // Move Assignment and Move Constructor NumberArrays
+  MemRef &operator=(MemRef &&rhs) noexcept;
+  MemRef(MemRef &&) noexcept;
+
+  // String overloading
+  template <typename U, std::size_t M>
+  friend std::ostream &operator<<(std::ostream &os, const MemRef<U, M> &memref);
+
   // Desctrutor.
   ~MemRef();
   // Permute the dimensions.
@@ -74,16 +88,16 @@ private:
   size_t product(intptr_t sizes[N]) const;
 
   // Data.
-  T *allocated;
-  T *aligned;
+  T *allocated{nullptr};
+  T *aligned{nullptr};
   // Offset.
   intptr_t offset = 0;
   // Shape.
-  intptr_t sizes[N];
+  intptr_t sizes[N]{};
   // Strides.
-  intptr_t strides[N];
+  intptr_t strides[N]{};
   // Number of elements.
-  size_t size;
+  size_t size{};
 };
 
 #include "Utils/Container.cpp"
