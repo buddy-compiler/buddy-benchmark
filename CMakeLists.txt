@@ -30,6 +30,8 @@ set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_EXAMPLES_DIR ${BUDDY_SOURCE_DIR}/examples)
 set(BUDDY_INCLUDE_DIR ${BUDDY_SOURCE_DIR}/include)
+set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
+message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
 
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 

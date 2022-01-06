@@ -1,9 +1,7 @@
 set(BUDDY_OPT_STRIP_MINING 256 CACHE STRING "Stride Size")
-set(BUDDY_OPT_ATTR avx512f CACHE STRING "Taget Architecture")
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 
 message(STATUS "Configuring Stride Size: ${BUDDY_OPT_STRIP_MINING}")
-message(STATUS "Configuring Taget Architecture: ${BUDDY_OPT_ATTR}")
 
 #-------------------------------------------------------------------------------
 # MLIR Linalg Dialect Conv2D Operation + CB Algorithm
