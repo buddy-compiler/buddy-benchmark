@@ -1,4 +1,3 @@
-set(BUDDY_OPT_ATTR avx512f)
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 
 add_custom_command(OUTPUT conv-2d-nhwc-hwcf.o
