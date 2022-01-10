@@ -24,31 +24,32 @@ Currently, the image processing benchmark includes the following frameworks or o
 
 Run the image processing benchmark:
 
+*Note: Please replace the `/PATH/TO/*` with your local path.
+Use `-DBUDDY_OPT_STRIP_MINING` (default: 256) and `-DBUDDY_OPT_ATTR` (default: avx512f) to specify strip-mining size and architecture extension.*
+
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
-    -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
-    -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
-    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
+    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark
 ```
 
-Note : The convolution implementation in buddy mlir is not feature complete at the moment and it may produce output which differs to some extent from the frameworks used in comparison. 
-
 ## Deep Learning Benchmark
+
+*Note: Please replace the `/PATH/TO/*` with your local path.
+Use `-DBUDDY_OPT_ATTR` (default: avx512f) to specify architecture extension.*
 
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
-    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
+    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja
 ```
 
@@ -56,7 +57,7 @@ The deep learning benchmark includes the following e2e models and operations:
 
 - MobileNet
 
-NOTE: We generated the model code with IREE and made appropriate modifications, and then compiled it with the MLIR tool chain.
+We generated the model code with IREE and made appropriate modifications, and then compiled it with the MLIR tool chain.
 
 Run the MobileNet benchmark:
 
