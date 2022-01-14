@@ -31,7 +31,9 @@ set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_EXAMPLES_DIR ${BUDDY_SOURCE_DIR}/examples)
 set(BUDDY_INCLUDE_DIR ${BUDDY_SOURCE_DIR}/include)
 set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
+set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
 message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
+message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
 
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 
@@ -41,6 +43,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 include_directories(${BUDDY_MAIN_INCLUDE_DIR})
 include_directories(${BUDDY_INCLUDE_DIR})
 include_directories(${BUDDY_SOURCE_DIR}/lib) # For template inclusion model.
+
+# MLIR binary directory.
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
+
+# Helper functions.
+include(buddy-benchmark.cmake)
 
 #-------------------------------------------------------------------------------
 # Deploy google/benchmark
