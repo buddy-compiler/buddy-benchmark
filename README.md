@@ -24,8 +24,13 @@ Currently, the image processing benchmark includes the following frameworks or o
 
 Run the image processing benchmark:
 
-*Note: Please replace the `/PATH/TO/*` with your local path.
-Use `-DBUDDY_OPT_STRIP_MINING` (default: 256) and `-DBUDDY_OPT_ATTR` (default: avx512f) to specify strip-mining size and architecture extension.*
+| CMake Options  | Default Value |
+| -------------- | ------------- |
+| `-DBUDDY_OPT_STRIP_MINING`  | 256  |
+| `-DBUDDY_OPT_ATTR`  | avx512f  |
+| `-DBUDDY_OPT_TRIPLE`  | x86_64-unknown-linux-gnu  |
+
+*Note: Please replace the `/PATH/TO/*` with your local path.*
 
 ```
 $ cd buddy-benchmark
@@ -40,8 +45,12 @@ $ cd bin && ./image-processing-benchmark
 
 ## Deep Learning Benchmark
 
-*Note: Please replace the `/PATH/TO/*` with your local path.
-Use `-DBUDDY_OPT_ATTR` (default: avx512f) to specify architecture extension.*
+| CMake Options  | Default Value |
+| -------------- | ------------- |
+| `-DBUDDY_OPT_ATTR`  | avx512f  |
+| `-DBUDDY_OPT_TRIPLE`  | x86_64-unknown-linux-gnu  |
+
+*Note: Please replace the `/PATH/TO/*` with your local path.*
 
 ```
 $ cd buddy-benchmark
