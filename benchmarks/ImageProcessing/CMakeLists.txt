@@ -15,7 +15,7 @@ add_custom_command(OUTPUT conv2d.o
             -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=x86_64-unknown-linux-gnu 
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
             -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/conv2d.o
 )
@@ -34,7 +34,7 @@ add_custom_command(OUTPUT corr2d.o
             -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=x86_64-unknown-linux-gnu 
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
             -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/corr2d.o
 )
