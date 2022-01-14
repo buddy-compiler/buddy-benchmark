@@ -42,6 +42,12 @@ include_directories(${BUDDY_MAIN_INCLUDE_DIR})
 include_directories(${BUDDY_INCLUDE_DIR})
 include_directories(${BUDDY_SOURCE_DIR}/lib) # For template inclusion model.
 
+# MLIR binary directory.
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
+
+# Helper functions.
+include(buddy-benchmark.cmake)
+
 #-------------------------------------------------------------------------------
 # Deploy google/benchmark
 #-------------------------------------------------------------------------------
