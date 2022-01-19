@@ -1,7 +1,7 @@
-add_buddy_model_benchmark(mobilenetv3-benchmark
+add_buddy_model_benchmark(mobilenet-v3-benchmark
   OpenCV
   MLIR MobileNetV3.mlir
-  BITCODE mobilenetv3-default.o
+  BITCODE mobilenet-v3-default.o
   LIBRARY MobileNetV3Default
   OPTIONS
     --linalg-bufferize 

@@ -28,11 +28,10 @@ namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
-void _mlir_ciface_mobilenet_v3(MemRef<float, 2> *output, MemRef<float, 4> *input);
+void _mlir_ciface_mobilenet_v3(MemRef<float, 2> *output,
+                               MemRef<float, 4> *input);
 }
 
-// TODO: Add input image preprocessing, the current preprocessing only has
-// resize step.
 const cv::Mat imagePreprocessing() {
 
   cv::Mat inputImage = cv::imread(
@@ -48,18 +47,17 @@ const cv::Mat imagePreprocessing() {
 
 cv::Mat image = imagePreprocessing();
 
-// TODO: figure out the correct strides layout.
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
 intptr_t sizesOutnput[2] = {1, 1001};
 
 MemRef<float, 4> input(image, sizesInput);
-MemRef<float, 2> output(sizesOutnput);        
+MemRef<float, 2> output(sizesOutnput);
 
 // Define benchmark function.
 void BM_MobileNet(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mobilenet_v3(&output, &input);  
+      _mlir_ciface_mobilenet_v3(&output, &input);
     }
   }
 }
@@ -103,7 +101,6 @@ std::string getLabel(int idx) {
 
 // Register benchmarking function with different arguments.
 BENCHMARK(BM_MobileNet)->Arg(1);
-BENCHMARK(BM_MobileNet)->Arg(4);
 
 // Print result function.
 void printResult() {
