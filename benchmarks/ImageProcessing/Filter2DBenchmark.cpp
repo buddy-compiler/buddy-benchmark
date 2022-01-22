@@ -25,13 +25,16 @@
 using namespace cv;
 using namespace std;
 
-// Read input image and specify kernel.
-Mat inputImageFilter2D = imread(
-    "../../benchmarks/ImageProcessing/Images/YuTu.png", IMREAD_GRAYSCALE);
-Mat kernelFilter2D = Mat(3, 3, CV_32FC1, laplacianKernelAlign);
+// Declare input image, kernel and output image.
+Mat inputImageFilter2D, kernelFilter2D, outputFilter2D;
 
-// Declare output image.
-Mat outputFilter2D;
+void initializeBM_Filter2D_OpenCV(int argc, char** argv)
+{
+  inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
+
+  kernelFilter2D = Mat(
+    get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1, get<0>(kernelMap[argv[2]]));
+}
 
 // Benchmarking function.
 static void BM_Filter2D_OpenCV(benchmark::State &state) {

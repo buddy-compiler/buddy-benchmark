@@ -34,29 +34,48 @@ void _mlir_ciface_corr_2d(MemRef<float, 2> *inputCorr2D,
                           unsigned int centerY, int boundaryOption);
 }
 
-// Read input image.
-Mat inputImageCorr2D = imread(
-    "../../benchmarks/ImageProcessing/Images/YuTu.png", IMREAD_GRAYSCALE);
+// Declare input image and kernel.
+Mat inputImageCorr2D, kernelCorr2DMat;
 
 // Define the kernel size.
-int kernelRowsCorr2D = laplacianKernelRows;
-int kernelColsCorr2D = laplacianKernelCols;
+int kernelRowsCorr2D, kernelColsCorr2D; 
 
 // Define the output size.
-int outputRowsCorr2D = inputImageCorr2D.rows;
-int outputColsCorr2D = inputImageCorr2D.cols;
+int outputRowsCorr2D, outputColsCorr2D;
 
 // Define sizes of input, kernel, and output.
-intptr_t sizesInputCorr2D[2] = {inputImageCorr2D.rows, inputImageCorr2D.cols};
-intptr_t sizesKernelCorr2D[2] = {kernelRowsCorr2D, kernelColsCorr2D};
-intptr_t sizesOutputCorr2D[2] = {outputRowsCorr2D, outputColsCorr2D};
+intptr_t sizesInputCorr2D[2];
+intptr_t sizesKernelCorr2D[2];
+intptr_t sizesOutputCorr2D[2];
 
-// Define the MemRef descriptor for input, kernel, and output.
-MemRef<float, 2> inputCorr2D(inputImageCorr2D, sizesInputCorr2D);
-MemRef<float, 2> kernelCorr2D(laplacianKernelAlign, sizesKernelCorr2D);
-MemRef<float, 2> outputCorr2D(sizesOutputCorr2D);
+void initializeBM_Corr2D_Buddy(int argc, char** argv)
+{
+  inputImageCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
+  kernelCorr2DMat = Mat(
+    get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1, get<0>(kernelMap[argv[2]]));
+
+  kernelRowsCorr2D = kernelCorr2DMat.rows;
+  kernelColsCorr2D = kernelCorr2DMat.cols;
+
+  outputRowsCorr2D = inputImageCorr2D.rows;
+  outputColsCorr2D = inputImageCorr2D.cols;
+
+  sizesInputCorr2D[0] = inputImageCorr2D.rows;
+  sizesInputCorr2D[1] = inputImageCorr2D.cols;
+
+  sizesKernelCorr2D[0] = kernelRowsCorr2D;
+  sizesKernelCorr2D[1] = kernelColsCorr2D;
+
+  sizesOutputCorr2D[0] = outputRowsCorr2D;
+  sizesOutputCorr2D[1] = outputColsCorr2D;
+}
 
 static void BM_Corr2D_Buddy(benchmark::State &state) {
+  // Define the MemRef descriptor for input, kernel, and output.
+  MemRef<float, 2> inputCorr2D(inputImageCorr2D, sizesInputCorr2D);
+  MemRef<float, 2> kernelCorr2D(kernelCorr2DMat, sizesKernelCorr2D);
+  MemRef<float, 2> outputCorr2D(sizesOutputCorr2D);
+
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_corr_2d(&inputCorr2D, &kernelCorr2D, &outputCorr2D,
@@ -77,7 +96,7 @@ BENCHMARK(BM_Corr2D_Buddy)->Arg(16);
 void generateResultCorr2D() {
   // Define the MemRef descriptor for input, kernel, and output.
   MemRef<float, 2> input(inputImageCorr2D, sizesInputCorr2D);
-  MemRef<float, 2> kernel(laplacianKernelAlign, sizesKernelCorr2D);
+  MemRef<float, 2> kernel(kernelCorr2DMat, sizesKernelCorr2D);
   MemRef<float, 2> output(sizesOutputCorr2D);
   // Run the 2D correlation.
   _mlir_ciface_corr_2d(&input, &kernel, &output, 1 /* Center X */,

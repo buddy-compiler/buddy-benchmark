@@ -34,28 +34,47 @@ void _mlir_ciface_conv_2d(MemRef<float, 2> *inputConv2D,
 }
 
 // Read input image.
-Mat inputImageConv2D = imread(
-    "../../benchmarks/ImageProcessing/Images/YuTu.png", IMREAD_GRAYSCALE);
+Mat inputImageConv2D, kernelConv2DMat;
 
 // Define the kernel size.
-int kernelRowsConv2D = laplacianKernelRows;
-int kernelColsConv2D = laplacianKernelCols;
+int kernelRowsConv2D, kernelColsConv2D;
 
 // Define the output size.
-int outputRowsConv2D = inputImageConv2D.rows - kernelRowsConv2D + 1;
-int outputColsConv2D = inputImageConv2D.cols - kernelColsConv2D + 1;
+int outputRowsConv2D, outputColsConv2D;
 
 // Define sizes of input, kernel, and output.
-intptr_t sizesInputConv2D[2] = {inputImageConv2D.rows, inputImageConv2D.cols};
-intptr_t sizesKernelConv2D[2] = {kernelRowsConv2D, kernelColsConv2D};
-intptr_t sizesOutputConv2D[2] = {outputRowsConv2D, outputColsConv2D};
+intptr_t sizesInputConv2D[2];
+intptr_t sizesKernelConv2D[2];
+intptr_t sizesOutputConv2D[2];
 
-// Define the MemRef descriptor for input, kernel, and output.
-MemRef<float, 2> inputConv2D(inputImageConv2D, sizesInputConv2D);
-MemRef<float, 2> kernelConv2D(laplacianKernelAlign, sizesKernelConv2D);
-MemRef<float, 2> outputConv2D(sizesOutputConv2D);
+void initializeBM_Conv2D_Buddy(int argc, char** argv)
+{
+  inputImageConv2D = imread(argv[1], IMREAD_GRAYSCALE);
+  kernelConv2DMat = Mat(
+    get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1, get<0>(kernelMap[argv[2]]));
+
+  kernelRowsConv2D = kernelConv2DMat.rows;
+  kernelColsConv2D = kernelConv2DMat.cols;
+
+  outputRowsConv2D = inputImageConv2D.rows - kernelRowsConv2D + 1;
+  outputColsConv2D = inputImageConv2D.cols - kernelColsConv2D + 1;
+
+  sizesInputConv2D[0] = inputImageConv2D.rows;
+  sizesInputConv2D[1] = inputImageConv2D.cols;
+
+  sizesKernelConv2D[0] = kernelRowsConv2D;
+  sizesKernelConv2D[1] = kernelColsConv2D;
+
+  sizesOutputConv2D[0] = outputRowsConv2D;
+  sizesOutputConv2D[1] = outputColsConv2D;
+}
 
 static void BM_Conv2D_Buddy(benchmark::State &state) {
+  // Define the MemRef descriptor for input, kernel, and output.
+  MemRef<float, 2> inputConv2D(inputImageConv2D, sizesInputConv2D);
+  MemRef<float, 2> kernelConv2D(kernelConv2DMat, sizesKernelConv2D);
+  MemRef<float, 2> outputConv2D(sizesOutputConv2D);
+
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_conv_2d(&inputConv2D, &kernelConv2D, &outputConv2D);
@@ -74,7 +93,7 @@ BENCHMARK(BM_Conv2D_Buddy)->Arg(16);
 void generateResultConv2D() {
   // Define the MemRef descriptor for input, kernel, and output.
   MemRef<float, 2> input(inputImageConv2D, sizesInputConv2D);
-  MemRef<float, 2> kernel(laplacianKernelAlign, sizesKernelConv2D);
+  MemRef<float, 2> kernel(kernelConv2DMat, sizesKernelConv2D);
   MemRef<float, 2> output(sizesOutputConv2D);
   // Run the 2D convolution.
   _mlir_ciface_conv_2d(&input, &kernel, &output);
