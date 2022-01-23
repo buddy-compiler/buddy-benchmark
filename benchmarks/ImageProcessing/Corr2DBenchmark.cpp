@@ -38,7 +38,7 @@ void _mlir_ciface_corr_2d(MemRef<float, 2> *inputCorr2D,
 Mat inputImageCorr2D, kernelCorr2DMat;
 
 // Define the kernel size.
-int kernelRowsCorr2D, kernelColsCorr2D; 
+int kernelRowsCorr2D, kernelColsCorr2D;
 
 // Define the output size.
 int outputRowsCorr2D, outputColsCorr2D;
@@ -48,11 +48,10 @@ intptr_t sizesInputCorr2D[2];
 intptr_t sizesKernelCorr2D[2];
 intptr_t sizesOutputCorr2D[2];
 
-void initializeBM_Corr2D_Buddy(int argc, char** argv)
-{
+void initializeBM_Corr2D_Buddy(int argc, char **argv) {
   inputImageCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
-  kernelCorr2DMat = Mat(
-    get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1, get<0>(kernelMap[argv[2]]));
+  kernelCorr2DMat = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
+                        CV_32FC1, get<0>(kernelMap[argv[2]]));
 
   kernelRowsCorr2D = kernelCorr2DMat.rows;
   kernelColsCorr2D = kernelCorr2DMat.cols;

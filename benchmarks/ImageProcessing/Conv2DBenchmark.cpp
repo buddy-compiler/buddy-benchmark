@@ -47,11 +47,10 @@ intptr_t sizesInputConv2D[2];
 intptr_t sizesKernelConv2D[2];
 intptr_t sizesOutputConv2D[2];
 
-void initializeBM_Conv2D_Buddy(int argc, char** argv)
-{
+void initializeBM_Conv2D_Buddy(int argc, char **argv) {
   inputImageConv2D = imread(argv[1], IMREAD_GRAYSCALE);
-  kernelConv2DMat = Mat(
-    get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1, get<0>(kernelMap[argv[2]]));
+  kernelConv2DMat = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
+                        CV_32FC1, get<0>(kernelMap[argv[2]]));
 
   kernelRowsConv2D = kernelConv2DMat.rows;
   kernelColsConv2D = kernelConv2DMat.cols;

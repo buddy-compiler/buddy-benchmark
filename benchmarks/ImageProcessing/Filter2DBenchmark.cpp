@@ -28,12 +28,11 @@ using namespace std;
 // Declare input image, kernel and output image.
 Mat inputImageFilter2D, kernelFilter2D, outputFilter2D;
 
-void initializeBM_Filter2D_OpenCV(int argc, char** argv)
-{
+void initializeBM_Filter2D_OpenCV(int argc, char **argv) {
   inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
 
-  kernelFilter2D = Mat(
-    get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1, get<0>(kernelMap[argv[2]]));
+  kernelFilter2D = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
+                       CV_32FC1, get<0>(kernelMap[argv[2]]));
 }
 
 // Benchmarking function.

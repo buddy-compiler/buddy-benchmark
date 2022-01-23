@@ -20,21 +20,24 @@
 
 #include <benchmark/benchmark.h>
 
-void initializeBM_Conv2D_Buddy(int, char**);
-void initializeBM_Corr2D_Buddy(int, char**);
-void initializeBM_Filter2D_OpenCV(int, char**);
+void initializeBM_Conv2D_Buddy(int, char **);
+void initializeBM_Corr2D_Buddy(int, char **);
+void initializeBM_Filter2D_OpenCV(int, char **);
 
 void generateResultConv2D();
 void generateResultCorr2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 3)
-  {
-    throw std::invalid_argument("Wrong format of command line arguments.\n"
-    "Correct format is ./image-processing-benchmark <image path> <kernel name>\n where "
-    "image path provides path of the image to be processed and kernel name denotes the name "
-    "of desired kernel as specified in include/ImageProcessing/Kernels.h\n");
+  if (argc != 3) {
+    throw std::invalid_argument(
+        "Wrong format of command line arguments.\n"
+        "Correct format is ./image-processing-benchmark <image path> <kernel "
+        "name>\n where "
+        "image path provides path of the image to be processed and kernel name "
+        "denotes the name "
+        "of desired kernel as specified in "
+        "include/ImageProcessing/Kernels.h\n");
   }
 
   initializeBM_Conv2D_Buddy(argc, argv);
