@@ -1,4 +1,5 @@
-//===- InceptionV3Benchmark.cpp ---------------------------------------------===//
+//===- InceptionV3Benchmark.cpp
+//---------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +29,8 @@ namespace {
 
 // Declare the inceptionv3 C interface.
 extern "C" {
-void _mlir_ciface_inception_v3(MemRef<float, 2> *output, MemRef<float, 4> *input);
+void _mlir_ciface_inception_v3(MemRef<float, 2> *output,
+                               MemRef<float, 4> *input);
 }
 
 const cv::Mat imagePreprocessing() {
