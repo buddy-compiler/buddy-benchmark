@@ -81,12 +81,8 @@ static void BM_Conv2D_Buddy(benchmark::State &state) {
   }
 }
 
-// Register benchmarking function with different arguments.
+// Register benchmarking function.
 BENCHMARK(BM_Conv2D_Buddy)->Arg(1);
-BENCHMARK(BM_Conv2D_Buddy)->Arg(2);
-BENCHMARK(BM_Conv2D_Buddy)->Arg(4);
-BENCHMARK(BM_Conv2D_Buddy)->Arg(8);
-BENCHMARK(BM_Conv2D_Buddy)->Arg(16);
 
 // Generate result image.
 void generateResultConv2D() {
