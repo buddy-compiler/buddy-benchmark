@@ -29,7 +29,7 @@ void generateResultCorr2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 3) {
+  if (argc != 3 && argc != 5) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
         "Correct format is ./image-processing-benchmark <image path> <kernel "
