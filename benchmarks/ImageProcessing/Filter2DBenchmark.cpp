@@ -45,9 +45,5 @@ static void BM_Filter2D_OpenCV(benchmark::State &state) {
   }
 }
 
-// Register benchmarking function with different arguments.
+// Register benchmarking function.
 BENCHMARK(BM_Filter2D_OpenCV)->Arg(1);
-BENCHMARK(BM_Filter2D_OpenCV)->Arg(2);
-BENCHMARK(BM_Filter2D_OpenCV)->Arg(4);
-BENCHMARK(BM_Filter2D_OpenCV)->Arg(8);
-BENCHMARK(BM_Filter2D_OpenCV)->Arg(16);

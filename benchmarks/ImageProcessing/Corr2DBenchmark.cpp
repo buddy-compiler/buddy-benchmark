@@ -84,12 +84,8 @@ static void BM_Corr2D_Buddy(benchmark::State &state) {
   }
 }
 
-// Register benchmarking function with different arguments.
+// Register benchmarking function.
 BENCHMARK(BM_Corr2D_Buddy)->Arg(1);
-BENCHMARK(BM_Corr2D_Buddy)->Arg(2);
-BENCHMARK(BM_Corr2D_Buddy)->Arg(4);
-BENCHMARK(BM_Corr2D_Buddy)->Arg(8);
-BENCHMARK(BM_Corr2D_Buddy)->Arg(16);
 
 // Generate result image.
 void generateResultCorr2D() {
