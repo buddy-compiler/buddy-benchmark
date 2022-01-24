@@ -22,6 +22,8 @@
 #define IMAGE_PROCESSING_KERNELS
 
 // clang-format off
+#include <string>
+#include <map>
 
 static float prewittKernelAlign[9] = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
 static int prewittKernelRows = 3;
@@ -72,6 +74,16 @@ static float logKernelAlign[25] = {0, 0, 1, 0, 0,
                                    0, 0, 1, 0, 0};
 static int logKernelRows = 5;
 static int logKernelCols = 5;
+
+static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
+    {"prewittKernelAlign", {prewittKernelAlign, prewittKernelRows, prewittKernelCols}},
+    {"sobel3x3KernelAlign", {sobel3x3KernelAlign, sobel3x3KernelRows, sobel3x3KernelCols}},
+    {"sobel5x5KernelAlign", {sobel5x5KernelAlign, sobel5x5KernelRows, sobel5x5KernelCols}},
+    {"sobel7x7KernelAlign", {sobel7x7KernelAlign, sobel7x7KernelRows, sobel7x7KernelCols}},
+    {"sobel9x9KernelAlign", {sobel9x9KernelAlign, sobel9x9KernelRows, sobel9x9KernelCols}},
+    {"laplacianKernelAlign", {laplacianKernelAlign, laplacianKernelRows, laplacianKernelCols}},
+    {"logKernelAlign", {logKernelAlign, logKernelRows, logKernelCols}}
+};
 
 // clang-format on
 
