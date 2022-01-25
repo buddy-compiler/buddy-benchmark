@@ -110,3 +110,21 @@ $ cmake --build . --
 $ ninja test
 ```
 
+For tests related to DIP dialect : 
+
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DIMAGE_PROCESSING_BENCHMARKS=ON \
+    -DDEEP_LEARNING_BENCHMARKS=ON \
+    -DBUILD_TESTS=ON \
+    -DOpenCV_DIR=/path/to/opencv/build/ \
+    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
+    -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
+    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
+$ ninja DIPCorr2DTest
+$ cd bin && ./DIPCorr2DTest <image path>
+```
+
+where `<image path>` is the path of image used as first operand during 2D Correlation.
