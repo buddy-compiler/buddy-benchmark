@@ -1,4 +1,4 @@
-//===- Filter2DBenchmark.cpp ----------------------------------------------===//
+//===- OpenCVFilter2DBenchmark.cpp ----------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ using namespace std;
 // Declare input image, kernel and output image.
 Mat inputImageFilter2D, kernelFilter2D, outputFilter2D;
 
-void initializeBM_Filter2D_OpenCV(int argc, char **argv) {
+void initializeOpenCVFilter2D(int argc, char **argv) {
   inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
 
   kernelFilter2D = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
@@ -36,7 +36,7 @@ void initializeBM_Filter2D_OpenCV(int argc, char **argv) {
 }
 
 // Benchmarking function.
-static void BM_Filter2D_OpenCV(benchmark::State &state) {
+static void OpenCV_Filter2D(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
@@ -46,4 +46,4 @@ static void BM_Filter2D_OpenCV(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(BM_Filter2D_OpenCV)->Arg(1);
+BENCHMARK(OpenCV_Filter2D)->Arg(1);
