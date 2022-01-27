@@ -27,6 +27,7 @@ Run the image processing benchmark:
 | CMake Options  | Default Value |
 | -------------- | ------------- |
 | `-DBUDDY_OPT_STRIP_MINING`  | 256  |
+| `-DMLIR_LINALG_TILE`  | 2  |
 | `-DBUDDY_OPT_ATTR`  | avx512f  |
 | `-DBUDDY_OPT_TRIPLE`  | x86_64-unknown-linux-gnu  |
 
