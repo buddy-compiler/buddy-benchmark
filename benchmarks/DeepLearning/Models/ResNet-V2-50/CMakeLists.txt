@@ -15,7 +15,7 @@ add_buddy_model_benchmark(resnet_v2_50-benchmark
     --finalizing-bufferize 
     --lower-affine 
     --convert-vector-to-llvm 
-    -std-expand -arith-expand 
+    -memref-expand -arith-expand 
     --convert-memref-to-llvm 
     --convert-math-to-llvm 
     --convert-std-to-llvm='emit-c-wrappers=1'
