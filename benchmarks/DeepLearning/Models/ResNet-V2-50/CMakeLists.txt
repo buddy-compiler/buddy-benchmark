@@ -9,9 +9,8 @@ add_buddy_model_benchmark(resnet_v2_50-benchmark
     --convert-vector-to-scf 
     --convert-scf-to-std 
     --func-bufferize 
-    --tensor-constant-bufferize 
+    --arith-bufferize 
     --tensor-bufferize 
-    --std-bufferize 
     --finalizing-bufferize 
     --lower-affine 
     --convert-vector-to-llvm 
