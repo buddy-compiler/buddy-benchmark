@@ -1,10 +1,13 @@
-#include "../../../include/ImageProcessing/Kernels.h"
+#include "ImageProcessing/Kernels.h"
 #include "Utils/Container.h"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
 
+#include <gtest/gtest.h>
 #include <iostream>
+#include <string>
+// #include "../../UniTests/Test.h"
 
 using namespace cv;
 using namespace std;
@@ -15,6 +18,30 @@ void _mlir_ciface_corr_2d(MemRef<float, 2> *input, MemRef<float, 2> *kernel,
                           MemRef<float, 2> *output, unsigned int centerX,
                           unsigned int centerY, int boundaryOption);
 }
+
+// Fixture for testing the dip.corr_2d operation.
+class FilterTest : public ::testing::Test {
+protected:
+  void SetUp()
+  {
+    inputImage = imread(imageName, IMREAD_GRAYSCALE);
+  }
+
+public:
+  static void setImageName(std::string imageNameParam)
+  {
+    imageName = imageNameParam;
+  }
+
+  const Mat& getInputImage()
+  {
+    return inputImage;
+  }
+
+private:
+  Mat inputImage;
+  static std::string imageName;
+};
 
 bool equalImages(const Mat &img1, const Mat &img2) {
   if (img1.rows != img2.rows || img1.cols != img2.cols) {
@@ -56,7 +83,7 @@ void testKernelImpl(const Mat &inputImage, unsigned int kernelRows,
 
   _mlir_ciface_corr_2d(&input, &kernel, &output, x, y, 0);
 
-  filter2D(inputImage, opencvOutput, CV_32FC1, kernel1, cv::Point(x, y), 1.0,
+  filter2D(inputImage, opencvOutput, CV_32FC1, kernel1, cv::Point(x, y), 0.0,
            cv::BORDER_REPLICATE);
 
   // Define a cv::Mat with the output of corr_2d.
@@ -79,11 +106,20 @@ void testKernel(const Mat &inputImage, unsigned int kernelRows,
       testKernelImpl(inputImage, kernelRows, kernelCols, kernelArray, x, y);
 }
 
-int main(int argc, char **argv) {
-  // Read input image
-  Mat inputImage = imread(argv[1], IMREAD_GRAYSCALE);
-
+TEST_F(FilterTest, OpenCVComparison) {
   for (auto kernel : kernelMap)
-    testKernel(inputImage, get<1>(kernel.second), get<2>(kernel.second),
+    testKernel(getInputImage(), get<1>(kernel.second), get<2>(kernel.second),
                get<0>(kernel.second));
+
+  // testKernel(getInputImage(), 3, 3, laplacianKernelAlign);
+  // ASSERT_EQ(2, 2);
+}
+
+string FilterTest::imageName = "";
+
+int main(int argc, char **argv)
+{
+  FilterTest::setImageName(argv[1]);
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

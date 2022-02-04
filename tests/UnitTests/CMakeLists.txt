@@ -11,5 +11,3 @@ add_dependencies(test-container Container)
 
 include(GoogleTest)
 gtest_discover_tests(test-container)
-
-add_subdirectory(ImageProcessing)

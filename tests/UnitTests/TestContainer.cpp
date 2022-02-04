@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Test.h"
+#include "Utils/Test.h"
 #include "Utils/Container.h"
 
 // Fixture for testing the MemRef class.
