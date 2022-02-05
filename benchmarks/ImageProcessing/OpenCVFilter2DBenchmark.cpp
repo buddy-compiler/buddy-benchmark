@@ -28,7 +28,7 @@ using namespace std;
 // Declare input image, kernel and output image.
 Mat inputImageFilter2D, kernelFilter2D, outputFilter2D;
 
-void initializeOpenCVFilter2D(int argc, char **argv) {
+void initializeOpenCVFilter2D(char **argv) {
   inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
 
   kernelFilter2D = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
