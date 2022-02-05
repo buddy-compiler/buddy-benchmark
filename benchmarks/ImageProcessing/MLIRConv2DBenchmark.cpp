@@ -47,7 +47,7 @@ intptr_t sizesInputMLIRConv2D[2];
 intptr_t sizesKernelMLIRConv2D[2];
 intptr_t sizesOutputMLIRConv2D[2];
 
-void initializeMLIRConv2D(int argc, char **argv) {
+void initializeMLIRConv2D(char **argv) {
   inputImageMLIRConv2D = imread(argv[1], IMREAD_GRAYSCALE);
   kernelMLIRConv2DMat =
       Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,

@@ -49,7 +49,7 @@ intptr_t sizesInputBuddyCorr2D[2];
 intptr_t sizesKernelBuddyCorr2D[2];
 intptr_t sizesOutputBuddyCorr2D[2];
 
-void initializeBuddyCorr2D(int argc, char **argv) {
+void initializeBuddyCorr2D(char **argv) {
   inputImageBuddyCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
   kernelBuddyCorr2DMat =
       Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
@@ -92,10 +92,10 @@ static void Buddy_Corr2D(benchmark::State &state) {
 BENCHMARK(Buddy_Corr2D)->Arg(1);
 
 // Generate result image.
-void generateResultBuddyCorr2D() {
+void generateResultBuddyCorr2D(char **argv) {
   // Define the MemRef descriptor for input, kernel, and output.
   MemRef<float, 2> input(inputImageBuddyCorr2D, sizesInputBuddyCorr2D);
-  MemRef<float, 2> kernel(kernelBuddyCorr2DMat, sizesKernelBuddyCorr2D);
+  MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
   _mlir_ciface_corr_2d(&input, &kernel, &output, 1 /* Center X */,
