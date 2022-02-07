@@ -14,8 +14,8 @@ add_custom_command(OUTPUT mlir-conv2d.o
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/MLIRConv2D.mlir 
             -linalg-tile="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}"
             -convert-linalg-to-loops
-            -convert-scf-to-std -convert-linalg-to-llvm
-            -lower-affine -convert-scf-to-std --convert-memref-to-llvm 
+            -convert-scf-to-cf -convert-linalg-to-llvm
+            -lower-affine -convert-scf-to-cf --convert-memref-to-llvm 
             -convert-std-to-llvm='emit-c-wrappers=1'
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -34,7 +34,8 @@ add_custom_command(OUTPUT buddy-conv2d.o
   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
             -conv-vectorization="strip-mining=${BUDDY_OPT_STRIP_MINING}" 
-            -lower-affine -convert-scf-to-std -convert-vector-to-llvm 
+            -convert-vector-to-scf 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
             -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -53,7 +54,7 @@ add_custom_command(OUTPUT buddy-corr2d.o
   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyCorr2D.mlir 
             -lower-dip="DIP-strip-mining=${BUDDY_OPT_STRIP_MINING}" 
-            -lower-affine -convert-scf-to-std -convert-vector-to-llvm 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
             -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
