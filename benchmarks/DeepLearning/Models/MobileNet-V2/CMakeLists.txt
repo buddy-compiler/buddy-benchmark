@@ -7,7 +7,7 @@ add_buddy_model_benchmark(mobilenet-benchmark
     --linalg-bufferize 
     --convert-linalg-to-loops 
     --convert-vector-to-scf 
-    --convert-scf-to-std 
+    --convert-scf-to-cf 
     --func-bufferize 
     --arith-bufferize 
     --tensor-bufferize 
