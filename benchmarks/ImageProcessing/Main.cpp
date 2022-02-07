@@ -27,6 +27,7 @@ void initializeOpenCVFilter2D(int, char **);
 
 void generateResultBuddyConv2D();
 void generateResultBuddyCorr2D();
+void generateResultOpenCVFilter2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -51,6 +52,7 @@ int main(int argc, char **argv) {
   // Generate result image.
   generateResultBuddyConv2D();
   generateResultBuddyCorr2D();
+  generateResultOpenCVFilter2D();
 
   return 0;
 }

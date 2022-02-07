@@ -47,3 +47,27 @@ static void OpenCV_Filter2D(benchmark::State &state) {
 
 // Register benchmarking function.
 BENCHMARK(OpenCV_Filter2D)->Arg(1);
+
+// Generate result image.
+void generateResultOpenCVFilter2D() {
+  filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
+               cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
+
+  // Choose a PNG compression level
+  vector<int> compressionParams;
+  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
+  compressionParams.push_back(9);
+
+  // Write output to PNG.
+  bool result = false;
+  try {
+    result = imwrite("ResultOpenCVFilter2D.png", outputFilter2D, compressionParams);
+  } catch (const cv::Exception &ex) {
+    fprintf(stderr, "Exception converting image to PNG format: %s\n",
+            ex.what());
+  }
+  if (result)
+    cout << "Saved PNG file." << endl;
+  else
+    cout << "ERROR: Can't save PNG file." << endl;
+}
