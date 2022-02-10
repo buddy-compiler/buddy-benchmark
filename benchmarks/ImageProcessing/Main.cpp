@@ -20,16 +20,18 @@
 
 #include <benchmark/benchmark.h>
 
-void initializeBM_Conv2D_Buddy(int, char **);
-void initializeBM_Corr2D_Buddy(int, char **);
-void initializeBM_Filter2D_OpenCV(int, char **);
+void initializeMLIRConv2D(int, char **);
+void initializeBuddyConv2D(int, char **);
+void initializeBuddyCorr2D(int, char **);
+void initializeOpenCVFilter2D(int, char **);
 
-void generateResultConv2D();
-void generateResultCorr2D();
+void generateResultBuddyConv2D();
+void generateResultBuddyCorr2D();
+void generateResultOpenCVFilter2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 3) {
+  if (argc != 3 && argc != 5) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
         "Correct format is ./image-processing-benchmark <image path> <kernel "
@@ -40,15 +42,17 @@ int main(int argc, char **argv) {
         "include/ImageProcessing/Kernels.h\n");
   }
 
-  initializeBM_Conv2D_Buddy(argc, argv);
-  initializeBM_Corr2D_Buddy(argc, argv);
-  initializeBM_Filter2D_OpenCV(argc, argv);
+  initializeMLIRConv2D(argc, argv);
+  initializeBuddyConv2D(argc, argv);
+  initializeBuddyCorr2D(argc, argv);
+  initializeOpenCVFilter2D(argc, argv);
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
   // Generate result image.
-  generateResultConv2D();
-  generateResultCorr2D();
+  generateResultBuddyConv2D();
+  generateResultBuddyCorr2D();
+  generateResultOpenCVFilter2D();
 
   return 0;
 }

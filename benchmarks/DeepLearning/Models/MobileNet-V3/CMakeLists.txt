@@ -7,15 +7,14 @@ add_buddy_model_benchmark(mobilenet-v3-benchmark
     --linalg-bufferize 
     --convert-linalg-to-loops 
     --convert-vector-to-scf 
-    --convert-scf-to-std 
+    --convert-scf-to-cf 
     --func-bufferize 
-    --tensor-constant-bufferize 
+    --arith-bufferize 
     --tensor-bufferize 
-    --std-bufferize 
     --finalizing-bufferize 
     --lower-affine 
     --convert-vector-to-llvm 
-    -std-expand -arith-expand 
+    -memref-expand -arith-expand 
     --convert-memref-to-llvm 
     --convert-math-to-llvm 
     --convert-std-to-llvm='emit-c-wrappers=1'

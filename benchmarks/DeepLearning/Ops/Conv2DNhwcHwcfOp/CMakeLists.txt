@@ -4,7 +4,7 @@ add_buddy_ops_benchmark(conv-2d-nhwc-hwcf-benchmark
   LIBRARY Conv2DNhwcHwcf
   OPTIONS
     -convert-linalg-to-loops 
-    -convert-scf-to-std 
+    -convert-scf-to-cf 
     -convert-linalg-to-llvm 
     -lower-affine 
     --convert-memref-to-llvm 
