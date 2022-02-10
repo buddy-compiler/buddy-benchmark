@@ -15,7 +15,6 @@ add_buddy_model_benchmark(squeezenet-benchmark
     --func-bufferize 
     --tensor-constant-bufferize 
     --tensor-bufferize 
-    --std-bufferize 
     --finalizing-bufferize 
     --lower-affine 
     --convert-vector-to-llvm 
