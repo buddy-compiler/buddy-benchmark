@@ -22,6 +22,7 @@
 #define IMAGE_PROCESSING_KERNELS
 
 // clang-format off
+#include <vector>
 #include <string>
 #include <map>
 
@@ -84,6 +85,11 @@ static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"laplacianKernelAlign", {laplacianKernelAlign, laplacianKernelRows, laplacianKernelCols}},
     {"logKernelAlign", {logKernelAlign, logKernelRows, logKernelCols}}
 };
+
+static std::vector<std::string> imageNames = {
+    "test_6x6.png", "YuTu.png",    "YuTu4.png",   "YuTu6.png",
+    "YuTu8.png",    "YuTu16.png",  "YuTu32.png",  "YuTu64.png",
+    "YuTu128.png",  "YuTu256.png", "YuTu512.png", "YuTu1024.png"};
 
 // clang-format on
 

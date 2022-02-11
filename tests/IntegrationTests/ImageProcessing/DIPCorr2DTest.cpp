@@ -21,26 +21,19 @@ void _mlir_ciface_corr_2d(MemRef<float, 2> *input, MemRef<float, 2> *kernel,
 
 // Fixture for testing the dip.corr_2d operation.
 class FilterTest : public ::testing::Test {
-protected:
-  void SetUp()
-  {
-    inputImage = imread(imageName, IMREAD_GRAYSCALE);
-  }
-
 public:
-  static void setImageName(std::string imageNameParam)
+  static void setImageNames(std::vector<std::string> testImageNamesParam)
   {
-    imageName = imageNameParam;
+    testImageNames = testImageNamesParam;
   }
 
-  const Mat& getInputImage()
+  const std::vector<std::string>& getTestImageNames()
   {
-    return inputImage;
+    return testImageNames;
   }
 
 private:
-  Mat inputImage;
-  static std::string imageName;
+  static std::vector<std::string> testImageNames;
 };
 
 bool equalImages(const Mat &img1, const Mat &img2) {
@@ -107,19 +100,33 @@ void testKernel(const Mat &inputImage, unsigned int kernelRows,
 }
 
 TEST_F(FilterTest, OpenCVComparison) {
-  for (auto kernel : kernelMap)
-    testKernel(getInputImage(), get<1>(kernel.second), get<2>(kernel.second),
-               get<0>(kernel.second));
+  // for (auto kernel : kernelMap)
+  //   testKernel(getInputImage(), get<1>(kernel.second), get<2>(kernel.second),
+  //              get<0>(kernel.second));
+  std::vector<std::string> testImageNames = getTestImageNames();
+  for (auto testImageName : testImageNames)
+  {
+    for (auto kernel : kernelMap)
+    {
+      std::string testImagePath = "../../benchmarks/ImageProcessing/Images/" + testImageName;
+      cv::Mat testImage = cv::imread(testImagePath, cv::IMREAD_GRAYSCALE);
+      testKernel(testImage, get<1>(kernel.second), get<2>(kernel.second), get<0>(kernel.second));
+    }
+  }
 
   // testKernel(getInputImage(), 3, 3, laplacianKernelAlign);
   // ASSERT_EQ(2, 2);
 }
 
-string FilterTest::imageName = "";
+std::vector<std::string> FilterTest::testImageNames = {};
 
 int main(int argc, char **argv)
 {
-  FilterTest::setImageName(argv[1]);
+  FilterTest::setImageNames(imageNames);
+
+  // for (auto imageName : imageNames)
+  //   FilterTest::setImageName()
+
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
