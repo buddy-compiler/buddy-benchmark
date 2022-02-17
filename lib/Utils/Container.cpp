@@ -80,14 +80,16 @@ MemRef<T, N>::MemRef(std::vector<size_t> sizes, T init) {
 }
 
 template <typename T, size_t N>
-MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N]) {
+MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N],
+                     IMAGE_MATRIX_OPERATION operation) {
   static_assert(N == 2 || N == 4, "Currently only support 2d and 4d memref.");
 
   for (size_t i = 0; i < N; i++)
     this->sizes[i] = sizes[i];
   size = product(this->sizes);
   if (N == 2) {
-    // Copy image pixels for image processing memref.
+    // Copy image pixels for memref(assuming an image with only one channel).
+    // ToDo : Add support for multi-channeled images in this configuration.
     auto ptr = new T[image.rows * image.cols];
     this->allocated = ptr;
     this->aligned = ptr;
@@ -95,32 +97,52 @@ MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N]) {
     for (int i = 0; i < image.rows; i++) {
       for (int j = 0; j < image.cols; j++) {
         this->aligned[k] = (T)image.at<uchar>(i, j);
+
+        if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE ||
+            operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE)
+          this->aligned[k] /= 255.0f;
         k++;
       }
     }
-    setStrides();
+    if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE ||
+        operation == IMAGE_MATRIX_OPERATION::TRANSPOSE)
+      setStrides(true);
+    else
+      setStrides();
   } else if (N == 4) {
-    // Copy image pixels for deep learning tensors.
-    auto ptr = new T[image.rows * image.cols * 3];
+    // Copy image pixels for tensors.
+    unsigned int num_channels = image.channels();
+    auto ptr = new T[image.rows * image.cols * num_channels];
     this->allocated = ptr;
     this->aligned = ptr;
     int k = 0;
     // NHWC layout.
     for (int i = 0; i < image.rows; i++) {
       for (int j = 0; j < image.cols; j++) {
-        for (int color = 0; color < 3; color++) {
-          // Reorder to RGB layout and normalize the element.
-          this->aligned[k] = (T)image.at<cv::Vec3b>(i, j)[2 - color] / 255.0f;
+        for (int color = 0; color < num_channels; color++) {
+          if (num_channels == 1)
+            this->aligned[k] = (T)image.at<uchar>(i, j);
+          else // Reorder to RGB layout.
+            this->aligned[k] = (T)image.at<cv::Vec3b>(i, j)[2 - color];
+
+          if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE ||
+              operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE)
+            this->aligned[k] /= 255.0f;
           k++;
         }
       }
     }
-    setStrides(true);
+    if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE ||
+        operation == IMAGE_MATRIX_OPERATION::TRANSPOSE)
+      setStrides(true);
+    else
+      setStrides();
   }
 }
 
 template <typename T, std::size_t N>
-MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
+MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N],
+                     IMAGE_MATRIX_OPERATION operation) {
   static_assert(N == 3, "MemRef size not supported.");
 
   // Set the shape.
@@ -128,7 +150,11 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
     this->sizes[i] = sizes[i];
   }
   // Set the strides.
-  setStrides();
+  if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE ||
+      operation == IMAGE_MATRIX_OPERATION::TRANSPOSE)
+    setStrides(true);
+  else
+    setStrides();
   // Set the data.
   size_t channels = img.channels;
   size_t height = img.height;
@@ -144,8 +170,9 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
       }
     }
   }
-  // Normalize image data to [0,1] range.
-  if (img.color_type == PNG_COLOR_TYPE_RGB) {
+  if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE ||
+      operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE) {
+    // Normalize image data to [0,1] range.
     for (size_t i = 0; i < size; i++) {
       data[i] /= 255.0f;
     }
@@ -155,7 +182,8 @@ MemRef<T, N>::MemRef(const PNGImage &img, intptr_t sizes[N]) {
 }
 
 template <typename T, std::size_t N>
-MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
+MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N],
+                     IMAGE_MATRIX_OPERATION operation) {
   static_assert(N == 4, "MemRef size not supported.");
 
   // Set the shape.
@@ -163,7 +191,11 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
     this->sizes[i] = sizes[i];
   }
   // Set the strides.
-  setStrides();
+  if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE ||
+      operation == IMAGE_MATRIX_OPERATION::TRANSPOSE)
+    setStrides(true);
+  else
+    setStrides();
   // Set the data.
   size_t batch = imgs.size();
   size_t channels = imgs[0].channels;
@@ -179,6 +211,12 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]) {
               b * strides[0] + c * strides[1] + h * strides[2] + w * strides[3];
           data[offset] = static_cast<T>(
               imgs[b].data[h * width * channels + w * channels + c]);
+
+          if (operation == IMAGE_MATRIX_OPERATION::NORMALIZE ||
+              operation == IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE) {
+            // Normalize image data to [0,1] range.
+            data[offset] /= 255.0f;
+          }
         }
       }
     }
