@@ -31,8 +31,6 @@ extern "C" {
 void _mlir_ciface_resnet(MemRef<float, 2> *output, MemRef<float, 4> *input);
 }
 
-// TODO: Add input image preprocessing, the current preprocessing only has
-// resize step.
 const cv::Mat imagePreprocessing() {
 
   cv::Mat inputImage = cv::imread(
@@ -48,7 +46,6 @@ const cv::Mat imagePreprocessing() {
 
 cv::Mat image = imagePreprocessing();
 
-// TODO: figure out the correct strides layout.
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
 intptr_t sizesOutput[2] = {1, 1001};
 

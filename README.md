@@ -27,11 +27,23 @@ Run the image processing benchmark:
 | CMake Options  | Default Value |
 | -------------- | ------------- |
 | `-DBUDDY_OPT_STRIP_MINING`  | 256  |
+| `-DMLIR_LINALG_TILE`  | 2  |
 | `-DBUDDY_OPT_ATTR`  | avx512f  |
 | `-DBUDDY_OPT_TRIPLE`  | x86_64-unknown-linux-gnu  |
 
-*Note: Please replace the `/PATH/TO/*` with your local path.*
+*Note:*
 
+*1. Please replace the `/PATH/TO/*` with your local path.*
+
+*2. For running executable :*
+
+*i. Please replace `<image path>` with path of the image which is to be used for*
+*benchmarking.*
+
+*ii. Please replace `<kernel name>` with name of the kernel which is to be used for*
+*benchmarking as specifed in `include/ImageProcessing/Kernels.h`.*
+
+Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign`
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
@@ -40,7 +52,7 @@ $ cmake -G Ninja .. \
     -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
     -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
-$ cd bin && ./image-processing-benchmark
+$ cd bin && ./image-processing-benchmark <image path> <kernel name>
 ```
 
 ## Deep Learning Benchmark
