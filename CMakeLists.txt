@@ -49,7 +49,7 @@ set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/lib)
 
 # Helper functions.
-include(buddy-benchmark.cmake)
+include(${BUDDY_SOURCE_DIR}/cmake/buddy-benchmark.cmake)
 
 #-------------------------------------------------------------------------------
 # Deploy google/benchmark
@@ -113,6 +113,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
+
+#-------------------------------------------------------------------------------
+# Hardware detection
+#-------------------------------------------------------------------------------
+
+include(${BUDDY_SOURCE_DIR}/cmake/check-simd.cmake)
+check_simd()
 
 #-------------------------------------------------------------------------------
 # Subdirectory
