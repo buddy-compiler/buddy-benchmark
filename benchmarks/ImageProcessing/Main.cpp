@@ -19,6 +19,7 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
+#include <stdexcept>
 
 void initializeMLIRConv2D(char **);
 void initializeBuddyConv2D(char **);
