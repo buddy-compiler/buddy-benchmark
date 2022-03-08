@@ -8,7 +8,7 @@ add_buddy_ops_benchmark(pooling-nhwc-sum-benchmark
     -convert-linalg-to-llvm 
     -lower-affine 
     --convert-memref-to-llvm 
-    -convert-std-to-llvm='emit-c-wrappers=1' 
+    -convert-func-to-llvm='emit-c-wrappers=1' 
     -reconcile-unrealized-casts
   SOURCE Main.cpp MLIROptBenchmark.cpp
 )

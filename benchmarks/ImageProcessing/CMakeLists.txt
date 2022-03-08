@@ -28,7 +28,7 @@ add_custom_command(OUTPUT mlir-conv2d.o
             -convert-linalg-to-loops
             -convert-scf-to-cf -convert-linalg-to-llvm
             -lower-affine -convert-scf-to-cf --convert-memref-to-llvm 
-            -convert-std-to-llvm='emit-c-wrappers=1'
+            -convert-func-to-llvm='emit-c-wrappers=1'
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -48,7 +48,7 @@ add_custom_command(OUTPUT buddy-conv2d.o
             -conv-vectorization="strip-mining=${SPLITING_SIZE}" 
             -convert-vector-to-scf 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
+            -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -65,7 +65,7 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 #             -conv-vectorization="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}" 
 #             -convert-vector-to-scf 
 #             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-#             -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
+#             -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1' 
 #             -reconcile-unrealized-casts | 
 #           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
 #           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -84,7 +84,7 @@ add_custom_command(OUTPUT buddy-corr2d.o
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyCorr2D.mlir 
             -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
+            -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
