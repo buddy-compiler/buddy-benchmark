@@ -47,7 +47,7 @@ intptr_t sizesInputBuddyConv2D[2];
 intptr_t sizesKernelBuddyConv2D[2];
 intptr_t sizesOutputBuddyConv2D[2];
 
-void initializeBuddyConv2D(int argc, char **argv) {
+void initializeBuddyConv2D(char **argv) {
   inputImageBuddyConv2D = imread(argv[1], IMREAD_GRAYSCALE);
   kernelBuddyConv2DMat =
       Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
@@ -91,10 +91,10 @@ static void Buddy_Conv2D(benchmark::State &state) {
 BENCHMARK(Buddy_Conv2D)->Arg(1);
 
 // Generate result image.
-void generateResultBuddyConv2D() {
+void generateResultBuddyConv2D(char **argv) {
   // Define the MemRef descriptor for input, kernel, and output.
   MemRef<float, 2> input(inputImageBuddyConv2D, sizesInputBuddyConv2D);
-  MemRef<float, 2> kernel(kernelBuddyConv2DMat, sizesKernelBuddyConv2D);
+  MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyConv2D);
   MemRef<float, 2> output(sizesOutputBuddyConv2D);
   // Run the 2D convolution.
   _mlir_ciface_buddy_conv_2d(&input, &kernel, &output);

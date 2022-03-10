@@ -1,8 +1,21 @@
-set(BUDDY_OPT_STRIP_MINING 256 CACHE STRING "Stride Size")
+#-------------------------------------------------------------------------------
+# Optimization Configurations
+#-------------------------------------------------------------------------------
+
+if (${BUDDY_OPT_STRIP_MINING})
+  set(SPLITING_SIZE ${BUDDY_OPT_STRIP_MINING} CACHE STRING "Spliting Size")
+elseif(HAVE_AVX512)
+  set(SPLITING_SIZE 256 CACHE STRING "Spliting Size")
+elseif(HAVE_AVX2)
+  set(SPLITING_SIZE 128 CACHE STRING "Spliting Size")
+elseif(HAVE_SSE)
+  set(SPLITING_SIZE 64 CACHE STRING "Spliting Size")
+endif()
+
 set(MLIR_LINALG_TILE 2 CACHE STRING "MLIR Linalg Tile Size")
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 
-message(STATUS "Configuring Stride Size: ${BUDDY_OPT_STRIP_MINING}")
+message(STATUS "Configuring Stride Size: ${SPLITING_SIZE}")
 message(STATUS "Configuring MLIR Linalg Tile Size: ${MLIR_LINALG_TILE}")
 
 #-------------------------------------------------------------------------------
@@ -12,11 +25,10 @@ message(STATUS "Configuring MLIR Linalg Tile Size: ${MLIR_LINALG_TILE}")
 add_custom_command(OUTPUT mlir-conv2d.o
   COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/MLIRConv2D.mlir 
-            -linalg-tile="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}"
             -convert-linalg-to-loops
             -convert-scf-to-cf -convert-linalg-to-llvm
             -lower-affine -convert-scf-to-cf --convert-memref-to-llvm 
-            -convert-std-to-llvm='emit-c-wrappers=1'
+            -convert-func-to-llvm='emit-c-wrappers=1'
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -33,10 +45,10 @@ set_target_properties(MLIRConv2D PROPERTIES LINKER_LANGUAGE CXX)
 add_custom_command(OUTPUT buddy-conv2d.o
   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
-            -conv-vectorization="strip-mining=${BUDDY_OPT_STRIP_MINING}" 
+            -conv-vectorization="strip-mining=${SPLITING_SIZE}" 
             -convert-vector-to-scf 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
+            -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -46,6 +58,23 @@ add_custom_command(OUTPUT buddy-conv2d.o
 add_library(BuddyConv2D STATIC buddy-conv2d.o)
 set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 
+# add_custom_command(OUTPUT buddy-conv2d.o
+#   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+#           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
+#             -linalg-tile="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}"
+#             -conv-vectorization="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}" 
+#             -convert-vector-to-scf 
+#             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+#             -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1' 
+#             -reconcile-unrealized-casts | 
+#           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+#           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+#             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+#             -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-conv2d.o
+# )
+# add_library(BuddyConv2D STATIC buddy-conv2d.o)
+# set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
+
 #-------------------------------------------------------------------------------
 # Buddy DIP Dialect Corr2D Operation + CB Algorithm
 #-------------------------------------------------------------------------------
@@ -53,9 +82,9 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 add_custom_command(OUTPUT buddy-corr2d.o
   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyCorr2D.mlir 
-            -lower-dip="DIP-strip-mining=${BUDDY_OPT_STRIP_MINING}" 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            -convert-memref-to-llvm -convert-std-to-llvm='emit-c-wrappers=1' 
+            -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1' 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 

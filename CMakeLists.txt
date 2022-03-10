@@ -16,7 +16,7 @@ endif()
 
 project(buddy-benchmark LANGUAGES CXX C)
   
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_FLAGS "-no-pie")
 set(CMAKE_C_FLAGS "-no-pie")
@@ -49,7 +49,7 @@ set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
 set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/lib)
 
 # Helper functions.
-include(buddy-benchmark.cmake)
+include(${BUDDY_SOURCE_DIR}/cmake/buddy-benchmark.cmake)
 
 #-------------------------------------------------------------------------------
 # Deploy google/benchmark
@@ -113,6 +113,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
+
+#-------------------------------------------------------------------------------
+# Hardware detection
+#-------------------------------------------------------------------------------
+
+include(${BUDDY_SOURCE_DIR}/cmake/check-simd.cmake)
+check_simd()
 
 #-------------------------------------------------------------------------------
 # Subdirectory
