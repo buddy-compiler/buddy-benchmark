@@ -96,7 +96,7 @@ $ cd <path to build>/bin && ./depthwise-conv-2d-nhwc-hwc-benchmark
 
 ## Audio Processing Benchmark
 
-Currently, the image processing benchmark includes the following frameworks or optimizers:
+Currently, the audio processing benchmark includes the following frameworks or optimizers:
 
 - KFR ([link](https://github.com/kfrlib/kfr))
 
@@ -109,7 +109,7 @@ $ cmake -G Ninja .. \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
-$ ninja
+$ ninja audio-processing-benchmark
 ```
 
 ## Testing

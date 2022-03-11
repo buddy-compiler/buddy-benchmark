@@ -104,15 +104,19 @@ endif()
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
-find_package(OpenCV REQUIRED CONFIG)
-include_directories(${OpenCV_INCLUDE_DIRS})
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+  find_package(OpenCV REQUIRED CONFIG)
+  include_directories(${OpenCV_INCLUDE_DIRS})
+endif()
 
 #-------------------------------------------------------------------------------
 # Find PNG
 #-------------------------------------------------------------------------------
 
-find_package(PNG REQUIRED)
-include_directories(${PNG_INCLUDE_DIR})
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+  find_package(PNG REQUIRED)
+  include_directories(${PNG_INCLUDE_DIR})
+endif()
 
 #-------------------------------------------------------------------------------
 # Hardware detection
