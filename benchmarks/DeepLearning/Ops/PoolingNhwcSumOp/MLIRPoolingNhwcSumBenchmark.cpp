@@ -1,4 +1,4 @@
-//===- MLIROptBenchmark.cpp -----------------------------------------------===//
+//===- PoolingNhwcSumBenchmark.cpp ----------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@ void _mlir_ciface_pooling_nhwc_sum(MemRef<float, 4> *input,
 }
 
 // Create input, filter, and output.
-MemRef<float, 4> input({1, 6, 6, 1}, 1.0);
+MemRef<float, 4> input({1, 1024, 1024, 1}, 0.1);
 MemRef<float, 2> filter({3, 3}, 1.0);
-intptr_t sizesOutput[4] = {1, 3, 3, 1};
+intptr_t sizesOutput[4] = {1, 1022, 1022, 1};
 MemRef<float, 4> output(sizesOutput);
 
 // Define benchmark function.
-void BM_PoolingNhwcSum(benchmark::State &state) {
+void MLIR_PoolingNhwcSum(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_pooling_nhwc_sum(&input, &filter, &output);
@@ -48,18 +48,5 @@ void BM_PoolingNhwcSum(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_PoolingNhwcSum)->Arg(1);
-BENCHMARK(BM_PoolingNhwcSum)->Arg(4);
-
-// Print result function.
-void printResult() {
-  // Create the output memref.
-  MemRef<float, 4> output(sizesOutput);
-  // Run the mlir function.
-  _mlir_ciface_pooling_nhwc_sum(&input, &filter, &output);
-  // Print the output.
-  std::cout << "Output: [ ";
-  for (int i = 0; i < 9; ++i)
-    std::cout << output[i] << " ";
-  std::cout << "]" << std::endl;
-}
+BENCHMARK(MLIR_PoolingNhwcSum)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(MLIR_PoolingNhwcSum)->Arg(4)->Unit(benchmark::kMillisecond);
