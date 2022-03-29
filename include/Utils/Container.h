@@ -28,6 +28,8 @@
 
 #include "Utils/PNGImage.h"
 
+// ToDo : Identify the proper usecase which requires "TRANSPOSE" operation.
+
 enum class IMAGE_MATRIX_OPERATION {
   DEFAULT,
   NORMALIZE,
