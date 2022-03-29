@@ -5,6 +5,7 @@ add_executable(
 target_link_libraries(
   test-container
   gtest_main
+  ${OpenCV_LIBS}
 )
 
 add_dependencies(test-container Container)
