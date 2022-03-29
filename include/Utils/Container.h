@@ -28,6 +28,15 @@
 
 #include "Utils/PNGImage.h"
 
+// ToDo : Identify the proper usecase which requires "TRANSPOSE" operation.
+
+enum class IMAGE_MATRIX_OPERATION {
+  DEFAULT,
+  NORMALIZE,
+  NORMALIZE_AND_TRANSPOSE,
+  TRANSPOSE
+};
+
 // MemRef descriptor.
 // - T represents the type of the elements.
 // - N represents the number of dimensions.
@@ -40,12 +49,15 @@ public:
   MemRef(intptr_t sizes[N], T init = T(0));
   MemRef(std::vector<size_t> sizes, T init = T(0));
   // Create a memref from an opencv image.
-  MemRef(cv::Mat image, intptr_t sizes[N]);
+  MemRef(cv::Mat image, intptr_t sizes[N],
+         IMAGE_MATRIX_OPERATION operation = IMAGE_MATRIX_OPERATION::DEFAULT);
   // Constructor from a png image.
-  MemRef(const PNGImage &img, intptr_t sizes[N]);
+  MemRef(const PNGImage &img, intptr_t sizes[N],
+         IMAGE_MATRIX_OPERATION operation = IMAGE_MATRIX_OPERATION::DEFAULT);
   // Constructor from a vector of png images.
   // Assume that all the images have the same shape.
-  MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N]);
+  MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N],
+         IMAGE_MATRIX_OPERATION operation = IMAGE_MATRIX_OPERATION::DEFAULT);
   // Copy constructor.
   MemRef(const MemRef<T, N> &other);
   // Copy assignment operator.
