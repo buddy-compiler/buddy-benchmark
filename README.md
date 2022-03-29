@@ -27,6 +27,7 @@ Run the image processing benchmark:
 | CMake Options  | Default Value |
 | -------------- | ------------- |
 | `-DBUDDY_OPT_STRIP_MINING`  | 256  |
+| `-DMLIR_LINALG_TILE`  | 2  |
 | `-DBUDDY_OPT_ATTR`  | avx512f  |
 | `-DBUDDY_OPT_TRIPLE`  | x86_64-unknown-linux-gnu  |
 
@@ -91,6 +92,24 @@ Run the DepthwiseConv2DNhwcHwc operation benchmark:
 
 ```
 $ cd <path to build>/bin && ./depthwise-conv-2d-nhwc-hwc-benchmark
+```
+
+## Audio Processing Benchmark
+
+Currently, the audio processing benchmark includes the following frameworks or optimizers:
+
+- KFR ([link](https://github.com/kfrlib/kfr))
+
+*Note: Please replace the `/PATH/TO/*` with your local path.*
+
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DAUDIO_PROCESSING_BENCHMARKS=ON \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
+$ ninja audio-processing-benchmark
 ```
 
 ## Testing

@@ -20,6 +20,7 @@
 
 #include "Utils/Test.h"
 #include "Utils/Container.h"
+#include <opencv2/opencv.hpp>
 
 // Fixture for testing the MemRef class.
 class MemRefTest : public ::testing::Test {
@@ -193,6 +194,56 @@ TEST_F(MemRefTest, TransposeNCHWToNHWC) {
   size_t n_data = sizeof(true_data) / sizeof(float);
   ASSERT_EQ(transposed.getSize(), n_data);
   ASSERT_ARRAY_EQ(transposed.getData(), true_data, n_data);
+}
+
+TEST_F(MemRefTest, ImageNormalization) {
+  cv::Mat testImage = cv::imread(
+      "../../benchmarks/ImageProcessing/Images/YuTu.png", cv::IMREAD_GRAYSCALE);
+  intptr_t testImageDimensions[2] = {testImage.rows, testImage.cols};
+  MemRef<float, 2> testImageMemref(testImage, testImageDimensions,
+                                   IMAGE_MATRIX_OPERATION::NORMALIZE);
+  unsigned int testImageSize = testImage.rows * testImage.cols, k = 0;
+  float *true_data = new float[testImageSize];
+
+  for (unsigned int i = 0; i < testImage.rows; ++i)
+    for (unsigned int j = 0; j < testImage.cols; ++j)
+      true_data[k] = testImage.at<uchar>(i, j) / 255.0f, ++k;
+
+  ASSERT_ARRAY_EQ(testImageMemref.getData(), true_data, testImageSize);
+}
+
+TEST_F(MemRefTest, ImageTranspose) {
+  cv::Mat testImage = cv::imread(
+      "../../benchmarks/ImageProcessing/Images/YuTu.png", cv::IMREAD_GRAYSCALE);
+  intptr_t testImageDimensions[2] = {testImage.rows, testImage.cols};
+  MemRef<float, 2> testImageMemref(testImage, testImageDimensions,
+                                   IMAGE_MATRIX_OPERATION::TRANSPOSE);
+  unsigned int testImageSize = testImage.rows * testImage.cols;
+
+  cv::transpose(testImage, testImage);
+  intptr_t testImageTransposeDimensions[2] = {testImage.rows, testImage.cols};
+  MemRef<float, 2> trueImageMemref(testImage, testImageTransposeDimensions);
+
+  ASSERT_ARRAY_EQ(testImageMemref.getData(), trueImageMemref.getData(),
+                  testImageSize);
+}
+
+TEST_F(MemRefTest, ImageNormalizeAndTranspose) {
+  cv::Mat testImage = cv::imread(
+      "../../benchmarks/ImageProcessing/Images/YuTu.png", cv::IMREAD_GRAYSCALE);
+  intptr_t testImageDimensions[2] = {testImage.rows, testImage.cols};
+  MemRef<float, 2> testImageMemref(
+      testImage, testImageDimensions,
+      IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE);
+  unsigned int testImageSize = testImage.rows * testImage.cols, k = 0;
+  cv::transpose(testImage, testImage);
+  float *true_data = new float[testImageSize];
+
+  for (unsigned int i = 0; i < testImage.rows; ++i)
+    for (unsigned int j = 0; j < testImage.cols; ++j)
+      true_data[k] = testImage.at<uchar>(i, j) / 255.0f, ++k;
+
+  ASSERT_ARRAY_EQ(testImageMemref.getData(), true_data, testImageSize);
 }
 
 // Copy constructor.

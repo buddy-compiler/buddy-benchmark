@@ -16,7 +16,7 @@ endif()
 
 project(buddy-benchmark LANGUAGES CXX C)
   
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_FLAGS "-no-pie")
 set(CMAKE_C_FLAGS "-no-pie")
@@ -46,9 +46,10 @@ include_directories(${BUDDY_SOURCE_DIR}/lib) # For template inclusion model.
 
 # MLIR binary directory.
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
+set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/lib)
 
 # Helper functions.
-include(buddy-benchmark.cmake)
+include(${BUDDY_SOURCE_DIR}/cmake/buddy-benchmark.cmake)
 
 #-------------------------------------------------------------------------------
 # Deploy google/benchmark
@@ -103,15 +104,26 @@ endif()
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
-find_package(OpenCV REQUIRED CONFIG)
-include_directories(${OpenCV_INCLUDE_DIRS})
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+  find_package(OpenCV REQUIRED CONFIG)
+  include_directories(${OpenCV_INCLUDE_DIRS})
+endif()
 
 #-------------------------------------------------------------------------------
 # Find PNG
 #-------------------------------------------------------------------------------
 
-find_package(PNG REQUIRED)
-include_directories(${PNG_INCLUDE_DIR})
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+  find_package(PNG REQUIRED)
+  include_directories(${PNG_INCLUDE_DIR})
+endif()
+
+#-------------------------------------------------------------------------------
+# Hardware detection
+#-------------------------------------------------------------------------------
+
+include(${BUDDY_SOURCE_DIR}/cmake/check-simd.cmake)
+check_simd()
 
 #-------------------------------------------------------------------------------
 # Subdirectory

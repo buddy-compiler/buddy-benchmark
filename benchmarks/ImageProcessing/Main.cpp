@@ -19,13 +19,16 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
+#include <stdexcept>
 
-void initializeBM_Conv2D_Buddy(int, char **);
-void initializeBM_Corr2D_Buddy(int, char **);
-void initializeBM_Filter2D_OpenCV(int, char **);
+void initializeMLIRConv2D(char **);
+void initializeBuddyConv2D(char **);
+void initializeBuddyCorr2D(char **);
+void initializeOpenCVFilter2D(char **);
 
-void generateResultConv2D();
-void generateResultCorr2D();
+void generateResultBuddyConv2D(char **);
+void generateResultBuddyCorr2D(char **);
+void generateResultOpenCVFilter2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -40,15 +43,18 @@ int main(int argc, char **argv) {
         "include/ImageProcessing/Kernels.h\n");
   }
 
-  initializeBM_Conv2D_Buddy(argc, argv);
-  initializeBM_Corr2D_Buddy(argc, argv);
-  initializeBM_Filter2D_OpenCV(argc, argv);
+  initializeMLIRConv2D(argv);
+  initializeBuddyConv2D(argv);
+  initializeBuddyCorr2D(argv);
+  initializeOpenCVFilter2D(argv);
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
+
   // Generate result image.
-  generateResultConv2D();
-  generateResultCorr2D();
+  generateResultOpenCVFilter2D();
+  generateResultBuddyConv2D(argv);
+  generateResultBuddyCorr2D(argv);
 
   return 0;
 }

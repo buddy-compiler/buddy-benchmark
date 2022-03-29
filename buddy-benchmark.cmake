@@ -40,10 +40,12 @@ function(add_buddy_model_benchmark name)
   add_executable(${name} ${ARGS_SOURCE})
 
   # Link libraries
+  target_link_directories(${name} PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
   target_link_libraries(${name}
     ${ARGS_LIBRARY}
     GoogleBenchmark
     Container
+    mlir_c_runner_utils
   )
   if (${ARGS_OpenCV})
     target_link_libraries(${name} ${ARGS_LIBRARY} ${OpenCV_LIBS})
