@@ -28,11 +28,12 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_corr_2d(MemRef<float, 2> *inputBuddyCorr2D,
-                          MemRef<float, 2> *kernelBuddyCorr2D,
-                          MemRef<float, 2> *outputBuddyCorr2D,
-                          unsigned int centerX, unsigned int centerY,
-                          int boundaryOption);
+void _mlir_ciface_corr_2d_constant_padding(MemRef<float, 2> *inputBuddyCorr2D,
+                                           MemRef<float, 2> *kernelBuddyCorr2D,
+                                           MemRef<float, 2> *outputBuddyCorr2D,
+                                           unsigned int centerX,
+                                           unsigned int centerY,
+                                           float constantValue);
 }
 
 // Declare input image and kernel.
@@ -81,9 +82,9 @@ static void Buddy_Corr2D(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_corr_2d(&inputBuddyCorr2D, &kernelBuddyCorr2D,
-                           &outputBuddyCorr2D, 1 /* Center X */,
-                           1 /* Center Y */, 0 /* Boundary Option */);
+      _mlir_ciface_corr_2d_constant_padding(
+          &inputBuddyCorr2D, &kernelBuddyCorr2D, &outputBuddyCorr2D,
+          1 /* Center X */, 1 /* Center Y */, 0.0f /* Constant Value */);
     }
   }
 }
@@ -98,8 +99,9 @@ void generateResultBuddyCorr2D(char **argv) {
   MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
-  _mlir_ciface_corr_2d(&input, &kernel, &output, 1 /* Center X */,
-                       1 /* Center Y */, 0 /* Boundary Option */);
+  _mlir_ciface_corr_2d_constant_padding(&input, &kernel, &output,
+                                        1 /* Center X */, 1 /* Center Y */,
+                                        0.0f /* Constant Value */);
 
   // Define a cv::Mat with the output of the correlation.
   Mat outputImage(outputRowsBuddyCorr2D, outputColsBuddyCorr2D, CV_32FC1,
