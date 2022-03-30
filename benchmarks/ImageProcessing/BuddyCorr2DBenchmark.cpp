@@ -31,8 +31,8 @@ extern "C" {
 void _mlir_ciface_corr_2d(MemRef<float, 2> *inputBuddyCorr2D,
                           MemRef<float, 2> *kernelBuddyCorr2D,
                           MemRef<float, 2> *outputBuddyCorr2D,
-                          unsigned int centerX, unsigned int centerY,
-                          int boundaryOption);
+                          unsigned int centerX, unsigned int centerY, 
+                          float constantValue);
 }
 
 // Declare input image and kernel.
@@ -83,7 +83,7 @@ static void Buddy_Corr2D(benchmark::State &state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_corr_2d(&inputBuddyCorr2D, &kernelBuddyCorr2D,
                            &outputBuddyCorr2D, 1 /* Center X */,
-                           1 /* Center Y */, 0 /* Boundary Option */);
+                           1 /* Center Y */, 0.0f);
     }
   }
 }
