@@ -22,11 +22,21 @@
 #define UTILS_CONTAINER
 
 #include <memory>
-#include <opencv2/opencv.hpp>
+
 #include <stdint.h>
 #include <vector>
 
+#ifdef AUDIO_CONTAINER
+#include <kfr/base.hpp>
+#include <kfr/dft.hpp>
+#include <kfr/dsp.hpp>
+#include <kfr/io.hpp>
+#endif
+
+#ifdef IMAGE_CONTAINER
+#include <opencv2/opencv.hpp>
 #include "Utils/PNGImage.h"
+#endif
 
 // ToDo : Identify the proper usecase which requires "TRANSPOSE" operation.
 
@@ -36,7 +46,7 @@ enum class IMAGE_MATRIX_OPERATION {
   NORMALIZE_AND_TRANSPOSE,
   TRANSPOSE
 };
-
+#endif
 // MemRef descriptor.
 // - T represents the type of the elements.
 // - N represents the number of dimensions.
@@ -48,6 +58,7 @@ public:
   // Constructor from shape.
   MemRef(intptr_t sizes[N], T init = T(0));
   MemRef(std::vector<size_t> sizes, T init = T(0));
+  #ifdef IMAGE_CONTAINER
   // Create a memref from an opencv image.
   MemRef(cv::Mat image, intptr_t sizes[N],
          IMAGE_MATRIX_OPERATION operation = IMAGE_MATRIX_OPERATION::DEFAULT);
@@ -58,6 +69,14 @@ public:
   // Assume that all the images have the same shape.
   MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N],
          IMAGE_MATRIX_OPERATION operation = IMAGE_MATRIX_OPERATION::DEFAULT);
+  #endif
+  #ifdef AUDIO_CONTAINER
+  // Constructor from KFR univector. 
+  MemRef(const kfr::univector<T>, intptr_t sizes[N]);
+  // Constructor from KFR univector2d.
+  // Data layout is determined by sizes[N]. 
+  MemRef(const kfr::univector2d<T>, intptr_t sizes[N]);
+  #endif
   // Copy constructor.
   MemRef(const MemRef<T, N> &other);
   // Copy assignment operator.

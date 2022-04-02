@@ -78,7 +78,7 @@ MemRef<T, N>::MemRef(std::vector<size_t> sizes, T init) {
   allocated = data;
   std::fill(data, data + size, init);
 }
-
+#ifdef IMAGE_CONTAINER
 template <typename T, size_t N>
 MemRef<T, N>::MemRef(cv::Mat image, intptr_t sizes[N],
                      IMAGE_MATRIX_OPERATION operation) {
@@ -224,7 +224,47 @@ MemRef<T, N>::MemRef(const std::vector<PNGImage> &imgs, intptr_t sizes[N],
   aligned = data;
   allocated = data;
 }
+#endif
+#ifdef AUDIO_CONTAINER
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(const kfr::univector<T> aud, intptr_t sizes[N]) {
+  static_assert(N == 1, "When data container is univerctor<T> type, the constructor only support mono audio.");
+  this->offset = 0;
+  for (size_t i = 0; i < N; i++) {
+    this->sizes[i] = sizes[i];
+  }
+  setStrides();
+  size = product(sizes);
+  T *ptr = new T[size];
+  this->aligned = ptr;
+  this->allocated = ptr;
+  for(int i = 0; i < aud.size(); i++) {
+    *ptr = aud[i];
+    ptr++;
+  }
+}
 
+template <typename T, std::size_t N>
+MemRef<T, N>::MemRef(const kfr::univector2d<T> aud, intptr_t sizes[N]) {
+  static_assert(N == 2, "When data container is univector2d<T> type, the constructor only support stereo audio.");
+  printf("Testing!!!\n");
+  this->offset = 0;
+  for (size_t i = 0; i < N; i++) {
+    this->sizes[i] = sizes[i];
+  }
+  setStrides();
+  size = product(sizes);
+  T *ptr = new T[size];
+  this->aligned = ptr;
+  this->allocated = ptr;
+  for(int i = 0; i < this->sizes[0]; i++) {
+    for(int j = 0; j < this->sizes[1]; j++){
+      *ptr = aud[i][j];
+      ptr++;
+    }
+  }
+}
+#endif
 template <typename T, std::size_t N>
 MemRef<T, N>::MemRef(const MemRef<T, N> &other)
     : offset(other.offset), size(other.size) {
