@@ -7,34 +7,41 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
-// #include "../../UniTests/Test.h"
 
 using namespace cv;
 using namespace std;
 
 // Declare the Corr2D C interface.
 extern "C" {
-void _mlir_ciface_corr_2d(MemRef<float, 2> *input, MemRef<float, 2> *kernel,
-                          MemRef<float, 2> *output, unsigned int centerX,
-                          unsigned int centerY, int boundaryOption);
+void _mlir_ciface_corr_2d_constant_padding(MemRef<float, 2> *input, MemRef<float, 2> *kernel,
+                                           MemRef<float, 2> *output, unsigned int centerX,
+                                           unsigned int centerY, float constantValue);
 }
 
 // Fixture for testing the dip.corr_2d operation.
 class FilterTest : public ::testing::Test {
 public:
-  static void setImageNames(std::vector<std::string> testImageNamesParam)
+  static void setImageNames(int argc, char **argv)
   {
-    testImageNames = testImageNamesParam;
+    if (argc > 1)
+      testImageName = argv[1];
+    else 
+      {
+        testImageName = "../../benchmarks/ImageProcessing/Images/YuTu.png";
+        std::cout << "Reached here\n";
+      }
   }
 
-  const std::vector<std::string>& getTestImageNames()
+  const std::string getTestImageName()
   {
-    return testImageNames;
+    return testImageName;
   }
 
 private:
-  static std::vector<std::string> testImageNames;
+  static std::string testImageName;
 };
+
+std::string FilterTest::testImageName;
 
 bool equalImages(const Mat &img1, const Mat &img2) {
   if (img1.rows != img2.rows || img1.cols != img2.cols) {
@@ -45,7 +52,7 @@ bool equalImages(const Mat &img1, const Mat &img2) {
 
   for (unsigned int y = 0; y < img1.rows; ++y) {
     for (unsigned int x = 0; x < img1.cols; ++x) {
-      if (abs(img1.at<float>(x, y) - img2.at<float>(x, y)) > 10e-3) {
+      if (abs(img1.at<float>(x, y) - img2.at<float>(x, y)) > 10e-2) {
         std::cout << "Produced outputs by DIP and OpenCV differ.\n";
         return 0;
       }
@@ -58,14 +65,13 @@ void testKernelImpl(const Mat &inputImage, unsigned int kernelRows,
                     unsigned int kernelCols, float *kernelArray, unsigned int x,
                     unsigned int y) {
   // Define container sizes.
-  intptr_t sizesInput[2] = {inputImage.rows, inputImage.cols};
+  intptr_t sizesImage[2] = {inputImage.rows, inputImage.cols};
   intptr_t sizesKernel[2] = {kernelRows, kernelCols};
-  intptr_t sizesOutput[2] = {inputImage.rows, inputImage.cols};
 
   // Define input, kernel, and output.
-  MemRef<float, 2> input(inputImage, sizesInput);
+  MemRef<float, 2> input(inputImage, sizesImage);
   MemRef<float, 2> kernel(kernelArray, sizesKernel);
-  MemRef<float, 2> output(sizesOutput);
+  MemRef<float, 2> output(sizesImage);
 
   for (int i = 0; i < inputImage.rows; i++)
     for (int j = 0; j < inputImage.cols; j++)
@@ -74,10 +80,10 @@ void testKernelImpl(const Mat &inputImage, unsigned int kernelRows,
   Mat kernel1 = Mat(kernelRows, kernelCols, CV_32FC1, kernelArray);
   Mat opencvOutput;
 
-  _mlir_ciface_corr_2d(&input, &kernel, &output, x, y, 0);
+  _mlir_ciface_corr_2d_constant_padding(&input, &kernel, &output, x, y, 0);
 
   filter2D(inputImage, opencvOutput, CV_32FC1, kernel1, cv::Point(x, y), 0.0,
-           cv::BORDER_REPLICATE);
+           cv::BORDER_CONSTANT);
 
   // Define a cv::Mat with the output of corr_2d.
   Mat dipOutput(inputImage.rows, inputImage.cols, CV_32FC1, output.getData());
@@ -100,32 +106,16 @@ void testKernel(const Mat &inputImage, unsigned int kernelRows,
 }
 
 TEST_F(FilterTest, OpenCVComparison) {
-  // for (auto kernel : kernelMap)
-  //   testKernel(getInputImage(), get<1>(kernel.second), get<2>(kernel.second),
-  //              get<0>(kernel.second));
-  std::vector<std::string> testImageNames = getTestImageNames();
-  for (auto testImageName : testImageNames)
-  {
     for (auto kernel : kernelMap)
     {
-      std::string testImagePath = "../../benchmarks/ImageProcessing/Images/" + testImageName;
-      cv::Mat testImage = cv::imread(testImagePath, cv::IMREAD_GRAYSCALE);
+      cv::Mat testImage = cv::imread(getTestImageName(), cv::IMREAD_GRAYSCALE);
       testKernel(testImage, get<1>(kernel.second), get<2>(kernel.second), get<0>(kernel.second));
     }
-  }
-
-  // testKernel(getInputImage(), 3, 3, laplacianKernelAlign);
-  // ASSERT_EQ(2, 2);
 }
-
-std::vector<std::string> FilterTest::testImageNames = {};
 
 int main(int argc, char **argv)
 {
-  FilterTest::setImageNames(imageNames);
-
-  // for (auto imageName : imageNames)
-  //   FilterTest::setImageName()
+  FilterTest::setImageNames(argc, argv);
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
