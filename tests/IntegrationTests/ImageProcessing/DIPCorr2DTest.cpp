@@ -26,10 +26,7 @@ public:
     if (argc > 1)
       testImageName = argv[1];
     else 
-      {
-        testImageName = "../../benchmarks/ImageProcessing/Images/YuTu.png";
-        std::cout << "Reached here\n";
-      }
+      testImageName = "../../benchmarks/ImageProcessing/Images/YuTu.png";
   }
 
   const std::string getTestImageName()

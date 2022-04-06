@@ -126,24 +126,13 @@ $ cmake -G Ninja .. \
     -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
     -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
 $ cmake --build . --
-$ ninja test
+$ ninja test && ninja image-processing-integration-tests
 ```
 
-For tests related to DIP dialect : 
-
+For executing Image Processing integration tests : 
 ```
-$ cd buddy-benchmark
-$ mkdir build && cd build
-$ cmake -G Ninja .. \
-    -DIMAGE_PROCESSING_BENCHMARKS=ON \
-    -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DBUILD_TESTS=ON \
-    -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
-    -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
-    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
-$ ninja DIPCorr2DTest
-$ cd bin && ./DIPCorr2DTest <image path>
+cd bin 
+./image-processing-integration-tests <optional_image_path>
 ```
 
-where `<image path>` is the path of image used as first operand during 2D Correlation.
+where `<optional_image_path>` is an optional parameter used for pointing to the image which is to be used while executing tests.
