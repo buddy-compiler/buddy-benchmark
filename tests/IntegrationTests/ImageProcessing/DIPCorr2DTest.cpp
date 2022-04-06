@@ -13,26 +13,22 @@ using namespace std;
 
 // Declare the Corr2D C interface.
 extern "C" {
-void _mlir_ciface_corr_2d_constant_padding(MemRef<float, 2> *input, MemRef<float, 2> *kernel,
-                                           MemRef<float, 2> *output, unsigned int centerX,
-                                           unsigned int centerY, float constantValue);
+void _mlir_ciface_corr_2d_constant_padding(
+    MemRef<float, 2> *input, MemRef<float, 2> *kernel, MemRef<float, 2> *output,
+    unsigned int centerX, unsigned int centerY, float constantValue);
 }
 
 // Fixture for testing the dip.corr_2d operation.
 class FilterTest : public ::testing::Test {
 public:
-  static void setImageNames(int argc, char **argv)
-  {
+  static void setImageNames(int argc, char **argv) {
     if (argc > 1)
       testImageName = argv[1];
-    else 
+    else
       testImageName = "../../benchmarks/ImageProcessing/Images/YuTu.png";
   }
 
-  const std::string getTestImageName()
-  {
-    return testImageName;
-  }
+  const std::string getTestImageName() { return testImageName; }
 
 private:
   static std::string testImageName;
@@ -103,15 +99,14 @@ void testKernel(const Mat &inputImage, unsigned int kernelRows,
 }
 
 TEST_F(FilterTest, OpenCVComparison) {
-    for (auto kernel : kernelMap)
-    {
-      cv::Mat testImage = cv::imread(getTestImageName(), cv::IMREAD_GRAYSCALE);
-      testKernel(testImage, get<1>(kernel.second), get<2>(kernel.second), get<0>(kernel.second));
-    }
+  for (auto kernel : kernelMap) {
+    cv::Mat testImage = cv::imread(getTestImageName(), cv::IMREAD_GRAYSCALE);
+    testKernel(testImage, get<1>(kernel.second), get<2>(kernel.second),
+               get<0>(kernel.second));
+  }
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   FilterTest::setImageNames(argc, argv);
 
   ::testing::InitGoogleTest(&argc, argv);

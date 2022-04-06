@@ -14,6 +14,6 @@ target_link_libraries(
   ${OpenCV_LIBS} 
   BuddyCorr2D 
   Container 
-  PNGImage 
+   
   gtest_main
 )
