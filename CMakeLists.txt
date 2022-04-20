@@ -136,3 +136,7 @@ if (BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+if (BUILD_COMPARISONS)
+  add_subdirectory(comparison)
+endif()
