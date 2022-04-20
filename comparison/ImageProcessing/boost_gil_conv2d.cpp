@@ -1,4 +1,4 @@
-//===- boost_gil_conv2d.cpp -------------------------------------------===//
+//===- boost_gil_conv2d.cpp -----------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements an example for depicting the use of Boost GIL's 2D Convolution API.
+// This file implements an example for depicting the use of Boost GIL's 2D
+// Convolution API.
 //
 //===----------------------------------------------------------------------===//
 

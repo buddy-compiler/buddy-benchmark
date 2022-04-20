@@ -141,3 +141,4 @@ $ cmake -G Ninja .. \
 $ ninja boost_gil_conv2d
 $ cd bin && ./boost_gil_conv2d <image_path> <output_image_name>
 ```
+Ex. `./boost_gil_conv2d ../../benchmarks/ImageProcessing/Images/gil_sample.png gil_output.png`
