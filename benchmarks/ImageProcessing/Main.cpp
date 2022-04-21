@@ -25,10 +25,12 @@ void initializeMLIRConv2D(char **);
 void initializeBuddyConv2D(char **);
 void initializeBuddyCorr2D(char **);
 void initializeOpenCVFilter2D(char **);
+void initializeEigenConvolve2D(char **);
 
 void generateResultBuddyConv2D(char **);
 void generateResultBuddyCorr2D(char **);
 void generateResultOpenCVFilter2D();
+void generateResultEigenConvolve2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -47,6 +49,7 @@ int main(int argc, char **argv) {
   initializeBuddyConv2D(argv);
   initializeBuddyCorr2D(argv);
   initializeOpenCVFilter2D(argv);
+  initializeEigenConvolve2D(argv);
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
@@ -55,6 +58,7 @@ int main(int argc, char **argv) {
   generateResultOpenCVFilter2D();
   generateResultBuddyConv2D(argv);
   generateResultBuddyCorr2D(argv);
+  generateResultEigenConvolve2D();
 
   return 0;
 }

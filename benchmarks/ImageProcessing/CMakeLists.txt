@@ -101,10 +101,17 @@ set_target_properties(BuddyCorr2D PROPERTIES LINKER_LANGUAGE CXX)
 add_executable(image-processing-benchmark
   Main.cpp 
   OpenCVFilter2DBenchmark.cpp
+  EigenConvolve2DBenchmark.cpp
   MLIRConv2DBenchmark.cpp
   BuddyConv2DBenchmark.cpp
   BuddyCorr2DBenchmark.cpp
   )
+
+target_include_directories(image-processing-benchmark 
+  PRIVATE
+  ${EIGEN_DIR}
+  ${EIGEN_DIR}/unsupported/
+)
 
 target_link_libraries(image-processing-benchmark 
   GoogleBenchmark
