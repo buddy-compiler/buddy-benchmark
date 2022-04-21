@@ -18,6 +18,8 @@ Currently, the image processing benchmark includes the following frameworks or o
 
 *NOTE: Please build OpenCV from source to achieve the best performance.*
 
+- Eigen ([link](https://eigen.tuxfamily.org/index.php?title=Main_Page))
+
 - Buddy MLIR ([link](https://github.com/buddy-compiler/buddy-mlir))
 
 *NOTE: Please make sure the `buddy-opt` tool of buddy-mlir project can work well.*
@@ -50,6 +52,7 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
     -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DEIGEN_DIR=/PATH/TO/EIGEN/SOURCE/CODE \
     -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark <image path> <kernel name>
