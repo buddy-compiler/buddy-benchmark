@@ -35,7 +35,7 @@ pip install onnxruntime
 
 ## Run Comparison
 
-Please make sure TensorFlow, PyTorch, onnx, onnxruntime are installed in your environment.
+Please make sure TensorFlow, OpenCV, PyTorch, ONNX, ONNX Runtime are installed in your environment.
 
 - TensorFlow
 
