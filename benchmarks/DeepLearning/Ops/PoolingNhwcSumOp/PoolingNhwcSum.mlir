@@ -1,4 +1,4 @@
-func @pooling_nhwc_sum(%input: memref<?x?x?x?xf32>, %filter: memref<?x?xf32>,
+func.func @pooling_nhwc_sum(%input: memref<?x?x?x?xf32>, %filter: memref<?x?xf32>,
                        %output: memref<?x?x?x?xf32>) {
 
   linalg.pooling_nhwc_sum
