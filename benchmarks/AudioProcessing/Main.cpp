@@ -21,13 +21,21 @@
 #include <benchmark/benchmark.h>
 
 void initializeKFRFir();
+void initializeKFRBiquad();
+void initializeKFRFft();
 
 void generateResultKFRFir();
+void generateResultKFRBiquad();
+void generateResultKFRFft();
 
 int main(int argc, char **argv) {
   initializeKFRFir();
+  initializeKFRBiquad();
+  initializeKFRFft();
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
   generateResultKFRFir();
+  generateResultKFRBiquad();
+  generateResultKFRFft();
   return 0;
 }

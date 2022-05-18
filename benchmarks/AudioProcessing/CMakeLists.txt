@@ -7,7 +7,9 @@ add_subdirectory(${KFR_DIR} ./kfr)
 include_directories(${KFR_DIR}/include)
 
 add_executable(audio-processing-benchmark
+  KFRFft.cpp
   KFRFir.cpp 
+  KFRBiquad.cpp
   Main.cpp
 )
 
