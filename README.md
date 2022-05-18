@@ -111,7 +111,7 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
-    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
+    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE 
 $ ninja audio-processing-benchmark
 ```
 
