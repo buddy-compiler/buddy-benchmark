@@ -10,6 +10,7 @@ add_executable(audio-processing-benchmark
   KFRFft.cpp
   KFRFir.cpp 
   KFRBiquad.cpp
+  KFRIir.cpp
   Main.cpp
 )
 
