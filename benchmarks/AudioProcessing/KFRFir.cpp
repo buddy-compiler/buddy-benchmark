@@ -54,6 +54,8 @@ BENCHMARK(KFR_FIR)->Arg(1);
 
 // Generate result wav file.
 void generateResultKFRFir() {
+  println("-------------------------------------------------------");
+  println("[ KFR FIR Result Information ]");
   univector<float> generateResult = kfr::fir(aud, taps127);
 
   audio_writer_wav<float> writer(open_file_for_writing("./ResultKFRFir.wav"),

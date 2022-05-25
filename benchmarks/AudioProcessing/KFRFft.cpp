@@ -52,5 +52,7 @@ static void KFR_FFT(benchmark::State &state) {
 BENCHMARK(KFR_FFT)->Arg(1);
 
 void generateResultKFRFft() {
+  println("-------------------------------------------------------");
+  println("[ KFR FFT Result Information ]");
   println("FFT operation finished!");
 }

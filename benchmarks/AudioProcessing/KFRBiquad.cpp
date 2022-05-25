@@ -51,5 +51,7 @@ static void KFR_Biquad(benchmark::State &state) {
 BENCHMARK(KFR_Biquad)->Arg(1); 
 
 void generateResultKFRBiquad() {
+  println("-------------------------------------------------------");
+  println("[ KFR Biquad Result Information ]");
   println("Biquad operation finished!");
 }

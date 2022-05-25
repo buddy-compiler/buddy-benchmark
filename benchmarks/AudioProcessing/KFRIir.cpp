@@ -54,6 +54,8 @@ BENCHMARK(KFR_IIR)->Arg(1);
 
 // Generate result wav file.
 void generateResultKFRIir() {
+  println("-------------------------------------------------------");
+  println("[ KFR IIR Result Information ]");
   univector<float> generateResult = biquad<maxorder>(bqs, aud_iir);
 
   audio_writer_wav<float> writer(open_file_for_writing("./ResultKFRIir.wav"),
