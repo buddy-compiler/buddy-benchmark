@@ -44,7 +44,7 @@ void initializeKFRIir() {
 static void KFR_IIR(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      output = biquad<maxorder>(bqs, unitimpulse());
+      output = biquad<maxorder>(bqs, aud_iir);
     }
   }
 }
@@ -54,5 +54,17 @@ BENCHMARK(KFR_IIR)->Arg(1);
 
 // Generate result wav file.
 void generateResultKFRIir() {
-  println("IIR operation finished!");
+  univector<float> generateResult = biquad<maxorder>(bqs, aud_iir);
+
+  audio_writer_wav<float> writer(open_file_for_writing("./ResultKFRIir.wav"),
+                                 audio_format{1 /* channel */,
+                                              audio_sample_type::i24,
+                                              100000 /* sample rate */});
+  writer.write(generateResult.data(), generateResult.size());
+  println("Sample Rate  = ", writer.format().samplerate);
+  println("Channels     = ", writer.format().channels);
+  println("Length       = ", writer.format().length);
+  println("Duration (s) = ",
+          writer.format().length / writer.format().samplerate);
+  println("Bit depth    = ", audio_sample_bit_depth(writer.format().type));
 }
