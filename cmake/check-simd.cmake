@@ -55,16 +55,16 @@ macro(CHECK_SIMD)
 # Check Intel AVX512
 #-------------------------------------------------------------------------------
 
-SET(CMAKE_REQUIRED_FLAGS -mavx512f)
-check_cxx_source_runs(
-  "
-  #include <immintrin.h>
-  int main() {
-    float data[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    __m512 vector = _mm512_loadu_ps(data);
-    return 0;
-  }
-  " HAVE_AVX512)
+  set(CMAKE_REQUIRED_FLAGS -mavx512f)
+  check_cxx_source_runs(
+    "
+    #include <immintrin.h>
+    int main() {
+      float data[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+      __m512 vector = _mm512_loadu_ps(data);
+      return 0;
+    }
+    " HAVE_AVX512)
 
   if(${HAVE_AVX512})
     message(STATUS "\tAVX512 support - yes")
@@ -77,15 +77,15 @@ check_cxx_source_runs(
 #-------------------------------------------------------------------------------
 
   check_cxx_source_runs(
-          "
-  #include <arm_neon.h>
-  int main() {
-    float32x4_t a;
-    float A[] = {1.0,2.0,3.0,4.0};
-    a = vld1q_f32(A);
-    return 0;
-  }
-  " HAVE_NEON)
+    "
+    #include <arm_neon.h>
+    int main() {
+      float32x4_t a;
+      float A[] = {1.0,2.0,3.0,4.0};
+      a = vld1q_f32(A);
+      return 0;
+    }
+    " HAVE_NEON)
 
   if(${HAVE_NEON})
     message(STATUS "\tArm Neon support - yes")

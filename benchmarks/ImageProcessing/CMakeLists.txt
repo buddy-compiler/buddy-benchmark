@@ -10,7 +10,7 @@ elseif(HAVE_AVX2)
   set(SPLITING_SIZE 128 CACHE STRING "Spliting Size")
 elseif(HAVE_SSE)
   set(SPLITING_SIZE 64 CACHE STRING "Spliting Size")
-else(HAVE_NEON)
+elseif(HAVE_NEON)
   set(SPLITING_SIZE 64 CACHE STRING "Spliting Size")
 else()  # Fallback value, avoid crashing
   set(SPLITING_SIZE 16 CACHE STRING "Spliting Size")
