@@ -57,6 +57,12 @@ intptr_t sizesInputBuddyCorr2D[2];
 intptr_t sizesKernelBuddyCorr2D[2];
 intptr_t sizesOutputBuddyCorr2D[2];
 
+// Declare Boundary Options supported.
+enum BoundaryOption {constant_padding, replicate_padding};
+
+// Define Boundary option selected.
+int BoundaryType;
+
 void initializeBuddyCorr2D(char **argv) {
   inputImageBuddyCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
   kernelBuddyCorr2DMat =
@@ -77,6 +83,14 @@ void initializeBuddyCorr2D(char **argv) {
 
   sizesOutputBuddyCorr2D[0] = outputRowsBuddyCorr2D;
   sizesOutputBuddyCorr2D[1] = outputColsBuddyCorr2D;
+
+  string argv3 = argv[3];
+  if(argv3 == "REPLICATE_PADDING"){
+    BoundaryType = replicate_padding;
+  }
+  else {
+    BoundaryType = constant_padding;
+  }
 }
 
 static void Buddy_Corr2D_Constant_Padding(benchmark::State &state) {
@@ -114,8 +128,14 @@ static void Buddy_Corr2D_Replicate_Padding(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(Buddy_Corr2D_Constant_Padding)->Arg(1);
-BENCHMARK(Buddy_Corr2D_Replicate_Padding)->Arg(1);
+void registerBenchmarkCorr2D() {
+  if(BoundaryType == replicate_padding){
+    BENCHMARK(Buddy_Corr2D_Replicate_Padding)->Arg(1);
+  }
+  else {
+    BENCHMARK(Buddy_Corr2D_Constant_Padding)->Arg(1);
+  }
+}
 
 // Generate result image.
 void generateResultBuddyCorr2D(char **argv) {
@@ -124,9 +144,17 @@ void generateResultBuddyCorr2D(char **argv) {
   MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
-  _mlir_ciface_corr_2d_constant_padding(&input, &kernel, &output,
-                                        1 /* Center X */, 1 /* Center Y */,
-                                        0.0f /* Constant Value */);
+  if(argv[3] == "REPLICATE_PADDING"){
+    _mlir_ciface_corr_2d_replicate_padding(&input, &kernel, &output,
+                                          1 /* Center X */, 1 /* Center Y */,
+                                          0.0f /* Constant Value */);
+  }
+  else {
+    _mlir_ciface_corr_2d_constant_padding(&input, &kernel, &output,
+                                          1 /* Center X */, 1 /* Center Y */,
+                                          0.0f /* Constant Value */);
+  }
+  
 
   // Define a cv::Mat with the output of the correlation.
   Mat outputImage(outputRowsBuddyCorr2D, outputColsBuddyCorr2D, CV_32FC1,
