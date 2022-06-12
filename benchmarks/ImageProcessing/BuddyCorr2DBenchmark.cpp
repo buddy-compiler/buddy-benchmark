@@ -61,7 +61,7 @@ intptr_t sizesOutputBuddyCorr2D[2];
 enum BoundaryOption {constant_padding, replicate_padding};
 
 // Define Boundary option selected.
-int BoundaryType;
+bool BoundaryType;
 
 void initializeBuddyCorr2D(char **argv) {
   inputImageBuddyCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -84,8 +84,7 @@ void initializeBuddyCorr2D(char **argv) {
   sizesOutputBuddyCorr2D[0] = outputRowsBuddyCorr2D;
   sizesOutputBuddyCorr2D[1] = outputColsBuddyCorr2D;
 
-  string argv3 = argv[3];
-  if(argv3 == "REPLICATE_PADDING"){
+  if(static_cast<string>(argv[3]) == "REPLICATE_PADDING"){
     BoundaryType = replicate_padding;
   }
   else {
@@ -144,7 +143,7 @@ void generateResultBuddyCorr2D(char **argv) {
   MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
-  if(argv[3] == "REPLICATE_PADDING"){
+  if(static_cast<string>(argv[3]) == "REPLICATE_PADDING"){
     _mlir_ciface_corr_2d_replicate_padding(&input, &kernel, &output,
                                           1 /* Center X */, 1 /* Center Y */,
                                           0.0f /* Constant Value */);
@@ -154,7 +153,6 @@ void generateResultBuddyCorr2D(char **argv) {
                                           1 /* Center X */, 1 /* Center Y */,
                                           0.0f /* Constant Value */);
   }
-  
 
   // Define a cv::Mat with the output of the correlation.
   Mat outputImage(outputRowsBuddyCorr2D, outputColsBuddyCorr2D, CV_32FC1,
