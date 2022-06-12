@@ -32,7 +32,8 @@ void generateResultBuddyCorr2D(char **);
 void generateResultOpenCVFilter2D();
 void generateResultEigenConvolve2D();
 
-void registerBenchmarkCorr2D();
+void registerBenchmarkBuddyCorr2D();
+void registerBenchmarkOpenCVFilter2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -45,8 +46,7 @@ int main(int argc, char **argv) {
         "denotes the name "
         "of desired kernel as specified in "
         "include/ImageProcessing/Kernels.h and Boundary options available "
-        "are CONSTANT_PADDING, REPLICATE_PADDING.\n"
-        );
+        "are CONSTANT_PADDING, REPLICATE_PADDING.\n");
   }
 
   initializeMLIRConv2D(argv);
@@ -55,7 +55,8 @@ int main(int argc, char **argv) {
   initializeOpenCVFilter2D(argv);
   initializeEigenConvolve2D(argv);
 
-  registerBenchmarkCorr2D();
+  registerBenchmarkBuddyCorr2D();
+  registerBenchmarkOpenCVFilter2D();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();

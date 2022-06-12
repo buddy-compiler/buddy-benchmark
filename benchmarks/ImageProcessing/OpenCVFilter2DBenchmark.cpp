@@ -28,15 +28,27 @@ using namespace std;
 // Declare input image, kernel and output image.
 Mat inputImageFilter2D, kernelFilter2D, outputFilter2D;
 
+// Declare Boundary Options supported.
+enum BoundaryOption { constant_padding, replicate_padding };
+
+// Define Boundary option selected.
+bool OpenCVBoundaryType;
+
 void initializeOpenCVFilter2D(char **argv) {
   inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
 
   kernelFilter2D = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
                        CV_32FC1, get<0>(kernelMap[argv[2]]));
+
+  if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
+    OpenCVBoundaryType = replicate_padding;
+  } else {
+    OpenCVBoundaryType = constant_padding;
+  }
 }
 
 // Benchmarking function.
-static void OpenCV_Filter2D(benchmark::State &state) {
+static void OpenCV_Filter2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
@@ -45,13 +57,33 @@ static void OpenCV_Filter2D(benchmark::State &state) {
   }
 }
 
+static void OpenCV_Filter2D_Replicate_Padding(benchmark::State &state) {
+  for (auto _ : state) {
+    for (int i = 0; i < state.range(0); ++i) {
+      filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
+               cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
+    }
+  }
+}
+
 // Register benchmarking function.
-BENCHMARK(OpenCV_Filter2D)->Arg(1);
+void registerBenchmarkOpenCVFilter2D() {
+  if (OpenCVBoundaryType == replicate_padding) {
+    BENCHMARK(OpenCV_Filter2D_Replicate_Padding)->Arg(1);
+  } else {
+    BENCHMARK(OpenCV_Filter2D_Constant_Padding)->Arg(1);
+  }
+}
 
 // Generate result image.
 void generateResultOpenCVFilter2D() {
-  filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
-               cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
+  if (OpenCVBoundaryType == replicate_padding) {
+    filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
+             cv::Point(-1, -1), 0.0, cv::BORDER_REPLICATE);
+  } else {
+    filter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2D,
+             cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
+  }
 
   // Choose a PNG compression level
   vector<int> compressionParams;
@@ -61,7 +93,8 @@ void generateResultOpenCVFilter2D() {
   // Write output to PNG.
   bool result = false;
   try {
-    result = imwrite("ResultOpenCVFilter2D.png", outputFilter2D, compressionParams);
+    result =
+        imwrite("ResultOpenCVFilter2D.png", outputFilter2D, compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());

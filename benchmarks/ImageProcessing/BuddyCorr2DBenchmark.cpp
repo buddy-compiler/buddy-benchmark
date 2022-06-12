@@ -40,7 +40,7 @@ void _mlir_ciface_corr_2d_replicate_padding(MemRef<float, 2> *inputBuddyCorr2D,
                                             MemRef<float, 2> *outputBuddyCorr2D,
                                             unsigned int centerX,
                                             unsigned int centerY,
-                                            float constantValue);                                        
+                                            float constantValue);
 }
 
 // Declare input image and kernel.
@@ -58,7 +58,7 @@ intptr_t sizesKernelBuddyCorr2D[2];
 intptr_t sizesOutputBuddyCorr2D[2];
 
 // Declare Boundary Options supported.
-enum BoundaryOption {constant_padding, replicate_padding};
+enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
 bool BoundaryType;
@@ -84,10 +84,9 @@ void initializeBuddyCorr2D(char **argv) {
   sizesOutputBuddyCorr2D[0] = outputRowsBuddyCorr2D;
   sizesOutputBuddyCorr2D[1] = outputColsBuddyCorr2D;
 
-  if(static_cast<string>(argv[3]) == "REPLICATE_PADDING"){
+  if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
     BoundaryType = replicate_padding;
-  }
-  else {
+  } else {
     BoundaryType = constant_padding;
   }
 }
@@ -127,11 +126,10 @@ static void Buddy_Corr2D_Replicate_Padding(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-void registerBenchmarkCorr2D() {
-  if(BoundaryType == replicate_padding){
+void registerBenchmarkBuddyCorr2D() {
+  if (BoundaryType == replicate_padding) {
     BENCHMARK(Buddy_Corr2D_Replicate_Padding)->Arg(1);
-  }
-  else {
+  } else {
     BENCHMARK(Buddy_Corr2D_Constant_Padding)->Arg(1);
   }
 }
@@ -143,12 +141,11 @@ void generateResultBuddyCorr2D(char **argv) {
   MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
-  if(static_cast<string>(argv[3]) == "REPLICATE_PADDING"){
+  if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
     _mlir_ciface_corr_2d_replicate_padding(&input, &kernel, &output,
-                                          1 /* Center X */, 1 /* Center Y */,
-                                          0.0f /* Constant Value */);
-  }
-  else {
+                                           1 /* Center X */, 1 /* Center Y */,
+                                           0.0f /* Constant Value */);
+  } else {
     _mlir_ciface_corr_2d_constant_padding(&input, &kernel, &output,
                                           1 /* Center X */, 1 /* Center Y */,
                                           0.0f /* Constant Value */);
