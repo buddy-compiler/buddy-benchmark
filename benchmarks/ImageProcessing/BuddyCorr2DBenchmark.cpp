@@ -61,7 +61,7 @@ intptr_t sizesOutputBuddyCorr2D[2];
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-bool BoundaryType;
+BoundaryOption BoundaryType;
 
 void initializeBuddyCorr2D(char **argv) {
   inputImageBuddyCorr2D = imread(argv[1], IMREAD_GRAYSCALE);

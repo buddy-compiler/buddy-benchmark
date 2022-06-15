@@ -32,7 +32,7 @@ Mat inputImageFilter2D, kernelFilter2D, outputFilter2D;
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-bool OpenCVBoundaryType;
+BoundaryOption OpenCVBoundaryType;
 
 void initializeOpenCVFilter2D(char **argv) {
   inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
