@@ -17,8 +17,9 @@ add_buddy_model_benchmark(mobilenet-benchmark
     --convert-vector-to-llvm 
     -memref-expand -arith-expand 
     --convert-memref-to-llvm 
-    --convert-math-to-llvm 
-    --convert-func-to-llvm='emit-c-wrappers=1'
+    --convert-math-to-llvm
+    --llvm-request-c-wrappers
+    --convert-func-to-llvm
     --reconcile-unrealized-casts
   SOURCE Main.cpp MobileNetBenchmark.cpp
 )
