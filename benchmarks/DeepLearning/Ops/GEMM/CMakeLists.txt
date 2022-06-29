@@ -1,12 +1,12 @@
 add_buddy_ops_benchmark(gemm-benchmark
-  MLIR gemm.mlir
+  MLIR opt_gemm.mlir
   BITCODE gemm.o
   LIBRARY GEMM
   OPTIONS
-    -convert-linalg-to-loops 
+    --affine-loop-normalize
+    --affine-simplify-structures
+    --lower-affine
     -convert-scf-to-cf 
-    -convert-linalg-to-llvm 
-    -lower-affine 
     --convert-memref-to-llvm
     --llvm-request-c-wrappers
     -convert-func-to-llvm 
