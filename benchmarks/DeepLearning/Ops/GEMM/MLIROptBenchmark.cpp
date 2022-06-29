@@ -25,46 +25,35 @@ namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
-    void _mlir_ciface_gemm(MemRef<float, 2> *A, MemRef<float, 2> *B, MemRef<float, 2> *C);
+void _mlir_ciface_gemm(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                       MemRef<float, 2> *C);
 }
 
-int M = 128;
-int N = 128;
-int K = 128;
-
-intptr_t sizesA[2] = {M, K};
-intptr_t sizesB[2] = {K, N};
-intptr_t sizesC[2] = {M, N};
-
-// Create input, filter, and output.
-MemRef<float, 2> A(sizesA, 1.0);
-MemRef<float, 2> B(sizesB, 1.0);
-MemRef<float, 2> C(sizesC, 0.0);
-
-// Define benchmark function.
 void BM_GEMM(benchmark::State &state) {
+  long M, N, K;
+  M = N = K = state.range(0);
+  intptr_t sizesA[2] = {M, K};
+  intptr_t sizesB[2] = {K, N};
+  intptr_t sizesC[2] = {M, N};
+
+  MemRef<float, 2> A(sizesA, 1.0);
+  MemRef<float, 2> B(sizesB, 1.0);
+  MemRef<float, 2> C(sizesC, 0.0);
+
   for (auto _ : state) {
-    for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_gemm(&A, &B, &C);
-    }
+    auto start = std::chrono::high_resolution_clock::now();
+    _mlir_ciface_gemm(&A, &B, &C);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto elapsed_seconds =
+        std::chrono::duration_cast<std::chrono::duration<long double>>(end -
+                                                                       start);
+    state.counters["GFLOPS"] =
+        (2 * M * N * K) / (elapsed_seconds.count() * 1e9);
   }
 }
 
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_GEMM)->Arg(1);
-BENCHMARK(BM_GEMM)->Arg(4);
-
-// Print result function.
-void printResult() {
-  // Clear the output memref.
-  MemRef<float, 2> outputMemRef(sizesC, 0.0);
-  // Run the mlir function.
-  _mlir_ciface_gemm(&A, &B, &outputMemRef);
-  // Print the output.
-  std::cout << "Output: [ ";
-  for (int i = 0; i < 8; ++i)
-    std::cout << outputMemRef[i] << " ";
-  std::cout << "]" << std::endl;
-}
+BENCHMARK(BM_GEMM)->DenseRange(50, 1500, 50);
