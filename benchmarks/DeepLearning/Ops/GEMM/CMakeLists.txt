@@ -3,9 +3,8 @@ add_buddy_ops_benchmark(gemm-benchmark
   BITCODE gemm.o
   LIBRARY GEMM
   OPTIONS
-    --affine-loop-normalize
-    --affine-simplify-structures
     --lower-affine
+
     -convert-scf-to-cf 
     --convert-memref-to-llvm
     --llvm-request-c-wrappers
