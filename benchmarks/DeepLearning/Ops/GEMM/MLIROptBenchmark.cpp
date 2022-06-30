@@ -56,4 +56,4 @@ void BM_GEMM(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_GEMM)->DenseRange(50, 1500, 50);
+BENCHMARK(BM_GEMM)->DenseRange(512, 56320, 512);
