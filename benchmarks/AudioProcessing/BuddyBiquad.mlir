@@ -29,19 +29,19 @@ func.func @buddy_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : mem
   %init_z1 = arith.constant 0.0 : f32
   %init_z2 = arith.constant 0.0 : f32
 
-  %res:2 = affine.for %i = 0 to %N iter_args(%z1 = %init_z1, %z2 = %init_z2) {
+  %res:2 = affine.for %i = 0 to %N iter_args(%z1 = %init_z1, %z2 = %init_z2) -> (f32, f32) {
     %input = affine.load %in[%i] : memref<?xf32>
-    %t0 = arith.mulf %b0, %input
-    %output = arith.addf %t0, %z1
+    %t0 = arith.mulf %b0, %input : f32
+    %output = arith.addf %t0, %z1 : f32
 
-    %t1 = arith.mulf %b1, %input
-    %t2 = arith.mulf %a1, %output
-    %t3 = arith.subf %t1, %t2
-    %z1_next = arith.addf %z2, %t3
+    %t1 = arith.mulf %b1, %input : f32
+    %t2 = arith.mulf %a1, %output : f32
+    %t3 = arith.subf %t1, %t2 : f32
+    %z1_next = arith.addf %z2, %t3 : f32
 
-    %t4 = arith.mulf %b2, %input
-    %t5 = arith.mulf %a2, %output
-    %z2_next = arith.subf %t4, %t5
+    %t4 = arith.mulf %b2, %input : f32
+    %t5 = arith.mulf %a2, %output : f32
+    %z2_next = arith.subf %t4, %t5 : f32
 
     affine.store %output, %out[%i] : memref<?xf32>
 

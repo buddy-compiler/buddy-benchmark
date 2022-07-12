@@ -11,14 +11,16 @@ include_directories(${KFR_DIR}/include)
 add_custom_command(OUTPUT buddy-biquad.o
         COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyBiquad.mlir
-        -convert-linalg-to-affine-loops
-        -lower-affine -convert-scf-to-cf -convert-vector-to-llvm
-        -convert-memref-to-llvm -convert-func-to-llvm='emit-c-wrappers=1'
+        -lower-dap -convert-linalg-to-affine-loops
+        -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+        -convert-arith-to-llvm
+        -convert-memref-to-llvm -convert-func-to-llvm
+        --llvm-request-c-wrappers
         -reconcile-unrealized-casts |
         ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-        ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE}
-        -mattr=${BUDDY_OPT_ATTR} --filetype=obj
-        -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/buddy-biquad.o
+        ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/buddy-biquad.o
         )
 add_library(BuddyBiquad STATIC buddy-biquad.o)
 set_target_properties(BuddyBiquad PROPERTIES LINKER_LANGUAGE CXX)
