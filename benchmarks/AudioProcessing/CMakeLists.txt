@@ -13,9 +13,9 @@ add_custom_command(OUTPUT buddy-biquad.o
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyBiquad.mlir
         -lower-dap -convert-linalg-to-affine-loops
         -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+        --llvm-request-c-wrappers
         -convert-arith-to-llvm
         -convert-memref-to-llvm -convert-func-to-llvm
-        --llvm-request-c-wrappers
         -reconcile-unrealized-casts |
         ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -30,8 +30,8 @@ add_executable(audio-processing-benchmark
   KFRFir.cpp 
   KFRBiquad.cpp
   KFRIir.cpp
-  Main.cpp
   BuddyBiquadBenchmark.cpp
+  Main.cpp
 )
 
 target_link_directories(audio-processing-benchmark PRIVATE ${KFR_DIR}/build/)
