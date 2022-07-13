@@ -104,7 +104,7 @@ endif()
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS OR VECTORIZATION_BENCHMARKS)
   find_package(OpenCV REQUIRED CONFIG)
   include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
@@ -113,7 +113,7 @@ endif()
 # Find PNG
 #-------------------------------------------------------------------------------
 
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS OR VECTORIZATION_BENCHMARKS)
   find_package(PNG REQUIRED)
   include_directories(${PNG_INCLUDE_DIR})
 endif()
