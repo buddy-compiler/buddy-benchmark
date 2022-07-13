@@ -115,6 +115,22 @@ $ cmake -G Ninja .. \
 $ ninja audio-processing-benchmark
 ```
 
+## Vectorization Benchmark
+
+*Note: Please replace the `/PATH/TO/*` with your local path.*
+
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DVECTORIZATION_BENCHMARKS=ON \
+    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+$ ninja vectorization-benchmark
+$ cd bin
+$ ./vectorization-benchmark
+```
+
 ## Testing
 
 ```
