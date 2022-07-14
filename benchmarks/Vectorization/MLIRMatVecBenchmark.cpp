@@ -67,6 +67,4 @@ void generateResultMLIRMatVec() {
     std::cout << output.getData()[i] << " ";
   }
   std::cout << "]" << std::endl;
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
 }
