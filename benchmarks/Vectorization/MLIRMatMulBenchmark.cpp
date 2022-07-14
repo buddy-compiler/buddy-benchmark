@@ -29,24 +29,16 @@ void _mlir_ciface_mlir_matmul(MemRef<float, 2> *input1,
                               MemRef<float, 2> *output);
 }
 
-// Define input and output array.
-float inputArrayMLIRMatMul1[4] = {1, 2, 3, 4};
-float inputArrayMLIRMatMul2[4] = {1, 2, 3, 4};
-float outputArrayMLIRMatMul[4] = {0};
-
-intptr_t sizesInputArrayMLIRMatMul1[2] = {2, 2};
-intptr_t sizesInputArrayMLIRMatMul2[2] = {2, 2};
-intptr_t sizesOutputArrayMLIRMatMul[2] = {2, 2};
+// Define input and output sizes.
+intptr_t sizesInputArrayMLIRMatMul1[2] = {5, 3};
+intptr_t sizesInputArrayMLIRMatMul2[2] = {3, 2};
+intptr_t sizesOutputArrayMLIRMatMul[2] = {5, 2};
+// Define the MemRef container for input1, input2, and output.
+MemRef<float, 2> inputMLIRMatMul1(sizesInputArrayMLIRMatMul1, 2);
+MemRef<float, 2> inputMLIRMatMul2(sizesInputArrayMLIRMatMul2, 3);
+MemRef<float, 2> outputMLIRMatMul(sizesOutputArrayMLIRMatMul, 0);
 
 static void MLIR_MatMul(benchmark::State &state) {
-  // Define the MemRef descriptor for input1, input2, and output.
-  MemRef<float, 2> inputMLIRMatMul1(inputArrayMLIRMatMul1,
-                                    sizesInputArrayMLIRMatMul1);
-  MemRef<float, 2> inputMLIRMatMul2(inputArrayMLIRMatMul2,
-                                    sizesInputArrayMLIRMatMul2);
-  MemRef<float, 2> outputMLIRMatMul(outputArrayMLIRMatMul,
-                                    sizesOutputArrayMLIRMatMul);
-
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_mlir_matmul(&inputMLIRMatMul1, &inputMLIRMatMul2,
@@ -61,9 +53,9 @@ BENCHMARK(MLIR_MatMul)->Arg(1);
 // Generate result image.
 void generateResultMLIRMatMul() {
   // Define the MemRef descriptor for input1, intput2, and output.
-  MemRef<float, 2> input1(inputArrayMLIRMatMul1, sizesInputArrayMLIRMatMul1);
-  MemRef<float, 2> input2(inputArrayMLIRMatMul2, sizesInputArrayMLIRMatMul2);
-  MemRef<float, 2> output(outputArrayMLIRMatMul, sizesOutputArrayMLIRMatMul);
+  MemRef<float, 2> input1(sizesInputArrayMLIRMatMul1, 2);
+  MemRef<float, 2> input2(sizesInputArrayMLIRMatMul2, 3);
+  MemRef<float, 2> output(sizesOutputArrayMLIRMatMul, 0);
   // Run the 2D matmul.
   _mlir_ciface_mlir_matmul(&input1, &input2, &output);
   // Print the output.
