@@ -24,6 +24,8 @@ set(CMAKE_C_FLAGS "-no-pie")
 #-------------------------------------------------------------------------------
 # BUDDY configuration
 #-------------------------------------------------------------------------------
+set(BuddyMLIR_DIR ${BUDDY_OPT_BUILD_DIR}/cmake)
+find_package(BuddyMLIR REQUIRED CONFIG)
 
 # BUDDY project.
 set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -43,6 +45,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 include_directories(${BUDDY_MAIN_INCLUDE_DIR})
 include_directories(${BUDDY_INCLUDE_DIR})
 include_directories(${BUDDY_SOURCE_DIR}/lib) # For template inclusion model.
+include_directories(${BUDDY_MLIR_INTERFACE_DIR})
+include_directories(${BUDDY_MLIR_LIB_DIR})
 
 # MLIR binary directory.
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
@@ -104,7 +108,7 @@ endif()
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS OR VECTORIZATION_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
   find_package(OpenCV REQUIRED CONFIG)
   include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
@@ -113,7 +117,7 @@ endif()
 # Find PNG
 #-------------------------------------------------------------------------------
 
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS OR VECTORIZATION_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
   find_package(PNG REQUIRED)
   include_directories(${PNG_INCLUDE_DIR})
 endif()

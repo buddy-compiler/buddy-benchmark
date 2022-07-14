@@ -31,7 +31,5 @@ add_executable(vectorization-benchmark
 
 target_link_libraries(vectorization-benchmark
   GoogleBenchmark
-  ${OpenCV_LIBS}
   MLIRMatMul
-  Container
   )
