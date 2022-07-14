@@ -62,10 +62,8 @@ void generateResultMLIRMatMul() {
   std::cout << "--------------------------------------------------------"
             << std::endl;
   std::cout << "MLIR_MatMul: MLIR MatMul Operation + Nested Loop" << std::endl;
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
   std::cout << "[ ";
-  for (size_t i; i < output.getSize(); i++) {
+  for (size_t i = 0; i < output.getSize(); i++) {
     std::cout << output.getData()[i] << " ";
   }
   std::cout << "]" << std::endl;
