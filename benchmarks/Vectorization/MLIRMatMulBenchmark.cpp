@@ -18,11 +18,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
-
-using namespace cv;
-using namespace std;
+#include <buddy/core/Container.h>
+#include <iostream>
 
 // Declare the matmul C interface.
 extern "C" {
@@ -69,12 +67,14 @@ void generateResultMLIRMatMul() {
   // Run the 2D matmul.
   _mlir_ciface_mlir_matmul(&input1, &input2, &output);
   // Print the output.
-  cout << "--------------------------------------------------------" << endl;
-  cout << "MLIR_MatMul: MLIR MatMul Operation + Nested Loop" << endl;
-  cout << "--------------------------------------------------------" << endl;
-  cout << "[ ";
+  std::cout << "--------------------------------------------------------"
+            << std::endl;
+  std::cout << "MLIR_MatMul: MLIR MatMul Operation + Nested Loop" << std::endl;
+  std::cout << "--------------------------------------------------------"
+            << std::endl;
+  std::cout << "[ ";
   for (size_t i; i < output.getSize(); i++) {
-    cout << output.getData()[i] << " ";
+    std::cout << output.getData()[i] << " ";
   }
-  cout << "]" << endl;
+  std::cout << "]" << std::endl;
 }

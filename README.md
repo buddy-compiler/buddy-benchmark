@@ -111,8 +111,11 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
-    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE 
+    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja audio-processing-benchmark
+$ cd bin
+$ ./audio-processing-benchmark
 ```
 
 ## Vectorization Benchmark
@@ -124,7 +127,6 @@ $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DVECTORIZATION_BENCHMARKS=ON \
-    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
     -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja vectorization-benchmark
 $ cd bin
