@@ -21,6 +21,7 @@
 #include <benchmark/benchmark.h>
 
 void generateResultMLIRMatMul();
+void generateResultMLIRMatVec();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -30,6 +31,7 @@ int main(int argc, char **argv) {
 
   // Generate result.
   generateResultMLIRMatMul();
+  generateResultMLIRMatVec();
 
   return 0;
 }
