@@ -1,8 +1,8 @@
 module{
-    func.func @gemm(%a : memref<?x?xf32>, %b : memref<?x?xf32>, %c : memref<?x?xf32>) {
+    func.func @gemm(%a : memref<2088x2048xf64>, %b : memref<2048x2048xf64>, %c : memref<2088x2048xf64>) {
       linalg.matmul 
-        ins(%a, %b: memref<?x?xf32>, memref<?x?xf32>)
-       outs(%c:memref<?x?xf32>)
+        ins(%a, %b: memref<2088x2048xf64>, memref<2048x2048xf64>)
+       outs(%c:memref<2088x2048xf64>)
       return
     }
 }
