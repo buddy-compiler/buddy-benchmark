@@ -1,14 +1,27 @@
-add_buddy_ops_benchmark(gemm-benchmark
-  MLIR opt_gemm.mlir
-  BITCODE gemm.o
-  LIBRARY GEMM
-  OPTIONS
-    --lower-affine
-
-    -convert-scf-to-cf 
-    --convert-memref-to-llvm
-    --llvm-request-c-wrappers
-    -convert-func-to-llvm 
-    -reconcile-unrealized-casts
-  SOURCE Main.cpp MLIROptBenchmark.cpp
+add_custom_command(OUTPUT mlir-gemm.o
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+  ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/GEMM/opt_gemm.mlir 
+            --lower-affine
+            -convert-scf-to-cf
+            -convert-linalg-to-llvm
+            -llvm-request-c-wrappers
+            -convert-memref-to-llvm
+            -convert-func-to-llvm
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/GEMM/mlir-gemm.o
 )
+add_library(MLIRGEMM STATIC mlir-gemm.o)
+set_target_properties(MLIRGEMM PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(gemm-benchmark
+  Main.cpp
+  MLIROptBenchmark.cpp
+  )
+
+target_link_libraries(gemm-benchmark
+  GoogleBenchmark
+  MLIRGEMM
+  )

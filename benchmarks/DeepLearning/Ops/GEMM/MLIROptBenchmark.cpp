@@ -40,16 +40,7 @@ void BM_GEMM(benchmark::State &state) {
   MemRef<double, 2> C(sizesC, 0.0);
 
   for (auto _ : state) {
-    auto start = std::chrono::high_resolution_clock::now();
     _mlir_ciface_gemm(&A, &B, &C);
-    auto end = std::chrono::high_resolution_clock::now();
-
-    auto elapsed_seconds =
-        std::chrono::duration_cast<std::chrono::duration<long double>>(end -
-                                                                       start);
-    auto res = (2.0 * M * N * K * 1.0E9) / (elapsed_seconds.count());
-    std::cout << res << std::endl;
-    state.counters["GFLOPS"] = res;
   }
 }
 
