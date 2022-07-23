@@ -32,17 +32,21 @@ void generateResultBuddyCorr2D(char **);
 void generateResultOpenCVFilter2D();
 void generateResultEigenConvolve2D();
 
+void registerBenchmarkBuddyCorr2D();
+void registerBenchmarkOpenCVFilter2D();
+
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 3 && argc != 5) {
+  if (argc != 4) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
         "Correct format is ./image-processing-benchmark <image path> <kernel "
-        "name>\n where "
-        "image path provides path of the image to be processed and kernel name "
+        "name> <Boundary Option>\n where "
+        "image path provides path of the image to be processed, kernel name "
         "denotes the name "
         "of desired kernel as specified in "
-        "include/ImageProcessing/Kernels.h\n");
+        "include/ImageProcessing/Kernels.h and Boundary options available "
+        "are CONSTANT_PADDING, REPLICATE_PADDING.\n");
   }
 
   initializeMLIRConv2D(argv);
@@ -50,6 +54,9 @@ int main(int argc, char **argv) {
   initializeBuddyCorr2D(argv);
   initializeOpenCVFilter2D(argv);
   initializeEigenConvolve2D(argv);
+
+  registerBenchmarkBuddyCorr2D();
+  registerBenchmarkOpenCVFilter2D();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
