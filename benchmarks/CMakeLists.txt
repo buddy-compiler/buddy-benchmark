@@ -13,3 +13,8 @@ endif()
 if(VECTORIZATION_BENCHMARKS)
   add_subdirectory(Vectorization)
 endif()
+
+if(GEMM_BENCHMARKS)
+    add_subdirectory(GEMM)
+endif()
+
