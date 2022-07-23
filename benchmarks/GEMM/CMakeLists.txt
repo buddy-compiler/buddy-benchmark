@@ -1,11 +1,12 @@
 add_custom_command(OUTPUT mlir-gemm.o
   COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
   ${BUDDY_SOURCE_DIR}/benchmarks/GEMM/opt_gemm.mlir 
+            -convert-vector-to-llvm
+            -convert-memref-to-llvm
             --lower-affine
             -convert-scf-to-cf
             -convert-linalg-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
