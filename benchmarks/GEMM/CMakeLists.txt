@@ -25,4 +25,5 @@ add_executable(gemm-benchmark
 target_link_libraries(gemm-benchmark
   GoogleBenchmark
   MLIRGEMM
+  ${OpenCV_LIBS}
   )
