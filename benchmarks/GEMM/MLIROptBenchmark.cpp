@@ -20,6 +20,16 @@
 
 #include <buddy/core/Container.h>
 #include <benchmark/benchmark.h>
+#include <cmath>
+#include <iostream>
+
+#include <opencv2/core.hpp>
+#include <opencv2/core/base.hpp>
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/matx.hpp>
+#include <opencv2/dnn/dnn.hpp>
+#include <opencv2/opencv.hpp>
+
 
 namespace {
 
@@ -30,7 +40,7 @@ void _mlir_ciface_gemm(MemRef<double, 2> *A, MemRef<double, 2> *B,
 }
 
 void BM_GEMM(benchmark::State &state) {
-  long M = 2088, N = 2048, K = 2048;
+  long M = state.range(0), N = state.range(0), K = state.range(0);
   intptr_t sizesA[2] = {M, K};
   intptr_t sizesB[2] = {K, N};
   intptr_t sizesC[2] = {M, N};
@@ -44,8 +54,23 @@ void BM_GEMM(benchmark::State &state) {
   }
 }
 
+void BM_OPENCV_GEMM(benchmark::State &state) {
+  long M = state.range(0), N = state.range(0), K = state.range(0);
+
+  cv::Mat A = cv::Mat::ones(M, N, CV_64F);
+  cv::Mat B = cv::Mat::ones(M, N, CV_64F);
+  cv::Mat C = cv::Mat::zeros(M, N, CV_64F);
+
+  for (auto _ : state) {
+      // C += A * B;
+      cv::gemm(A, B, 1.0, C, 1.0, C, 0);
+  }
+}
+
 } // namespace
 
 // Register benchmarking function with different arguments.
-// BENCHMARK(BM_GEMM)->DenseRange(512, 56320, 512);
-BENCHMARK(BM_GEMM);
+BENCHMARK(BM_GEMM)->DenseRange(40, 2000, 40);
+BENCHMARK(BM_OPENCV_GEMM)->DenseRange(40, 2000, 40);
+// BENCHMARK(BM_GEMM);
+//
