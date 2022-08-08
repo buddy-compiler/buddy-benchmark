@@ -22,6 +22,7 @@
 #define IMAGE_PROCESSING_KERNELS
 
 // clang-format off
+#include <vector>
 #include <string>
 #include <map>
 

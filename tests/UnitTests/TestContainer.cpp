@@ -18,8 +18,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Test.h"
 #include "Utils/Container.h"
+#include "Utils/Test.h"
 #include <opencv2/opencv.hpp>
 
 // Fixture for testing the MemRef class.

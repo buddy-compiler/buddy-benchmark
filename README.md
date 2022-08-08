@@ -149,6 +149,13 @@ $ cmake -G Ninja .. \
     -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
     -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
 $ cmake --build . --
-$ ninja test
+$ ninja test && ninja image-processing-integration-tests
 ```
 
+For executing Image Processing integration tests : 
+```
+cd bin 
+./image-processing-integration-tests <optional_image_path>
+```
+
+where `<optional_image_path>` is an optional parameter used for pointing to the image which is to be used while executing tests.
