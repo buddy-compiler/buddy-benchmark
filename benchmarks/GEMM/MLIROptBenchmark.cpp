@@ -36,8 +36,8 @@ namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
-void _mlir_ciface_gemm(MemRef<double, 2> *A, MemRef<double, 2> *B,
-                       MemRef<double, 2> *C);
+void _mlir_ciface_gemm(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                       MemRef<float, 2> *C);
 }
 
 void BM_GEMM(benchmark::State &state) {
@@ -46,9 +46,9 @@ void BM_GEMM(benchmark::State &state) {
   intptr_t sizesB[2] = {K, N};
   intptr_t sizesC[2] = {M, N};
 
-  MemRef<double, 2> A(sizesA, 1.0);
-  MemRef<double, 2> B(sizesB, 1.0);
-  MemRef<double, 2> C(sizesC, 0.0);
+  MemRef<float, 2> A(sizesA, 1.0);
+  MemRef<float, 2> B(sizesB, 1.0);
+  MemRef<float, 2> C(sizesC, 0.0);
 
   for (auto _ : state) {
     _mlir_ciface_gemm(&A, &B, &C);
@@ -74,9 +74,9 @@ void BM_OPENCV_GEMM(benchmark::State &state) {
 
 void BM_RAW_GEMM(benchmark::State &state) {
   long M = state.range(0), N = state.range(0), K = state.range(0);
-  double* A = (double*)malloc(sizeof(double) * M * K);
-  double* B = (double*)malloc(sizeof(double) * K * N);
-  double* C = (double*)malloc(sizeof(double) * M * N);
+  float* A = (float*)malloc(sizeof(float) * M * K);
+  float* B = (float*)malloc(sizeof(float) * K * N);
+  float* C = (float*)malloc(sizeof(float) * M * N);
 
   for (auto _ : state) {
       // C += A * B;
