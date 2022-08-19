@@ -11,7 +11,7 @@ buddy-opt opt_gemm.mlir  \
 buddy-translate --mlir-to-llvmir \
 | \
 llc -mtriple='x86_64-unknown-linux-gnu' \
--mattr='avx512f' --filetype=obj -O0 -o mlir-gemm.o
+-mattr='avx512f' --filetype=obj -O3 -o mlir-gemm.o
 llvm-objdump -d mlir-gemm.o > dump.ll
 rm mlir-gemm.o
 cat dump.ll | less
