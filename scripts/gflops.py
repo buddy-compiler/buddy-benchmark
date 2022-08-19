@@ -12,7 +12,7 @@ while True:
         base_size = int(base_size)
         
         gflops = (2.0 * it_times * base_size * base_size * base_size) / time_cpu
-        print(name, base_size, gflops)
+        print(f'{name}\t\t {base_size}\t\t {gflops}')
     except EOFError:
         break
     

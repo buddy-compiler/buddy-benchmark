@@ -22,6 +22,7 @@
 #include <benchmark/benchmark.h>
 #include <cmath>
 #include <iostream>
+#include <cstdlib>
 
 #include <opencv2/core.hpp>
 #include <opencv2/core/base.hpp>
@@ -52,6 +53,10 @@ void BM_GEMM(benchmark::State &state) {
   for (auto _ : state) {
     _mlir_ciface_gemm(&A, &B, &C);
   }
+  for(int i = 0; i < 10; i ++){
+	//std::cout << C.getData()[i] << " ";
+  }
+  //std::cout << std::endl;
 }
 
 void BM_OPENCV_GEMM(benchmark::State &state) {
@@ -67,10 +72,29 @@ void BM_OPENCV_GEMM(benchmark::State &state) {
   }
 }
 
+void BM_RAW_GEMM(benchmark::State &state) {
+  long M = state.range(0), N = state.range(0), K = state.range(0);
+  double* A = (double*)malloc(sizeof(double) * M * K);
+  double* B = (double*)malloc(sizeof(double) * K * N);
+  double* C = (double*)malloc(sizeof(double) * M * N);
+
+  for (auto _ : state) {
+      // C += A * B;
+      for(int i = 0; i < M; i ++){
+	for(int j = 0; j < N; j ++){
+		for(int k = 0; k < K; k ++){
+			C[i * M + j] += A[i * M + k] * B[k * K + j];
+		}
+	}
+      }
+  }
+}
+
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_GEMM)->DenseRange(40, 2000, 40);
-BENCHMARK(BM_OPENCV_GEMM)->DenseRange(40, 2000, 40);
+BENCHMARK(BM_GEMM)->DenseRange(512, 2048, 64);
+BENCHMARK(BM_OPENCV_GEMM)->DenseRange(512, 2048, 64);
+// BENCHMARK(BM_RAW_GEMM)->DenseRange(64, 512, 64);
 // BENCHMARK(BM_GEMM);
 //
