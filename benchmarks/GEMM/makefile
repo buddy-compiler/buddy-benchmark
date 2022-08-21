@@ -36,18 +36,18 @@ v-tile-reorder-unroll:
 		--affine-simplify-structures \
 		--gemm-loop-perfect \
 		--canonicalize \
-	       	--affine-super-tilling=stratege=100,4,-1,16,-1,400,8 \ 
-		--loop-order-change=new-order-list=2,0,1,6,3,5,7,4 \ 
+	       	--affine-super-tilling=stratege=100,4,-1,16,-1,400,8 \
+		--loop-order-change=new-order-list=2,0,1,6,3,5,7,4 \
 		--affine-loop-invariant-code-motion \
 		--affine-loop-unroll=unroll-factor=4 \
 		-affine-loop-unroll=unroll-factor=8  \
 		--cse \
-		--gemm-eliminate \ 
+		--gemm-eliminate \
 		--cse \
 		--affine-simplify-structures \
 		--normalize-memrefs \
 		--affine-scalrep \
-		-canonicalize \
+		--canonicalize \
 		-o opt_gemm.mlir
 
 clean:
