@@ -24,6 +24,7 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <immintrin.h>
 #include <opencv2/core.hpp>
 #include <opencv2/core/base.hpp>
 #include <opencv2/core/hal/interface.h>
@@ -40,6 +41,62 @@ void _mlir_ciface_gemm(MemRef<float, 2> *A, MemRef<float, 2> *B,
                        MemRef<float, 2> *C);
 }
 
+
+void fastGEMM( const float* aptr, size_t astep, const float* bptr,
+               size_t bstep, float* cptr, size_t cstep,
+               int ma, int na, int nb )
+{
+    int n = 0;
+
+    for( ; n <= nb - 32; n += 32 )
+    {
+        for( int m = 0; m < ma; m += 4 )
+        {
+            const float* aptr0 = aptr + astep*m;
+            const float* aptr1 = aptr + astep*std::min(m+1, ma-1);
+            const float* aptr2 = aptr + astep*std::min(m+2, ma-1);
+            const float* aptr3 = aptr + astep*std::min(m+3, ma-1);
+
+            float* cptr0 = cptr + cstep*m;
+            float* cptr1 = cptr + cstep*std::min(m+1, ma-1);
+            float* cptr2 = cptr + cstep*std::min(m+2, ma-1);
+            float* cptr3 = cptr + cstep*std::min(m+3, ma-1);
+
+            __m512 d00 = _mm512_setzero_ps(), d01 = _mm512_setzero_ps();
+            __m512 d10 = _mm512_setzero_ps(), d11 = _mm512_setzero_ps();
+            __m512 d20 = _mm512_setzero_ps(), d21 = _mm512_setzero_ps();
+            __m512 d30 = _mm512_setzero_ps(), d31 = _mm512_setzero_ps();
+
+            for( int k = 0; k < na; k++ )
+            {
+                __m512 a0 = _mm512_set1_ps(aptr0[k]);
+                __m512 a1 = _mm512_set1_ps(aptr1[k]);
+                __m512 a2 = _mm512_set1_ps(aptr2[k]);
+                __m512 a3 = _mm512_set1_ps(aptr3[k]);
+                __m512 b0 = _mm512_loadu_ps(bptr + k*bstep + n);
+                __m512 b1 = _mm512_loadu_ps(bptr + k*bstep + n + 16);
+                d00 = _mm512_fmadd_ps(a0, b0, d00);
+                d01 = _mm512_fmadd_ps(a0, b1, d01);
+                d10 = _mm512_fmadd_ps(a1, b0, d10);
+                d11 = _mm512_fmadd_ps(a1, b1, d11);
+                d20 = _mm512_fmadd_ps(a2, b0, d20);
+                d21 = _mm512_fmadd_ps(a2, b1, d21);
+                d30 = _mm512_fmadd_ps(a3, b0, d30);
+                d31 = _mm512_fmadd_ps(a3, b1, d31);
+            }
+
+            _mm512_storeu_ps(cptr0 + n, d00);
+            _mm512_storeu_ps(cptr0 + n + 16, d01);
+            _mm512_storeu_ps(cptr1 + n, d10);
+            _mm512_storeu_ps(cptr1 + n + 16, d11);
+            _mm512_storeu_ps(cptr2 + n, d20);
+            _mm512_storeu_ps(cptr2 + n + 16, d21);
+            _mm512_storeu_ps(cptr3 + n, d30);
+            _mm512_storeu_ps(cptr3 + n + 16, d31);
+        }
+    }
+}
+
 void BM_GEMM(benchmark::State &state) {
   long M = state.range(0), N = state.range(0), K = state.range(0);
   intptr_t sizesA[2] = {M, K};
@@ -48,27 +105,46 @@ void BM_GEMM(benchmark::State &state) {
 
   MemRef<float, 2> A(sizesA, 1.0);
   MemRef<float, 2> B(sizesB, 1.0);
-  MemRef<float, 2> C(sizesC, 0.0);
+  MemRef<float, 2> C(sizesC, 0);
 
   for (auto _ : state) {
     _mlir_ciface_gemm(&A, &B, &C);
   }
-  for(int i = 0; i < 10; i ++){
-	//std::cout << C.getData()[i] << " ";
+  // 我们先检查是否一样，然后再看结果
+#ifdef false
+  MemRef<float, 2> m_A(sizesA, 1.0);
+  MemRef<float, 2> m_B(sizesB, 1.0);
+  MemRef<float, 2> m_C(sizesC, 0);
+
+  _mlir_ciface_gemm(&m_A, &m_B, &m_C);
+  _mlir_ciface_gemm(&m_A, &m_B, &m_C);
+
+  float* o_A = (float*)malloc(sizeof(float) * M * K);
+  float* o_B = (float*)malloc(sizeof(float) * K * N);
+  float* o_C = (float*)malloc(sizeof(float) * M * N);
+
+  fastGEMM(o_A, K, o_B, M, o_C, N, M, K, N);
+  for(int i = 0; i < M; i ++){
+	for(int j = 0; j < N; j ++){
+		assert(m_C.getData()[i * M + j] == o_C.at<float>(i, j));
+	}
   }
-  //std::cout << std::endl;
+#endif
+
 }
+
 
 void BM_OPENCV_GEMM(benchmark::State &state) {
   long M = state.range(0), N = state.range(0), K = state.range(0);
 
-  cv::Mat A = cv::Mat::ones(M, N, CV_64F);
-  cv::Mat B = cv::Mat::ones(M, N, CV_64F);
-  cv::Mat C = cv::Mat::zeros(M, N, CV_64F);
+  float* o_A = (float*)malloc(sizeof(float) * M * K);
+  float* o_B = (float*)malloc(sizeof(float) * K * N);
+  float* o_C = (float*)malloc(sizeof(float) * M * N);
+
 
   for (auto _ : state) {
       // C += A * B;
-      cv::gemm(A, B, 1.0, C, 1.0, C, 0);
+      fastGEMM(o_A, K, o_B, M, o_C, N, M, K, N);
   }
 }
 
@@ -93,8 +169,8 @@ void BM_RAW_GEMM(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_GEMM)->DenseRange(512, 2048, 64);
-BENCHMARK(BM_OPENCV_GEMM)->DenseRange(512, 2048, 64);
+// BENCHMARK(BM_GEMM)->DenseRange(512, 2048, 32);
+BENCHMARK(BM_OPENCV_GEMM)->DenseRange(512, 2048, 32);
 // BENCHMARK(BM_RAW_GEMM)->DenseRange(64, 512, 64);
 // BENCHMARK(BM_GEMM);
 //
