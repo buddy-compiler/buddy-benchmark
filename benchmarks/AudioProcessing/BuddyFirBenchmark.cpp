@@ -18,7 +18,6 @@
 //
 //===----------------------------------------------------------------------===//
 #include "Utils/Container.h"
-#include "Utils/Correctness.h"
 #include <benchmark/benchmark.h>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
@@ -47,7 +46,7 @@ int sizeofAud{aud.size()};
 MemRef<float, 1> taps127Ref(reinterpret_cast<intptr_t *>(&sizeofTaps));
 MemRef<float, 1> audRef(reinterpret_cast<intptr_t *>(&sizeofAud));
 MemRef<float, 1> resRef(reinterpret_cast<intptr_t *>(&sizeofAud));
-}
+} // namespace
 
 // Initialize univector.
 void initializeBuddyFir() {
@@ -55,18 +54,19 @@ void initializeBuddyFir() {
       to_pointer(window_kaiser<float>(taps127.size(), 3.0));
   fir_lowpass(taps127, 0.2, kaiser, true);
   audio_reader_wav<float> reader(open_file_for_reading(
-      "/Users/zircon/Works/Github/buddy-benchmark/benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
+      "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
   reader.read(aud.data(), aud.size());
-  taps127Ref = std::move(MemRef<float, 1>(taps127.data(),
-                                          reinterpret_cast<intptr_t *>(&sizeofTaps)));
-  audRef = std::move(MemRef<float, 1>(aud.data(),
-                                      reinterpret_cast<intptr_t *>(&sizeofAud)));
-  resRef = std::move(MemRef<float, 1>(reinterpret_cast<intptr_t *>(&sizeofAud)));
+  taps127Ref = std::move(MemRef<float, 1>(
+      taps127.data(), reinterpret_cast<intptr_t *>(&sizeofTaps)));
+  audRef = std::move(
+      MemRef<float, 1>(aud.data(), reinterpret_cast<intptr_t *>(&sizeofAud)));
+  resRef =
+      std::move(MemRef<float, 1>(reinterpret_cast<intptr_t *>(&sizeofAud)));
 }
 
 // Benchmarking function.
 static void BUDDY_FIR(benchmark::State &state) {
-  for (auto _: state) {
+  for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       // result = kfr::fir(aud, taps127);
       _mlir_ciface_conv1d_buddy(&audRef, &taps127Ref, &resRef);
@@ -81,18 +81,7 @@ BENCHMARK(BUDDY_FIR)->Arg(1);
 void generateResultBuddyFir() {
   MemRef<float, 1> generateResult(reinterpret_cast<intptr_t *>(&sizeofAud));
   _mlir_ciface_conv1d_buddy(&audRef, &taps127Ref, &generateResult);
-  univector<float> resultKFR = kfr::fir(aud, taps127);
-  std::function<float(int)> memRefAcc = [&generateResult](int num) { return generateResult[num]; };
-  std::function<float(int)> uniVecAcc = [&resultKFR](int num) { return resultKFR[num]; };
-  auto dist = euclideanDistMono(uniVecAcc, memRefAcc, resultKFR.size());
-  println("Euclidean dist:", dist);
-  auto num = equivCheckMono(uniVecAcc, memRefAcc, resultKFR.size(), 0.02f);
-  println("Different points bigger than 0.02:", num);
 
-  // Notice: dtw will construct an array with sizeof(count*count)
-  // It could be very big when comparing the whole sequence.
-  auto dtw = DTWCheckMono(uniVecAcc, memRefAcc, 10000, 2);
-  println("DTW euclidean dist:", dtw);
   audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyFir.wav"),
                                  audio_format{1 /* channel */,
                                               audio_sample_type::i24,
