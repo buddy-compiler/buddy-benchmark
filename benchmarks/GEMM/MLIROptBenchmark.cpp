@@ -107,30 +107,38 @@ void BM_GEMM(benchmark::State &state) {
   MemRef<float, 2> B(sizesB, 1.0);
   MemRef<float, 2> C(sizesC, 0);
 
+int cnt = 0;
   for (auto _ : state) {
     _mlir_ciface_gemm(&A, &B, &C);
+cnt ++;
   }
-  // 我们先检查是否一样，然后再看结果
-#ifdef false
-  MemRef<float, 2> m_A(sizesA, 1.0);
-  MemRef<float, 2> m_B(sizesB, 1.0);
-  MemRef<float, 2> m_C(sizesC, 0);
 
-  _mlir_ciface_gemm(&m_A, &m_B, &m_C);
-  _mlir_ciface_gemm(&m_A, &m_B, &m_C);
-
-  float* o_A = (float*)malloc(sizeof(float) * M * K);
-  float* o_B = (float*)malloc(sizeof(float) * K * N);
-  float* o_C = (float*)malloc(sizeof(float) * M * N);
-
-  fastGEMM(o_A, K, o_B, M, o_C, N, M, K, N);
+#ifdef CHECK
+  cv::Mat cvA = cv::Mat::ones(M, N, CV_32F);
+  cv::Mat cvB = cv::Mat::ones(M, N, CV_32F);
+  cv::Mat cvC = cv::Mat::zeros(M, N, CV_32F);
+	for(int i = 0; i < cnt; i ++)
+	  cv::gemm(cvA, cvB, 1.0, cvC, 1.0, cvC, 0);
   for(int i = 0; i < M; i ++){
 	for(int j = 0; j < N; j ++){
-		assert(m_C.getData()[i * M + j] == o_C.at<float>(i, j));
-	}
+		if(C.getData()[i * M + j] == cvC.at<float>(i, j)) {
+
+                } else {
+std::cout << M << std::endl;
+			std::cout << "[" << i << ", " << j << "] == " << C.getData()[i * M + j] << ", expect " << cvC.at<float>(i, j) << std::endl;
+                }
+        }	
   }
 #endif
-
+#ifdef DEBUG
+for(int i = 0; i < M; i ++){
+	for(int j = 0; j < N; j ++){
+		std::cout << C.getData()[i * M + j] <<  " " ;
+}
+std::cout << std::endl;
+}
+assert(false);
+#endif
 }
 
 
@@ -138,9 +146,11 @@ void BM_OPENCV_GEMM(benchmark::State &state) {
   long M = state.range(0), N = state.range(0), K = state.range(0);
 
   float* o_A = (float*)malloc(sizeof(float) * M * K);
+  memset(o_A, sizeof(float) * M * K, 1.0);
   float* o_B = (float*)malloc(sizeof(float) * K * N);
+  memset(o_B, sizeof(float) * K * N, 1.0);
   float* o_C = (float*)malloc(sizeof(float) * M * N);
-
+  memset(o_C, sizeof(float) * M * N, 0.0);
 
   for (auto _ : state) {
       // C += A * B;
@@ -169,8 +179,8 @@ void BM_RAW_GEMM(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-// BENCHMARK(BM_GEMM)->DenseRange(512, 2048, 32);
-BENCHMARK(BM_OPENCV_GEMM)->DenseRange(512, 2048, 32);
+BENCHMARK(BM_GEMM)->DenseRange(64, 2048, 64);
+BENCHMARK(BM_OPENCV_GEMM)->DenseRange(64, 2048, 64);
 // BENCHMARK(BM_RAW_GEMM)->DenseRange(64, 512, 64);
 // BENCHMARK(BM_GEMM);
 //

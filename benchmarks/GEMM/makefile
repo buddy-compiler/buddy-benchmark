@@ -50,5 +50,25 @@ v-tile-reorder-unroll:
 		--canonicalize \
 		-o opt_gemm.mlir
 
+v:
+	@buddy-opt ./gemm.mlir \
+		-convert-linalg-to-affine-loops \
+		--convert-linalg-to-affine-loops \
+		--affine-super-vectorize=virtual-vector-size=16 \
+		--gemm-loop-perfect \
+	       	--affine-super-tilling=stratege=480,8,-1,180,4,-1,1 \
+		--loop-order-change=new-order-list=1,0,2,3,5,4,6,7 \
+		--affine-loop-normalize \
+		--gemm-loop-perfect \
+		--affine-loop-invariant-code-motion \
+		--affine-loop-unroll=unroll-factor=4 \
+		--affine-loop-unroll=unroll-factor=8 \
+		-o opt_gemm.mlir
+opt:
+	@buddy-opt --gemm-vectorization="strip-mining=16 kernel-m=6 kernel-n=4" gemm.mlir  -o opt_gemm.mlir
+
+clean:
+	rm opt_gemm.mlir
+
 clean:
 	rm opt_gemm.mlir
