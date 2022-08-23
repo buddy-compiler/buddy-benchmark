@@ -27,7 +27,7 @@ add_executable(audio-processing-benchmark
   KFRBiquad.cpp
   KFRIir.cpp
   Main.cpp
-  BuddyFirBenchmark.cpp
+  BuddyFir.cpp
 )
 
 target_link_directories(audio-processing-benchmark PRIVATE ${KFR_DIR}/build/)
