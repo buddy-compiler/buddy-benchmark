@@ -14,7 +14,7 @@ if(VECTORIZATION_BENCHMARKS)
   add_subdirectory(Vectorization)
 endif()
 
-if(GEMM_BENCHMARKS)
-    add_subdirectory(GEMM)
+if(OP_OPTIMIZATION_BENCHMARKS)
+    add_subdirectory(OpOptimization)
 endif()
 
