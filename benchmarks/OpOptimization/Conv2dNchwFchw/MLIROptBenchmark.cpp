@@ -28,26 +28,29 @@ namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
-void _mlir_ciface_conv2d(MemRef<float, 4> *A, MemRef<float, 4> *B,
-                       MemRef<float, 4> *C);
+void _mlir_ciface_conv2d(MemRef<float, 4> *input, MemRef<float, 4> *filter,
+                       MemRef<float, 4> *output);
 }
 
 void BM_CONV(benchmark::State &state) {
-  long M = state.range(0), N = state.range(0), K = state.range(0);
-  intptr_t sizesA[2] = {M, K};
-  intptr_t sizesB[2] = {K, N};
-  intptr_t sizesC[2] = {M, N};
+  long factor = state.range(0);
+  long a = 1, b = factor, c = 16 * factor, d = 16 * factor,
+       e = 1, f = 32 * factor, g = 32 * factor;
 
-  MemRef<float, 2> A(sizesA, 1.0);
-  MemRef<float, 2> B(sizesB, 1.0);
-  MemRef<float, 2> C(sizesC, 0);
+  intptr_t sizesInput[4] = {a, e, c + f, d + g};
+  intptr_t sizesFilter[4] = {a, e, f, g};
+  intptr_t sizesOutput[4] = {a, b, c, d};
+
+  MemRef<float, 4> input(sizesInput, 1.0);
+  MemRef<float, 4> filter(sizesFilter, 1.0);
+  MemRef<float, 4> output(sizesOutput, 0);
 
   for (auto _ : state) {
-    _mlir_ciface_conv2d(&A, &B, &C);
+	  _mlir_ciface_conv2d(&input, &filter, &output);
   }
 }
 
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_CONV)->DenseRange(64, 2048, 64);
+BENCHMARK(BM_CONV)->DenseRange(10, 100, 10);
