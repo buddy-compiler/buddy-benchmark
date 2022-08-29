@@ -26,6 +26,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f")
 
 target_link_libraries(conv2d-benchmark
   GoogleBenchmark
-  MLIRCON2D 
+  MLIRCONV2D 
   ${OpenCV_LIBS}
   )
