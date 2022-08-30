@@ -125,7 +125,7 @@ $ ./audio-processing-benchmark
 To better demonstrate the result after processing, we provide a tool for figure plotting. To use this tool, you have to make sure that you are using `python3` and that the `numpy`, `matplotlib` and `scipy` packages have been installed properly. Use the following command to install the required packages:
 
 ```
-$ pip install matplotlib, scipy
+$ pip install matplotlib scipy
 ```
 
 You can customize the `python3` path by adding the option `-DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN` while building:
