@@ -24,7 +24,6 @@ add_executable(gemm-benchmark
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f")
 
-
 target_link_libraries(gemm-benchmark
   GoogleBenchmark
   MLIRGEMM

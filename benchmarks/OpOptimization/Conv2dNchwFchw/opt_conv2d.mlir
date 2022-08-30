@@ -38,6 +38,7 @@ module {
         }
       }
     }
+    memref.dealloc %7 : memref<1xvector<16xf32>>
     return
   }
 }
