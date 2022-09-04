@@ -43,7 +43,9 @@ void fastConv( const float* weights, size_t wstep, const float* bias,
                int blockSize, int vecsize, int vecsize_aligned,
                const float* relu, bool initOutput )
 {
-    CV_Assert(cv::isAligned<32>(weights));
+    if(!cv::isAligned<32>(weights)) {
+	std::cout << "NO not aligned." << std::endl;
+    }
 
     // 因为Conv需要定义Kernel的大小，所以需要指定？
     int outCn = outShape[1];
@@ -360,25 +362,37 @@ void BM_CONV(benchmark::State &state) {
 }
 
 void BM_OPENCV_CONV(benchmark::State &state) {
-  long factor = state.range(0);
-  long a = 1, b = factor, c = 16 * factor, d = 16 * factor,
+  size_t factor = state.range(0);
+  std::cout << "factor: " << factor << std::endl;
+
+  int a = 1, b = factor, c = 16 * factor, d = 16 * factor,
        e = 1, f = 32 * factor, g = 32 * factor;
 
-  float* weight = (float*)malloc(sizeof(float) * a * e * (c + f) * (d + g));
-  size_t wstep = d + g;
+  float* rowbuf = (float*)malloc(sizeof(float) * a * e * (c + f) * (d + g));
   float* bias = (float*)malloc(sizeof(float) * a * b * c * d);
-  float* rowbuf = (float*)malloc(sizeof(float) * b * e * f * g);
+  // aligned to 32 is needed.
+  float* weight = (float*)aligned_alloc(sizeof(float) * b * e * f * g, 32);
+  size_t wstep = g;
   float* output = (float*)malloc(sizeof(float) * a * b * c * d);
-  int outShape[] = {}; // ?
-  int BlockSize = 0;
-  int vecsize = 0;
-  int vecsize_aligned = 0;
+  int outShape[] = {0, b * e, f, g}; // ?
+  int blockSize = d + g; // ?
+  int vecsize = 16;
+  int vecsize_aligned = 16;
   float* relu = nullptr;
   bool initOutput = false;
 
+  for (auto _ : state) {
+    fastConv(weight, wstep, bias, rowbuf, output, outShape, blockSize, vecsize, vecsize_aligned, relu, initOutput);
+  }
+
+  free(output);
+  free(rowbuf);
+  free(bias);
+  free(weight);
 }
 
 } // namespace
 
 // Register benchmarking function with different arguments.
 BENCHMARK(BM_CONV)->DenseRange(1, 10, 1);
+// BENCHMARK(BM_OPENCV_CONV)->DenseRange(1, 10, 1);
