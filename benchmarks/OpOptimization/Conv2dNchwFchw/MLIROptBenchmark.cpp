@@ -394,5 +394,5 @@ void BM_OPENCV_CONV(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_CONV)->DenseRange(1, 10, 1);
+BENCHMARK(BM_CONV)->DenseRange(1, 20, 1);
 // BENCHMARK(BM_OPENCV_CONV)->DenseRange(1, 10, 1);
