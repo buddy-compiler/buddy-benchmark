@@ -32,14 +32,16 @@ namespace {
 extern "C" {
 void _mlir_ciface_conv2d(MemRef<float, 4> *input, MemRef<float, 4> *filter,
                        MemRef<float, 4> *output);
+#ifdef OP_TEST
 void _mlir_ciface_conv2d_org(MemRef<float, 4> *input, MemRef<float, 4> *filter,
                        MemRef<float, 4> *output);
+#endif
 }
 
 void BM_CONV(benchmark::State &state) {
   long factor = state.range(0);
   long a = 1, b = factor, c = 16 * factor, d = 16 * factor,
-       e = 1, f = 32 * factor, g = 32 * factor;
+       e = 1, f = 16 * factor, g = 16 * factor;
 
   intptr_t sizesInput[4] = {a, e, c + f, d + g};
   intptr_t sizesFilter[4] = {b, e, f, g};
@@ -53,22 +55,24 @@ void BM_CONV(benchmark::State &state) {
     _mlir_ciface_conv2d(&input, &filter, &output);
   }
 
+#ifdef OP_TEST
 // Test Correctness.
   float* inputAData = new float[a * e * (c + f) * (d + g)];
   for(int i = 0; i < a * e * (c + f) * (d + g); ++ i){
-	  inputAData[i] = (i * std::rand()) % 5;
+	  inputAData[i] = std::rand() % 5;
   }
 
   float* inputBData = new float[b * e * f * g];
   for(int i = 0; i < b * e * f * g; ++ i){
-	  inputBData[i] = i % 13;
+	  inputBData[i] = std::rand();
   }
 
   float* inputCData = new float[a * b * c * d];
   for(int i = 0; i < a * b * c * d; ++ i){
-	  inputCData[i] = i % 5;
+	  inputCData[i] = std::rand();
   }
 
+  std::cout << "TEST" << std::endl;
   MemRef<float, 4> input_a(inputAData, sizesInput, 0);
   MemRef<float, 4> filter_a(inputBData, sizesFilter, 0);
   MemRef<float, 4> output_a(inputCData, sizesOutput, 0);
@@ -90,27 +94,24 @@ void BM_CONV(benchmark::State &state) {
   }
   if(!isOK){
 	std::cerr << "RESULT_ERROR" << std::endl;
-	for(int i = 0; i < a; i ++){
-		for(int j = 0; j < b; j ++){
-			for(int k = 0; k < c; k ++){
-				for(int l = 0; l < d; l ++){
-					int p = i * a + j * b + k * c + l;
-					// std::cerr << dataA[p];	
-					if(dataA[p] != dataB[p]) {
-						// std::cerr << " (" << dataB[p] << ") ";
-						std::cerr << "\t[" << dataA[p] - dataB[p] << "]\t";
-					} else
-						std::cerr << "\t[ ]\t";
-				}
-				std::cerr << std::endl;
-			}
-		}
+	for(int i = 0; i < a * b * c * d; ++ i){
+		if(dataA[i] != dataB[i]) {
+			// std::cerr << " (" << dataB[p] << ") ";
+			std::cerr << "\t[" << dataA[i] - dataB[i] << "]\t";
+		} else
+			std::cerr << "\t[ ]\t";
 	}
+	std::cerr << std::endl;
   }
   assert(isOK);
+
+  free(inputCData);
+  free(inputBData);
+  free(inputAData);
+#endif
 }
 
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_CONV)->DenseRange(1, 20, 1);
+BENCHMARK(BM_CONV)->DenseRange(1, 10, 1);
