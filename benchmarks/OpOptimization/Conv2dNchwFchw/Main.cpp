@@ -19,6 +19,7 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
+#include <iostream>
 
 void printResult();
 
@@ -28,6 +29,5 @@ int main(int argc, char **argv) {
   ::benchmark::RunSpecifiedBenchmarks();
   // Print result.
   // printResult();
-
   return 0;
 }
