@@ -1,16 +1,16 @@
 def calc_conv(p):
     '''
-  long a = 1, b = factor, c = 16 * factor, d = 16 * factor,
-       e = 1, f = 32 * factor, g = 32 * factor;
+  long a = 1, b = factor, c = 13 * factor, d = 6 * factor,
+       e = 1, f = 7 * factor, g = 11 * factor;
     '''
 
     a = 1
     b = p
-    c = 16 * p
-    d = 16 * p
+    c = 13 * p
+    d = 6 * p
     e = 1
-    f = 32 * p
-    g = 32 * p
+    f = 7 * p
+    g = 11 * p
 
     res = 2.0 * a * b * c * d * e * f * g 
     # print(a, b, c, d, e, f, g, res)
@@ -21,6 +21,7 @@ def calc_gemm(p):
 
 calc_dict = {
         'BM_CONV': calc_conv,
+        'BM_OPENCV_CONV': calc_conv,
 
         'BM_GEMM': calc_gemm,
         'BM_OPENCV_GEMM': calc_gemm
