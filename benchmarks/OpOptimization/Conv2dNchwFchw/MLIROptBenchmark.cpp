@@ -26,6 +26,8 @@
 #include <cstdlib>
 #include "opencv2/dnn/all_layers.hpp"
 
+#define OP_TEST
+
 namespace {
 
 // Declare the C interface.
@@ -40,8 +42,8 @@ void _mlir_ciface_conv2d_org(MemRef<float, 4> *input, MemRef<float, 4> *filter,
 
 void BM_CONV(benchmark::State &state) {
   long factor = state.range(0);
-  long a = 1, b = factor, c = 16 * factor, d = 16 * factor,
-       e = 1, f = 16 * factor, g = 16 * factor;
+  long a = 1, b = factor, c = 13 * factor, d = 6 * factor,
+       e = 1, f = 7 * factor, g = 11 * factor;
 
   intptr_t sizesInput[4] = {a, e, c + f, d + g};
   intptr_t sizesFilter[4] = {b, e, f, g};
@@ -64,15 +66,14 @@ void BM_CONV(benchmark::State &state) {
 
   float* inputBData = new float[b * e * f * g];
   for(int i = 0; i < b * e * f * g; ++ i){
-	  inputBData[i] = std::rand();
+	  inputBData[i] = std::rand() % 3;
   }
 
   float* inputCData = new float[a * b * c * d];
   for(int i = 0; i < a * b * c * d; ++ i){
-	  inputCData[i] = std::rand();
+	  inputCData[i] = std::rand() % 2;
   }
 
-  std::cout << "TEST" << std::endl;
   MemRef<float, 4> input_a(inputAData, sizesInput, 0);
   MemRef<float, 4> filter_a(inputBData, sizesFilter, 0);
   MemRef<float, 4> output_a(inputCData, sizesOutput, 0);
@@ -114,4 +115,4 @@ void BM_CONV(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_CONV)->DenseRange(1, 10, 1);
+BENCHMARK(BM_CONV)->DenseRange(1, 50, 1);
