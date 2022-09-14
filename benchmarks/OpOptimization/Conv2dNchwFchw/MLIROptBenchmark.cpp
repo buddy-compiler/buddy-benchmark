@@ -18,13 +18,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <buddy/core/Container.h>
-#include <immintrin.h>
-#include <benchmark/benchmark.h>
-#include <cmath>
-#include <iostream>
-#include <cstdlib>
 #include "opencv2/dnn/all_layers.hpp"
+#include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <cmath>
+#include <cstdlib>
+#include <immintrin.h>
+#include <iostream>
 
 #define OP_TEST
 
@@ -33,17 +33,33 @@ namespace {
 // Declare the C interface.
 extern "C" {
 void _mlir_ciface_conv2d(MemRef<float, 4> *input, MemRef<float, 4> *filter,
-                       MemRef<float, 4> *output);
-#ifdef OP_TEST
+                         MemRef<float, 4> *output);
 void _mlir_ciface_conv2d_org(MemRef<float, 4> *input, MemRef<float, 4> *filter,
-                       MemRef<float, 4> *output);
-#endif
+                             MemRef<float, 4> *output);
+}
+
+void BM_CONV_ORG(benchmark::State &state) {
+  long factor = state.range(0);
+  long a = 1, b = factor, c = 13 * factor, d = 6 * factor, e = 1,
+       f = 7 * factor, g = 11 * factor;
+
+  intptr_t sizesInput[4] = {a, e, c + f, d + g};
+  intptr_t sizesFilter[4] = {b, e, f, g};
+  intptr_t sizesOutput[4] = {a, b, c, d};
+
+  MemRef<float, 4> input(sizesInput, 1.0);
+  MemRef<float, 4> filter(sizesFilter, 1.0);
+  MemRef<float, 4> output(sizesOutput, 0);
+
+  for (auto _ : state) {
+    _mlir_ciface_conv2d_org(&input, &filter, &output);
+  }
 }
 
 void BM_CONV(benchmark::State &state) {
   long factor = state.range(0);
-  long a = 1, b = factor, c = 13 * factor, d = 6 * factor,
-       e = 1, f = 7 * factor, g = 11 * factor;
+  long a = 1, b = factor, c = 13 * factor, d = 6 * factor, e = 1,
+       f = 7 * factor, g = 11 * factor;
 
   intptr_t sizesInput[4] = {a, e, c + f, d + g};
   intptr_t sizesFilter[4] = {b, e, f, g};
@@ -58,20 +74,20 @@ void BM_CONV(benchmark::State &state) {
   }
 
 #ifdef OP_TEST
-// Test Correctness.
-  float* inputAData = new float[a * e * (c + f) * (d + g)];
-  for(int i = 0; i < a * e * (c + f) * (d + g); ++ i){
-	  inputAData[i] = std::rand() % 5;
+  // Test Correctness.
+  float *inputAData = new float[a * e * (c + f) * (d + g)];
+  for (int i = 0; i < a * e * (c + f) * (d + g); ++i) {
+    inputAData[i] = std::rand() % 5;
   }
 
-  float* inputBData = new float[b * e * f * g];
-  for(int i = 0; i < b * e * f * g; ++ i){
-	  inputBData[i] = std::rand() % 3;
+  float *inputBData = new float[b * e * f * g];
+  for (int i = 0; i < b * e * f * g; ++i) {
+    inputBData[i] = std::rand() % 3;
   }
 
-  float* inputCData = new float[a * b * c * d];
-  for(int i = 0; i < a * b * c * d; ++ i){
-	  inputCData[i] = std::rand() % 2;
+  float *inputCData = new float[a * b * c * d];
+  for (int i = 0; i < a * b * c * d; ++i) {
+    inputCData[i] = std::rand() % 2;
   }
 
   MemRef<float, 4> input_a(inputAData, sizesInput, 0);
@@ -87,22 +103,22 @@ void BM_CONV(benchmark::State &state) {
   auto dataA = output_a.getData();
   auto dataB = output_b.getData();
   bool isOK = true;
-  for(int i = 0; i < a * b * c * d; ++ i){
-	  if(dataA[i] != dataB[i]) {
-		isOK = false;
-		break;
-	  }
+  for (int i = 0; i < a * b * c * d; ++i) {
+    if (dataA[i] != dataB[i]) {
+      isOK = false;
+      break;
+    }
   }
-  if(!isOK){
-	std::cerr << "RESULT_ERROR" << std::endl;
-	for(int i = 0; i < a * b * c * d; ++ i){
-		if(dataA[i] != dataB[i]) {
-			// std::cerr << " (" << dataB[p] << ") ";
-			std::cerr << "\t[" << dataA[i] - dataB[i] << "]\t";
-		} else
-			std::cerr << "\t[ ]\t";
-	}
-	std::cerr << std::endl;
+  if (!isOK) {
+    std::cerr << "RESULT_ERROR" << std::endl;
+    for (int i = 0; i < a * b * c * d; ++i) {
+      if (dataA[i] != dataB[i]) {
+        // std::cerr << " (" << dataB[p] << ") ";
+        std::cerr << "\t[" << dataA[i] - dataB[i] << "]\t";
+      } else
+        std::cerr << "\t[ ]\t";
+    }
+    std::cerr << std::endl;
   }
   assert(isOK);
 
@@ -115,4 +131,5 @@ void BM_CONV(benchmark::State &state) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_CONV)->DenseRange(1, 50, 1);
+BENCHMARK(BM_CONV)->DenseRange(10, 50, 1);
+BENCHMARK(BM_CONV_ORG)->DenseRange(10, 50, 1);
