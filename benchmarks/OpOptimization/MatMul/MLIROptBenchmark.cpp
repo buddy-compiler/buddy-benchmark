@@ -107,10 +107,10 @@ void BM_GEMM(benchmark::State &state) {
   MemRef<float, 2> B(sizesB, 1.0);
   MemRef<float, 2> C(sizesC, 0);
 
-int cnt = 0;
-  for (auto _ : state) {
-    _mlir_ciface_gemm(&A, &B, &C);
-cnt ++;
+  int cnt = 0;
+    for (auto _ : state) {
+      _mlir_ciface_gemm(&A, &B, &C);
+      cnt ++;
   }
 
 #ifdef CHECK
@@ -156,6 +156,10 @@ void BM_OPENCV_GEMM(benchmark::State &state) {
       // C += A * B;
       fastGEMM(o_A, K, o_B, M, o_C, N, M, K, N);
   }
+
+  free(o_C);
+  free(o_B);
+  free(o_A);
 }
 
 void BM_RAW_GEMM(benchmark::State &state) {
