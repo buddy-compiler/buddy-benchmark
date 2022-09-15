@@ -14,11 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for Buddy Fir function.
+// This file implements the correctness checking for Buddy Fir function.
 //
 //===----------------------------------------------------------------------===//
 #include "Utils/Container.h"
-#include <benchmark/benchmark.h>
+#include "Utils/Correctness.h"
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
@@ -27,10 +27,6 @@
 using namespace kfr;
 
 extern "C" {
-void _mlir_ciface_conv1d_buddy(MemRef<float, 1> *inputBuddyConv1D,
-                               MemRef<float, 1> *kernelBuddyConv1D,
-                               MemRef<float, 1> *outputBuddyConv1D);
-
 void _mlir_ciface_conv1d_linalg(MemRef<float, 1> *inputBuddyConv1D,
                                 MemRef<float, 1> *kernelBuddyConv1D,
                                 MemRef<float, 1> *outputBuddyConv1D);
@@ -64,24 +60,17 @@ void initializeBuddyFir() {
       std::move(MemRef<float, 1>(reinterpret_cast<intptr_t *>(&sizeofAud)));
 }
 
-// Benchmarking function.
-static void BUDDY_FIR(benchmark::State &state) {
-  for (auto _ : state) {
-    for (int i = 0; i < state.range(0); ++i) {
-      // result = kfr::fir(aud, taps127);
-      _mlir_ciface_conv1d_buddy(&audRef, &taps127Ref, &resRef);
-    }
-  }
-}
-
-// Register benchmarking function.
-BENCHMARK(BUDDY_FIR)->Arg(1);
-
-// Generate result wav file.
-void generateResultBuddyFir() {
+void runBuddyFir() {
+  initializeBuddyFir();
   MemRef<float, 1> generateResult(reinterpret_cast<intptr_t *>(&sizeofAud));
-  _mlir_ciface_conv1d_buddy(&audRef, &taps127Ref, &generateResult);
-
+  _mlir_ciface_conv1d_linalg(&audRef, &taps127Ref, &generateResult);
+  univector<float> resultKFR = kfr::fir(aud, taps127);
+  auto offset = taps127.size()/2;
+  std::function<float(int)> memRefAcc = [&generateResult](int num) { return generateResult[num]; };
+  std::function<float(int)> uniVecAcc = [&resultKFR](int num) { return resultKFR[num]; };
+  auto num = errorCheckMono(uniVecAcc, memRefAcc, resultKFR.size(), 0.02f);
+  println("Avg Error:",num.first/sizeofAud);
+  println("Max Error:",num.second);
   audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyFir.wav"),
                                  audio_format{1 /* channel */,
                                               audio_sample_type::i24,

@@ -25,6 +25,7 @@
 #include <vector>
 #include <cmath>
 #include <functional>
+#include <utility>
 
 #include "Utils/Container.h"
 #include "DTW.h"
@@ -39,14 +40,17 @@ T euclideanDistMono(std::function<T(int)> acc1, std::function<T(int)> acc2, int 
   return sqrt(sum);
 }
 
+// First: sum of all errors, Second: maximum error found
 template<typename T>
-int equivCheckMono(std::function<T(int)> acc1, std::function<T(int)> acc2, int count, T beta = 0.01f) {
+std::pair<T,T> errorCheckMono(std::function<T(int)> acc1, std::function<T(int)> acc2, int count, T beta = 0.01f) {
   T sum = 0;
+  T max = 0;
   for (int i = 0; i < count; ++i) {
     T dist = abs(acc1(i) - acc2(i));
-    sum += (dist > beta);
+    sum += (dist > beta)?dist:0;
+    if (dist>max) max=dist;
   }
-  return sum;
+  return {sum,max};
 }
 
 // P: p-norm (2 for euclidean, 1 for manhattan)

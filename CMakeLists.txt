@@ -40,6 +40,8 @@ message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
 
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 
+set(BUILD_CORRECTNESS OFF CACHE BOOL "Build correctness checking")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 
 # Add BUDDY files to the include path
@@ -141,4 +143,8 @@ add_subdirectory(benchmarks)
 if (BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
+endif()
+
+if (BUILD_CORRECTNESS)
+  add_subdirectory(correctness)
 endif()

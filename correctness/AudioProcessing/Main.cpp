@@ -1,4 +1,4 @@
-//===- BuddyFir.mlir ---------------------------------------------------===//
+//===- Main.cpp -----------------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file provides the MLIR Fir (Conv 1d) function.
+// This is the main file of the audio processing correctness checking.
 //
 //===----------------------------------------------------------------------===//
 
-func.func @conv1d_linalg(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>) -> () {
-  linalg.conv_1d ins(%in, %filter : memref<?xf32>, memref<?xf32>)
-                outs(%out : memref<?xf32>)
-  return
+void runBuddyFir();
+
+int main(int argc, char **argv) {
+  runBuddyFir();
+  return 0;
 }
