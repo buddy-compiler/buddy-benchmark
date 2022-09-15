@@ -139,6 +139,7 @@ check_simd()
 
 add_subdirectory(lib)
 add_subdirectory(benchmarks)
+add_subdirectory(plots)
 
 if (BUILD_TESTS)
   enable_testing()
