@@ -45,7 +45,9 @@ Run the image processing benchmark:
 *ii. Please replace `<kernel name>` with name of the kernel which is to be used for*
 *benchmarking as specifed in `include/ImageProcessing/Kernels.h`.*
 
-Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign`
+*iii. Please replace `<Boundary Option>` with `CONSTANT_PADDING` or `REPLICATE_PADDING`.*
+
+Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign CONSTANT_PADDING`
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
@@ -55,7 +57,7 @@ $ cmake -G Ninja .. \
     -DEIGEN_DIR=/PATH/TO/EIGEN/SOURCE/CODE \
     -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
-$ cd bin && ./image-processing-benchmark <image path> <kernel name>
+$ cd bin && ./image-processing-benchmark <image path> <kernel name> <Boundary Option>
 ```
 
 ## Deep Learning Benchmark
@@ -111,8 +113,58 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
-    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE 
+    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja audio-processing-benchmark
+$ cd bin
+$ ./audio-processing-benchmark
+```
+
+### audio-plot tool
+
+To better demonstrate the result after processing, we provide a tool for figure plotting. To use this tool, you have to make sure that you are using `python3` and that the `numpy`, `matplotlib` and `scipy` packages have been installed properly. Use the following command to install the required packages:
+
+```
+$ pip install matplotlib scipy
+```
+
+You can customize the `python3` path by adding the option `-DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN` while building:
+
+*Note: Please replace the `/PATH/TO/*` with your local path.*
+
+```
+$ cd build
+$ cmake -G Ninja .. \
+    -DAUDIO_PROCESSING_BENCHMARKS=ON \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD \
+    -DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN/
+$ ninja audio-plot
+```
+
+Once the processing is done, you can use this tool to plot a comparision figure:
+
+```
+$ cd bin
+$ ./audio-plot ../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav ResultKFRIir.wav
+```
+
+The result is saved in `bin/res.png`. For more usage, use `audio-plot -h` for detailed information.
+
+## Vectorization Benchmark
+
+*Note: Please replace the `/PATH/TO/*` with your local path.*
+
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DVECTORIZATION_BENCHMARKS=ON \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+$ ninja vectorization-benchmark
+$ cd bin
+$ ./vectorization-benchmark
 ```
 
 ## Testing

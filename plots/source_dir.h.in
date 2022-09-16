@@ -1,0 +1,2 @@
+#cmakedefine MAIN_PATH "@MAIN_PATH@"
+#cmakedefine PYTHON_PATH "@PYTHON_PATH@"
