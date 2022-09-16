@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @buddy_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>){
+func.func @MLIR_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>){
   %c0 = arith.constant 0 : index
   %N = memref.dim %in, %c0 : memref<?xf32>
   %b0 = affine.load %filter[0] : memref<?xf32>
@@ -48,5 +48,10 @@ func.func @buddy_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : mem
     affine.yield %z1_next, %z2_next : f32, f32
 
   }
+  return
+}
+
+func.func @buddy_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>) -> () {
+  dap.biquad %in, %filter, %out : memref<?xf32>, memref<?xf32>, memref<?xf32>
   return
 }

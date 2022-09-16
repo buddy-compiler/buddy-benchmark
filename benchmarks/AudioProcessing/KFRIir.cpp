@@ -28,7 +28,7 @@ using namespace kfr;
 
 constexpr size_t maxorder = 32;
 univector<float, 2000000> aud_iir;
-univector<fbase, 1024> output;
+univector<fbase, 2000000> output;
 
 zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
 std::vector<biquad_params<fbase>> bqs = to_sos(filt);
