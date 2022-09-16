@@ -35,9 +35,9 @@ biquad_params<float> bq = {biquad_lowpass(0.3, -1.0)};
 univector<float, 2000000> result_biquad;
 // Initialize univector.
 void initializeKFRBiquad() {
-  audio_reader_wav<float> reader_biquad(open_file_for_reading(
+  audio_reader_wav<float> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
-  reader_biquad.read(aud_biquad.data(), aud_biquad.size());
+  reader.read(aud_biquad.data(), aud_biquad.size());
 }
 
 // Benchmarking function.

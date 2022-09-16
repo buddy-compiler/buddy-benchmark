@@ -30,25 +30,6 @@ add_subdirectory(${KFR_DIR} ./kfr)
 
 include_directories(${KFR_DIR}/include)
 
-
-
-add_custom_command(OUTPUT buddy-biquad.o
-        COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
-        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyBiquad.mlir
-        -lower-dap="DAP-strip-mining=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
-        -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-        --llvm-request-c-wrappers
-        -convert-arith-to-llvm
-        -convert-memref-to-llvm -convert-func-to-llvm
-        -reconcile-unrealized-casts |
-        ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-        ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/buddy-biquad.o
-        )
-add_library(BuddyBiquad STATIC buddy-biquad.o)
-set_target_properties(BuddyBiquad PROPERTIES LINKER_LANGUAGE CXX)
-
 add_custom_command(OUTPUT buddy-iir.o
         COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyIIR.mlir
@@ -74,8 +55,7 @@ add_executable(audio-processing-benchmark
   KFRFir.cpp 
   KFRIir.cpp
   KFRBiquad.cpp
-  BuddyBiquadBenchmark.cpp
-  # BuddyIIRBenchmark.cpp
+  BuddyIIRBenchmark.cpp
   Main.cpp
 )
 
@@ -84,16 +64,6 @@ target_link_libraries(audio-processing-benchmark
   PRIVATE
   kfr_io
   kfr_dft
-  BuddyBiquad
-  # BuddyIir
-  GoogleBenchmark
-)
-
-add_executable(audio-processing-test BuddyBiquadTest.cpp)
-target_link_libraries(audio-processing-test 
-  PRIVATE
-  kfr_io
-  kfr_dft
-  BuddyBiquad
   BuddyIir
+  GoogleBenchmark
 )

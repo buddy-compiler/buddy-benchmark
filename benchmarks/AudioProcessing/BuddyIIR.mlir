@@ -1,4 +1,4 @@
-//===- BuddyBiquad.mlir ---------------------------------------------------===//
+//===- BuddyIIR.mlir ---------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file provides the MLIR Biquad IIR function.
+// This file provides the MLIR IIR function.
 //
 //===----------------------------------------------------------------------===//
 

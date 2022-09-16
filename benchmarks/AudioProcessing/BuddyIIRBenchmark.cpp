@@ -1,4 +1,4 @@
-//===- BuddyBiquadBenchmark.cpp
+//===- BuddyIIRBenchmark.cpp
 //---------------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for Buddy Biquad IIR function.
+// This file implements the benchmark for Buddy IIR function.
 //
 //===----------------------------------------------------------------------===//
 
@@ -30,25 +30,24 @@ using namespace kfr;
 
 extern "C" {
 void _mlir_ciface_MLIR_iir(MemRef<float, 1> *inputBuddyConv1D,
-                               MemRef<float, 2> *kernelBuddyConv1D,
-                               MemRef<float, 1> *outputBuddyConv1D);
-
+                           MemRef<float, 2> *kernelBuddyConv1D,
+                           MemRef<float, 1> *outputBuddyConv1D);
 
 void _mlir_ciface_buddy_iir(MemRef<float, 1> *inputBuddyConv1D,
-                               MemRef<float, 2> *kernelBuddyConv1D,
-                               MemRef<float, 1> *outputBuddyConv1D);
+                            MemRef<float, 2> *kernelBuddyConv1D,
+                            MemRef<float, 1> *outputBuddyConv1D);
 }
 
 namespace {
 univector<float> kernel;
-zpk<fbase> filt                       = iir_lowpass(bessel<fbase>(24), 1000, 48000);
+zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
 std::vector<biquad_params<fbase>> bqs = to_sos(filt);
 
-univector<float, 2000000> aud_buddy_biquad;
-univector<float, 2000000> result_buddy_biquad;
+univector<float, 2000000> aud_buddy_iir;
+univector<float, 2000000> result_buddy_iir;
 intptr_t size_f = bqs.size();
 intptr_t sizeofKernel[2] = {size_f, 6};
-intptr_t sizeofAud{aud_buddy_biquad.size()};
+intptr_t sizeofAud{aud_buddy_iir.size()};
 
 // MemRef copys all data, so data here are actually not accessed.
 MemRef<float, 2> kernelRef(sizeofKernel);
@@ -58,11 +57,11 @@ MemRef<float, 1> resRef(&sizeofAud);
 
 // Initialize univector.
 void initializeBuddyIIR() {
-  audio_reader_wav<float> reader_buddy_biquad(open_file_for_reading(
+  audio_reader_wav<float> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
-  reader_buddy_biquad.read(aud_buddy_biquad.data(), aud_buddy_biquad.size());
+  reader.read(aud_buddy_iir.data(), aud_buddy_iir.size());
 
-  for(int i=0; i<bqs.size(); ++i){
+  for (int i = 0; i < bqs.size(); ++i) {
     auto bq = bqs[i];
     kernel.push_back(bq.b0);
     kernel.push_back(bq.b1);
@@ -70,11 +69,10 @@ void initializeBuddyIIR() {
     kernel.push_back(bq.a0);
     kernel.push_back(bq.a1);
     kernel.push_back(bq.a2);
-
   }
-  
+
   kernelRef = std::move(MemRef<float, 2>(kernel.data(), sizeofKernel));
-  audRef = std::move(MemRef<float, 1>(aud_buddy_biquad.data(), &sizeofAud));
+  audRef = std::move(MemRef<float, 1>(aud_buddy_iir.data(), &sizeofAud));
   resRef = std::move(MemRef<float, 1>(&sizeofAud));
 }
 
@@ -100,18 +98,17 @@ static void BUDDY_IIR(benchmark::State &state) {
 BENCHMARK(MLIR_IIR)->Arg(1);
 BENCHMARK(BUDDY_IIR)->Arg(1);
 
-
-// Generate result_buddy_biquad wav file.
+// Generate result_buddy_iir wav file.
 void generateResultBuddyIIR() {
   println("-------------------------------------------------------");
   println("[ Buddy IIR Result Information ]");
   MemRef<float, 1> generateResult(&sizeofAud);
   _mlir_ciface_buddy_iir(&audRef, &kernelRef, &generateResult);
 
-  audio_writer_wav<float> writer(
-      open_file_for_writing("./ResultBuddyIIR.wav"),
-      audio_format{1 /* channel */, audio_sample_type::i24,
-                   100000 /* sample rate */});
+  audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyIIR.wav"),
+                                 audio_format{1 /* channel */,
+                                              audio_sample_type::i24,
+                                              100000 /* sample rate */});
   writer.write(generateResult.getData(), generateResult.getSize());
   println("Sample Rate  = ", writer.format().samplerate);
   println("Channels     = ", writer.format().channels);
@@ -119,4 +116,5 @@ void generateResultBuddyIIR() {
   println("Duration (s) = ",
           writer.format().length / writer.format().samplerate);
   println("Bit depth    = ", audio_sample_bit_depth(writer.format().type));
+  writer.close();
 }
