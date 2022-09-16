@@ -53,8 +53,8 @@ set_target_properties(BuddyIir PROPERTIES LINKER_LANGUAGE CXX)
 add_executable(audio-processing-benchmark
   KFRFft.cpp
   KFRFir.cpp 
-  KFRIir.cpp
   KFRBiquad.cpp
+  KFRIir.cpp
   BuddyIIRBenchmark.cpp
   Main.cpp
 )

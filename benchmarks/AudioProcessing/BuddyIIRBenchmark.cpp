@@ -28,6 +28,7 @@
 
 using namespace kfr;
 
+// Declare the IIR C interface.
 extern "C" {
 void _mlir_ciface_MLIR_iir(MemRef<float, 1> *inputBuddyConv1D,
                            MemRef<float, 2> *kernelBuddyConv1D,
