@@ -24,8 +24,9 @@ func.func @MLIR_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memr
   %b0 = affine.load %filter[0] : memref<?xf32>
   %b1 = affine.load %filter[1] : memref<?xf32>
   %b2 = affine.load %filter[2] : memref<?xf32>
-  %a1 = affine.load %filter[3] : memref<?xf32>
-  %a2 = affine.load %filter[4] : memref<?xf32>
+  %a0 = affine.load %filter[3] : memref<?xf32>
+  %a1 = affine.load %filter[4] : memref<?xf32>
+  %a2 = affine.load %filter[5] : memref<?xf32>
   %init_z1 = arith.constant 0.0 : f32
   %init_z2 = arith.constant 0.0 : f32
 

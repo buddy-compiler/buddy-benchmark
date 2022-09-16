@@ -28,19 +28,19 @@
 
 using namespace kfr;
 
+// Declare the biquad C interface.
 extern "C" {
 void _mlir_ciface_MLIR_biquad(MemRef<float, 1> *inputBuddyConv1D,
-                               MemRef<float, 1> *kernelBuddyConv1D,
-                               MemRef<float, 1> *outputBuddyConv1D);
+                              MemRef<float, 1> *kernelBuddyConv1D,
+                              MemRef<float, 1> *outputBuddyConv1D);
 
 void _mlir_ciface_buddy_biquad(MemRef<float, 1> *inputBuddyConv1D,
                                MemRef<float, 1> *kernelBuddyConv1D,
                                MemRef<float, 1> *outputBuddyConv1D);
-
 }
 
 namespace {
-univector<float, 5> kernel;
+univector<float, 6> kernel;
 biquad_params<float> bq = {biquad_lowpass(0.3, -1.0)};
 
 univector<float, 2000000> aud_buddy_biquad;
@@ -63,8 +63,9 @@ void initializeBuddyBiquad() {
   kernel[0] = bq.b0;
   kernel[1] = bq.b1;
   kernel[2] = bq.b2;
-  kernel[3] = bq.a1;
-  kernel[4] = bq.a2;
+  kernel[3] = bq.a0;
+  kernel[4] = bq.a1;
+  kernel[5] = bq.a2;
 
   kernelRef = std::move(MemRef<float, 1>(kernel.data(), &sizeofKernel));
   audRef = std::move(MemRef<float, 1>(aud_buddy_biquad.data(), &sizeofAud));
@@ -111,4 +112,5 @@ void generateResultBuddyBiquad() {
   println("Duration (s) = ",
           writer.format().length / writer.format().samplerate);
   println("Bit depth    = ", audio_sample_bit_depth(writer.format().type));
+  writer.close();
 }
