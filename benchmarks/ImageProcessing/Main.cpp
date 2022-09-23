@@ -24,20 +24,26 @@
 void initializeMLIRConv2D(char **);
 void initializeBuddyConv2D(char **);
 void initializeBuddyCorr2D(char **);
+void initializeBuddyErosion2D(char **);
+void initializeOpenCVErode2D(char **);
 void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **);
 
 void generateResultBuddyConv2D(char **);
 void generateResultBuddyCorr2D(char **);
+void generateResultBuddyErosion2D(char **);
+void generateResultOpenCVErode2D();
 void generateResultOpenCVFilter2D();
 void generateResultEigenConvolve2D();
 
 void registerBenchmarkBuddyCorr2D();
+void registerBenchmarkBuddyErosion2D();
+void registerBenchmarkOpenCVErode2D();
 void registerBenchmarkOpenCVFilter2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 4) {
+  if (argc != 5) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
         "Correct format is ./image-processing-benchmark <image path> <kernel "
@@ -52,11 +58,15 @@ int main(int argc, char **argv) {
   initializeMLIRConv2D(argv);
   initializeBuddyConv2D(argv);
   initializeBuddyCorr2D(argv);
+  initializeBuddyErosion2D(argv);
+  initializeOpenCVErode2D(argv);
   initializeOpenCVFilter2D(argv);
   initializeEigenConvolve2D(argv);
 
   registerBenchmarkBuddyCorr2D();
   registerBenchmarkOpenCVFilter2D();
+  registerBenchmarkBuddyErosion2D();
+  registerBenchmarkOpenCVErode2D();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
@@ -65,6 +75,8 @@ int main(int argc, char **argv) {
   generateResultOpenCVFilter2D();
   generateResultBuddyConv2D(argv);
   generateResultBuddyCorr2D(argv);
+  generateResultBuddyErosion2D(argv);
+  generateResultOpenCVErode2D();
   generateResultEigenConvolve2D();
 
   return 0;
