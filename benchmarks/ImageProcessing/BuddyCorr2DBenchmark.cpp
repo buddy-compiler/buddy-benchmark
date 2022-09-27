@@ -128,9 +128,13 @@ static void Buddy_Corr2D_Replicate_Padding(benchmark::State &state) {
 // Register benchmarking function.
 void registerBenchmarkBuddyCorr2D() {
   if (BoundaryType == replicate_padding) {
-    BENCHMARK(Buddy_Corr2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(Buddy_Corr2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(Buddy_Corr2D_Constant_Padding)->Arg(1);
+    BENCHMARK(Buddy_Corr2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 

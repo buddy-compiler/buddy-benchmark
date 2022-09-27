@@ -88,7 +88,7 @@ static void Buddy_Conv2D(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(Buddy_Conv2D)->Arg(1);
+BENCHMARK(Buddy_Conv2D)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result image.
 void generateResultBuddyConv2D(char **argv) {

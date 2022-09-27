@@ -104,7 +104,7 @@ static void Eigen_Convolve2D(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(Eigen_Convolve2D)->Arg(1);
+BENCHMARK(Eigen_Convolve2D)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result image.
 void generateResultEigenConvolve2D() {

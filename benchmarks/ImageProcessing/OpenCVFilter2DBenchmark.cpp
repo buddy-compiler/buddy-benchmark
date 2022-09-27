@@ -69,9 +69,13 @@ static void OpenCV_Filter2D_Replicate_Padding(benchmark::State &state) {
 // Register benchmarking function.
 void registerBenchmarkOpenCVFilter2D() {
   if (OpenCVBoundaryType == replicate_padding) {
-    BENCHMARK(OpenCV_Filter2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Filter2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_Filter2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Filter2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
