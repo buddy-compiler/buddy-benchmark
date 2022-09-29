@@ -21,7 +21,7 @@ def calc_gemm(p):
 
 calc_dict = {
         'BM_CONV': calc_conv,
-        'BM_OPENCV_CONV': calc_conv,
+        'BM_CONV_ORG': calc_conv,
 
         'BM_GEMM': calc_gemm,
         'BM_OPENCV_GEMM': calc_gemm
