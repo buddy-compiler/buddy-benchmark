@@ -106,7 +106,7 @@ void BM_GEMM(benchmark::State &state) {
     cnt++;
   }
 
-#ifdef CHECK
+#ifdef OP_TEST
   cv::Mat cvA = cv::Mat::ones(M, N, CV_32F);
   cv::Mat cvB = cv::Mat::ones(M, N, CV_32F);
   cv::Mat cvC = cv::Mat::zeros(M, N, CV_32F);
