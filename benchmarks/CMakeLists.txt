@@ -9,3 +9,7 @@ endif()
 if(AUDIO_PROCESSING_BENCHMARKS)
   add_subdirectory(AudioProcessing)
 endif()
+
+if(VECTORIZATION_BENCHMARKS)
+  add_subdirectory(Vectorization)
+endif()
