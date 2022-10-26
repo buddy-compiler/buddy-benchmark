@@ -33,7 +33,7 @@ include_directories(${KFR_DIR}/include)
 add_custom_command(OUTPUT buddy-biquad.o
         COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyBiquad.mlir
-        -lower-dap="DAP-strip-mining=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
+        -lower-dap="DAP-vector-splitting=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
         -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
         --llvm-request-c-wrappers
         -convert-arith-to-llvm
