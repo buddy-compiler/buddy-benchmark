@@ -29,7 +29,7 @@ using namespace kfr;
 
 // Declare the biquad C interface.
 extern "C" {
-void _mlir_ciface_MLIR_biquad(MemRef<float, 1> *inputBuddyConv1D,
+void _mlir_ciface_mlir_biquad(MemRef<float, 1> *inputBuddyConv1D,
                               MemRef<float, 1> *kernelBuddyConv1D,
                               MemRef<float, 1> *outputBuddyConv1D);
 
@@ -84,7 +84,7 @@ static void BUDDY_BIQUAD(benchmark::State &state) {
 static void MLIR_BIQUAD(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_MLIR_biquad(&audRef, &kernelRef, &resRef);
+      _mlir_ciface_mlir_biquad(&audRef, &kernelRef, &resRef);
     }
   }
 }
