@@ -32,8 +32,8 @@ include_directories(${KFR_DIR}/include)
 
 add_custom_command(OUTPUT buddy-iir.o
         COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
-        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyIIR.mlir
-        -lower-dap="DAP-strip-mining=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
+        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyIir.mlir
+        -lower-dap="DAP-vector-splitting=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
         -lower-affine
         -convert-scf-to-cf 
         -convert-vector-to-llvm 
@@ -55,7 +55,7 @@ add_executable(audio-processing-benchmark
   KFRFir.cpp 
   KFRBiquad.cpp
   KFRIir.cpp
-  BuddyIIRBenchmark.cpp
+  BuddyIirBenchmark.cpp
   Main.cpp
 )
 

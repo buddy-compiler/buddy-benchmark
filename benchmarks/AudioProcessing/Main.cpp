@@ -24,27 +24,27 @@ void initializeKFRFir();
 void initializeKFRBiquad();
 void initializeKFRFft();
 void initializeKFRIir();
-void initializeBuddyIIR();
+void initializeBuddyIir();
 
 void generateResultKFRFir();
 void generateResultKFRBiquad();
 void generateResultKFRFft();
 void generateResultKFRIir();
-void generateResultBuddyIIR();
+void generateResultBuddyIir();
 
 int main(int argc, char **argv) {
   initializeKFRFir();
   initializeKFRBiquad();
   initializeKFRFft();
   initializeKFRIir();
-  initializeBuddyIIR();
+  initializeBuddyIir();
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
   generateResultKFRFir();
   generateResultKFRBiquad();
   generateResultKFRFft();
   generateResultKFRIir();
-  generateResultBuddyIIR();
+  generateResultBuddyIir();
 
   return 0;
 }
