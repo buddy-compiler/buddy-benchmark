@@ -118,6 +118,54 @@ add_custom_command(OUTPUT buddy-erosion2d.o
 add_library(BuddyErosion2D STATIC buddy-erosion2d.o)
 set_target_properties(BuddyErosion2D PROPERTIES LINKER_LANGUAGE CXX)
 
+add_custom_command(OUTPUT buddy-dilation2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyDilation2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-dilation2d.o
+)
+add_library(BuddyDilation2D STATIC buddy-dilation2d.o)
+set_target_properties(BuddyDilation2D PROPERTIES LINKER_LANGUAGE CXX)
+
+add_custom_command(OUTPUT buddy-opening2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyOpening2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-opening2d.o
+)
+add_library(BuddyOpening2D STATIC buddy-opening2d.o)
+set_target_properties(BuddyOpening2D PROPERTIES LINKER_LANGUAGE CXX)
+
+add_custom_command(OUTPUT buddy-closing2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyClosing2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-closing2d.o
+)
+add_library(BuddyClosing2D STATIC buddy-closing2d.o)
+set_target_properties(BuddyClosing2D PROPERTIES LINKER_LANGUAGE CXX)
+
 #-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
@@ -130,7 +178,13 @@ add_executable(image-processing-benchmark
   BuddyConv2DBenchmark.cpp
   BuddyCorr2DBenchmark.cpp
   BuddyErosion2DBenchmark.cpp
+  BuddyDilation2DBenchmark.cpp
+  BuddyOpening2DBenchmark.cpp
+  BuddyClosing2DBenchmark.cpp
   OpenCVErode2DBenchmark.cpp
+  OpenCVDilate2DBenchmark.cpp
+  OpenCVOpening2DBenchmark.cpp
+  OpenCVClosing2DBenchmark.cpp
   )
 
 target_include_directories(image-processing-benchmark 
@@ -146,6 +200,9 @@ target_link_libraries(image-processing-benchmark
   BuddyConv2D
   BuddyCorr2D
   BuddyErosion2D
+  BuddyDilation2D
+  BuddyOpening2D
+  BuddyClosing2D
   Container
   PNGImage
   )

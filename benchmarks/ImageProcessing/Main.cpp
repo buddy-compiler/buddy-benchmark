@@ -24,27 +24,39 @@
 void initializeMLIRConv2D(char **);
 void initializeBuddyConv2D(char **);
 void initializeBuddyCorr2D(char **);
+void initializeBuddyOpening2D(char **);
+void initializeBuddyClosing2D(char **);
 void initializeBuddyErosion2D(char **);
 void initializeBuddyDilation2D(char **);
 void initializeOpenCVErode2D(char **);
 void initializeOpenCVDilate2D(char **);
 void initializeOpenCVFilter2D(char **);
+void initializeOpenCVOpening2D(char **);
+void initializeOepnCVClosing2D(char **);
 void initializeEigenConvolve2D(char **);
 
 void generateResultBuddyConv2D(char **);
 void generateResultBuddyCorr2D(char **);
 void generateResultBuddyErosion2D(char **);
+void generateResultBuddyOpening2D(char **);
+void generateResultBuddyClosing2D(char **);
 void generateResultBuddyDilation2D(char **);
 void generateResultOpenCVErode2D();
 void generateResultOpenCVDilate2D();
 void generateResultOpenCVFilter2D();
+void generateResultOpenCVOpening2D();
+void generateResultOpenCVClosing2D();
 void generateResultEigenConvolve2D();
 
 void registerBenchmarkBuddyCorr2D();
 void registerBenchmarkBuddyErosion2D();
 void registerBenchmarkBuddyDilation2D();
+void registerBenchmarkBuddyOpening2D();
+void registerBenchmarkBuddyClosing2D();
 void registerBenchmarkOpenCVErode2D();
 void registerBenchmarkOpenCVDilate2D();
+void registerBenchmarkOpenCVOpening2D();
+void registerBenchmarkOpenCVClosing2D();
 void registerBenchmarkOpenCVFilter2D();
 
 // Run benchmarks.
@@ -66,8 +78,12 @@ int main(int argc, char **argv) {
   initializeBuddyCorr2D(argv);
   initializeBuddyErosion2D(argv);
   initializeBuddyDilation2D(argv);
+  initializeBuddyOpening2D(argv);
+  initializeBuddyClosing2D(argv);
   initializeOpenCVErode2D(argv);
   initializeOpenCVDilate2D(argv);
+  initializeOpenCVOpening2D(argv);
+  initializeOpenCVClosing2D(argv);
   initializeOpenCVFilter2D(argv);
   initializeEigenConvolve2D(argv);
 
@@ -75,7 +91,11 @@ int main(int argc, char **argv) {
   registerBenchmarkOpenCVFilter2D();
   registerBenchmarkBuddyErosion2D();
   registerBenchmarkBuddyDilation2D();
+  registerBenchmarkBuddyOpening2D();
+  registerBenchmarkBuddyClosing2D();
   registerBenchmarkOpenCVErode2D();
+  registerBenchmarkOpenCVOpening2D();
+  registerBenchmarkOpenCVClosing2D();
   registerBenchmarkOpenCVDilate2D();
 
   ::benchmark::Initialize(&argc, argv);
@@ -87,8 +107,12 @@ int main(int argc, char **argv) {
   generateResultBuddyCorr2D(argv);
   generateResultBuddyErosion2D(argv);
   generateResultBuddyDilation2D(argv);
+  generateResultBuddyOpening2D(argv);
+  generateResultBuddyClosing2D(argv);
   generateResultOpenCVErode2D();
   generateResultOpenCVDilate2D();
+  generateResultOpenCVOpening2D();
+  generateResultOpenCVClosing2D();
   generateResultEigenConvolve2D();
 
   return 0;
