@@ -166,6 +166,54 @@ add_custom_command(OUTPUT buddy-closing2d.o
 add_library(BuddyClosing2D STATIC buddy-closing2d.o)
 set_target_properties(BuddyClosing2D PROPERTIES LINKER_LANGUAGE CXX)
 
+add_custom_command(OUTPUT buddy-tophat2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyTopHat2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-tophat2d.o
+)
+add_library(BuddyTopHat2D STATIC buddy-tophat2d.o)
+set_target_properties(BuddyTopHat2D PROPERTIES LINKER_LANGUAGE CXX)
+
+add_custom_command(OUTPUT buddy-bottomhat2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyBottomHat2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-bottomhat2d.o
+)
+add_library(BuddyBottomHat2D STATIC buddy-bottomhat2d.o)
+set_target_properties(BuddyBottomHat2D PROPERTIES LINKER_LANGUAGE CXX)
+
+add_custom_command(OUTPUT buddy-morphgrad2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyMorphGrad2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-morphgrad2d.o
+)
+add_library(BuddyMorphGrad2D STATIC buddy-morphgrad2d.o)
+set_target_properties(BuddyMorphGrad2D PROPERTIES LINKER_LANGUAGE CXX)
+
 #-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
@@ -181,10 +229,16 @@ add_executable(image-processing-benchmark
   BuddyDilation2DBenchmark.cpp
   BuddyOpening2DBenchmark.cpp
   BuddyClosing2DBenchmark.cpp
+  BuddyTopHat2DBenchmark.cpp
+  BuddyBottomHat2DBenchmark.cpp
+  BuddyMorphGrad2DBenchmark.cpp
   OpenCVErode2DBenchmark.cpp
   OpenCVDilate2DBenchmark.cpp
   OpenCVOpening2DBenchmark.cpp
   OpenCVClosing2DBenchmark.cpp
+  OpenCVTopHat2DBenchmark.cpp
+  OpenCVBottomHat2DBenchmark.cpp
+  OpenCVMorphGrad2DBenchmark.cpp
   )
 
 target_include_directories(image-processing-benchmark 
@@ -203,6 +257,9 @@ target_link_libraries(image-processing-benchmark
   BuddyDilation2D
   BuddyOpening2D
   BuddyClosing2D
+  BuddyTopHat2D
+  BuddyBottomHat2D
+  BuddyMorphGrad2D
   Container
   PNGImage
   )
