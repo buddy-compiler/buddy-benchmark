@@ -1,4 +1,4 @@
-//===- KFRBiquad.cpp ---------------------------------------------------------===//
+//===- KFRBiquad.cpp ------------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,39 +19,46 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
+#include <kfr/all.hpp>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
+#include <kfr/dsp/biquad.hpp>
 #include <kfr/io.hpp>
 #include <kfr/math.hpp>
-#include <kfr/dsp/biquad.hpp>
-#include <kfr/all.hpp>
 
 using namespace kfr;
 
 univector<float, 2000000> aud_biquad;
-biquad_params<double> bq = {biquad_lowpass(0.3, -1.0)};
+biquad_params<float> bq = {biquad_lowpass(0.3, -1.0)};
+univector<float, 2000000> result_biquad;
 // Initialize univector.
 void initializeKFRBiquad() {
-  audio_reader_wav<float> reader(open_file_for_reading(
+  audio_reader_wav<float> reader_biquad(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
-  reader.read(aud_biquad.data(), aud_biquad.size());
+  reader_biquad.read(aud_biquad.data(), aud_biquad.size());
 }
 
 // Benchmarking function.
 static void KFR_Biquad(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-        aud_biquad = biquad(bq, aud_biquad);
+      result_biquad = biquad(bq, aud_biquad);
     }
   }
 }
 
 // Register benchmarking function.
-BENCHMARK(KFR_Biquad)->Arg(1); 
+BENCHMARK(KFR_Biquad)->Arg(1);
 
 void generateResultKFRBiquad() {
   println("-------------------------------------------------------");
   println("[ KFR Biquad Result Information ]");
+  result_biquad = biquad(bq, aud_biquad);
+  audio_writer_wav<float> writer(open_file_for_writing("./ResultKFRBiqaud.wav"),
+                                 audio_format{1 /* channel */,
+                                              audio_sample_type::i24,
+                                              100000 /* sample rate */});
+  writer.write(result_biquad.data(), result_biquad.size());
   println("Biquad operation finished!");
 }
