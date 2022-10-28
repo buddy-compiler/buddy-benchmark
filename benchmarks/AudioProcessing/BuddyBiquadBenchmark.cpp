@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Utils/Container.h"
+#include "buddy/core/Container.h"
 #include <benchmark/benchmark.h>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
@@ -72,7 +72,7 @@ void initializeBuddyBiquad() {
 }
 
 // Benchmarking function.
-static void BUDDY_BIQUAD(benchmark::State &state) {
+static void BUDDY_Biquad(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_buddy_biquad(&audRef, &kernelRef, &resRef);
@@ -81,7 +81,7 @@ static void BUDDY_BIQUAD(benchmark::State &state) {
 }
 
 // Benchmarking function.
-static void MLIR_BIQUAD(benchmark::State &state) {
+static void MLIR_Biquad(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_mlir_biquad(&audRef, &kernelRef, &resRef);
@@ -90,8 +90,8 @@ static void MLIR_BIQUAD(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(MLIR_BIQUAD)->Arg(1);
-BENCHMARK(BUDDY_BIQUAD)->Arg(1);
+BENCHMARK(MLIR_Biquad)->Arg(1);
+BENCHMARK(BUDDY_Biquad)->Arg(1);
 
 // Generate result_buddy_biquad wav file.
 void generateResultBuddyBiquad() {
