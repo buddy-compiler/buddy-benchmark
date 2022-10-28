@@ -18,14 +18,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @dilation_2d_constant_padding(%inputImage : memref<?x?xf32>, %kernel : memref<?x?xf32>, %outputImage : memref<?x?xf32>, %centerX : index, %centerY : index, %iterations : index, %constantValue: f32)
+func.func @dilation_2d_constant_padding(%inputImage : memref<?x?xf32>, %kernel : memref<?x?xf32>, %outputImage : memref<?x?xf32>, %copymemref : memref<?x?xf32>, %centerX : index, %centerY : index, %iterations : index, %constantValue: f32)
 {
-  dip.erosion_2d <CONSTANT_PADDING> %inputImage,  %kernel, %outputImage, %centerX, %centerY, %iterations, %constantValue : memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, index, index, index, f32
+  dip.dilation_2d <CONSTANT_PADDING> %inputImage,  %kernel, %outputImage, %copymemref, %centerX, %centerY, %iterations, %constantValue : memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, index, index, index, f32
   return
 }
 
-func.func @dilation_2d_replicate_padding(%inputImage : memref<?x?xf32>, %kernel : memref<?x?xf32>, %outputImage : memref<?x?xf32>, %centerX : index, %centerY : index, %iterations : index, %constantValue : f32)
+func.func @dilation_2d_replicate_padding(%inputImage : memref<?x?xf32>, %kernel : memref<?x?xf32>, %outputImage : memref<?x?xf32>, %copymemref : memref<?x?xf32>, %centerX : index, %centerY : index, %iterations : index, %constantValue : f32)
 {
-  dip.erosion_2d <REPLICATE_PADDING> %inputImage, %kernel, %outputImage, %centerX, %centerY, %iterations, %constantValue : memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, index, index, index, f32
-  return 
+  dip.dilation_2d <REPLICATE_PADDING> %inputImage, %kernel, %outputImage, %copymemref, %centerX, %centerY, %iterations, %constantValue : memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, memref<?x?xf32>, index, index, index, f32
+  return
 }

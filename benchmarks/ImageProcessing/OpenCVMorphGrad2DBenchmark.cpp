@@ -32,7 +32,7 @@ Mat inputImageMorphGrad2D, kernelMorphGrad2D, outputMorphGrad2D;
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption OpenCVBoundaryType6;
+BoundaryOption OpenCVBoundaryType7;
 
 void initializeOpenCVMorphGrad2D(char **argv) {
   inputImageMorphGrad2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -41,9 +41,9 @@ void initializeOpenCVMorphGrad2D(char **argv) {
                        CV_8UC1, get<0>(kernelMap1[argv[4]]));
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    OpenCVBoundaryType6 = replicate_padding;
+    OpenCVBoundaryType7 = replicate_padding;
   } else {
-    OpenCVBoundaryType6 = constant_padding;
+    OpenCVBoundaryType7 = constant_padding;
   }
 }
 
@@ -68,7 +68,7 @@ static void OpenCV_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVMorphGrad2D() {
-  if (OpenCVBoundaryType3 == replicate_padding) {
+  if (OpenCVBoundaryType7 == replicate_padding) {
     BENCHMARK(OpenCV_MorphGrad2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(OpenCV_MorphGrad2D_Constant_Padding)->Arg(1);
@@ -77,7 +77,7 @@ void registerBenchmarkOpenCVMorphGrad2D() {
 
 // Generate result image.
 void generateResultOpenCVMorphGrad2D() {
-  if (OpenCVBoundaryType3 == replicate_padding) {
+  if (OpenCVBoundaryType7 == replicate_padding) {
   cv::morphologyEx(inputImageMorphGrad2D, outputMorphGrad2D, 4, kernelMorphGrad2D, cv::Point(1, 1),
                3, cv::BORDER_REPLICATE, 0.0); 
   } else {

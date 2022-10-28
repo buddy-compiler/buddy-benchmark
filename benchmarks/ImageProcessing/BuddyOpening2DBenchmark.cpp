@@ -32,6 +32,8 @@ void _mlir_ciface_opening_2d_constant_padding(MemRef<float, 2> *inputBuddyOpenin
                                            MemRef<float, 2> *kernelBuddyOpening2D,
                                            MemRef<float, 2> *outputBuddyOpening2D,
                                            MemRef<float, 2> *outputBuddyOpening2D1,
+                                           MemRef<float, 2> * copyMemRefOpening2D,
+                                           MemRef<float, 2>* copyMemRefOpening2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
                                            unsigned int iterations,
@@ -42,6 +44,8 @@ void _mlir_ciface_opening_2d_replicate_padding(MemRef<float, 2> *inputBuddyOpeni
                                            MemRef<float, 2> *kernelBuddyOpening2D,
                                            MemRef<float, 2> *outputBuddyOpening2D,
                                            MemRef<float, 2> *outputBuuddyOpening2D1,
+                                           MemRef<float, 2> * copyMemRefOpening2D,
+                                           MemRef<float, 2>* copyMemRefOpening2D1,                                           
                                            unsigned int centerX,
                                            unsigned int centerY,
                                            unsigned int iterations,
@@ -68,9 +72,9 @@ intptr_t sizesOutputBuddyOpening2D[2];
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption BoundaryType2;
+BoundaryOption BoundaryType3;
 
-void initializeBuddyOpening2D(char **argv) {
+void initializeOpening2D(char **argv) {
   inputImageBuddyOpening2D = imread(argv[1], IMREAD_GRAYSCALE);
   kernelBuddyOpening2DMat =
       Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
@@ -92,25 +96,27 @@ void initializeBuddyOpening2D(char **argv) {
   sizesOutputBuddyOpening2D[1] = outputColsBuddyOpening2D;
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    BoundaryType2 = replicate_padding;
+    BoundaryType3 = replicate_padding;
   } else {
-    BoundaryType2 = constant_padding;
+    BoundaryType3 = constant_padding;
   }
 }
 
 static void Buddy_Opening2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> inputBuddyOpening2D(inputImageBuddyErosion2D,
-                                    sizesInputBuddyErosion2D);
-  MemRef<float, 2> kernelBuddyOpening2D(kernelBuddyErosion2DMat,
-                                     sizesKernelBuddyErosion2D);
-  MemRef<float, 2> outputBuddyOpening2D(sizesOutputBuddyErosion2D);
-  MemRef<float, 2> outpuutBuddyOpening2D1(sizesOutputBuddyOpening2D);
+  MemRef<float, 2> inputBuddyOpening2D(inputImageBuddyOpening2D,
+                                    sizesInputBuddyOpening2D);
+  MemRef<float, 2> kernelBuddyOpening2D(kernelBuddyOpening2DMat,
+                                     sizesKernelBuddyOpening2D);
+  MemRef<float, 2> outputBuddyOpening2D(sizesOutputBuddyOpening2D);
+  MemRef<float, 2> outputBuddyOpening2D1(sizesOutputBuddyOpening2D);
+  MemRef<float, 2> copyMemRefOpening2D(sizesOutputBuddyOpening2D, -1.f);
+  MemRef<float, 2> copyMemRefOpening2D1(sizesOutputBuddyOpening2D, 256.f);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_opening_2d_constant_padding(
-          &inputBuddyOpening2D, &kernelBuddyOpening2D, &outputBuddyOpening2D, &outputBuddyOpening2D1,
+          &inputBuddyOpening2D, &kernelBuddyOpening2D, &outputBuddyOpening2D, &outputBuddyOpening2D1, &copyMemRefOpening2D, &copyMemRefOpening2D1,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
   }
@@ -124,11 +130,13 @@ static void Buddy_Opening2D_Replicate_Padding(benchmark::State &state) {
                                      sizesKernelBuddyOpening2D);
   MemRef<float, 2> outputBuddyOpening2D(sizesOutputBuddyOpening2D);
   MemRef<float, 2> outputBuddyOpening2D1(sizesOutputBuddyOpening2D);
+  MemRef<float, 2> copyMemRefOpening2D(sizesOutputBuddyOpening2D, -1.f);
+  MemRef<float, 2> copyMemRefOpening2D1(sizesOutputBuddyOpening2D, 256.f);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_opening_2d_replicate_padding(
-          &inputBuddyOpening2D, &kernelBuddyOpening2D, &outputBuddyOpening2D, &outputBuddyOpening2D1,
+          &inputBuddyOpening2D, &kernelBuddyOpening2D, &outputBuddyOpening2D, &outputBuddyOpening2D1, &copyMemRefOpening2D, &copyMemRefOpening2D1,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
   }
@@ -136,7 +144,7 @@ static void Buddy_Opening2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddyOpening2D() {
-  if (BoundaryType2 == replicate_padding) {
+  if (BoundaryType3 == replicate_padding) {
     BENCHMARK(Buddy_Opening2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(Buddy_Opening2D_Constant_Padding)->Arg(1);
@@ -147,21 +155,23 @@ void registerBenchmarkBuddyOpening2D() {
 void generateResultBuddyOpening2D(char **argv) {
   // Define the MemRef descriptor for input, kernel, and output.
   MemRef<float, 2> input(inputImageBuddyOpening2D, sizesInputBuddyOpening2D);
-  MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyErosion2D);
+  MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyOpening2D);
   MemRef<float, 2> output(sizesOutputBuddyOpening2D);
   MemRef<float, 2> output1(sizesOutputBuddyOpening2D);
-  // Run the 2D Erosionelation.
+  MemRef<float, 2> copymemref(sizesOutputBuddyOpening2D, -1.f);
+  MemRef<float, 2> copymemref1(sizesOutputBuddyOpening2D, 256.f);
+  // Run the 2D Opening operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_opening_2d_replicate_padding(&input, &kernel, &output, &output1,
+    _mlir_ciface_opening_2d_replicate_padding(&input, &kernel, &output, &output1, &copymemref, &copymemref1,
                                            1 /* Center X */, 1 /* Center Y */, 5,
                                            0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_opening_2d_constant_padding(&input, &kernel, &output, &output1,
+    _mlir_ciface_opening_2d_constant_padding(&input, &kernel, &output, &output1, &copymemref, &copymemref1,
                                           1 /* Center X */, 1 /* Center Y */, 5,
                                           0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the Erosionelation.
+  // Define a cv::Mat with the output of the Opening
   Mat outputImage(outputRowsBuddyOpening2D, outputColsBuddyOpening2D, CV_32FC1,
                   output.getData());
 

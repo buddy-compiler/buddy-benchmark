@@ -32,7 +32,7 @@ Mat inputImageTopHat2D, kernelTopHat2D, outputTopHat2D;
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption OpenCVBoundaryType4;
+BoundaryOption OpenCVBoundaryType5;
 
 void initializeOpenCVTopHat2D(char **argv) {
   inputImageTopHat2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -41,9 +41,9 @@ void initializeOpenCVTopHat2D(char **argv) {
                        CV_8UC1, get<0>(kernelMap1[argv[4]]));
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    OpenCVBoundaryType4 = replicate_padding;
+    OpenCVBoundaryType5 = replicate_padding;
   } else {
-    OpenCVBoundaryType4 = constant_padding;
+    OpenCVBoundaryType5 = constant_padding;
   }
 }
 
@@ -68,7 +68,7 @@ static void OpenCV_TopHat2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVTopHat2D() {
-  if (OpenCVBoundaryType3 == replicate_padding) {
+  if (OpenCVBoundaryType5 == replicate_padding) {
     BENCHMARK(OpenCV_TopHat2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(OpenCV_TopHat2D_Constant_Padding)->Arg(1);
@@ -77,7 +77,7 @@ void registerBenchmarkOpenCVTopHat2D() {
 
 // Generate result image.
 void generateResultOpenCVTopHat2D() {
-  if (OpenCVBoundaryType3 == replicate_padding) {
+  if (OpenCVBoundaryType5 == replicate_padding) {
   cv::morphologyEx(inputImageTopHat2D, outputTopHat2D, 5, kernelTopHat2D, cv::Point(1, 1),
                3, cv::BORDER_REPLICATE, 0.0); 
   } else {

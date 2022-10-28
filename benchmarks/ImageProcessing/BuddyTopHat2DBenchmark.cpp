@@ -34,7 +34,7 @@ void _mlir_ciface_tophat_2d_constant_padding(MemRef<float, 2> *inputBuddyTopHat2
                                            MemRef<float, 2> *outputBuddyTopHat2D1,
                                            MemRef<float, 2> *outputBuddyTopHat2D2,
                                            MemRef<float, 2> *inputBuddyTopHat2D1,
-                                           MemRef<float, 2> *copyMemRefTopHat2D
+                                           MemRef<float, 2> *copyMemRefTopHat2D,
                                            MemRef<float, 2>* copyMemRefTopHat2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
@@ -48,7 +48,7 @@ void _mlir_ciface_tophat_2d_replicate_padding(MemRef<float, 2> *inputBuddyTopHat
                                            MemRef<float, 2> *outputBuddyTopHat2D1,
                                            MemRef<float, 2> *outputBuddyTopHat2D2,
                                            MemRef<float, 2> *inputBuddyTopHat2D1,
-                                           MemRef<float, 2> *copyMemRefTopHat2D
+                                           MemRef<float, 2> *copyMemRefTopHat2D,
                                            MemRef<float, 2>* copyMemRefTopHat2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
@@ -75,7 +75,7 @@ intptr_t sizesOutputBuddyTopHat2D[2];
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption BoundaryType4;
+BoundaryOption BoundaryType5;
 
 void initializeTopHat2D(char **argv) {
   inputImageBuddyTopHat2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -93,15 +93,15 @@ void initializeTopHat2D(char **argv) {
   sizesInputBuddyTopHat2D[1] = inputImageBuddyTopHat2D.cols;
 
   sizesKernelBuddyTopHat2D[0] = kernelRowsBuddyTopHat2D;
-  sizesKernelTopHat2D[1] = kernelColsBuddyTopHat2D;
+  sizesKernelBuddyTopHat2D[1] = kernelColsBuddyTopHat2D;
 
   sizesOutputBuddyTopHat2D[0] = outputRowsBuddyTopHat2D;
   sizesOutputBuddyTopHat2D[1] = outputColsBuddyTopHat2D;
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    BoundaryType4 = replicate_padding;
+    BoundaryType5 = replicate_padding;
   } else {
-    BoundaryType4 = constant_padding;
+    BoundaryType5 = constant_padding;
   }
 }
 
@@ -117,7 +117,7 @@ static void Buddy_TopHat2D_Constant_Padding(benchmark::State &state) {
   MemRef<float, 2> outputBuddyTopHat2D1(sizesOutputBuddyTopHat2D);
   MemRef<float, 2> outputBuddyTopHat2D2(sizesOutputBuddyTopHat2D);  
   MemRef<float, 2> copyMemRefTopHat2D(sizesOutputBuddyTopHat2D, 256.f);
-  MemRef<float, 2> copyMemRefTopHat2D1(sizesOutputBuddyTophat2D, -1.f);
+  MemRef<float, 2> copyMemRefTopHat2D1(sizesOutputBuddyTopHat2D, -1.f);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
@@ -153,7 +153,7 @@ static void Buddy_TopHat2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddyTopHat2D() {
-  if (BoundaryType4 == replicate_padding) {
+  if (BoundaryType5 == replicate_padding) {
     BENCHMARK(Buddy_TopHat2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(Buddy_TopHat2D_Constant_Padding)->Arg(1);

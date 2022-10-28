@@ -8,13 +8,13 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_morphGrad_2d_constant_padding(MemRef<float, 2> *inputBuddyMorphGrad2D,
+void _mlir_ciface_morphgrad_2d_constant_padding(MemRef<float, 2> *inputBuddyMorphGrad2D,
                                            MemRef<float, 2> *kernelBuddyMorphGrad2D,
                                            MemRef<float, 2> *outputBuddyMorphGrad2D,
                                            MemRef<float, 2> *outputBuddyMorphGrad2D1,
                                            MemRef<float, 2> *outputBuddyMorphGrad2D2,
                                            MemRef<float, 2> *inputBuddyMorphGrad2D1,
-                                           MemRef<float, 2> *copyMemRefMorphGrad2D
+                                           MemRef<float, 2> *copyMemRefMorphGrad2D,
                                            MemRef<float, 2>* copyMemRefMorphGrad2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
@@ -22,13 +22,13 @@ void _mlir_ciface_morphGrad_2d_constant_padding(MemRef<float, 2> *inputBuddyMorp
                                            float constantValue
     );
 
-void _mlir_ciface_morphGrad_2d_replicate_padding(MemRef<float, 2> *inputBuddyMorphGrad2D,
+void _mlir_ciface_morphgrad_2d_replicate_padding(MemRef<float, 2> *inputBuddyMorphGrad2D,
                                            MemRef<float, 2> *kernelBuddyMorphGrad2D,
                                            MemRef<float, 2> *outputBuddyMorphGrad2D,
                                            MemRef<float, 2> *outputBuddyMorphGrad2D1,
                                            MemRef<float, 2> *outputBuddyMorphGrad2D2,
                                            MemRef<float, 2> *inputBuddyMorphGrad2D1,
-                                           MemRef<float, 2> *copyMemRefMorphGrad2D
+                                           MemRef<float, 2> *copyMemRefMorphGrad2D,
                                            MemRef<float, 2>* copyMemRefMorphGrad2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
@@ -55,7 +55,7 @@ intptr_t sizesOutputBuddyMorphGrad2D[2];
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption BoundaryType6;
+BoundaryOption BoundaryType7;
 
 void initializeMorphGrad2D(char **argv) {
   inputImageBuddyMorphGrad2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -73,15 +73,15 @@ void initializeMorphGrad2D(char **argv) {
   sizesInputBuddyMorphGrad2D[1] = inputImageBuddyMorphGrad2D.cols;
 
   sizesKernelBuddyMorphGrad2D[0] = kernelRowsBuddyMorphGrad2D;
-  sizesKernelMorphGrad2D[1] = kernelColsBuddyMorphGrad2D;
+  sizesKernelBuddyMorphGrad2D[1] = kernelColsBuddyMorphGrad2D;
 
   sizesOutputBuddyMorphGrad2D[0] = outputRowsBuddyMorphGrad2D;
   sizesOutputBuddyMorphGrad2D[1] = outputColsBuddyMorphGrad2D;
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    BoundaryType5 = replicate_padding;
+    BoundaryType7 = replicate_padding;
   } else {
-    BoundaryType5 = constant_padding;
+    BoundaryType7 = constant_padding;
   }
 }
 
@@ -101,7 +101,7 @@ static void Buddy_MorphGrad2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_morphGrad_2d_constant_padding(
+      _mlir_ciface_morphgrad_2d_constant_padding(
           &inputBuddyMorphGrad2D, &kernelBuddyMorphGrad2D, &outputBuddyMorphGrad2D, &outputBuddyMorphGrad2D1, &outputBuddyMorphGrad2D2, &inputBuddyMorphGrad2D1, &copyMemRefMorphGrad2D, &copyMemRefMorphGrad2D1,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
@@ -124,7 +124,7 @@ static void Buddy_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_morphGrad_2d_replicate_padding(
+      _mlir_ciface_morphgrad_2d_replicate_padding(
           &inputBuddyMorphGrad2D, &kernelBuddyMorphGrad2D, &outputBuddyMorphGrad2D, &outputBuddyMorphGrad2D1, &outputBuddyMorphGrad2D2, &inputBuddyMorphGrad2D1, &copyMemRefMorphGrad2D, &copyMemRefMorphGrad2D1,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
@@ -133,7 +133,7 @@ static void Buddy_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddyMorphGrad2D() {
-  if (BoundaryType6 == replicate_padding) {
+  if (BoundaryType7 == replicate_padding) {
     BENCHMARK(Buddy_MorphGrad2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(Buddy_MorphGrad2D_Constant_Padding)->Arg(1);
@@ -153,11 +153,11 @@ void generateResultBuddyMorphGrad2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyMorphGrad2D, -1.f);
   // Run the 2D MorphGrad operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_morphGrad_2d_replicate_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
+    _mlir_ciface_morphgrad_2d_replicate_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
                                            1 /* Center X */, 1 /* Center Y */, 5,
                                            0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_morphGrad_2d_constant_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
+    _mlir_ciface_morphgrad_2d_constant_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
                                           1 /* Center X */, 1 /* Center Y */, 5,
                                           0.0f /* Constant Value */);
   }

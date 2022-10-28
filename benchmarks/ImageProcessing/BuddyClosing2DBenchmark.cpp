@@ -72,7 +72,7 @@ intptr_t sizesOutputBuddyClosing2D[2];
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption BoundaryType3;
+BoundaryOption BoundaryType4;
 
 void initializeClosing2D(char **argv) {
   inputImageBuddyClosing2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -90,15 +90,15 @@ void initializeClosing2D(char **argv) {
   sizesInputBuddyClosing2D[1] = inputImageBuddyClosing2D.cols;
 
   sizesKernelBuddyClosing2D[0] = kernelRowsBuddyClosing2D;
-  sizesKernelClosing2D[1] = kernelColsBuddyClosing2D;
+  sizesKernelBuddyClosing2D[1] = kernelColsBuddyClosing2D;
 
   sizesOutputBuddyClosing2D[0] = outputRowsBuddyClosing2D;
   sizesOutputBuddyClosing2D[1] = outputColsBuddyClosing2D;
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    BoundaryType3 = replicate_padding;
+    BoundaryType4 = replicate_padding;
   } else {
-    BoundaryType3 = constant_padding;
+    BoundaryType4 = constant_padding;
   }
 }
 
@@ -144,7 +144,7 @@ static void Buddy_Closing2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddyClosing2D() {
-  if (BoundaryType3 == replicate_padding) {
+  if (BoundaryType4 == replicate_padding) {
     BENCHMARK(Buddy_Closing2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(Buddy_Closing2D_Constant_Padding)->Arg(1);

@@ -34,7 +34,7 @@ void _mlir_ciface_bottomhat_2d_constant_padding(MemRef<float, 2> *inputBuddyBott
                                            MemRef<float, 2> *outputBuddyBottomHat2D1,
                                            MemRef<float, 2> *outputBuddyBottomHat2D2,
                                            MemRef<float, 2> *inputBuddyBottomHat2D1,
-                                           MemRef<float, 2> *copyMemRefBottomHat2D
+                                           MemRef<float, 2> *copyMemRefBottomHat2D,
                                            MemRef<float, 2>* copyMemRefBottomHat2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
@@ -48,7 +48,7 @@ void _mlir_ciface_bottomhat_2d_replicate_padding(MemRef<float, 2> *inputBuddyBot
                                            MemRef<float, 2> *outputBuddyBottomHat2D1,
                                            MemRef<float, 2> *outputBuddyBottomHat2D2,
                                            MemRef<float, 2> *inputBuddyBottomHat2D1,
-                                           MemRef<float, 2> *copyMemRefBottomHat2D
+                                           MemRef<float, 2> *copyMemRefBottomHat2D,
                                            MemRef<float, 2>* copyMemRefBottomHat2D1,
                                            unsigned int centerX,
                                            unsigned int centerY,
@@ -75,7 +75,7 @@ intptr_t sizesOutputBuddyBottomHat2D[2];
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption BoundaryType5;
+BoundaryOption BoundaryType6;
 
 void initializeBottomHat2D(char **argv) {
   inputImageBuddyBottomHat2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -93,15 +93,15 @@ void initializeBottomHat2D(char **argv) {
   sizesInputBuddyBottomHat2D[1] = inputImageBuddyBottomHat2D.cols;
 
   sizesKernelBuddyBottomHat2D[0] = kernelRowsBuddyBottomHat2D;
-  sizesKernelBottomHat2D[1] = kernelColsBuddyBottomHat2D;
+  sizesKernelBuddyBottomHat2D[1] = kernelColsBuddyBottomHat2D;
 
   sizesOutputBuddyBottomHat2D[0] = outputRowsBuddyBottomHat2D;
   sizesOutputBuddyBottomHat2D[1] = outputColsBuddyBottomHat2D;
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    BoundaryType5 = replicate_padding;
+    BoundaryType6 = replicate_padding;
   } else {
-    BoundaryType5 = constant_padding;
+    BoundaryType6 = constant_padding;
   }
 }
 
@@ -121,7 +121,7 @@ static void Buddy_BottomHat2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_bottomHat_2d_constant_padding(
+      _mlir_ciface_bottomhat_2d_constant_padding(
           &inputBuddyBottomHat2D, &kernelBuddyBottomHat2D, &outputBuddyBottomHat2D, &outputBuddyBottomHat2D1, &outputBuddyBottomHat2D2, &inputBuddyBottomHat2D1, &copyMemRefBottomHat2D, &copyMemRefBottomHat2D1,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
@@ -144,7 +144,7 @@ static void Buddy_BottomHat2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_bottomHat_2d_replicate_padding(
+      _mlir_ciface_bottomhat_2d_replicate_padding(
           &inputBuddyBottomHat2D, &kernelBuddyBottomHat2D, &outputBuddyBottomHat2D, &outputBuddyBottomHat2D1, &outputBuddyBottomHat2D2, &inputBuddyBottomHat2D1, &copyMemRefBottomHat2D, &copyMemRefBottomHat2D1,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
@@ -153,7 +153,7 @@ static void Buddy_BottomHat2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddyBottomHat2D() {
-  if (BoundaryType4 == replicate_padding) {
+  if (BoundaryType6 == replicate_padding) {
     BENCHMARK(Buddy_BottomHat2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(Buddy_BottomHat2D_Constant_Padding)->Arg(1);
@@ -173,11 +173,11 @@ void generateResultBuddyBottomHat2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyBottomHat2D, -1.f);
   // Run the 2D BottomHat operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_bottomHat_2d_replicate_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
+    _mlir_ciface_bottomhat_2d_replicate_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
                                            1 /* Center X */, 1 /* Center Y */, 5,
                                            0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_bottomHat_2d_constant_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
+    _mlir_ciface_bottomhat_2d_constant_padding(&input, &kernel, &output, &output1, &output2, &input1, &copymemref, &copymemref1,
                                           1 /* Center X */, 1 /* Center Y */, 5,
                                           0.0f /* Constant Value */);
   }

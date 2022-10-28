@@ -31,6 +31,7 @@ extern "C" {
 void _mlir_ciface_dilation_2d_constant_padding(MemRef<float, 2> *inputBuddyDilation2D,
                                            MemRef<float, 2> *kernelBuddyDilation2D,
                                            MemRef<float, 2> *outputBuddyDilation2D,
+                                           MemRef<float, 2> *copyMemRefDilation2D,
                                            unsigned int centerX,
                                            unsigned int centerY,
                                            unsigned int iterations,
@@ -39,6 +40,7 @@ void _mlir_ciface_dilation_2d_constant_padding(MemRef<float, 2> *inputBuddyDilat
 void _mlir_ciface_dilation_2d_replicate_padding(MemRef<float, 2> *inputBuddyDilation2D,
                                             MemRef<float, 2> *kernelBuddyDilation2D,
                                             MemRef<float, 2> *outputBuddyDilation2D,
+                                            MemRef<float, 2> *copyMemRefDilation2D,
                                             unsigned int centerX,
                                             unsigned int centerY,
                                             unsigned int iterations,
@@ -100,11 +102,12 @@ static void Buddy_Dilation2D_Constant_Padding(benchmark::State &state) {
   MemRef<float, 2> kernelBuddyDilation2D(kernelBuddyDilation2DMat,
                                      sizesKernelBuddyDilation2D);
   MemRef<float, 2> outputBuddyDilation2D(sizesOutputBuddyDilation2D);
+  MemRef<float, 2> copyMemRefDialtion2D(sizesOutputBuddyDilation2D, -1.f);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_dilation_2d_constant_padding(
-          &inputBuddyDilation2D, &kernelBuddyDilation2D, &outputBuddyDilation2D,
+          &inputBuddyDilation2D, &kernelBuddyDilation2D, &outputBuddyDilation2D, &copyMemRefDialtion2D,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
   }
@@ -117,11 +120,12 @@ static void Buddy_Dilation2D_Replicate_Padding(benchmark::State &state) {
   MemRef<float, 2> kernelBuddyDilation2D(kernelBuddyDilation2DMat,
                                      sizesKernelBuddyDilation2D);
   MemRef<float, 2> outputBuddyDilation2D(sizesOutputBuddyDilation2D);
+  MemRef<float, 2> copyMemRefDilation2D(sizesOutputBuddyDilation2D, -1.f);
 
   for (auto _ : state) {
     for (int i = 0;i < state.range(0); ++i) {
       _mlir_ciface_dilation_2d_replicate_padding(
-          &inputBuddyDilation2D, &kernelBuddyDilation2D, &outputBuddyDilation2D,
+          &inputBuddyDilation2D, &kernelBuddyDilation2D, &outputBuddyDilation2D, &copyMemRefDilation2D,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
   }
@@ -142,13 +146,14 @@ void generateResultBuddyDilation2D(char **argv) {
   MemRef<float, 2> input(inputImageBuddyDilation2D, sizesInputBuddyDilation2D);
   MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyDilation2D);
   MemRef<float, 2> output(sizesOutputBuddyDilation2D);
+  MemRef<float, 2> copymemref(sizesOutputBuddyDilation2D, -1.f);
   // Run the 2D Dilationelation.
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_dilation_2d_replicate_padding(&input, &kernel, &output,
+    _mlir_ciface_dilation_2d_replicate_padding(&input, &kernel, &output, &copymemref,
                                            1 /* Center X */, 1 /* Center Y */, 5,
                                            0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_dilation_2d_constant_padding(&input, &kernel, &output,
+    _mlir_ciface_dilation_2d_constant_padding(&input, &kernel, &output, &copymemref,
                                           1 /* Center X */, 1 /* Center Y */, 5,
                                           0.0f /* Constant Value */);
   }

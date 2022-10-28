@@ -31,6 +31,7 @@ extern "C" {
 void _mlir_ciface_erosion_2d_constant_padding(MemRef<float, 2> *inputBuddyErosion2D,
                                            MemRef<float, 2> *kernelBuddyErosion2D,
                                            MemRef<float, 2> *outputBuddyErosion2D,
+                                           MemRef<float, 2> *copyMemRefErosion2D,
                                            unsigned int centerX,
                                            unsigned int centerY,
                                            unsigned int iterations,
@@ -39,6 +40,7 @@ void _mlir_ciface_erosion_2d_constant_padding(MemRef<float, 2> *inputBuddyErosio
 void _mlir_ciface_erosion_2d_replicate_padding(MemRef<float, 2> *inputBuddyErosion2D,
                                             MemRef<float, 2> *kernelBuddyErosion2D,
                                             MemRef<float, 2> *outputBuddyErosion2D,
+                                            MemRef<float, 2> *copyMemRefErosion2D,
                                             unsigned int centerX,
                                             unsigned int centerY,
                                             unsigned int iterations,
@@ -100,11 +102,12 @@ static void Buddy_Erosion2D_Constant_Padding(benchmark::State &state) {
   MemRef<float, 2> kernelBuddyErosion2D(kernelBuddyErosion2DMat,
                                      sizesKernelBuddyErosion2D);
   MemRef<float, 2> outputBuddyErosion2D(sizesOutputBuddyErosion2D);
+  MemRef<float, 2> copyMemRefErosion2D(sizesOutputBuddyErosion2D, 256.f);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_erosion_2d_constant_padding(
-          &inputBuddyErosion2D, &kernelBuddyErosion2D, &outputBuddyErosion2D,
+          &inputBuddyErosion2D, &kernelBuddyErosion2D, &outputBuddyErosion2D, &copyMemRefErosion2D,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
   }
@@ -117,11 +120,12 @@ static void Buddy_Erosion2D_Replicate_Padding(benchmark::State &state) {
   MemRef<float, 2> kernelBuddyErosion2D(kernelBuddyErosion2DMat,
                                      sizesKernelBuddyErosion2D);
   MemRef<float, 2> outputBuddyErosion2D(sizesOutputBuddyErosion2D);
+  MemRef<float, 2> copyMemRefErosion2D(sizesOutputBuddyErosion2D, 256.f);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       _mlir_ciface_erosion_2d_replicate_padding(
-          &inputBuddyErosion2D, &kernelBuddyErosion2D, &outputBuddyErosion2D,
+          &inputBuddyErosion2D, &kernelBuddyErosion2D, &outputBuddyErosion2D, &copyMemRefErosion2D,
           1 /* Center X */, 1 /* Center Y */,5, 0.0f /* Constant Value */);
     }
   }
@@ -142,13 +146,14 @@ void generateResultBuddyErosion2D(char **argv) {
   MemRef<float, 2> input(inputImageBuddyErosion2D, sizesInputBuddyErosion2D);
   MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyErosion2D);
   MemRef<float, 2> output(sizesOutputBuddyErosion2D);
+  MemRef<float, 2> copyMemRef(sizesOutputBuddyErosion2D, 256.f);
   // Run the 2D Erosionelation.
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_erosion_2d_replicate_padding(&input, &kernel, &output,
+    _mlir_ciface_erosion_2d_replicate_padding(&input, &kernel, &output, &copyMemRef,
                                            1 /* Center X */, 1 /* Center Y */, 5,
                                            0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_erosion_2d_constant_padding(&input, &kernel, &output,
+    _mlir_ciface_erosion_2d_constant_padding(&input, &kernel, &output, &copyMemRef,
                                           1 /* Center X */, 1 /* Center Y */, 5,
                                           0.0f /* Constant Value */);
   }

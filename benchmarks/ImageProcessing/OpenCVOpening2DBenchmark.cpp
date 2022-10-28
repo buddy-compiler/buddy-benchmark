@@ -32,7 +32,7 @@ Mat inputImageOpening2D, kernelOpening2D, outputOpening2D;
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption OpenCVBoundaryType2;
+BoundaryOption OpenCVBoundaryType3;
 
 void initializeOpenCVOpening2D(char **argv) {
   inputImageOpening2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -41,9 +41,9 @@ void initializeOpenCVOpening2D(char **argv) {
                        CV_8UC1, get<0>(kernelMap1[argv[4]]));
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    OpenCVBoundaryType2 = replicate_padding;
+    OpenCVBoundaryType3 = replicate_padding;
   } else {
-    OpenCVBoundaryType2 = constant_padding;
+    OpenCVBoundaryType3 = constant_padding;
   }
 }
 
@@ -68,7 +68,7 @@ static void OpenCV_Opening2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVOpening2D() {
-  if (OpenCVBoundaryType2 == replicate_padding) {
+  if (OpenCVBoundaryType3 == replicate_padding) {
     BENCHMARK(OpenCV_Opening2D_Replicate_Padding)->Arg(1);
   } else {
     BENCHMARK(OpenCV_Opening2D_Constant_Padding)->Arg(1);
@@ -77,7 +77,7 @@ void registerBenchmarkOpenCVOpening2D() {
 
 // Generate result image.
 void generateResultOpenCVOpening2D() {
-  if (OpenCVBoundaryType2 == replicate_padding) {
+  if (OpenCVBoundaryType3 == replicate_padding) {
   cv::morphologyEx(inputImageOpening2D, outputOpening2D, 2, kernelOpening2D, cv::Point(1, 1),
                3, cv::BORDER_REPLICATE, 0.0); 
   } else {
