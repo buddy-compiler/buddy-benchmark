@@ -25,12 +25,14 @@ void initializeKFRBiquad();
 void initializeKFRFft();
 void initializeKFRIir();
 void initializeBuddyBiquad();
+void initializeBuddyIir();
 
 void generateResultKFRFir();
 void generateResultKFRBiquad();
 void generateResultKFRFft();
 void generateResultKFRIir();
 void generateResultBuddyBiquad();
+void generateResultBuddyIir();
 
 int main(int argc, char **argv) {
   initializeKFRFir();
@@ -38,6 +40,7 @@ int main(int argc, char **argv) {
   initializeKFRFft();
   initializeKFRIir();
   initializeBuddyBiquad();
+  initializeBuddyIir();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
@@ -47,6 +50,7 @@ int main(int argc, char **argv) {
   generateResultKFRFft();
   generateResultKFRIir();
   generateResultBuddyBiquad();
+  generateResultBuddyIir();
 
   return 0;
 }
