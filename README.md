@@ -45,6 +45,9 @@ Run the image processing benchmark:
 *ii. Please replace `<kernel name>` with name of the kernel which is to be used for*
 *benchmarking as specifed in `include/ImageProcessing/Kernels.h`.*
 
+*ii. Please replace `<kernelmorph name>` with name of the unsigned int kernel which is to be used for*
+*benchmarking as specifed in `include/ImageProcessing/Kernels.h`.*
+
 *iii. Please replace `<Boundary Option>` with `CONSTANT_PADDING` or `REPLICATE_PADDING`.*
 
 Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign CONSTANT_PADDING`
@@ -57,7 +60,7 @@ $ cmake -G Ninja .. \
     -DEIGEN_DIR=/PATH/TO/EIGEN/SOURCE/CODE \
     -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
-$ cd bin && ./image-processing-benchmark <image path> <kernel name> <Boundary Option>
+$ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph name> <Boundary Option>
 ```
 
 ## Deep Learning Benchmark

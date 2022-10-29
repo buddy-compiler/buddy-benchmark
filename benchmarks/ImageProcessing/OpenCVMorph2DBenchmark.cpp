@@ -1,4 +1,4 @@
-//===- OpenCVErode2DBenchmark.cpp ----------------------------------------===//
+//===- OpenCVMorph2DBenchmark.cpp ----------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for OpenCV Erode2D.
+// This file implements the benchmark for OpenCV's Morphological Operations.
 //
 //===----------------------------------------------------------------------===//
 
