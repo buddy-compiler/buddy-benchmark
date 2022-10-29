@@ -71,10 +71,11 @@ int main(int argc, char **argv) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
         "Correct format is ./image-processing-benchmark <image path> <kernel "
-        "name> <Boundary Option>\n where "
+        "name> <kernelmorph> <Boundary Option>\n where "
         "image path provides path of the image to be processed, kernel name "
         "denotes the name "
         "of desired kernel as specified in "
+        "kernelmorph denotes the kernel to be used for morphological operations"
         "include/ImageProcessing/Kernels.h and Boundary options available "
         "are CONSTANT_PADDING, REPLICATE_PADDING.\n");
   }
