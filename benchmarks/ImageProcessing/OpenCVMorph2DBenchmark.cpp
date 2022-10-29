@@ -26,7 +26,9 @@ using namespace cv;
 using namespace std;
 
 // Declare input image, kernel and output image.
-Mat inputImageMorph2D, kernelMorph2D, outputErode2D, outputDilate2D, outputOpening2D, outputClosing2D, outputTopHat2D, outputBottomHat2D, outputMorphGrad2D;
+Mat inputImageMorph2D, kernelMorph2D, outputErode2D, outputDilate2D,
+    outputOpening2D, outputClosing2D, outputTopHat2D, outputBottomHat2D,
+    outputMorphGrad2D;
 
 // Declare Boundary Options supported.
 enum BoundaryOption { constant_padding, replicate_padding };
@@ -37,7 +39,7 @@ void initializeOpenCVMorph2D(char **argv) {
   inputImageMorph2D = imread(argv[1], IMREAD_GRAYSCALE);
 
   kernelMorph2D = Mat(get<1>(kernelMap1[argv[4]]), get<2>(kernelMap1[argv[4]]),
-                       CV_8UC1, get<0>(kernelMap1[argv[4]]));
+                      CV_8UC1, get<0>(kernelMap1[argv[4]]));
 
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
     OpenCVBoundaryType1 = replicate_padding;
@@ -50,8 +52,8 @@ void initializeOpenCVMorph2D(char **argv) {
 static void OpenCV_Erode2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-        erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_CONSTANT, 0.0);
+      erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
+            cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -59,8 +61,8 @@ static void OpenCV_Erode2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_Erode2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_REPLICATE, 0.0);
+      erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
+            cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -69,8 +71,8 @@ static void OpenCV_Erode2D_Replicate_Padding(benchmark::State &state) {
 static void OpenCV_Dilate2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-        dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_CONSTANT, 0.0);
+      dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1),
+             5, cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -78,8 +80,8 @@ static void OpenCV_Dilate2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_Dilate2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_REPLICATE, 0.0);
+      dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1),
+             5, cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -88,8 +90,8 @@ static void OpenCV_Dilate2D_Replicate_Padding(benchmark::State &state) {
 static void OpenCV_Opening2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0);        
+      cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -97,8 +99,8 @@ static void OpenCV_Opening2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_Opening2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+      cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -107,8 +109,8 @@ static void OpenCV_Opening2D_Replicate_Padding(benchmark::State &state) {
 static void OpenCV_Closing2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0);        
+      cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -116,8 +118,8 @@ static void OpenCV_Closing2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_Closing2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+      cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -126,8 +128,8 @@ static void OpenCV_Closing2D_Replicate_Padding(benchmark::State &state) {
 static void OpenCV_TopHat2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0);        
+      cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -135,8 +137,8 @@ static void OpenCV_TopHat2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_TopHat2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+      cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -145,8 +147,8 @@ static void OpenCV_TopHat2D_Replicate_Padding(benchmark::State &state) {
 static void OpenCV_BottomHat2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0);        
+      cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -154,8 +156,8 @@ static void OpenCV_BottomHat2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_BottomHat2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+      cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -164,8 +166,8 @@ static void OpenCV_BottomHat2D_Replicate_Padding(benchmark::State &state) {
 static void OpenCV_MorphGrad2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0);        
+      cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
     }
   }
 }
@@ -173,8 +175,8 @@ static void OpenCV_MorphGrad2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-  cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+      cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D,
+                       cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
     }
   }
 }
@@ -245,11 +247,11 @@ void registerBenchmarkOpenCVMorphGrad2D() {
 // Generate result image.
 void generateResultOpenCVErode2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_REPLICATE, 0.0);
+    erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
+          cv::BORDER_REPLICATE, 0.0);
   } else {
-  erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_CONSTANT, 0.0);
+    erode(inputImageMorph2D, outputErode2D, kernelMorph2D, cv::Point(1, 1), 5,
+          cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -275,11 +277,11 @@ void generateResultOpenCVErode2D() {
 // Generate result image.
 void generateResultOpenCVDilate2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_REPLICATE, 0.0);
+    dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1), 5,
+           cv::BORDER_REPLICATE, 0.0);
   } else {
-  dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1), 5,
-        cv::BORDER_CONSTANT, 0.0);
+    dilate(inputImageMorph2D, outputDilate2D, kernelMorph2D, cv::Point(1, 1), 5,
+           cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -305,11 +307,11 @@ void generateResultOpenCVDilate2D() {
 // Generate result image.
 void generateResultOpenCVOpening2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
   } else {
-  cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputOpening2D, 2, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -320,8 +322,8 @@ void generateResultOpenCVOpening2D() {
   // Write output to PNG.
   bool result = false;
   try {
-    result =
-        imwrite("ResultOpenCVOpening2D.png", outputOpening2D, compressionParams);
+    result = imwrite("ResultOpenCVOpening2D.png", outputOpening2D,
+                     compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());
@@ -335,11 +337,11 @@ void generateResultOpenCVOpening2D() {
 // Generate result image.
 void generateResultOpenCVClosing2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
   } else {
-  cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputClosing2D, 2, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -350,8 +352,8 @@ void generateResultOpenCVClosing2D() {
   // Write output to PNG.
   bool result = false;
   try {
-    result =
-        imwrite("ResultOpenCVClosing2D.png", outputClosing2D, compressionParams);
+    result = imwrite("ResultOpenCVClosing2D.png", outputClosing2D,
+                     compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());
@@ -365,11 +367,11 @@ void generateResultOpenCVClosing2D() {
 // Generate result image.
 void generateResultOpenCVTopHat2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
   } else {
-  cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputTopHat2D, 5, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -395,11 +397,11 @@ void generateResultOpenCVTopHat2D() {
 // Generate result image.
 void generateResultOpenCVBottomHat2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
   } else {
-  cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputBottomHat2D, 6, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -410,8 +412,8 @@ void generateResultOpenCVBottomHat2D() {
   // Write output to PNG.
   bool result = false;
   try {
-    result =
-        imwrite("ResultOpenCVBottomHat2D.png", outputBottomHat2D, compressionParams);
+    result = imwrite("ResultOpenCVBottomHat2D.png", outputBottomHat2D,
+                     compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());
@@ -425,11 +427,11 @@ void generateResultOpenCVBottomHat2D() {
 // Generate result image.
 void generateResultOpenCVMorphGrad2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-  cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_REPLICATE, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_REPLICATE, 0.0);
   } else {
-  cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D, cv::Point(1, 1),
-               3, cv::BORDER_CONSTANT, 0.0); 
+    cv::morphologyEx(inputImageMorph2D, outputMorphGrad2D, 4, kernelMorph2D,
+                     cv::Point(1, 1), 3, cv::BORDER_CONSTANT, 0.0);
   }
 
   // Choose a PNG compression level
@@ -440,8 +442,8 @@ void generateResultOpenCVMorphGrad2D() {
   // Write output to PNG.
   bool result = false;
   try {
-    result =
-        imwrite("ResultOpenCVMorphGrad2D.png", outputMorphGrad2D, compressionParams);
+    result = imwrite("ResultOpenCVMorphGrad2D.png", outputMorphGrad2D,
+                     compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());
