@@ -24,21 +24,9 @@
 void initializeMLIRConv2D(char **);
 void initializeBuddyConv2D(char **);
 void initializeBuddyCorr2D(char **);
-void initializeBuddyOpening2D(char **);
-void initializeBuddyClosing2D(char **);
-void initializeBuddyTopHat2D(char **);
-void initializeBuddyBottomHat2D(char **);
-void initializeBuddyMorphGrad2D(char **);
-void initializeBuddyErosion2D(char **);
-void initializeBuddyDilation2D(char **);
-void initializeOpenCVErode2D(char **);
-void initializeOpenCVDilate2D(char **);
+void initializeBuddyMorph2D(char **);
+void initializeOpenCVMorph2D(char **);
 void initializeOpenCVFilter2D(char **);
-void initializeOpenCVOpening2D(char **);
-void initializeOpenCVClosing2D(char **);
-void initializeOpenCVTopHat2D(char **);
-void initializeOpenCVBottomHat2D(char **);
-void initializeOpenCVMorphGrad2D(char **);
 void initializeEigenConvolve2D(char **);
 
 void generateResultBuddyConv2D(char **);
@@ -94,20 +82,8 @@ int main(int argc, char **argv) {
   initializeMLIRConv2D(argv);
   initializeBuddyConv2D(argv);
   initializeBuddyCorr2D(argv);
-  initializeBuddyErosion2D(argv);
-  initializeBuddyDilation2D(argv);
-  initializeBuddyOpening2D(argv);
-  initializeBuddyClosing2D(argv);
-  initializeBuddyTopHat2D(argv);
-  initializeOpenCVBottomHat2D(argv);
-  initializeBuddyMorphGrad2D(argv);
-  initializeOpenCVErode2D(argv);
-  initializeOpenCVDilate2D(argv);
-  initializeOpenCVOpening2D(argv);
-  initializeOpenCVClosing2D(argv);
-  initializeOpenCVTopHat2D(argv);
-  initializeOpenCVBottomHat2D(argv);
-  initializeOpenCVMorphGrad2D(argv);
+  initializeBuddyMorph2D(argv);
+  initializeOpenCVMorph2D(argv);
   initializeOpenCVFilter2D(argv);
   initializeEigenConvolve2D(argv);
 
@@ -152,4 +128,3 @@ int main(int argc, char **argv) {
 
   return 0;
 }
-
