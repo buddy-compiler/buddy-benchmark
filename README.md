@@ -50,7 +50,7 @@ Run the image processing benchmark:
 
 *iii. Please replace `<Boundary Option>` with `CONSTANT_PADDING` or `REPLICATE_PADDING`.*
 
-Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign CONSTANT_PADDING`
+Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.png random3x3KernelAlign random3x3KernelAlignInt CONSTANT_PADDING`
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
