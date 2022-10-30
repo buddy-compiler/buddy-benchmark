@@ -7,7 +7,7 @@ if (${BUDDY_OPT_STRIP_MINING})
 elseif(HAVE_AVX512)
   set(SPLITING_SIZE 256 CACHE STRING "Spliting Size")
 elseif(HAVE_AVX2)
-  set(SPLITING_SIZE 128 CACHE STRING "Spliting Size" FORCE)
+  set(SPLITING_SIZE 128 CACHE STRING "Spliting Size")
 elseif(HAVE_SSE)
   set(SPLITING_SIZE 64 CACHE STRING "Spliting Size")
 elseif(HAVE_NEON)
@@ -131,7 +131,6 @@ add_executable(image-processing-benchmark
   BuddyCorr2DBenchmark.cpp
   BuddyMorph2DBenchmark.cpp
   OpenCVMorph2DBenchmark.cpp
-  OpenCVFilter2DBenchmark.cpp
   )
 
 target_include_directories(image-processing-benchmark 
