@@ -145,6 +145,24 @@ static float random13x13KernelAlign[169] = {8, 0, 6, 6, 7, 3, 4, 0, 6, 1, 5, 4, 
 static int random13x13KernelRows = 13;
 static int random13x13KernelCols = 13;
 
+static float random15x15KernelAlign[225] = {0, 7, 6, 8, 5, 9, 6, 1, 6, 0, 7, 5, 6, 1, 6,
+                                            2, 9, 8, 4, 0, 5, 5, 1, 8, 4, 0, 3, 0, 1, 1,
+                                            5, 4, 9, 1, 2, 4, 2, 0, 8, 9, 0, 7, 6, 6, 8,
+                                            3, 0, 7, 3, 4, 9, 8, 2, 0, 9, 6, 2, 2, 8, 6,
+                                            4, 3, 0, 5, 6, 2, 9, 9, 4, 9, 0, 4, 6, 6, 2,
+                                            6, 9, 3, 6, 4, 9, 5, 5, 1, 6, 4, 0, 0, 8, 8,
+                                            6, 4, 4, 8, 9, 0, 2, 1, 1, 6, 0, 3, 0, 7, 0,
+                                            5, 3, 1, 0, 1, 6, 9, 7, 3, 3, 5, 7, 3, 7, 5,
+                                            3, 4, 0, 9, 2, 1, 2, 5, 2, 3, 3, 3, 7, 4, 2,
+                                            9, 1, 5, 2, 1, 9, 0, 2, 6, 3, 7, 3, 0, 2, 0,
+                                            8, 8, 6, 0, 7, 1, 1, 9, 6, 4, 5, 9, 7, 4, 5,
+                                            9, 5, 8, 6, 7, 1, 5, 8, 6, 3, 1, 3, 6, 4, 8,
+                                            9, 4, 6, 5, 4, 3, 6, 7, 5, 4, 1, 0, 6, 0, 6,
+                                            3, 1, 1, 2, 0, 8, 5, 7, 6, 1, 1, 0, 7, 9, 6,
+                                            5, 0, 2, 1, 6, 8, 6, 4, 5, 3, 1, 9, 3, 7, 9};
+static int random15x15KernelRows = 15;
+static int random15x15KernelCols = 15;
+
 static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"prewittKernelAlign", {prewittKernelAlign, prewittKernelRows, prewittKernelCols}},
     {"sobel3x3KernelAlign", {sobel3x3KernelAlign, sobel3x3KernelRows, sobel3x3KernelCols}},
