@@ -13,3 +13,8 @@ endif()
 if(VECTORIZATION_BENCHMARKS)
   add_subdirectory(Vectorization)
 endif()
+
+if(OP_OPTIMIZATION_BENCHMARKS)
+    add_subdirectory(OpOptimization)
+endif()
+
