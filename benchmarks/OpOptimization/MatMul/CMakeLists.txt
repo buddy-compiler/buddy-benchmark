@@ -1,6 +1,7 @@
 add_custom_command(OUTPUT mlir-gemm.o
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-  ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/opt_gemm.mlir 
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+  ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/gemm.mlir
+            --matmul-optimize="vec-size=16;kernel-m=1;kernel-n=2"
             --lower-affine
             -convert-vector-to-llvm
             -convert-memref-to-llvm

@@ -40,6 +40,7 @@ void _mlir_ciface_gemm(MemRef<float, 2> *A, MemRef<float, 2> *B,
                        MemRef<float, 2> *C);
 }
 
+// TODO: avoid avx512
 void fastGEMM(const float *aptr, size_t astep, const float *bptr, size_t bstep,
               float *cptr, size_t cstep, int ma, int na, int nb) {
   int n = 0;
@@ -178,6 +179,3 @@ void BM_RAW_GEMM(benchmark::State &state) {
 // Register benchmarking function with different arguments.
 BENCHMARK(BM_GEMM)->DenseRange(64, 2048, 64);
 BENCHMARK(BM_OPENCV_GEMM)->DenseRange(64, 2048, 64);
-// BENCHMARK(BM_RAW_GEMM)->DenseRange(64, 512, 64);
-// BENCHMARK(BM_GEMM);
-//

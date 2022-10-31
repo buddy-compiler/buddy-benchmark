@@ -1,6 +1,7 @@
 add_custom_command(OUTPUT mlir-conv2d.o
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-  ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/Conv2dNchwFchw/opt_conv2d.mlir 
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+          ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/Conv2dNchwFchw/Conv2DNchwFchw.mlir
+            --conv-optimize="kernel-m=2;kernel-n=3;vec-size=16"
             --lower-affine
             -convert-vector-to-llvm
             -convert-memref-to-llvm
@@ -17,8 +18,10 @@ add_custom_command(OUTPUT mlir-conv2d.o
 add_library(MLIRCONV2D STATIC mlir-conv2d.o)
 
 add_custom_command(OUTPUT mlir-conv2d-org.o
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-  ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/Conv2dNchwFchw/org_conv2d.mlir 
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/Conv2dNchwFchw/Conv2DNchwFchw.mlir |
+          sed 's/conv2d/conv2d_org/' |
+          ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+            --convert-linalg-to-affine-loops
             --lower-affine
             -convert-vector-to-llvm
             -convert-memref-to-llvm
