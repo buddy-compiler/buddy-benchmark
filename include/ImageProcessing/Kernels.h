@@ -176,7 +176,8 @@ static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"random7x7KernelAlign", {random7x7KernelAlign, random7x7KernelRows, random7x7KernelCols}},
     {"random9x9KernelAlign", {random9x9KernelAlign, random9x9KernelRows, random9x9KernelCols}},
     {"random11x11KernelAlign", {random11x11KernelAlign, random11x11KernelRows, random11x11KernelCols}},
-    {"random13x13KernelAlign", {random13x13KernelAlign, random13x13KernelRows, random13x13KernelCols}}
+    {"random13x13KernelAlign", {random13x13KernelAlign, random13x13KernelRows, random13x13KernelCols}},
+    {"random15x15KernelAlign", {random15x15KernelAlign, random15x15KernelRows, random15x15KernelCols}}    
 };
 
 static std::map<std::string, std::tuple<uint8_t*, int, int>> kernelMap1 = {
