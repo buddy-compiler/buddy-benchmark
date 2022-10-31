@@ -102,6 +102,22 @@ add_custom_command(OUTPUT buddy-corr2d.o
 add_library(BuddyCorr2D STATIC buddy-corr2d.o)
 set_target_properties(BuddyCorr2D PROPERTIES LINKER_LANGUAGE CXX)
 
+add_custom_command(OUTPUT buddy-morph2d.o
+  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyMorph2D.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
+            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-memref-to-llvm -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-morph2d.o
+)
+add_library(BuddyMorph2D STATIC buddy-morph2d.o)
+set_target_properties(BuddyMorph2D PROPERTIES LINKER_LANGUAGE CXX)
+
 #-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
@@ -113,6 +129,8 @@ add_executable(image-processing-benchmark
   MLIRConv2DBenchmark.cpp
   BuddyConv2DBenchmark.cpp
   BuddyCorr2DBenchmark.cpp
+  BuddyMorph2DBenchmark.cpp
+  OpenCVMorph2DBenchmark.cpp
   )
 
 target_include_directories(image-processing-benchmark 
@@ -127,6 +145,7 @@ target_link_libraries(image-processing-benchmark
   MLIRConv2D
   BuddyConv2D
   BuddyCorr2D
+  BuddyMorph2D
   Container
   PNGImage
   )

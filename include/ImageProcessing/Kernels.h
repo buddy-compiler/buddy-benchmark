@@ -78,6 +78,10 @@ static int logKernelCols = 5;
 static float random3x3KernelAlign[9] = {0, 4, 1, 
                                         3, 3, 8, 
                                         9, 6, 3};
+
+static uint8_t random3x3KernelAlignInt[9] = {0, 4, 1, 
+                                        3, 3, 8, 
+                                        9, 6, 3};                                        
 static int random3x3KernelRows = 3;
 static int random3x3KernelCols = 3;
 
@@ -85,7 +89,7 @@ static float random5x5KernelAlign[25] = {1, 9, 8, 8, 1,
                                          6, 6, 3, 3, 7, 
                                          1, 9, 5, 5, 7, 
                                          4, 5, 4, 3, 2, 
-                                         9, 8, 3, 8, 9};
+                                         9, 8, 3, 8, 9};                                       
 static int random5x5KernelRows = 5;
 static int random5x5KernelCols = 5;
 
@@ -95,7 +99,7 @@ static float random7x7KernelAlign[49] = {6, 3, 1, 5, 1, 9, 4,
                                         4, 5, 2, 6, 3, 9, 1, 
                                         7, 7, 2, 6, 7, 8, 6, 
                                         2, 8, 9, 2, 2, 7, 8, 
-                                        8, 9, 2, 3, 5, 3, 5};
+                                        8, 9, 2, 3, 5, 3, 5};                                      
 static int random7x7KernelRows = 7;
 static int random7x7KernelCols = 7;
 
@@ -107,7 +111,7 @@ static float random9x9KernelAlign[81] = {7, 9, 5, 0, 9, 8, 4, 9, 9,
                                          7, 2, 9, 8, 1, 4, 5, 7, 7, 
                                          7, 3, 4, 4, 3, 3, 4, 0, 7, 
                                          2, 7, 3, 5, 2, 3, 4, 2, 3, 
-                                         9, 5, 2, 7, 7, 4, 8, 7, 2};
+                                         9, 5, 2, 7, 7, 4, 8, 7, 2};                                       
 static int random9x9KernelRows = 9;
 static int random9x9KernelCols = 9;
 
@@ -121,7 +125,7 @@ static float random11x11KernelAlign[121] = {4, 5, 7, 6, 3, 6, 6, 6, 1, 9, 8,
                                             0, 6, 7, 9, 7, 5, 6, 6, 1, 8, 0,
                                             0, 7, 8, 3, 3, 8, 3, 2, 6, 9, 2,
                                             6, 5, 8, 1, 0, 7, 5, 8, 9, 7, 5,
-                                            6, 8, 4, 3, 7, 0, 6, 5, 1, 6, 5};
+                                            6, 8, 4, 3, 7, 0, 6, 5, 1, 6, 5};                                           
 static int random11x11KernelRows = 11;
 static int random11x11KernelCols = 11;
 
@@ -137,7 +141,7 @@ static float random13x13KernelAlign[169] = {8, 0, 6, 6, 7, 3, 4, 0, 6, 1, 5, 4, 
                                             3, 1, 5, 4, 0, 7, 9, 4, 0, 2, 9, 3, 2,
                                             0, 4, 4, 1, 4, 6, 2, 8, 9, 7, 6, 8, 2,
                                             8, 2, 0, 6, 6, 3, 0, 1, 8, 0, 8, 9, 6,
-                                            9, 1, 5, 2, 6, 8, 8, 2, 1, 4, 9, 3, 2};
+                                            9, 1, 5, 2, 6, 8, 8, 2, 1, 4, 9, 3, 2};                                          
 static int random13x13KernelRows = 13;
 static int random13x13KernelCols = 13;
 
@@ -173,7 +177,11 @@ static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"random9x9KernelAlign", {random9x9KernelAlign, random9x9KernelRows, random9x9KernelCols}},
     {"random11x11KernelAlign", {random11x11KernelAlign, random11x11KernelRows, random11x11KernelCols}},
     {"random13x13KernelAlign", {random13x13KernelAlign, random13x13KernelRows, random13x13KernelCols}},
-    {"random15x15KernelAlign", {random15x15KernelAlign, random15x15KernelRows, random15x15KernelCols}}
+    {"random15x15KernelAlign", {random15x15KernelAlign, random15x15KernelRows, random15x15KernelCols}}    
+};
+
+static std::map<std::string, std::tuple<uint8_t*, int, int>> kernelMap1 = {
+    {"random3x3KernelAlignInt", {random3x3KernelAlignInt, random3x3KernelRows, random3x3KernelCols}}
 };
 
 // clang-format on
