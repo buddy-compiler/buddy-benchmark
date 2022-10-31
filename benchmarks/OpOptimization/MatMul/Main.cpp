@@ -20,14 +20,10 @@
 
 #include <benchmark/benchmark.h>
 
-void printResult();
-
 int main(int argc, char **argv) {
   // Run benchmark.
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
-  // Print result.
-  // printResult();
 
   return 0;
 }
