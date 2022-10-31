@@ -40,7 +40,8 @@ void _mlir_ciface_gemm(MemRef<float, 2> *A, MemRef<float, 2> *B,
                        MemRef<float, 2> *C);
 }
 
-// TODO: avoid avx512
+// TODO: Check chip support is needed, running avx512 on unsupported platform
+// will cause crash.
 void fastGEMM(const float *aptr, size_t astep, const float *bptr, size_t bstep,
               float *cptr, size_t cstep, int ma, int na, int nb) {
   int n = 0;
