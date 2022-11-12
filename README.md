@@ -187,3 +187,16 @@ $ cmake --build . --
 $ ninja test
 ```
 
+## Comparisons
+
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DBUILD_COMPARISONS=ON \
+    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+$ ninja boost_gil_conv2d
+$ cd bin && ./boost_gil_conv2d <image_path> <output_image_name>
+```
+Ex. `./boost_gil_conv2d ../../benchmarks/ImageProcessing/Images/gil_sample.png gil_output.png`
