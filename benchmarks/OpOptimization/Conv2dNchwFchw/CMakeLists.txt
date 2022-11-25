@@ -1,5 +1,5 @@
 add_custom_command(OUTPUT mlir-conv2d.o
-  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
           ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/Conv2dNchwFchw/Conv2DNchwFchw.mlir
             --conv-optimize="kernel-m=2;kernel-n=3;vec-size=16"
             --lower-affine

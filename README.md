@@ -58,7 +58,7 @@ $ cmake -G Ninja .. \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
     -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
     -DEIGEN_DIR=/PATH/TO/EIGEN/SOURCE/CODE \
-    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph name> <Boundary Option>
 ```
@@ -78,7 +78,7 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DDEEP_LEARNING_BENCHMARKS=ON \
     -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
-    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja
 ```
 
@@ -117,7 +117,7 @@ $ cmake -G Ninja .. \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
-    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja audio-processing-benchmark
 $ cd bin
 $ ./audio-processing-benchmark
@@ -141,7 +141,7 @@ $ cmake -G Ninja .. \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
-    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD \
     -DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN/
 $ ninja audio-plot
 ```
@@ -164,7 +164,7 @@ $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DVECTORIZATION_BENCHMARKS=ON \
-    -DBUDDY_OPT_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja vectorization-benchmark
 $ cd bin
 $ ./vectorization-benchmark
@@ -180,7 +180,7 @@ $ cmake -G Ninja .. \
     -DDEEP_LEARNING_BENCHMARKS=ON \
     -DBUILD_TESTS=ON \
     -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_OPT_BUILD_DIR=/path/to/buddy-mlir/build/ \
+    -DBUDDY_MLIR_BUILD_DIR=/path/to/buddy-mlir/build/ \
     -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
     -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
 $ cmake --build . --

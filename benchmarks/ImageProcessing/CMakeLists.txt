@@ -17,7 +17,7 @@ else()  # Fallback value, avoid crashing
 endif()
 
 set(MLIR_LINALG_TILE 2 CACHE STRING "MLIR Linalg Tile Size")
-set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/bin)
 
 message(STATUS "Configuring Stride Size: ${SPLITING_SIZE}")
 message(STATUS "Configuring MLIR Linalg Tile Size: ${MLIR_LINALG_TILE}")
@@ -48,7 +48,7 @@ set_target_properties(MLIRConv2D PROPERTIES LINKER_LANGUAGE CXX)
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT buddy-conv2d.o
-  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
             -conv-vectorization="strip-mining=${SPLITING_SIZE}" 
             -convert-vector-to-scf 
@@ -65,7 +65,7 @@ add_library(BuddyConv2D STATIC buddy-conv2d.o)
 set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 
 # add_custom_command(OUTPUT buddy-conv2d.o
-#   COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+#   COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
 #           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
 #             -linalg-tile="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}"
 #             -conv-vectorization="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}" 
@@ -87,7 +87,7 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT buddy-corr2d.o
-  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt 
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyCorr2D.mlir 
             -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
@@ -103,7 +103,7 @@ add_library(BuddyCorr2D STATIC buddy-corr2d.o)
 set_target_properties(BuddyCorr2D PROPERTIES LINKER_LANGUAGE CXX)
 
 add_custom_command(OUTPUT buddy-morph2d.o
-  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt 
+  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt 
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyMorph2D.mlir 
             -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 

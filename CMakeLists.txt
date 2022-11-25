@@ -24,7 +24,7 @@ set(CMAKE_C_FLAGS "-no-pie")
 #-------------------------------------------------------------------------------
 # BUDDY configuration
 #-------------------------------------------------------------------------------
-set(BuddyMLIR_DIR ${BUDDY_OPT_BUILD_DIR}/cmake)
+set(BuddyMLIR_DIR ${BUDDY_MLIR_BUILD_DIR}/cmake)
 find_package(BuddyMLIR REQUIRED CONFIG)
 
 # BUDDY project.
@@ -49,8 +49,8 @@ include_directories(${BUDDY_MLIR_INTERFACE_DIR})
 include_directories(${BUDDY_MLIR_LIB_DIR})
 
 # MLIR binary directory.
-set(LLVM_MLIR_BINARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/bin)
-set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_OPT_BUILD_DIR}/../llvm/build/lib)
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/bin)
+set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/lib)
 
 # Helper functions.
 include(${BUDDY_SOURCE_DIR}/cmake/buddy-benchmark.cmake)
