@@ -19,18 +19,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "ImageProcessing/Kernels.h"
-#include "Utils/Container.h"
-
 #include <Eigen/CXX11/Tensor>
 #include <Eigen/Dense>
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
 
 // Declare the input, kernel and output OpenCV Mat.
-cv::Mat inputOpenCVMat, kernelOpenCVMat, outputOpenCVMat;
+cv::Mat inputOpenCVMat;
+float *kernelDataEigenConvolve2D;
 
 // Declare the input, kernel and output Eigen Tensor.
 Eigen::Tensor<float, 2> input;
@@ -52,15 +53,13 @@ int outputRowsEigenConvolve2D, outputColsEigenConvolve2D;
 void initializeEigenConvolve2D(char **argv) {
   // Read image and kernel as OpenCV Mat.
   inputOpenCVMat = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
-  kernelOpenCVMat =
-      cv::Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
-              get<0>(kernelMap[argv[2]]));
 
   // Get the sizes of the input, kernel and output.
   inputRowsEigenConvolve2D = inputOpenCVMat.rows;
   inputColsEigenConvolve2D = inputOpenCVMat.cols;
-  kernelRowsEigenConvolve2D = kernelOpenCVMat.rows;
-  kernelColsEigenConvolve2D = kernelOpenCVMat.cols;
+  kernelDataEigenConvolve2D = get<0>(kernelMap[argv[2]]);
+  kernelRowsEigenConvolve2D = get<1>(kernelMap[argv[2]]);
+  kernelColsEigenConvolve2D = get<2>(kernelMap[argv[2]]);
   outputRowsEigenConvolve2D =
       inputRowsEigenConvolve2D - kernelRowsEigenConvolve2D + 1;
   outputColsEigenConvolve2D =
@@ -74,8 +73,8 @@ void initializeEigenConvolve2D(char **argv) {
                                             outputColsEigenConvolve2D};
 
   // Define the input, kernel and output MemRef container.
-  MemRef<float, 2> inputMemRef(inputOpenCVMat, sizesInputEigenConvolve2D);
-  MemRef<float, 2> kernelMemRef(get<0>(kernelMap[argv[2]]),
+  Img<float, 2> inputMemRef(inputOpenCVMat);
+  MemRef<float, 2> kernelMemRef(kernelDataEigenConvolve2D,
                                 sizesKernelEigenConvolve2D);
   MemRef<float, 2> outputMemRef(sizesOutputEigenConvolve2D);
 

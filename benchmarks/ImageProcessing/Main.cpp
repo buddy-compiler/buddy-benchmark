@@ -29,6 +29,7 @@ void initializeOpenCVMorph2D(char **);
 void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **);
 
+void generateResultMLIRConv2D();
 void generateResultBuddyConv2D(char **);
 void generateResultBuddyCorr2D(char **);
 void generateResultBuddyErosion2D(char **);
@@ -108,6 +109,7 @@ int main(int argc, char **argv) {
   ::benchmark::RunSpecifiedBenchmarks();
 
   // Generate result image.
+  generateResultMLIRConv2D();
   generateResultOpenCVFilter2D();
   generateResultBuddyConv2D(argv);
   generateResultBuddyCorr2D(argv);

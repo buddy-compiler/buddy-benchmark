@@ -146,6 +146,4 @@ target_link_libraries(image-processing-benchmark
   BuddyConv2D
   BuddyCorr2D
   BuddyMorph2D
-  Container
-  PNGImage
   )

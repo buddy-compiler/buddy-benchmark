@@ -19,8 +19,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "ImageProcessing/Kernels.h"
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -28,15 +29,16 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_buddy_conv_2d(MemRef<float, 2> *inputBuddyConv2D,
+void _mlir_ciface_buddy_conv_2d(Img<float, 2> *inputBuddyConv2D,
                                 MemRef<float, 2> *kernelBuddyConv2D,
                                 MemRef<float, 2> *outputBuddyConv2D);
 }
 
 // Read input image.
-Mat inputImageBuddyConv2D, kernelBuddyConv2DMat;
+Mat inputImageBuddyConv2D;
 
-// Define the kernel size.
+// Define the kernel data and size.
+float *kernelDataBuddyConv2D;
 int kernelRowsBuddyConv2D, kernelColsBuddyConv2D;
 
 // Define the output size.
@@ -49,12 +51,10 @@ intptr_t sizesOutputBuddyConv2D[2];
 
 void initializeBuddyConv2D(char **argv) {
   inputImageBuddyConv2D = imread(argv[1], IMREAD_GRAYSCALE);
-  kernelBuddyConv2DMat =
-      Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
-          get<0>(kernelMap[argv[2]]));
 
-  kernelRowsBuddyConv2D = kernelBuddyConv2DMat.rows;
-  kernelColsBuddyConv2D = kernelBuddyConv2DMat.cols;
+  kernelDataBuddyConv2D = get<0>(kernelMap[argv[2]]);
+  kernelRowsBuddyConv2D = get<1>(kernelMap[argv[2]]);
+  kernelColsBuddyConv2D = get<2>(kernelMap[argv[2]]);
 
   outputRowsBuddyConv2D =
       inputImageBuddyConv2D.rows - kernelRowsBuddyConv2D + 1;
@@ -73,9 +73,8 @@ void initializeBuddyConv2D(char **argv) {
 
 static void Buddy_Conv2D(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> inputBuddyConv2D(inputImageBuddyConv2D,
-                                    sizesInputBuddyConv2D);
-  MemRef<float, 2> kernelBuddyConv2D(kernelBuddyConv2DMat,
+  Img<float, 2> inputBuddyConv2D(inputImageBuddyConv2D);
+  MemRef<float, 2> kernelBuddyConv2D(kernelDataBuddyConv2D,
                                      sizesKernelBuddyConv2D);
   MemRef<float, 2> outputBuddyConv2D(sizesOutputBuddyConv2D);
 
@@ -93,8 +92,8 @@ BENCHMARK(Buddy_Conv2D)->Arg(1)->Unit(benchmark::kMillisecond);
 // Generate result image.
 void generateResultBuddyConv2D(char **argv) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> input(inputImageBuddyConv2D, sizesInputBuddyConv2D);
-  MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyConv2D);
+  Img<float, 2> input(inputImageBuddyConv2D);
+  MemRef<float, 2> kernel(kernelDataBuddyConv2D, sizesKernelBuddyConv2D);
   MemRef<float, 2> output(sizesOutputBuddyConv2D);
   // Run the 2D convolution.
   _mlir_ciface_buddy_conv_2d(&input, &kernel, &output);

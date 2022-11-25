@@ -19,8 +19,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "ImageProcessing/Kernels.h"
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -28,14 +29,14 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_corr_2d_constant_padding(MemRef<float, 2> *inputBuddyCorr2D,
+void _mlir_ciface_corr_2d_constant_padding(Img<float, 2> *inputBuddyCorr2D,
                                            MemRef<float, 2> *kernelBuddyCorr2D,
                                            MemRef<float, 2> *outputBuddyCorr2D,
                                            unsigned int centerX,
                                            unsigned int centerY,
                                            float constantValue);
 
-void _mlir_ciface_corr_2d_replicate_padding(MemRef<float, 2> *inputBuddyCorr2D,
+void _mlir_ciface_corr_2d_replicate_padding(Img<float, 2> *inputBuddyCorr2D,
                                             MemRef<float, 2> *kernelBuddyCorr2D,
                                             MemRef<float, 2> *outputBuddyCorr2D,
                                             unsigned int centerX,
@@ -43,10 +44,11 @@ void _mlir_ciface_corr_2d_replicate_padding(MemRef<float, 2> *inputBuddyCorr2D,
                                             float constantValue);
 }
 
-// Declare input image and kernel.
-Mat inputImageBuddyCorr2D, kernelBuddyCorr2DMat;
+// Declare input image.
+Mat inputImageBuddyCorr2D;
 
-// Define the kernel size.
+// Define the kernel data and size.
+float *kernelDataBuddyCorr2D;
 int kernelRowsBuddyCorr2D, kernelColsBuddyCorr2D;
 
 // Define the output size.
@@ -65,12 +67,10 @@ BoundaryOption BoundaryType;
 
 void initializeBuddyCorr2D(char **argv) {
   inputImageBuddyCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
-  kernelBuddyCorr2DMat =
-      Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
-          get<0>(kernelMap[argv[2]]));
 
-  kernelRowsBuddyCorr2D = kernelBuddyCorr2DMat.rows;
-  kernelColsBuddyCorr2D = kernelBuddyCorr2DMat.cols;
+  kernelDataBuddyCorr2D = get<0>(kernelMap[argv[2]]);
+  kernelRowsBuddyCorr2D = get<1>(kernelMap[argv[2]]);
+  kernelColsBuddyCorr2D = get<2>(kernelMap[argv[2]]);
 
   outputRowsBuddyCorr2D = inputImageBuddyCorr2D.rows;
   outputColsBuddyCorr2D = inputImageBuddyCorr2D.cols;
@@ -93,9 +93,8 @@ void initializeBuddyCorr2D(char **argv) {
 
 static void Buddy_Corr2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> inputBuddyCorr2D(inputImageBuddyCorr2D,
-                                    sizesInputBuddyCorr2D);
-  MemRef<float, 2> kernelBuddyCorr2D(kernelBuddyCorr2DMat,
+  Img<float, 2> inputBuddyCorr2D(inputImageBuddyCorr2D);
+  MemRef<float, 2> kernelBuddyCorr2D(kernelDataBuddyCorr2D,
                                      sizesKernelBuddyCorr2D);
   MemRef<float, 2> outputBuddyCorr2D(sizesOutputBuddyCorr2D);
 
@@ -110,9 +109,8 @@ static void Buddy_Corr2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_Corr2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> inputBuddyCorr2D(inputImageBuddyCorr2D,
-                                    sizesInputBuddyCorr2D);
-  MemRef<float, 2> kernelBuddyCorr2D(kernelBuddyCorr2DMat,
+  Img<float, 2> inputBuddyCorr2D(inputImageBuddyCorr2D);
+  MemRef<float, 2> kernelBuddyCorr2D(kernelDataBuddyCorr2D,
                                      sizesKernelBuddyCorr2D);
   MemRef<float, 2> outputBuddyCorr2D(sizesOutputBuddyCorr2D);
 
@@ -141,8 +139,8 @@ void registerBenchmarkBuddyCorr2D() {
 // Generate result image.
 void generateResultBuddyCorr2D(char **argv) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> input(inputImageBuddyCorr2D, sizesInputBuddyCorr2D);
-  MemRef<float, 2> kernel(get<0>(kernelMap[argv[2]]), sizesKernelBuddyCorr2D);
+  Img<float, 2> input(inputImageBuddyCorr2D);
+  MemRef<float, 2> kernel(kernelDataBuddyCorr2D, sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {

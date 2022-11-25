@@ -19,8 +19,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "ImageProcessing/Kernels.h"
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -34,9 +35,10 @@ void _mlir_ciface_mlir_conv_2d(MemRef<float, 2> *inputConv2D,
 }
 
 // Read input image.
-Mat inputImageMLIRConv2D, kernelMLIRConv2DMat;
+Mat inputImageMLIRConv2D;
 
-// Define the kernel size.
+// Define the kernel data and kernel size.
+float *kernelDataMLIRConv2D;
 int kernelRowsMLIRConv2D, kernelColsMLIRConv2D;
 
 // Define the output size.
@@ -49,12 +51,10 @@ intptr_t sizesOutputMLIRConv2D[2];
 
 void initializeMLIRConv2D(char **argv) {
   inputImageMLIRConv2D = imread(argv[1], IMREAD_GRAYSCALE);
-  kernelMLIRConv2DMat =
-      Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]), CV_32FC1,
-          get<0>(kernelMap[argv[2]]));
 
-  kernelRowsMLIRConv2D = kernelMLIRConv2DMat.rows;
-  kernelColsMLIRConv2D = kernelMLIRConv2DMat.cols;
+  kernelDataMLIRConv2D = get<0>(kernelMap[argv[2]]);
+  kernelRowsMLIRConv2D = get<1>(kernelMap[argv[2]]);
+  kernelColsMLIRConv2D = get<2>(kernelMap[argv[2]]);
 
   outputRowsMLIRConv2D = inputImageMLIRConv2D.rows - kernelRowsMLIRConv2D + 1;
   outputColsMLIRConv2D = inputImageMLIRConv2D.cols - kernelColsMLIRConv2D + 1;
@@ -71,8 +71,9 @@ void initializeMLIRConv2D(char **argv) {
 
 static void MLIR_Conv2D(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> inputMLIRConv2D(inputImageMLIRConv2D, sizesInputMLIRConv2D);
-  MemRef<float, 2> kernelMLIRConv2D(kernelMLIRConv2DMat, sizesKernelMLIRConv2D);
+  Img<float, 2> inputMLIRConv2D(inputImageMLIRConv2D);
+  MemRef<float, 2> kernelMLIRConv2D(kernelDataMLIRConv2D,
+                                    sizesKernelMLIRConv2D);
   MemRef<float, 2> outputMLIRConv2D(sizesOutputMLIRConv2D);
 
   for (auto _ : state) {
@@ -89,8 +90,8 @@ BENCHMARK(MLIR_Conv2D)->Arg(1)->Unit(benchmark::kMillisecond);
 // Generate result image.
 void generateResultMLIRConv2D() {
   // Define the MemRef descriptor for input, kernel, and output.
-  MemRef<float, 2> input(inputImageMLIRConv2D, sizesInputMLIRConv2D);
-  MemRef<float, 2> kernel(kernelMLIRConv2DMat, sizesKernelMLIRConv2D);
+  Img<float, 2> input(inputImageMLIRConv2D);
+  MemRef<float, 2> kernel(kernelDataMLIRConv2D, sizesKernelMLIRConv2D);
   MemRef<float, 2> output(sizesOutputMLIRConv2D);
   // Run the 2D convolution.
   _mlir_ciface_mlir_conv_2d(&input, &kernel, &output);

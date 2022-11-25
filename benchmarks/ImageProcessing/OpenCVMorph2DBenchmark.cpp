@@ -184,63 +184,91 @@ static void OpenCV_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
 // Register benchmarking function.
 void registerBenchmarkOpenCVErode2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_Erode2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Erode2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_Erode2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Erode2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVDilate2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_Dilate2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Dilate2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_Dilate2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Dilate2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVOpening2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_Opening2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Opening2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_Opening2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Opening2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVClosing2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_Closing2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Closing2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_Closing2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_Closing2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVTopHat2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_TopHat2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_TopHat2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_TopHat2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_TopHat2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVBottomHat2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_BottomHat2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_BottomHat2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_BottomHat2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_BottomHat2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVMorphGrad2D() {
   if (OpenCVBoundaryType1 == replicate_padding) {
-    BENCHMARK(OpenCV_MorphGrad2D_Replicate_Padding)->Arg(1);
+    BENCHMARK(OpenCV_MorphGrad2D_Replicate_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(OpenCV_MorphGrad2D_Constant_Padding)->Arg(1);
+    BENCHMARK(OpenCV_MorphGrad2D_Constant_Padding)
+        ->Arg(1)
+        ->Unit(benchmark::kMillisecond);
   }
 }
 
