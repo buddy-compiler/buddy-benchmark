@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "ImageProcessing/Kernels.h"
+#include "Kernels.h"
 #include <benchmark/benchmark.h>
 #include <buddy/core/Container.h>
 #include <buddy/core/ImageContainer.h>

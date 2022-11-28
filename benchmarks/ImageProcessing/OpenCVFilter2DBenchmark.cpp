@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "ImageProcessing/Kernels.h"
+#include "Kernels.h"
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
 

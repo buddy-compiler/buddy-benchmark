@@ -135,6 +135,7 @@ add_executable(image-processing-benchmark
 
 target_include_directories(image-processing-benchmark 
   PRIVATE
+  ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/include/
   ${EIGEN_DIR}
   ${EIGEN_DIR}/unsupported/
 )

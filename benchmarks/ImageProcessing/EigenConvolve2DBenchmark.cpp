@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "ImageProcessing/Kernels.h"
+#include "Kernels.h"
 #include <Eigen/CXX11/Tensor>
 #include <Eigen/Dense>
 #include <benchmark/benchmark.h>
