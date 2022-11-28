@@ -41,7 +41,7 @@ void python(std::string &args) {
 #else
   std::string slash = "/";
 #endif
-  filename = MAIN_PATH + slash + "plots" + slash + "python" + slash + "plot.py";
+  filename = MAIN_PATH + slash + "utils" + slash + "plots" + slash + "python" + slash + "plot.py";
 
 #ifndef PYTHON_PATH
   (void)std::system(("python3 \"" + filename + "\"" + args).c_str());
