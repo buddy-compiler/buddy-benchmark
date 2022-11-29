@@ -1,0 +1,5 @@
+scipy
+matplotlib
+cffi
+numpy
+ipython
