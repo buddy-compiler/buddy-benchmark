@@ -32,6 +32,9 @@ set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
 message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
 message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
 
+set(BUILD_TESTS OFF CACHE BOOL "Build tests")
+set(BUILD_VALIDATION OFF CACHE BOOL "Build validations")
+set(BUILD_CORRECTNESS OFF CACHE BOOL "Build correctness checking")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 
 # Add BUDDY files to the include path
@@ -111,3 +114,9 @@ check_simd()
 
 add_subdirectory(benchmarks)
 add_subdirectory(utils)
+add_subdirectory(plots)
+
+if (BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
