@@ -169,21 +169,3 @@ $ ninja vectorization-benchmark
 $ cd bin
 $ ./vectorization-benchmark
 ```
-
-## Testing
-
-```
-$ cd buddy-benchmark
-$ mkdir build && cd build
-$ cmake -G Ninja .. \
-    -DIMAGE_PROCESSING_BENCHMARKS=ON \
-    -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DBUILD_TESTS=ON \
-    -DOpenCV_DIR=/path/to/opencv/build/ \
-    -DBUDDY_MLIR_BUILD_DIR=/path/to/buddy-mlir/build/ \
-    -DBUDDY_OPT_STRIP_MINING=<strip mining size, default: 256> \
-    -DBUDDY_OPT_ATTR=<ISA vector extension, default: avx512f>
-$ cmake --build . --
-$ ninja test
-```
-

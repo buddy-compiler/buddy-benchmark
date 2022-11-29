@@ -38,7 +38,6 @@ target_link_directories(resnet-18-benchmark PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
 target_link_libraries(resnet-18-benchmark
   ResNet18Default
   GoogleBenchmark
-  Container
   mlir_c_runner_utils
   ${OpenCV_LIBS}
 )

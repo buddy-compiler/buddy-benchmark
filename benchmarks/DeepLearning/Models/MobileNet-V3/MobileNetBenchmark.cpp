@@ -18,8 +18,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include <string>
@@ -28,8 +29,7 @@ namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
-void _mlir_ciface_mobilenet_v3(MemRef<float, 2> *output,
-                               MemRef<float, 4> *input);
+void _mlir_ciface_mobilenet_v3(MemRef<float, 2> *output, Img<float, 4> *input);
 }
 
 const cv::Mat imagePreprocessing() {
@@ -50,7 +50,8 @@ cv::Mat image = imagePreprocessing();
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
 intptr_t sizesOutnput[2] = {1, 1001};
 
-MemRef<float, 4> input(image, sizesInput, IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE);
+// MemRef<float, 4> input(image, sizesInput, IMAGE_MATRIX_OPERATION::NORMALIZE);
+Img<float, 4> input(image, true);
 MemRef<float, 2> output(sizesOutnput);
 
 // Define benchmark function.

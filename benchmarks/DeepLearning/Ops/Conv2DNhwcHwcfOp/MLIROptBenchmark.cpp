@@ -18,8 +18,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 
 namespace {
 

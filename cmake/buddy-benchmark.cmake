@@ -43,8 +43,7 @@ function(add_buddy_model_benchmark name)
   target_link_directories(${name} PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
   target_link_libraries(${name}
     ${ARGS_LIBRARY}
-    GoogleBenchmark
-    Container
+    GoogleBenchmark 
     mlir_c_runner_utils
   )
   if (${ARGS_OpenCV})
@@ -92,6 +91,5 @@ function(add_buddy_ops_benchmark name)
   target_link_libraries(${name}
     ${ARGS_LIBRARY}
     GoogleBenchmark
-    Container
   )
 endfunction()

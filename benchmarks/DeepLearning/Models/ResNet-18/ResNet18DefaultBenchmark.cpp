@@ -19,8 +19,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Utils/Container.h"
 #include <benchmark/benchmark.h>
+#include <buddy/core/Container.h>
+#include <buddy/core/ImageContainer.h>
 #include <fstream>
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -30,7 +31,7 @@ namespace {
 
 // Declare the resnet C interface.
 extern "C" {
-void _mlir_ciface_forward(MemRef<float, 2> *output, MemRef<float, 4> *input);
+void _mlir_ciface_forward(MemRef<float, 2> *output, Img<float, 4> *input);
 }
 
 const cv::Mat imagePreprocessing() {
@@ -52,8 +53,7 @@ cv::Mat image = imagePreprocessing();
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
 intptr_t sizesOutput[2] = {1, 1000};
 
-MemRef<float, 4> input(image, sizesInput,
-                       IMAGE_MATRIX_OPERATION::NORMALIZE_AND_TRANSPOSE);
+Img<float, 4> input(image, true);
 MemRef<float, 2> output(sizesOutput);
 
 // Define benchmark function.

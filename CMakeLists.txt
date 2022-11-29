@@ -31,20 +31,15 @@ find_package(BuddyMLIR REQUIRED CONFIG)
 set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_EXAMPLES_DIR ${BUDDY_SOURCE_DIR}/examples)
-set(BUDDY_INCLUDE_DIR ${BUDDY_SOURCE_DIR}/include)
 set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
 set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
 message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
 message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
 
-set(BUILD_TESTS OFF CACHE BOOL "Build tests")
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 
 # Add BUDDY files to the include path
 include_directories(${BUDDY_MAIN_INCLUDE_DIR})
-include_directories(${BUDDY_INCLUDE_DIR})
-include_directories(${BUDDY_SOURCE_DIR}/lib) # For template inclusion model.
 include_directories(${BUDDY_MLIR_INTERFACE_DIR})
 include_directories(${BUDDY_MLIR_LIB_DIR})
 
@@ -91,20 +86,6 @@ find_package(Threads)
 target_link_libraries(GoogleBenchmark INTERFACE Threads::Threads)
 
 #-------------------------------------------------------------------------------
-# Deploy GoogleTest
-#-------------------------------------------------------------------------------
-if (BUILD_TESTS)
-  include(FetchContent)
-  FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-  )
-
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(googletest)
-endif()
-
-#-------------------------------------------------------------------------------
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
@@ -133,11 +114,5 @@ check_simd()
 # Subdirectory
 #-------------------------------------------------------------------------------
 
-add_subdirectory(lib)
 add_subdirectory(benchmarks)
 add_subdirectory(utils)
-
-if (BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(tests)
-endif()
