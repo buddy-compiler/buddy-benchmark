@@ -15,10 +15,12 @@ COMMAND
     --finalizing-bufferize
     --convert-vector-to-scf
     --convert-scf-to-cf
+    --expand-strided-metadata
     --lower-affine
     --convert-vector-to-llvm
     --memref-expand
     --arith-expand
+    --convert-arith-to-llvm
     --convert-memref-to-llvm
     --convert-math-to-llvm
     --llvm-request-c-wrappers
