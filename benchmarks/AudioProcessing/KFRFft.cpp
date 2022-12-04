@@ -49,7 +49,7 @@ static void KFR_FFT(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(KFR_FFT)->Arg(1);
+BENCHMARK(KFR_FFT)->Arg(1)->Unit(benchmark::kMillisecond);
 
 void generateResultKFRFft() {
   println("-------------------------------------------------------");

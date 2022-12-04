@@ -100,7 +100,7 @@ std::string getLabel(int idx) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_InceptionV3)->Arg(1);
+BENCHMARK(BM_InceptionV3)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Print result function.
 void printResult() {

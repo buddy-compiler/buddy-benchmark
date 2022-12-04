@@ -50,7 +50,7 @@ static void KFR_IIR(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(KFR_IIR)->Arg(1);
+BENCHMARK(KFR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result wav file.
 void generateResultKFRIir() {

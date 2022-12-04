@@ -49,7 +49,7 @@ static void KFR_Biquad(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(KFR_Biquad)->Arg(1);
+BENCHMARK(KFR_Biquad)->Arg(1)->Unit(benchmark::kMillisecond);
 
 void generateResultKFRBiquad() {
   println("-------------------------------------------------------");

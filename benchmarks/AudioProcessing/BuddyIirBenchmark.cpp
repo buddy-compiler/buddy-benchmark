@@ -95,8 +95,8 @@ static void BUDDY_IIR(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(MLIR_IIR)->Arg(1);
-BENCHMARK(BUDDY_IIR)->Arg(1);
+BENCHMARK(MLIR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(BUDDY_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result_buddy_iir wav file.
 void generateResultBuddyIir() {

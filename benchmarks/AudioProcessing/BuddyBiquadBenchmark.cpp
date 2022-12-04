@@ -90,8 +90,8 @@ static void MLIR_Biquad(benchmark::State &state) {
 }
 
 // Register benchmarking function.
-BENCHMARK(MLIR_Biquad)->Arg(1);
-BENCHMARK(BUDDY_Biquad)->Arg(1);
+BENCHMARK(MLIR_Biquad)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(BUDDY_Biquad)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result_buddy_biquad wav file.
 void generateResultBuddyBiquad() {
