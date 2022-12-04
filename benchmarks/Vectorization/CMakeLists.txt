@@ -30,6 +30,9 @@ add_custom_command(OUTPUT mlir-matvec.o
             -convert-linalg-to-loops
             -convert-scf-to-cf
             -convert-linalg-to-llvm
+            -expand-strided-metadata
+            -lower-affine
+            -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
             -convert-func-to-llvm
