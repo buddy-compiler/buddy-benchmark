@@ -34,7 +34,7 @@ COMMAND
 add_library(ResNet18Default STATIC resnet-18-default.o)
 set_target_properties(ResNet18Default PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(resnet-18-benchmark Main.cpp ResNet18DefaultBenchmark)
+add_executable(resnet-18-benchmark Main.cpp ResNet18DefaultBenchmark.cpp)
 # Link libraries
 target_link_directories(resnet-18-benchmark PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
 target_link_libraries(resnet-18-benchmark
