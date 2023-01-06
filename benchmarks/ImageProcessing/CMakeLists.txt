@@ -49,7 +49,7 @@ set_target_properties(MLIRConv2D PROPERTIES LINKER_LANGUAGE CXX)
 
 add_custom_command(OUTPUT buddy-conv2d.o
   COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
+          ${BUDDY_MLIR_BUILD_DIR}/../examples/ConvOpt/conv2d.mlir 
             -conv-vectorization="strip-mining=${SPLITING_SIZE}" 
             -convert-vector-to-scf 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
@@ -66,7 +66,7 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 
 # add_custom_command(OUTPUT buddy-conv2d.o
 #   COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-#           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyConv2D.mlir 
+#           ${BUDDY_MLIR_BUILD_DIR}/../examples/ConvOpt/conv2d.mlir 
 #             -linalg-tile="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}"
 #             -conv-vectorization="tile-sizes=${MLIR_LINALG_TILE},${MLIR_LINALG_TILE}" 
 #             -convert-vector-to-scf 
@@ -83,40 +83,24 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 # set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# Buddy DIP Dialect Corr2D Operation + CB Algorithm
+# Buddy DIP Dialect
 #-------------------------------------------------------------------------------
 
-add_custom_command(OUTPUT buddy-corr2d.o
+add_custom_command(OUTPUT dip.o
   COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt 
-          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyCorr2D.mlir 
-            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
-            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            --llvm-request-c-wrappers
-            -convert-memref-to-llvm -convert-func-to-llvm 
+          ${BUDDY_MLIR_BUILD_DIR}/../examples/DIPDialect/dip.mlir 
+            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" -arith-expand 
+            -lower-affine -convert-scf-to-cf -convert-math-to-llvm 
+            -convert-vector-to-llvm -convert-memref-to-llvm 
+            -llvm-request-c-wrappers -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-corr2d.o
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/dip.o
 )
-add_library(BuddyCorr2D STATIC buddy-corr2d.o)
-set_target_properties(BuddyCorr2D PROPERTIES LINKER_LANGUAGE CXX)
-
-add_custom_command(OUTPUT buddy-morph2d.o
-  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt 
-          ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/BuddyMorph2D.mlir 
-            -lower-dip="DIP-strip-mining=${SPLITING_SIZE}" 
-            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            --llvm-request-c-wrappers
-            -convert-memref-to-llvm -convert-func-to-llvm 
-            -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/ImageProcessing/buddy-morph2d.o
-)
-add_library(BuddyMorph2D STATIC buddy-morph2d.o)
-set_target_properties(BuddyMorph2D PROPERTIES LINKER_LANGUAGE CXX)
+add_library(DIP STATIC dip.o)
+set_target_properties(DIP PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
@@ -145,6 +129,5 @@ target_link_libraries(image-processing-benchmark
   ${OpenCV_LIBS}
   MLIRConv2D
   BuddyConv2D
-  BuddyCorr2D
-  BuddyMorph2D
+  DIP
   )

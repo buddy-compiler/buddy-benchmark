@@ -29,9 +29,9 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_buddy_conv_2d(Img<float, 2> *inputBuddyConv2D,
-                                MemRef<float, 2> *kernelBuddyConv2D,
-                                MemRef<float, 2> *outputBuddyConv2D);
+void _mlir_ciface_conv_2d(Img<float, 2> *inputBuddyConv2D,
+                          MemRef<float, 2> *kernelBuddyConv2D,
+                          MemRef<float, 2> *outputBuddyConv2D);
 }
 
 // Read input image.
@@ -80,8 +80,8 @@ static void Buddy_Conv2D(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_buddy_conv_2d(&inputBuddyConv2D, &kernelBuddyConv2D,
-                                 &outputBuddyConv2D);
+      _mlir_ciface_conv_2d(&inputBuddyConv2D, &kernelBuddyConv2D,
+                           &outputBuddyConv2D);
     }
   }
 }
@@ -96,7 +96,7 @@ void generateResultBuddyConv2D(char **argv) {
   MemRef<float, 2> kernel(kernelDataBuddyConv2D, sizesKernelBuddyConv2D);
   MemRef<float, 2> output(sizesOutputBuddyConv2D);
   // Run the 2D convolution.
-  _mlir_ciface_buddy_conv_2d(&input, &kernel, &output);
+  _mlir_ciface_conv_2d(&input, &kernel, &output);
 
   // Define a cv::Mat with the output of the convolution.
   Mat outputImage(outputRowsBuddyConv2D, outputColsBuddyConv2D, CV_32FC1,

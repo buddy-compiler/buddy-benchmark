@@ -22,128 +22,11 @@
 #include <benchmark/benchmark.h>
 #include <buddy/core/Container.h>
 #include <buddy/core/ImageContainer.h>
+#include <buddy/dip/dip.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
 using namespace std;
-
-// Declare the C interface
-
-extern "C" {
-void _mlir_ciface_erosion_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyErosion2D,
-    MemRef<float, 2> *copyMemRefErosion2D, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_erosion_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyErosion2D,
-    MemRef<float, 2> *copyMemRefErosion2D, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_dilation_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyDilation2D,
-    MemRef<float, 2> *copyMemRefDilation2D, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_dilation_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyDilation2D,
-    MemRef<float, 2> *copyMemRefDilation2D, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_opening_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyOpening2D,
-    MemRef<float, 2> *outputBuddyOpening2D1,
-    MemRef<float, 2> *copyMemRefOpening2D,
-    MemRef<float, 2> *copyMemRefOpening2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_opening_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyOpening2D,
-    MemRef<float, 2> *outputBuuddyOpening2D1,
-    MemRef<float, 2> *copyMemRefOpening2D,
-    MemRef<float, 2> *copyMemRefOpening2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_closing_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyClosing2D,
-    MemRef<float, 2> *outputBuddyClosing2D1,
-    MemRef<float, 2> *copyMemRefClosing2D,
-    MemRef<float, 2> *copyMemRefClosing2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_closing_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyClosing2D,
-    MemRef<float, 2> *outputBuuddyClosing2D1,
-    MemRef<float, 2> *copyMemRefClosing2D,
-    MemRef<float, 2> *copyMemRefClosing2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_tophat_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyTopHat2D,
-    MemRef<float, 2> *outputBuddyTopHat2D1,
-    MemRef<float, 2> *outputBuddyTopHat2D2,
-    MemRef<float, 2> *inputBuddyTopHat2D1, MemRef<float, 2> *copyMemRefTopHat2D,
-    MemRef<float, 2> *copyMemRefTopHat2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_tophat_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyTopHat2D,
-    MemRef<float, 2> *outputBuddyTopHat2D1,
-    MemRef<float, 2> *outputBuddyTopHat2D2,
-    MemRef<float, 2> *inputBuddyTopHat2D1, MemRef<float, 2> *copyMemRefTopHat2D,
-    MemRef<float, 2> *copyMemRefTopHat2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_bottomhat_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyBottomHat2D,
-    MemRef<float, 2> *outputBuddyBottomHat2D1,
-    MemRef<float, 2> *outputBuddyBottomHat2D2,
-    MemRef<float, 2> *inputBuddyBottomHat2D1,
-    MemRef<float, 2> *copyMemRefBottomHat2D,
-    MemRef<float, 2> *copyMemRefBottomHat2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_bottomhat_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyBottomHat2D,
-    MemRef<float, 2> *outputBuddyBottomHat2D1,
-    MemRef<float, 2> *outputBuddyBottomHat2D2,
-    MemRef<float, 2> *inputBuddyBottomHat2D1,
-    MemRef<float, 2> *copyMemRefBottomHat2D,
-    MemRef<float, 2> *copyMemRefBottomHat2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_morphgrad_2d_constant_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyMorphGrad2D,
-    MemRef<float, 2> *outputBuddyMorphGrad2D1,
-    MemRef<float, 2> *outputBuddyMorphGrad2D2,
-    MemRef<float, 2> *inputBuddyMorphGrad2D1,
-    MemRef<float, 2> *copyMemRefMorphGrad2D,
-    MemRef<float, 2> *copyMemRefMorphGrad2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-
-void _mlir_ciface_morphgrad_2d_replicate_padding(
-    Img<float, 2> inputBuddyMorph2D, MemRef<float, 2> *kernelBuddyMorph2D,
-    MemRef<float, 2> *outputBuddyMorphGrad2D,
-    MemRef<float, 2> *outputBuddyMorphGrad2D1,
-    MemRef<float, 2> *outputBuddyMorphGrad2D2,
-    MemRef<float, 2> *inputBuddyMorphGrad2D1,
-    MemRef<float, 2> *copyMemRefMorphGrad2D,
-    MemRef<float, 2> *copyMemRefMorphGrad2D1, unsigned int centerX,
-    unsigned int centerY, unsigned int iterations, float constantValue);
-}
 
 // Declare input image and kernel.
 Mat inputImageBuddyMorph2D;
@@ -202,7 +85,7 @@ static void Buddy_Erosion2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_erosion_2d_constant_padding(
+      dip::detail::_mlir_ciface_erosion_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyErosion2D,
           &copyMemRefErosion2D, 1 /* Center X */, 1 /* Center Y */, 1,
           0.0f /* Constant Value */);
@@ -217,7 +100,7 @@ static void Buddy_Erosion2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_erosion_2d_replicate_padding(
+      dip::detail::_mlir_ciface_erosion_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyErosion2D,
           &copyMemRefErosion2D, 1 /* Center X */, 1 /* Center Y */, 1,
           0.0f /* Constant Value */);
@@ -232,7 +115,7 @@ static void Buddy_Dilation2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_dilation_2d_constant_padding(
+      dip::detail::_mlir_ciface_dilation_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyDilation2D,
           &copyMemRefDilation2D, 1 /* Center X */, 1 /* Center Y */, 1,
           0.0f /* Constant Value */);
@@ -247,7 +130,7 @@ static void Buddy_Dilation2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_dilation_2d_replicate_padding(
+      dip::detail::_mlir_ciface_dilation_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyDilation2D,
           &copyMemRefDilation2D, 1 /* Center X */, 1 /* Center Y */, 1,
           0.0f /* Constant Value */);
@@ -265,7 +148,7 @@ static void Buddy_Opening2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_opening_2d_constant_padding(
+      dip::detail::_mlir_ciface_opening_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyOpening2D,
           &outputBuddyOpening2D1, &copyMemRefOpening2D, &copyMemRefOpening2D1,
           1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
@@ -283,7 +166,7 @@ static void Buddy_Opening2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_opening_2d_replicate_padding(
+      dip::detail::_mlir_ciface_opening_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyOpening2D,
           &outputBuddyOpening2D1, &copyMemRefOpening2D, &copyMemRefOpening2D1,
           1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
@@ -301,7 +184,7 @@ static void Buddy_Closing2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_closing_2d_constant_padding(
+      dip::detail::_mlir_ciface_closing_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyClosing2D,
           &outputBuddyClosing2D1, &copyMemRefClosing2D, &copyMemRefClosing2D1,
           1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
@@ -319,7 +202,7 @@ static void Buddy_Closing2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_closing_2d_replicate_padding(
+      dip::detail::_mlir_ciface_closing_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyClosing2D,
           &outputBuddyClosing2D1, &copyMemRefClosing2D, &copyMemRefClosing2D1,
           1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
@@ -339,7 +222,7 @@ static void Buddy_TopHat2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_tophat_2d_constant_padding(
+      dip::detail::_mlir_ciface_tophat_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyTopHat2D,
           &outputBuddyTopHat2D1, &outputBuddyTopHat2D2, &inputBuddyTopHat2D1,
           &copyMemRefTopHat2D, &copyMemRefTopHat2D1, 1 /* Center X */,
@@ -359,7 +242,7 @@ static void Buddy_TopHat2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_tophat_2d_replicate_padding(
+      dip::detail::_mlir_ciface_tophat_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyTopHat2D,
           &outputBuddyTopHat2D1, &outputBuddyTopHat2D2, &inputBuddyTopHat2D1,
           &copyMemRefTopHat2D, &copyMemRefTopHat2D1, 1 /* Center X */,
@@ -379,7 +262,7 @@ static void Buddy_BottomHat2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_bottomhat_2d_constant_padding(
+      dip::detail::_mlir_ciface_bottomhat_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyBottomHat2D,
           &outputBuddyBottomHat2D1, &outputBuddyBottomHat2D2,
           &inputBuddyBottomHat2D1, &copyMemRefBottomHat2D,
@@ -400,7 +283,7 @@ static void Buddy_BottomHat2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_bottomhat_2d_replicate_padding(
+      dip::detail::_mlir_ciface_bottomhat_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyBottomHat2D,
           &outputBuddyBottomHat2D1, &outputBuddyBottomHat2D2,
           &inputBuddyBottomHat2D1, &copyMemRefBottomHat2D,
@@ -421,7 +304,7 @@ static void Buddy_MorphGrad2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_morphgrad_2d_constant_padding(
+      dip::detail::_mlir_ciface_morphgrad_2d_constant_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyMorphGrad2D,
           &outputBuddyMorphGrad2D1, &outputBuddyMorphGrad2D2,
           &inputBuddyMorphGrad2D1, &copyMemRefMorphGrad2D,
@@ -442,7 +325,7 @@ static void Buddy_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_morphgrad_2d_replicate_padding(
+      dip::detail::_mlir_ciface_morphgrad_2d_replicate_padding(
           inputBuddyMorph2D, &kernelBuddyMorph2D, &outputBuddyMorphGrad2D,
           &outputBuddyMorphGrad2D1, &outputBuddyMorphGrad2D2,
           &inputBuddyMorphGrad2D1, &copyMemRefMorphGrad2D,
@@ -552,11 +435,11 @@ void generateResultBuddyErosion2D(char **argv) {
   MemRef<float, 2> copyMemRef(sizesOutputBuddyMorph2D, 256.f);
   // Run the 2D Erosionelation.
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_erosion_2d_replicate_padding(
+    dip::detail::_mlir_ciface_erosion_2d_replicate_padding(
         input, &kernel, &output, &copyMemRef, 1 /* Center X */,
         1 /* Center Y */, 1, 0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_erosion_2d_constant_padding(
+    dip::detail::_mlir_ciface_erosion_2d_constant_padding(
         input, &kernel, &output, &copyMemRef, 1 /* Center X */,
         1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
@@ -594,11 +477,11 @@ void generateResultBuddyDilation2D(char **argv) {
   MemRef<float, 2> copymemref(sizesOutputBuddyMorph2D, -1.f);
   // Run the 2D Dilationelation.
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_dilation_2d_replicate_padding(
+    dip::detail::_mlir_ciface_dilation_2d_replicate_padding(
         input, &kernel, &output, &copymemref, 1 /* Center X */,
         1 /* Center Y */, 1, 0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_dilation_2d_constant_padding(
+    dip::detail::_mlir_ciface_dilation_2d_constant_padding(
         input, &kernel, &output, &copymemref, 1 /* Center X */,
         1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
@@ -638,11 +521,11 @@ void generateResultBuddyOpening2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyMorph2D, 256.f);
   // Run the 2D Opening operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_opening_2d_replicate_padding(
+    dip::detail::_mlir_ciface_opening_2d_replicate_padding(
         input, &kernel, &output, &output1, &copymemref, &copymemref1,
         1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_opening_2d_constant_padding(
+    dip::detail::_mlir_ciface_opening_2d_constant_padding(
         input, &kernel, &output, &output1, &copymemref, &copymemref1,
         1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
@@ -682,11 +565,11 @@ void generateResultBuddyClosing2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyMorph2D, 256.f);
   // Run the 2D Closing operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_closing_2d_replicate_padding(
+    dip::detail::_mlir_ciface_closing_2d_replicate_padding(
         input, &kernel, &output, &output1, &copymemref, &copymemref1,
         1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_closing_2d_constant_padding(
+    dip::detail::_mlir_ciface_closing_2d_constant_padding(
         input, &kernel, &output, &output1, &copymemref, &copymemref1,
         1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
@@ -728,12 +611,12 @@ void generateResultBuddyTopHat2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyMorph2D, -1.f);
   // Run the 2D TopHat operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_tophat_2d_replicate_padding(
+    dip::detail::_mlir_ciface_tophat_2d_replicate_padding(
         input, &kernel, &output, &output1, &output2, &input1, &copymemref,
         &copymemref1, 1 /* Center X */, 1 /* Center Y */, 1,
         0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_tophat_2d_constant_padding(
+    dip::detail::_mlir_ciface_tophat_2d_constant_padding(
         input, &kernel, &output, &output1, &output2, &input1, &copymemref,
         &copymemref1, 1 /* Center X */, 1 /* Center Y */, 1,
         0.0f /* Constant Value */);
@@ -775,12 +658,12 @@ void generateResultBuddyBottomHat2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyMorph2D, -1.f);
   // Run the 2D BottomHat operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_bottomhat_2d_replicate_padding(
+    dip::detail::_mlir_ciface_bottomhat_2d_replicate_padding(
         input, &kernel, &output, &output1, &output2, &input1, &copymemref,
         &copymemref1, 1 /* Center X */, 1 /* Center Y */, 1,
         0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_bottomhat_2d_constant_padding(
+    dip::detail::_mlir_ciface_bottomhat_2d_constant_padding(
         input, &kernel, &output, &output1, &output2, &input1, &copymemref,
         &copymemref1, 1 /* Center X */, 1 /* Center Y */, 1,
         0.0f /* Constant Value */);
@@ -823,12 +706,12 @@ void generateResultBuddyMorphGrad2D(char **argv) {
   MemRef<float, 2> copymemref1(sizesOutputBuddyMorph2D, -1.f);
   // Run the 2D MorphGrad operation
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_morphgrad_2d_replicate_padding(
+    dip::detail::_mlir_ciface_morphgrad_2d_replicate_padding(
         input, &kernel, &output, &output1, &output2, &input1, &copymemref,
         &copymemref1, 1 /* Center X */, 1 /* Center Y */, 1,
         0.0f /* Constant Value */);
   } else {
-    _mlir_ciface_morphgrad_2d_constant_padding(
+    dip::detail::_mlir_ciface_morphgrad_2d_constant_padding(
         input, &kernel, &output, &output1, &output2, &input1, &copymemref,
         &copymemref1, 1 /* Center X */, 1 /* Center Y */, 1,
         0.0f /* Constant Value */);

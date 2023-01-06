@@ -22,27 +22,11 @@
 #include <benchmark/benchmark.h>
 #include <buddy/core/Container.h>
 #include <buddy/core/ImageContainer.h>
+#include <buddy/dip/dip.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
 using namespace std;
-
-// Declare the conv2d C interface.
-extern "C" {
-void _mlir_ciface_corr_2d_constant_padding(Img<float, 2> *inputBuddyCorr2D,
-                                           MemRef<float, 2> *kernelBuddyCorr2D,
-                                           MemRef<float, 2> *outputBuddyCorr2D,
-                                           unsigned int centerX,
-                                           unsigned int centerY,
-                                           float constantValue);
-
-void _mlir_ciface_corr_2d_replicate_padding(Img<float, 2> *inputBuddyCorr2D,
-                                            MemRef<float, 2> *kernelBuddyCorr2D,
-                                            MemRef<float, 2> *outputBuddyCorr2D,
-                                            unsigned int centerX,
-                                            unsigned int centerY,
-                                            float constantValue);
-}
 
 // Declare input image.
 Mat inputImageBuddyCorr2D;
@@ -100,9 +84,11 @@ static void Buddy_Corr2D_Constant_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_corr_2d_constant_padding(
-          &inputBuddyCorr2D, &kernelBuddyCorr2D, &outputBuddyCorr2D,
-          1 /* Center X */, 1 /* Center Y */, 0.0f /* Constant Value */);
+      // Call the MLIR Corr2D function.
+      dip::Corr2D(&inputBuddyCorr2D, &kernelBuddyCorr2D, &outputBuddyCorr2D,
+                  1 /* Center X */, 1 /* Center Y */,
+                  dip::BOUNDARY_OPTION::CONSTANT_PADDING,
+                  0.0f /* Constant Value*/);
     }
   }
 }
@@ -116,9 +102,11 @@ static void Buddy_Corr2D_Replicate_Padding(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_corr_2d_replicate_padding(
-          &inputBuddyCorr2D, &kernelBuddyCorr2D, &outputBuddyCorr2D,
-          1 /* Center X */, 1 /* Center Y */, 0.0f /* Constant Value */);
+      // Call the MLIR Corr2D function.
+      dip::Corr2D(&inputBuddyCorr2D, &kernelBuddyCorr2D, &outputBuddyCorr2D,
+                  1 /* Center X */, 1 /* Center Y */,
+                  dip::BOUNDARY_OPTION::REPLICATE_PADDING,
+                  0.0f /* Constant Value*/);
     }
   }
 }
@@ -144,13 +132,15 @@ void generateResultBuddyCorr2D(char **argv) {
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
   if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
-    _mlir_ciface_corr_2d_replicate_padding(&input, &kernel, &output,
-                                           1 /* Center X */, 1 /* Center Y */,
-                                           0.0f /* Constant Value */);
+    // Call the MLIR Corr2D function.
+    dip::Corr2D(&input, &kernel, &output, 1 /* Center X */, 1 /* Center Y */,
+                dip::BOUNDARY_OPTION::REPLICATE_PADDING,
+                0.0f /* Constant Value*/);
   } else {
-    _mlir_ciface_corr_2d_constant_padding(&input, &kernel, &output,
-                                          1 /* Center X */, 1 /* Center Y */,
-                                          0.0f /* Constant Value */);
+    // Call the MLIR Corr2D function.
+    dip::Corr2D(&input, &kernel, &output, 1 /* Center X */, 1 /* Center Y */,
+                dip::BOUNDARY_OPTION::CONSTANT_PADDING,
+                0.0f /* Constant Value*/);
   }
 
   // Define a cv::Mat with the output of the correlation.
