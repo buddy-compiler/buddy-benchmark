@@ -45,12 +45,16 @@ function(add_buddy_model_benchmark name)
     ${ARGS_LIBRARY}
     GoogleBenchmark 
     mlir_c_runner_utils
+    DIP
   )
   if (${ARGS_OpenCV})
     target_link_libraries(${name} ${ARGS_LIBRARY} ${OpenCV_LIBS})
   endif()
   if (${ARGS_PNGImage})
     target_link_libraries(${name} ${ARGS_LIBRARY} PNGImage)
+  endif()
+  if (${ARGS_DIP})
+    target_link_libraries(${name} ${ARGS_LIBRARY} DIP)
   endif()
 endfunction()
 

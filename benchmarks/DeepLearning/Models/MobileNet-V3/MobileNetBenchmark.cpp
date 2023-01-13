@@ -21,6 +21,7 @@
 #include <benchmark/benchmark.h>
 #include <buddy/core/Container.h>
 #include <buddy/core/ImageContainer.h>
+#include <buddy/dip/dip.h>
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include <string>
@@ -35,13 +36,22 @@ void _mlir_ciface_mobilenet_v3(MemRef<float, 2> *output, Img<float, 4> *input);
 const cv::Mat imagePreprocessing() {
 
   cv::Mat inputImage = cv::imread(
-      "../../benchmarks/DeepLearning/Models/MobileNet-V3/Images/dog.png");
+      "../../benchmarks/DeepLearning/Models/MobileNet-V3/Images/ice-cream.png");
   assert(!inputImage.empty() && "Could not read the image.");
   cv::Mat resizedImage;
   int imageWidth = 224;
   int imageHeight = 224;
-  cv::resize(inputImage, resizedImage, cv::Size(imageWidth, imageHeight),
+  intptr_t outputSize[2] = {imageHeight, imageWidth};
+
+  // resizedImage = dip::Resize2DNChannels(inputImage, 
+  //   dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION, outputSize);
+
+   cv::resize(inputImage, resizedImage, cv::Size(imageWidth, imageHeight),
              cv::INTER_LINEAR);
+
+  // imwrite("dip-resize-result.png", resizedImage);
+  imwrite("opencv-resize-result.png", resizedImage);
+
   return resizedImage;
 }
 
