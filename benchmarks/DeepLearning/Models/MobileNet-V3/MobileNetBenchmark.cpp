@@ -35,24 +35,38 @@ void _mlir_ciface_mobilenet_v3(MemRef<float, 2> *output, Img<float, 4> *input);
 
 const cv::Mat imagePreprocessing() {
 
+  // cv::Mat inputImage = cv::imread(
+  //   "dip-resize-result.png");
+  // cv::Mat inputImage = cv::imread(
+  //     "opencv-resize-result_sample.png");
+  // cv::Mat inputImage = cv::imread(
+  //     "opencv-resize-result.png");
   cv::Mat inputImage = cv::imread(
-      "../../benchmarks/DeepLearning/Models/MobileNet-V3/Images/ice-cream.png");
+      "../../benchmarks/DeepLearning/Models/MobileNet-V3/Images/dog.png");
   assert(!inputImage.empty() && "Could not read the image.");
   cv::Mat resizedImage;
   int imageWidth = 224;
   int imageHeight = 224;
   intptr_t outputSize[2] = {imageHeight, imageWidth};
 
-  // resizedImage = dip::Resize2DNChannels(inputImage, 
-  //   dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION, outputSize);
+  resizedImage = dip::Resize2DNChannels(inputImage, 
+    dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION, outputSize);
 
-   cv::resize(inputImage, resizedImage, cv::Size(imageWidth, imageHeight),
-             cv::INTER_LINEAR);
+  //  cv::resize(inputImage, resizedImage, cv::Size(imageWidth, imageHeight),
+  //            cv::INTER_LINEAR);
 
-  // imwrite("dip-resize-result.png", resizedImage);
-  imwrite("opencv-resize-result.png", resizedImage);
+  // std::cout << "Here \n";
+  // std::cout << resizedImage.at<float>(0, 0)[0] << "\n\n";
+  // std::cout << resizedImage << "\n";
 
-  return resizedImage;
+  imwrite("dip-resize-result.png", resizedImage);
+  // imwrite("opencv-resize-result.png", resizedImage);
+
+  cv::Mat checkImage = cv::imread(
+    "dip-resize-result.png");
+
+  // return resizedImage;
+  return checkImage;
 }
 
 cv::Mat image = imagePreprocessing();
