@@ -50,8 +50,7 @@ cv::Mat image = imagePreprocessing();
 intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
 intptr_t sizesOutnput[2] = {1, 1001};
 
-// MemRef<float, 4> input(image, sizesInput, IMAGE_MATRIX_OPERATION::NORMALIZE);
-Img<float, 4> input(image, true);
+Img<float, 4> input(image, sizesInput, true);
 MemRef<float, 2> output(sizesOutnput);
 
 // Define benchmark function.
