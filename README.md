@@ -82,6 +82,7 @@ $ cmake -G Ninja .. \
 $ ninja
 ```
 
+### Models and Operations
 The deep learning benchmark includes the following e2e models and operations:
 
 - MobileNet
@@ -100,6 +101,33 @@ Run the DepthwiseConv2DNhwcHwc operation benchmark:
 
 ```
 $ cd <path to build>/bin && ./depthwise-conv-2d-nhwc-hwc-benchmark
+```
+### Cross-compilation on RISC-V
+Deep learning benchmark is also supported on RISC-V. To set up environments for RISC-V cross compilation and run the benchmarks:
+1. Build riscv-gnu-toolchain, QEMU and cross-compiled MLIR according to [this link](https://gist.github.com/zhanghb97/ad44407e169de298911b8a4235e68497).
+2. Cross-compile OpenCV on RISC-V:
+```
+$ cd opencv
+$ mkdir build && cd build
+$ cmake -DCMAKE_TOOLCHAIN_FILE=../platforms/linux/riscv64-gcc.toolchain.cmake ../
+$ make -j$(nproc)
+```
+3. Change the path of `RISCV_TOOLCHAIN_ROOT` in buddy-benchmark/cmake/riscv-toolchain.cmake to where your riscv-gnu-toolchain root directory is built.
+4. Cross-compile deep learning benchmark with CMAKE_TOOLCHAIN_FILE being set:
+```
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake .. -DCMAKE_TOOLCHAIN_FILE=/PATH/TO/BUDDY-BENCHMARK/cmake/riscv-toolchain.cmake \
+    -G Ninja \
+    -DDEEP_LEARNING_BENCHMARKS=ON \
+    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+$ ninja
+```
+5. Use QEMU to run RISC-V executable files:
+```
+$ cd <path to build>/bin
+$ <path to qemu-riscv64> -L <path to riscv-gnu-toolchain sysroot> -cpu rv64,x-v=true,vlen=128 ./mobilenet-benchmark
 ```
 
 ## Audio Processing Benchmark

@@ -26,12 +26,24 @@ function(add_buddy_model_benchmark name)
   )
 
   # Compile MLIR file to LLVM bitcode
-  add_custom_command(OUTPUT ${ARGS_BITCODE}
+  if(CMAKE_TOOLCHAIN_FILE STREQUAL ${BUDDY_SOURCE_DIR}/cmake/riscv-toolchain.cmake)
+    # Generate RISC-V object file.
+    add_custom_command(OUTPUT ${ARGS_BITCODE}
+    COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${CMAKE_CURRENT_SOURCE_DIR}/${ARGS_MLIR}
+    ${ARGS_OPTIONS} | ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+    ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple riscv64 -target-abi lp64d
+      -mattr=+m,+d,+v --filetype=obj -riscv-v-vector-bits-min=128
+      --filetype=obj -o ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_BITCODE}
+    )
+  else()
+    # Generate x86 object file.
+    add_custom_command(OUTPUT ${ARGS_BITCODE}
     COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${CMAKE_CURRENT_SOURCE_DIR}/${ARGS_MLIR} 
-      ${ARGS_OPTIONS} | ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-      ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} 
-        --filetype=obj -o ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_BITCODE}
-  )
+    ${ARGS_OPTIONS} | ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+    ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR}
+      --filetype=obj -o ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_BITCODE}
+    )
+  endif()
 
   add_library(${ARGS_LIBRARY} ${ARGS_BITCODE})
 
@@ -74,12 +86,24 @@ function(add_buddy_ops_benchmark name)
   )
 
   # Compile MLIR file to LLVM bitcode
-  add_custom_command(OUTPUT ${ARGS_BITCODE}
+  if(CMAKE_TOOLCHAIN_FILE STREQUAL ${BUDDY_SOURCE_DIR}/cmake/riscv-toolchain.cmake)
+    # Generate RISC-V object file.
+    add_custom_command(OUTPUT ${ARGS_BITCODE}
     COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${CMAKE_CURRENT_SOURCE_DIR}/${ARGS_MLIR}
-    ${ARGS_OPTIONS} | ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir | 
-    ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} 
+    ${ARGS_OPTIONS} | ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+    ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple riscv64 -target-abi lp64d
+      -mattr=+m,+d,+v --filetype=obj -riscv-v-vector-bits-min=128
       --filetype=obj -o ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_BITCODE}
-  )
+    )
+  else()
+    # Generate x86 object file.
+    add_custom_command(OUTPUT ${ARGS_BITCODE}
+    COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${CMAKE_CURRENT_SOURCE_DIR}/${ARGS_MLIR}
+    ${ARGS_OPTIONS} | ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+    ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR}
+      --filetype=obj -o ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_BITCODE}
+    )
+  endif()
 
   add_library(${ARGS_LIBRARY} ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_BITCODE})
 

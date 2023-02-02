@@ -41,7 +41,13 @@ include_directories(${BUDDY_MLIR_LIB_DIR})
 
 # MLIR binary directory.
 set(LLVM_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/bin)
-set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/lib)
+
+if(CMAKE_TOOLCHAIN_FILE STREQUAL ${BUDDY_SOURCE_DIR}/cmake/riscv-toolchain.cmake)
+  # Use cross-compiled RISC-V MLIR library.
+  set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build-cross-mlir/lib)
+else()
+  set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/lib)
+endif()
 
 # Helper functions.
 include(${BUDDY_SOURCE_DIR}/cmake/buddy-benchmark.cmake)
@@ -62,6 +68,7 @@ ExternalProject_Add(project_googlebenchmark
   TIMEOUT 10
   BUILD_BYPRODUCTS <INSTALL_DIR>/lib/${CMAKE_STATIC_LIBRARY_PREFIX}benchmark${CMAKE_STATIC_LIBRARY_SUFFIX}
   CMAKE_ARGS
+    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/vendor/benchmark
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DBENCHMARK_ENABLE_TESTING=OFF
