@@ -1,4 +1,4 @@
-//===- Main.cpp -----------------------------------------------------------===//
+//===- MLIRGccLoopsEx2a.mlir ----------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,28 +14,17 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This is the main file of the vectorization benchmark.
+// This file provides the MLIR GccLoopsEx2a function.
 //
 //===----------------------------------------------------------------------===//
 
-#include <benchmark/benchmark.h>
 
-void generateResultMLIRMatMul();
-void generateResultMLIRMatVec();
-void generateResultMLIRGccLoopsEx1();
-void generateResultMLIRGccLoopsEx2a();
-
-// Run benchmarks.
-int main(int argc, char **argv) {
-
-  ::benchmark::Initialize(&argc, argv);
-  ::benchmark::RunSpecifiedBenchmarks();
-
-  // Generate result.
-  generateResultMLIRMatMul();
-  generateResultMLIRMatVec();
-  generateResultMLIRGccLoopsEx1();
-  generateResultMLIRGccLoopsEx2a();
-
-  return 0;
+func.func @mlir_gccloopsex2a(%A: memref<?xi32>, %N: index,
+                       %X: i32) {
+  %c0 = arith.constant 0 : index
+  %c1 = arith.constant 1 : index
+  scf.for %i = %c0 to %N step %c1 {
+    memref.store %X, %A[%i] : memref<?xi32>
+  }
+  return
 }

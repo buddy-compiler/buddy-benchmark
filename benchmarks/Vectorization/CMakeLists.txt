@@ -46,7 +46,7 @@ add_library(MLIRMatVec STATIC mlir-matvec.o)
 set_target_properties(MLIRMatVec PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# MLIR SCF Dialect MatVec Operation + Upstream Lowering Passes
+# MLIR SCF Dialect GccLoopsEx1 Operation + Upstream Lowering Passes
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT mlir-gccloopsex1.o
@@ -68,6 +68,28 @@ add_custom_command(OUTPUT mlir-gccloopsex1.o
 add_library(MLIRGccLoopsEx1 STATIC mlir-gccloopsex1.o)
 set_target_properties(MLIRGccLoopsEx1 PROPERTIES LINKER_LANGUAGE CXX)
 
+#-------------------------------------------------------------------------------
+# MLIR SCF Dialect MatVec Operation + Upstream Lowering Passes
+#-------------------------------------------------------------------------------
+
+add_custom_command(OUTPUT mlir-gccloopsex2a.o
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+          ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx2a.mlir 
+            -convert-scf-to-cf
+            -expand-strided-metadata
+            -lower-affine
+            -convert-arith-to-llvm
+            -llvm-request-c-wrappers
+            -convert-memref-to-llvm
+            -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/Vectorization/mlir-gccloopsex2a.o
+)
+add_library(MLIRGccLoopsEx2a STATIC mlir-gccloopsex2a.o)
+set_target_properties(MLIRGccLoopsEx2a PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
@@ -78,6 +100,7 @@ add_executable(vectorization-benchmark
   MLIRMatMulBenchmark.cpp
   MLIRMatVecBenchmark.cpp
   MLIRGccLoopsEx1Benchmark.cpp
+  MLIRGccLoopsEx2aBenchmark.cpp
   )
 
 target_link_libraries(vectorization-benchmark
@@ -85,4 +108,5 @@ target_link_libraries(vectorization-benchmark
   MLIRMatMul
   MLIRMatVec
   MLIRGccLoopsEx1
+  MLIRGccLoopsEx2a
   )
