@@ -35,7 +35,6 @@ void _mlir_ciface_forward(MemRef<float, 2> *output, Img<float, 4> *input);
 }
 
 const cv::Mat imagePreprocessing() {
-  // std::cout << "preprocessing!!!" << std::endl;
   cv::Mat inputImage =
       cv::imread("../../benchmarks/DeepLearning/Models/ResNet-18/Images/"
                  "YellowLabradorLooking_new.jpg");
@@ -50,10 +49,10 @@ const cv::Mat imagePreprocessing() {
 
 cv::Mat image = imagePreprocessing();
 
-intptr_t sizesInput[4] = {1, image.rows, image.cols, 3};
+intptr_t sizesInput[4] = {1, 3, image.rows, image.cols};
 intptr_t sizesOutput[2] = {1, 1000};
 
-Img<float, 4> input(image, true);
+Img<float, 4> input(image, sizesInput, true);
 MemRef<float, 2> output(sizesOutput);
 
 // Define benchmark function.
