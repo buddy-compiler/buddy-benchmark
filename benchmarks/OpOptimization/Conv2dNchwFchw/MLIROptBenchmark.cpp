@@ -20,7 +20,7 @@
 
 #include "opencv2/dnn/all_layers.hpp"
 #include <benchmark/benchmark.h>
-#include <buddy/core/Container.h>
+#include <buddy/Core/Container.h>
 #include <cmath>
 #include <cstdlib>
 #include <immintrin.h>

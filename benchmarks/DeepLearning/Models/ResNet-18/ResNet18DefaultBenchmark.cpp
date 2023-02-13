@@ -20,8 +20,8 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
-#include <buddy/core/Container.h>
-#include <buddy/core/ImageContainer.h>
+#include <buddy/Core/Container.h>
+#include <buddy/DIP/ImageContainer.h>
 #include <fstream>
 #include <iostream>
 #include <opencv2/opencv.hpp>

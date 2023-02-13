@@ -22,8 +22,8 @@
 #include <Eigen/CXX11/Tensor>
 #include <Eigen/Dense>
 #include <benchmark/benchmark.h>
-#include <buddy/core/Container.h>
-#include <buddy/core/ImageContainer.h>
+#include <buddy/Core/Container.h>
+#include <buddy/DIP/ImageContainer.h>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 

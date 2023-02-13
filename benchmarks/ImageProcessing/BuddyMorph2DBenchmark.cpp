@@ -20,9 +20,9 @@
 
 #include "Kernels.h"
 #include <benchmark/benchmark.h>
-#include <buddy/core/Container.h>
-#include <buddy/core/ImageContainer.h>
-#include <buddy/dip/dip.h>
+#include <buddy/Core/Container.h>
+#include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/DIP.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
