@@ -25,6 +25,7 @@ void generateResultMLIRMatVec();
 void generateResultMLIRGccLoopsEx1();
 void generateResultMLIRGccLoopsEx2a();
 void generateResultMLIRGccLoopsEx2b();
+void generateResultMLIRGccLoopsEx3();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -38,6 +39,7 @@ int main(int argc, char **argv) {
   generateResultMLIRGccLoopsEx1();
   generateResultMLIRGccLoopsEx2a();
   generateResultMLIRGccLoopsEx2b();
+  generateResultMLIRGccLoopsEx3();
 
   return 0;
 }
