@@ -54,7 +54,6 @@ add_custom_command(OUTPUT mlir-gccloopsex1.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx1.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -77,7 +76,6 @@ add_custom_command(OUTPUT mlir-gccloopsex2a.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx2a.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -100,7 +98,6 @@ add_custom_command(OUTPUT mlir-gccloopsex2b.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx2b.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -123,7 +120,6 @@ add_custom_command(OUTPUT mlir-gccloopsex3.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx3.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -146,7 +142,6 @@ add_custom_command(OUTPUT mlir-gccloopsex4a.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx4a.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -169,7 +164,6 @@ add_custom_command(OUTPUT mlir-gccloopsex4b.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx4b.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -192,7 +186,6 @@ add_custom_command(OUTPUT mlir-gccloopsex4c.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx4c.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -216,7 +209,6 @@ add_custom_command(OUTPUT mlir-gccloopsex7.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx7.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -239,7 +231,6 @@ add_custom_command(OUTPUT mlir-gccloopsex8.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx8.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -262,7 +253,6 @@ add_custom_command(OUTPUT mlir-gccloopsex9.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx9.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -285,7 +275,6 @@ add_custom_command(OUTPUT mlir-gccloopsex10a.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx10a.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -308,7 +297,6 @@ add_custom_command(OUTPUT mlir-gccloopsex10b.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx10b.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -331,7 +319,6 @@ add_custom_command(OUTPUT mlir-gccloopsex11.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx11.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm
@@ -354,7 +341,6 @@ add_custom_command(OUTPUT mlir-gccloopsex12.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx12.mlir 
             -convert-scf-to-cf
             -expand-strided-metadata
-            -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
             -convert-memref-to-llvm

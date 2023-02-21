@@ -31,7 +31,7 @@ void _mlir_ciface_mlir_gccloopsex2a(MemRef<int, 1> *output,
 
 // Define input and output sizes.
 intptr_t sizesOutputArrayMLIRGccLoopsEx2a[1] = {10};
-// Define the MemRef container for input1, input2, and output.
+// Define the MemRef container for inputs and output.
 size_t input1 = 10;
 int input2 = 16;
 MemRef<int, 1> outputMLIRGccLoopsEx2a(sizesOutputArrayMLIRGccLoopsEx2a, 0);
@@ -50,7 +50,7 @@ BENCHMARK(MLIR_GccLoopsEx2a)->Arg(1);
 
 // Generate result image.
 void generateResultMLIRGccLoopsEx2a() {
-  // Define the MemRef descriptor for input1, intput2, and output.
+  // Define the MemRef descriptor for inputs and output.
   size_t input1 = 10;
   int input2 = 16;
   MemRef<int, 1> output(sizesOutputArrayMLIRGccLoopsEx2a, 0);

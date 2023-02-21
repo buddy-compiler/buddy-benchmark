@@ -32,7 +32,7 @@ void _mlir_ciface_mlir_gccloopsex4a(size_t n,
 // Define input and output sizes.
 intptr_t sizesInputArrayMLIRGccLoopsEx4a[1] = {12};
 intptr_t sizesOutputArrayMLIRGccLoopsEx4a[1] = {12};
-// Define the MemRef container for n, intput, and output.
+// Define the MemRef container for intput, and output.
 size_t n_4a = 12;
 MemRef<int, 1> inputMLIRGccLoopsEx4a(sizesInputArrayMLIRGccLoopsEx4a, 2);
 MemRef<int, 1> outputMLIRGccLoopsEx4a(sizesOutputArrayMLIRGccLoopsEx4a, 0);
@@ -51,7 +51,7 @@ BENCHMARK(MLIR_GccLoopsEx4a)->Arg(1);
 
 // Generate result image.
 void generateResultMLIRGccLoopsEx4a() {
-  // Define the MemRef descriptor for n, intput, and output.
+  // Define the MemRef descriptor for intput, and output.
   size_t n = 12;
   MemRef<int, 1> input(sizesInputArrayMLIRGccLoopsEx4a, 2);
   MemRef<int, 1> output(sizesOutputArrayMLIRGccLoopsEx4a, 0);

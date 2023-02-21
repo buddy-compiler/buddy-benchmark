@@ -31,7 +31,7 @@ void _mlir_ciface_mlir_gccloopsex4c(MemRef<int, 1> *output,
 // Define input and output sizes.
 intptr_t sizesInputArrayMLIRGccLoopsEx4c[1] = {10};
 intptr_t sizesOutputArrayMLIRGccLoopsEx4c[1] = {10};
-// Define the MemRef container for input1, input2, and output.
+// Define the MemRef container for input and output.
 int input_data[10] = {1,2,3,4,5,6,7,8,9,10};
 MemRef<int, 1> inputMLIRGccLoopsEx4c(input_data, sizesInputArrayMLIRGccLoopsEx4c);
 MemRef<int, 1> outputMLIRGccLoopsEx4c(sizesOutputArrayMLIRGccLoopsEx4c, 0);

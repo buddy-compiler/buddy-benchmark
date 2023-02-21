@@ -31,7 +31,7 @@ void _mlir_ciface_mlir_gccloopsex9(int* ret, MemRef<int, 1> *intput_1,
 // Define input and output sizes.
 intptr_t sizesInputArrayMLIRGccLoopsEx9[1] = {10};
 intptr_t sizesOutputArrayMLIRGccLoopsEx9[1] = {1};
-// Define the MemRef container for input1, input2, and output.
+// Define the MemRef container for inputs and output.
 int input1_data_ex9[10] = {1,2,3,4,5,6,7,8,9,10};
 int input2_data_ex9[10] = {1,1,1,1,1,1,1,1,1,1};
 int ret = 0;
@@ -52,7 +52,7 @@ BENCHMARK(MLIR_GccLoopsEx9)->Arg(1);
 
 // Generate result image.
 void generateResultMLIRGccLoopsEx9() {
-  // Define the MemRef descriptor for input and output.
+  // Define the MemRef descriptor for inputs and output.
   int input1_data_ex9[10] = {1,2,3,4,5,6,7,8,9,10};
   int input2_data_ex9[10] = {1,1,1,1,1,1,1,1,1,1};
   int ret = 0;

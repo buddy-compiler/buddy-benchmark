@@ -30,7 +30,7 @@ void _mlir_ciface_mlir_gccloopsex25(MemRef<int, 1> *dj, MemRef<float, 1> *da,  M
 
 // Define input and output sizes.
 intptr_t sizesArrayMLIRGccLoopsEx25[1] = {10};
-// Define the MemRef container for input1, input2, and output.
+// Define the MemRef container for inputs and output.
 float input_data_ex25_1[10] = {1.2,2.3,3.4,4.5,5.6,6.7,7.8,8.9,9.1,10.2};
 float input_data_ex25_2[10] = {1.1,2.4,3.3,4.6,5.5,6.8,7.7,8.8,9.0,10.3};
 float input_data_ex25_3[10] = {1.1,2.4,3.3,4.6,5.5,6.8,7.7,8.8,9.0,10.3};
@@ -55,7 +55,7 @@ BENCHMARK(MLIR_GccLoopsEx25)->Arg(1);
 
 // Generate result image.
 void generateResultMLIRGccLoopsEx25() {
-  // Define the MemRef descriptor for input and output.
+  // Define the MemRef descriptor for inputs and output.
   float input_data_ex25_1[10] = {1.2,2.3,3.4,4.5,5.6,6.7,7.8,8.9,9.1,10.2};
   float input_data_ex25_2[10] = {1.1,2.4,3.3,4.6,5.5,6.8,7.7,8.8,9.0,10.3};
   float input_data_ex25_3[10] = {1.1,2.4,3.3,4.6,5.5,6.8,7.7,8.8,9.0,10.3};
