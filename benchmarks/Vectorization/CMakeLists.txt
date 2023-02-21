@@ -69,7 +69,7 @@ add_library(MLIRGccLoopsEx1 STATIC mlir-gccloopsex1.o)
 set_target_properties(MLIRGccLoopsEx1 PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# MLIR SCF Dialect MatVec Operation + Upstream Lowering Passes
+# MLIR SCF Dialect GccLoopsEx2a Operation + Upstream Lowering Passes
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT mlir-gccloopsex2a.o
@@ -161,7 +161,7 @@ add_library(MLIRGccLoopsEx4a STATIC mlir-gccloopsex4a.o)
 set_target_properties(MLIRGccLoopsEx4a PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# MLIR SCF Dialect GccLoopsEx1 Operation + Upstream Lowering Passes
+# MLIR SCF Dialect GccLoopsEx4b Operation + Upstream Lowering Passes
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT mlir-gccloopsex4b.o
@@ -208,7 +208,7 @@ set_target_properties(MLIRGccLoopsEx4c PROPERTIES LINKER_LANGUAGE CXX)
 
 
 #-------------------------------------------------------------------------------
-# MLIR SCF Dialect GccLoopsEx5 Operation + Upstream Lowering Passes
+# MLIR SCF Dialect GccLoopsEx7 Operation + Upstream Lowering Passes
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT mlir-gccloopsex7.o
@@ -231,7 +231,7 @@ add_library(MLIRGccLoopsEx7 STATIC mlir-gccloopsex7.o)
 set_target_properties(MLIRGccLoopsEx7 PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# MLIR SCF Dialect GccLoopsEx5 Operation + Upstream Lowering Passes
+# MLIR SCF Dialect GccLoopsEx8 Operation + Upstream Lowering Passes
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT mlir-gccloopsex8.o
@@ -254,6 +254,29 @@ add_library(MLIRGccLoopsEx8 STATIC mlir-gccloopsex8.o)
 set_target_properties(MLIRGccLoopsEx8 PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
+# MLIR SCF Dialect GccLoopsEx9 Operation + Upstream Lowering Passes
+#-------------------------------------------------------------------------------
+
+add_custom_command(OUTPUT mlir-gccloopsex9.o
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+          ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx9.mlir 
+            -convert-scf-to-cf
+            -expand-strided-metadata
+            -lower-affine
+            -convert-arith-to-llvm
+            -llvm-request-c-wrappers
+            -convert-memref-to-llvm
+            -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/Vectorization/mlir-gccloopsex9.o
+)
+add_library(MLIRGccLoopsEx9 STATIC mlir-gccloopsex9.o)
+set_target_properties(MLIRGccLoopsEx9 PROPERTIES LINKER_LANGUAGE CXX)
+
+#-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
 
@@ -270,6 +293,7 @@ add_executable(vectorization-benchmark
   MLIRGccLoopsEx4cBenchmark.cpp
   MLIRGccLoopsEx7Benchmark.cpp
   MLIRGccLoopsEx8Benchmark.cpp
+  MLIRGccLoopsEx9Benchmark.cpp
   )
 
 target_link_libraries(vectorization-benchmark
@@ -285,4 +309,5 @@ target_link_libraries(vectorization-benchmark
   MLIRGccLoopsEx4c
   MLIRGccLoopsEx7
   MLIRGccLoopsEx8
+  MLIRGccLoopsEx9
   )
