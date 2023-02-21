@@ -414,6 +414,28 @@ add_library(MLIRGccLoopsEx14 STATIC mlir-gccloopsex14.o)
 set_target_properties(MLIRGccLoopsEx14 PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
+# MLIR SCF Dialect GccLoopsEx21 Operation + Upstream Lowering Passes
+#-------------------------------------------------------------------------------
+
+add_custom_command(OUTPUT mlir-gccloopsex21.o
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+          ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRGccLoopsEx21.mlir 
+            -convert-scf-to-cf
+            -expand-strided-metadata
+            -convert-arith-to-llvm
+            -llvm-request-c-wrappers
+            -convert-memref-to-llvm
+            -convert-func-to-llvm
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/Vectorization/mlir-gccloopsex21.o
+)
+add_library(MLIRGccLoopsEx21 STATIC mlir-gccloopsex21.o)
+set_target_properties(MLIRGccLoopsEx21 PROPERTIES LINKER_LANGUAGE CXX)
+
+#-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
 
@@ -437,6 +459,7 @@ add_executable(vectorization-benchmark
   MLIRGccLoopsEx12Benchmark.cpp
   MLIRGccLoopsEx13Benchmark.cpp
   MLIRGccLoopsEx14Benchmark.cpp
+  MLIRGccLoopsEx21Benchmark.cpp
   )
 
 target_link_libraries(vectorization-benchmark
@@ -459,4 +482,5 @@ target_link_libraries(vectorization-benchmark
   MLIRGccLoopsEx12
   MLIRGccLoopsEx13
   MLIRGccLoopsEx14
+  MLIRGccLoopsEx21
   )
