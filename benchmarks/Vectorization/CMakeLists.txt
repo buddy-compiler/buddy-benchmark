@@ -46,6 +46,29 @@ add_library(MLIRMatVec STATIC mlir-matvec.o)
 set_target_properties(MLIRMatVec PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
+# MLIR Arith Dialect Saxpy Operation + Upstream Lowering Passes
+#-------------------------------------------------------------------------------
+
+add_custom_command(OUTPUT mlir-saxpy.o
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+          ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRSaxpy.mlir 
+            -convert-scf-to-cf
+            -expand-strided-metadata
+            -lower-affine
+            -convert-arith-to-llvm
+            -llvm-request-c-wrappers
+            -convert-memref-to-llvm
+            -convert-func-to-llvm
+            -reconcile-unrealized-casts |
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/Vectorization/mlir-saxpy.o
+)
+add_library(MLIRSaxpy STATIC mlir-saxpy.o)
+set_target_properties(MLIRSaxpy PROPERTIES LINKER_LANGUAGE CXX)
+
+#-------------------------------------------------------------------------------
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
 
@@ -53,10 +76,12 @@ add_executable(vectorization-benchmark
   Main.cpp
   MLIRMatMulBenchmark.cpp
   MLIRMatVecBenchmark.cpp
+  MLIRSaxpyBenckmark.cpp
   )
 
 target_link_libraries(vectorization-benchmark
   GoogleBenchmark
   MLIRMatMul
   MLIRMatVec
+  MLIRSaxpy
   )

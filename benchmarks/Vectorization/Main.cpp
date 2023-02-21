@@ -22,6 +22,7 @@
 
 void generateResultMLIRMatMul();
 void generateResultMLIRMatVec();
+void generateResultMLIRSaxpy();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -32,6 +33,7 @@ int main(int argc, char **argv) {
   // Generate result.
   generateResultMLIRMatMul();
   generateResultMLIRMatVec();
+  generateResultMLIRSaxpy();
 
   return 0;
 }
