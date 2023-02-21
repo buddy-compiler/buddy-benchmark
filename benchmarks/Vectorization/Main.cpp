@@ -36,6 +36,7 @@ void generateResultMLIRGccLoopsEx10a();
 void generateResultMLIRGccLoopsEx10b();
 void generateResultMLIRGccLoopsEx11();
 void generateResultMLIRGccLoopsEx12();
+void generateResultMLIRGccLoopsEx13();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -60,5 +61,6 @@ int main(int argc, char **argv) {
   generateResultMLIRGccLoopsEx10b();
   generateResultMLIRGccLoopsEx11();
   generateResultMLIRGccLoopsEx12();
+  generateResultMLIRGccLoopsEx13();
   return 0;
 }
