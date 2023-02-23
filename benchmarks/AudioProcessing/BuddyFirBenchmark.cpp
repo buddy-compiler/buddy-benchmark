@@ -1,4 +1,4 @@
-//===- BuddyIirBenchmark.cpp ----------------------------------------------===//
+//===- BuddyFirBenchmark.cpp ----------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for Buddy IIR function.
+// This file implements the benchmark for Buddy FIR function.
 //
 //===----------------------------------------------------------------------===//
 
@@ -25,87 +25,79 @@
 #include <kfr/dsp.hpp>
 #include <kfr/io.hpp>
 
+
 using namespace kfr;
 
-// Declare the IIR C interface.
+// Declare the FIR C interface.
 extern "C" {
-void _mlir_ciface_mlir_iir(MemRef<float, 1> *inputBuddyConv1D,
-                           MemRef<float, 2> *kernelBuddyConv1D,
-                           MemRef<float, 1> *outputBuddyConv1D);
+void _mlir_ciface_conv1d_buddy(MemRef<float, 1> *inputBuddyConv1D,
+                               MemRef<float, 1> *kernelBuddyConv1D,
+                               MemRef<float, 1> *outputBuddyConv1D);
 
-void _mlir_ciface_buddy_iir(MemRef<float, 1> *inputBuddyConv1D,
-                            MemRef<float, 2> *kernelBuddyConv1D,
-                            MemRef<float, 1> *outputBuddyConv1D);
+void _mlir_ciface_conv1d_linalg(MemRef<float, 1> *inputBuddyConv1D,
+                                MemRef<float, 1> *kernelBuddyConv1D,
+                                MemRef<float, 1> *outputBuddyConv1D);
 }
 
 namespace {
-univector<float> kernel;
-zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
-std::vector<biquad_params<fbase>> bqs = to_sos(filt);
 
-univector<float, 2000000> aud_buddy_iir;
-univector<float, 2000000> result_buddy_iir;
-intptr_t size_f = bqs.size();
-intptr_t sizeofKernel[2] = {size_f, 6};
-intptr_t sizeofAud{aud_buddy_iir.size()};
+univector<float, 2000000> aud_buddy_fir;
+univector<float, 2000000> result_buddy_fir;
+univector<float, 127> taps127;
+intptr_t sizeofKernel{taps127.size()};
+intptr_t sizeofAud{aud_buddy_fir.size()};
 
 // MemRef copys all data, so data here are actually not accessed.
-MemRef<float, 2> kernelRef(sizeofKernel);
 MemRef<float, 1> audRef(&sizeofAud);
 MemRef<float, 1> resRef(&sizeofAud);
+MemRef<float, 1> kernelRef(&sizeofKernel);
 } // namespace
 
 // Initialize univector.
-void initializeBuddyIir() {
+void initializeBuddyFir() {
   audio_reader_wav<float> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
-  reader.read(aud_buddy_iir.data(), aud_buddy_iir.size());
+  reader.read(aud_buddy_fir.data(), aud_buddy_fir.size());
 
-  for (int i = 0; i < bqs.size(); ++i) {
-    auto bq = bqs[i];
-    kernel.push_back(bq.b0);
-    kernel.push_back(bq.b1);
-    kernel.push_back(bq.b2);
-    kernel.push_back(bq.a0);
-    kernel.push_back(bq.a1);
-    kernel.push_back(bq.a2);
-  }
+  expression_handle<float> kaiser =
+      to_handle(window_kaiser<float>(taps127.size(), 3.0));
+  fir_lowpass(taps127, 0.2, kaiser, true);
 
-  kernelRef = std::move(MemRef<float, 2>(kernel.data(), sizeofKernel));
-  audRef = std::move(MemRef<float, 1>(aud_buddy_iir.data(), &sizeofAud));
+  kernelRef = std::move(MemRef<float, 1>(taps127.data(), &sizeofKernel));
+  audRef = std::move(MemRef<float, 1>(aud_buddy_fir.data(), &sizeofAud));
   resRef = std::move(MemRef<float, 1>(&sizeofAud));
 }
 
 // Benchmarking function.
-static void MLIR_IIR(benchmark::State &state) {
+static void Linalg_FIR(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mlir_iir(&audRef, &kernelRef, &resRef);
+      _mlir_ciface_conv1d_linalg(&audRef, &kernelRef, &resRef);
     }
   }
 }
 
 // Benchmarking function.
-static void BUDDY_IIR(benchmark::State &state) {
+static void BUDDY_FIR(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_buddy_iir(&audRef, &kernelRef, &resRef);
+      _mlir_ciface_conv1d_buddy(&audRef, &kernelRef, &resRef);
     }
   }
 }
 
 // Register benchmarking function.
-BENCHMARK(MLIR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
-BENCHMARK(BUDDY_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(Linalg_FIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(BUDDY_FIR)->Arg(1)->Unit(benchmark::kMillisecond);
 
-// Generate result_buddy_iir wav file.
-void generateResultBuddyIir() {
+// Generate result_buddy_fir wav file.
+void generateResultBuddyFir() {
   println("-------------------------------------------------------");
-  println("[ Buddy IIR Result Information ]");
+  println("[ Buddy FIR Result Information ]");
   MemRef<float, 1> generateResult(&sizeofAud);
-  _mlir_ciface_buddy_iir(&audRef, &kernelRef, &generateResult);
+  _mlir_ciface_conv1d_buddy(&audRef, &kernelRef, &generateResult);
 
-  audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyIir.wav"),
+  audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyFir.wav"),
                                  audio_format{1 /* channel */,
                                               audio_sample_type::i24,
                                               100000 /* sample rate */});
