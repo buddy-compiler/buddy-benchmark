@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <buddy/core/Container.h>
+#include <buddy/Core/Container.h>
 #include <benchmark/benchmark.h>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
