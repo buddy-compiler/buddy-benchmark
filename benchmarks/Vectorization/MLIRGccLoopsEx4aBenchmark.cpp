@@ -19,7 +19,7 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
-#include <buddy/core/Container.h>
+#include <buddy/Core/Container.h>
 #include <iostream>
 
 // Declare the gccloopsex4a C interface.

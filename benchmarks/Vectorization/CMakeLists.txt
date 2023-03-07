@@ -488,7 +488,7 @@ add_library(MLIRGccLoopsEx25 STATIC mlir-gccloopsex25.o)
 set_target_properties(MLIRGccLoopsEx25 PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# Image Processing Benchmark Target
+# Vectorization Benchmark Targets
 #-------------------------------------------------------------------------------
 
 add_executable(vectorization-benchmark
