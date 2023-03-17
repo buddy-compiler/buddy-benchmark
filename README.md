@@ -157,6 +157,8 @@ The result is saved in `bin/res.png`. For more usage, use `audio-plot -h` for de
 
 ## Vectorization Benchmark
 
+Some of the benchmarks are ported from gcc-loops([link](https://github.com/llvm/llvm-test-suite/blob/main/SingleSource/UnitTests/Vectorizer/gcc-loops.cpp)) in LLVM test suit
+
 *Note: Please replace the `/PATH/TO/*` with your local path.*
 
 ```

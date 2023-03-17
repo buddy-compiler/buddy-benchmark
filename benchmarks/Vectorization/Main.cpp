@@ -22,6 +22,26 @@
 
 void generateResultMLIRMatMul();
 void generateResultMLIRMatVec();
+void generateResultMLIRGccLoopsEx1();
+void generateResultMLIRGccLoopsEx2a();
+void generateResultMLIRGccLoopsEx2b();
+void generateResultMLIRGccLoopsEx3();
+void generateResultMLIRGccLoopsEx4a();
+void generateResultMLIRGccLoopsEx4b();
+void generateResultMLIRGccLoopsEx4c();
+void generateResultMLIRGccLoopsEx7();
+void generateResultMLIRGccLoopsEx8();
+void generateResultMLIRGccLoopsEx9();
+void generateResultMLIRGccLoopsEx10a();
+void generateResultMLIRGccLoopsEx10b();
+void generateResultMLIRGccLoopsEx11();
+void generateResultMLIRGccLoopsEx12();
+void generateResultMLIRGccLoopsEx13();
+void generateResultMLIRGccLoopsEx14();
+void generateResultMLIRGccLoopsEx21();
+void generateResultMLIRGccLoopsEx23();
+void generateResultMLIRGccLoopsEx24();
+void generateResultMLIRGccLoopsEx25();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -32,6 +52,25 @@ int main(int argc, char **argv) {
   // Generate result.
   generateResultMLIRMatMul();
   generateResultMLIRMatVec();
-
+  generateResultMLIRGccLoopsEx1();
+  generateResultMLIRGccLoopsEx2a();
+  generateResultMLIRGccLoopsEx2b();
+  generateResultMLIRGccLoopsEx3();
+  generateResultMLIRGccLoopsEx4a();
+  generateResultMLIRGccLoopsEx4b();
+  generateResultMLIRGccLoopsEx4c();
+  generateResultMLIRGccLoopsEx7();
+  generateResultMLIRGccLoopsEx8();
+  generateResultMLIRGccLoopsEx9();
+  generateResultMLIRGccLoopsEx10a();
+  generateResultMLIRGccLoopsEx10b();
+  generateResultMLIRGccLoopsEx11();
+  generateResultMLIRGccLoopsEx12();
+  generateResultMLIRGccLoopsEx13();
+  generateResultMLIRGccLoopsEx14();
+  generateResultMLIRGccLoopsEx21();
+  generateResultMLIRGccLoopsEx23();
+  generateResultMLIRGccLoopsEx24();
+  generateResultMLIRGccLoopsEx25();
   return 0;
 }
