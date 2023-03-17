@@ -10,6 +10,23 @@ Clone the project:
 $ git clone git@github.com:buddy-compiler/buddy-benchmark.git
 ```
 
+## Choose and Build Dependencies
+
+###  Choose Submodules
+
+```
+$ git submodule update --init
+```
+
+### Build OpenCV
+
+```
+$ cd buddy-benchmark/thirdparty/opencv
+$ mkdir build && cd build
+$ cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+$ ninja
+```
+
 ## Image Processing Benchmark
 
 Currently, the image processing benchmark includes the following frameworks or optimizers:
@@ -74,10 +91,12 @@ $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph
 
 ```
 $ cd buddy-benchmark
+$ git lfs pull
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja
 ```
