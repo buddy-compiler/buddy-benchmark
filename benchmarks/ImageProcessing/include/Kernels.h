@@ -163,6 +163,14 @@ static float random15x15KernelAlign[225] = {0, 7, 6, 8, 5, 9, 6, 1, 6, 0, 7, 5, 
 static int random15x15KernelRows = 15;
 static int random15x15KernelCols = 15;
 
+float sepKernelX[3] = {1, 2, 3};
+int sepKernelXRows = 1;
+int sepKernelXCols = 3;
+
+float sepKernelY[3] = {3, 4, 5};
+int sepKernelYRows = 3;
+int sepKernelYCols = 1;
+
 static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"prewittKernelAlign", {prewittKernelAlign, prewittKernelRows, prewittKernelCols}},
     {"sobel3x3KernelAlign", {sobel3x3KernelAlign, sobel3x3KernelRows, sobel3x3KernelCols}},
@@ -177,7 +185,9 @@ static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"random9x9KernelAlign", {random9x9KernelAlign, random9x9KernelRows, random9x9KernelCols}},
     {"random11x11KernelAlign", {random11x11KernelAlign, random11x11KernelRows, random11x11KernelCols}},
     {"random13x13KernelAlign", {random13x13KernelAlign, random13x13KernelRows, random13x13KernelCols}},
-    {"random15x15KernelAlign", {random15x15KernelAlign, random15x15KernelRows, random15x15KernelCols}}    
+    {"random15x15KernelAlign", {random15x15KernelAlign, random15x15KernelRows, random15x15KernelCols}},
+    {"sepKernelX", {sepKernelX, sepKernelXRows, sepKernelXCols}},
+    {"sepKernelY", {sepKernelY, sepKernelYRows, sepKernelYCols}}    
 };
 
 static std::map<std::string, std::tuple<uint8_t*, int, int>> kernelMap1 = {

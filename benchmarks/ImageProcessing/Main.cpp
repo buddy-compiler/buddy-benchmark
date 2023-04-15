@@ -28,8 +28,8 @@ void initializeBuddyMorph2D(char **);
 void initializeOpenCVMorph2D(char **);
 void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **);
-void initializeOpenCVSeparable2D(char **);
-void initializeBuddySeparable2D(char **);
+void initializeOpenCVSepCorr2D(char **);
+void initializeBuddySepCorr2D(char **);
 
 void generateResultMLIRConv2D();
 void generateResultBuddyConv2D(char **);
@@ -41,7 +41,7 @@ void generateResultBuddyTopHat2D(char **);
 void generateResultBuddyBottomHat2D(char **);
 void generateResultBuddyMorphGrad2D(char **);
 void generateResultBuddyDilation2D(char **);
-void generateResultBuddySeparable2D(char **);
+void generateResultBuddySepCorr2D(char **);
 void generateResultOpenCVErode2D();
 void generateResultOpenCVDilate2D();
 void generateResultOpenCVFilter2D();
@@ -50,7 +50,7 @@ void generateResultOpenCVClosing2D();
 void generateResultOpenCVTopHat2D();
 void generateResultOpenCVBottomHat2D();
 void generateResultOpenCVMorphGrad2D();
-void generateResultOpenCVSeparable2D();
+void generateResultOpenCVSepCorr2D();
 void generateResultEigenConvolve2D();
 
 void registerBenchmarkBuddyCorr2D();
@@ -61,7 +61,7 @@ void registerBenchmarkBuddyClosing2D();
 void registerBenchmarkBuddyTopHat2D();
 void registerBenchmarkBuddyBottomHat2D();
 void registerBenchmarkBuddyMorphGrad2D();
-void registerBenchmarkBuddySeparable2D();
+void registerBenchmarkBuddySepCorr2D();
 void registerBenchmarkOpenCVErode2D();
 void registerBenchmarkOpenCVDilate2D();
 void registerBenchmarkOpenCVOpening2D();
@@ -70,7 +70,7 @@ void registerBenchmarkOpenCVTopHat2D();
 void registerBenchmarkOpenCVBottomHat2D();
 void registerBenchmarkOpenCVMorphGrad2D();
 void registerBenchmarkOpenCVFilter2D();
-void registerBenchmarkOpenCVSeparable2D();
+void registerBenchmarkOpenCVSepCorr2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
