@@ -141,7 +141,22 @@ static float random13x13KernelAlign[169] = {8, 0, 6, 6, 7, 3, 4, 0, 6, 1, 5, 4, 
                                             3, 1, 5, 4, 0, 7, 9, 4, 0, 2, 9, 3, 2,
                                             0, 4, 4, 1, 4, 6, 2, 8, 9, 7, 6, 8, 2,
                                             8, 2, 0, 6, 6, 3, 0, 1, 8, 0, 8, 9, 6,
-                                            9, 1, 5, 2, 6, 8, 8, 2, 1, 4, 9, 3, 2};                                          
+                                            9, 1, 5, 2, 6, 8, 8, 2, 1, 4, 9, 3, 2};
+
+static uint8_t random13x13KernelAlignInt[169] = {8, 0, 6, 6, 7, 3, 4, 0, 6, 1, 5, 4, 3,
+                                            5, 8, 4, 7, 8, 7, 0, 7, 9, 1, 9, 4, 6,
+                                            5, 6, 0, 7, 6, 8, 9, 4, 7, 7, 7, 1, 9,
+                                            3, 4, 7, 8, 8, 4, 8, 4, 2, 6, 3, 4, 3,
+                                            5, 6, 5, 9, 4, 2, 5, 4, 9, 3, 4, 8, 7,
+                                            1, 7, 4, 4, 9, 0, 9, 6, 0, 9, 2, 8, 3,
+                                            4, 7, 8, 1, 2, 3, 7, 9, 4, 3, 1, 9, 7,
+                                            2, 4, 3, 3, 3, 5, 0, 0, 9, 1, 0, 0, 9,
+                                            0, 9, 2, 0, 4, 8, 9, 3, 9, 2, 8, 8, 1,
+                                            3, 1, 5, 4, 0, 7, 9, 4, 0, 2, 9, 3, 2,
+                                            0, 4, 4, 1, 4, 6, 2, 8, 9, 7, 6, 8, 2,
+                                            8, 2, 0, 6, 6, 3, 0, 1, 8, 0, 8, 9, 6,
+                                            9, 1, 5, 2, 6, 8, 8, 2, 1, 4, 9, 3, 2};                                            
+
 static int random13x13KernelRows = 13;
 static int random13x13KernelCols = 13;
 
@@ -163,13 +178,21 @@ static float random15x15KernelAlign[225] = {0, 7, 6, 8, 5, 9, 6, 1, 6, 0, 7, 5, 
 static int random15x15KernelRows = 15;
 static int random15x15KernelCols = 15;
 
-float sepKernelX[3] = {1, 2, 3};
-int sepKernelXRows = 1;
-int sepKernelXCols = 3;
+static float sepKernelX[3] = {1, 2, 3};
+static int sepKernelXRows = 1;
+static int sepKernelXCols = 3;
 
-float sepKernelY[3] = {3, 4, 5};
-int sepKernelYRows = 3;
-int sepKernelYCols = 1;
+static float sepKernelY[3] = {3, 4, 5};
+static int sepKernelYRows = 3;
+static int sepKernelYCols = 1;
+
+static float sepKernel1x5[5] = {4, 5, 6, 7, 8};
+static float sepKernelRows1x5 = 1;
+static float sepKernelCols1x5 = 5;
+
+static float sepKernel5x1[5] = {4, 5, 7, 8, 10};
+static float sepKernelRows5x1 = 5;
+static float sepKernelCols5x1 = 1;
 
 static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"prewittKernelAlign", {prewittKernelAlign, prewittKernelRows, prewittKernelCols}},
@@ -187,11 +210,14 @@ static std::map<std::string, std::tuple<float*, int, int>> kernelMap = {
     {"random13x13KernelAlign", {random13x13KernelAlign, random13x13KernelRows, random13x13KernelCols}},
     {"random15x15KernelAlign", {random15x15KernelAlign, random15x15KernelRows, random15x15KernelCols}},
     {"sepKernelX", {sepKernelX, sepKernelXRows, sepKernelXCols}},
-    {"sepKernelY", {sepKernelY, sepKernelYRows, sepKernelYCols}}    
+    {"sepKernelY", {sepKernelY, sepKernelYRows, sepKernelYCols}},
+    {"sepKernel1x5", {sepKernel1x5, sepKernelRows1x5, sepKernelCols1x5}},
+    {"sepKernel5x1", {sepKernel5x1, sepKernelRows5x1, sepKernelCols5x1}}    
 };
 
 static std::map<std::string, std::tuple<uint8_t*, int, int>> kernelMap1 = {
-    {"random3x3KernelAlignInt", {random3x3KernelAlignInt, random3x3KernelRows, random3x3KernelCols}}
+    {"random3x3KernelAlignInt", {random3x3KernelAlignInt, random3x3KernelRows, random3x3KernelCols}},
+    {"random13x13KernelAlignInt", {random13x13KernelAlignInt, random13x13KernelRows, random13x13KernelCols}}
 };
 
 // clang-format on

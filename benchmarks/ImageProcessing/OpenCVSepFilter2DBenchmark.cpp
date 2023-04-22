@@ -27,26 +27,26 @@ using namespace cv;
 using namespace std;
 
 // Declare input image, kernel and output image.
-Mat inputImageFilter2D, kernelFilter2DX, kernelFilter2DY, outputFilter2D;
+Mat inputImageSepFilter2D, kernelFilter2DX, kernelFilter2DY, outputSepFilter2D;
 
 // Declare Boundary Options supported.
 enum BoundaryOption { constant_padding, replicate_padding };
 
 // Define Boundary option selected.
-BoundaryOption OpenCVBoundaryType;
+BoundaryOption OpenCVBoundaryType2;
 
-void initializeOpenCVFilter2D(char **argv) {
-  inputImageFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
+void initializeOpenCVSepFilter2D(char **argv) {
+  inputImageSepFilter2D = imread(argv[1], IMREAD_GRAYSCALE);
 
-  kernelFilter2DX = Mat(get<1>(kernelMap[argv[2]]), get<2>(kernelMap[argv[2]]),
-                       CV_32FC1, get<0>(kernelMap[argv[2]]));
-  kernelFilter2DY = Mat(get<1>(kernelMap[argv[3]]), get<2>(kernelMap[argv[3]]),
-                       CV_32FC1, get<0>(kernelMap[argv[3]]));                     
+  kernelFilter2DX = Mat(get<1>(kernelMap[argv[5]]), get<2>(kernelMap[argv[5]]),
+                       CV_32FC1, get<0>(kernelMap[argv[5]]));
+  kernelFilter2DY = Mat(get<1>(kernelMap[argv[6]]), get<2>(kernelMap[argv[6]]),
+                       CV_32FC1, get<0>(kernelMap[argv[6]]));                     
 
-  if (static_cast<string>(argv[4]) == "REPLICATE_PADDING") {
-    OpenCVBoundaryType = replicate_padding;
+  if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
+    OpenCVBoundaryType2 = replicate_padding;
   } else {
-    OpenCVBoundaryType = constant_padding;
+    OpenCVBoundaryType2 = constant_padding;
   }
 }
 
@@ -54,7 +54,7 @@ void initializeOpenCVFilter2D(char **argv) {
 static void OpenCV_SepFilter2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      sepFilter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
+      sepFilter2D(inputImageSepFilter2D, outputSepFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
                cv::Point(0, 0), 0.0, cv::BORDER_CONSTANT);
     }
   }
@@ -63,15 +63,15 @@ static void OpenCV_SepFilter2D_Constant_Padding(benchmark::State &state) {
 static void OpenCV_SepFilter2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      sepFilter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
+      sepFilter2D(inputImageSepFilter2D, outputSepFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
                cv::Point(0, 0), 0.0, cv::BORDER_REPLICATE);
     }
   }
 }
 
 // Register benchmarking function.
-void registerBenchmarkOpenCVFilter2D() {
-  if (OpenCVBoundaryType == replicate_padding) {
+void registerBenchmarkOpenCVSepFilter2D() {
+  if (OpenCVBoundaryType2 == replicate_padding) {
     BENCHMARK(OpenCV_SepFilter2D_Replicate_Padding)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
@@ -84,11 +84,11 @@ void registerBenchmarkOpenCVFilter2D() {
 
 // Generate result image.
 void generateResultOpenCVSepFilter2D() {
-  if (OpenCVBoundaryType == replicate_padding) {
-    sepFilter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
+  if (OpenCVBoundaryType2 == replicate_padding) {
+    sepFilter2D(inputImageSepFilter2D, outputSepFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
              cv::Point(0, 0), 0.0, cv::BORDER_REPLICATE);
   } else {
-    sepFilter2D(inputImageFilter2D, outputFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
+    sepFilter2D(inputImageSepFilter2D, outputSepFilter2D, CV_32FC1, kernelFilter2DX, kernelFilter2DY,
              cv::Point(0, 0), 0.0, cv::BORDER_CONSTANT);
   }
 
@@ -101,7 +101,7 @@ void generateResultOpenCVSepFilter2D() {
   bool result = false;
   try {
     result =
-        imwrite("ResultOpenCVFilter2D.png", outputFilter2D, compressionParams);
+        imwrite("ResultOpenCVFilter2D.png", outputSepFilter2D, compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());

@@ -28,7 +28,7 @@
 using namespace cv;
 using namespace std;
 
-Mat inputBuddySepCorr2D;
+Mat inputImageBuddySepCorr2D;
 
 float *kernelDataBuddySepCorr2DX;
 float *kernelDataBuddySepCorr2DY;
@@ -36,7 +36,7 @@ float *kernelDataBuddySepCorr2DY;
 int kernelRowsBuddySepCorr2DX, kernelColsBuddySepCorr2DX, kernelRowsBuddySepCorr2DY, kernelColsBuddySepCorr2DY;
 
 // Define the output size.
-int outputRowsBuddyCorr2D, outputColsBuddyCorr2D;
+int outputRowsBuddySepCorr2D, outputColsBuddySepCorr2D;
 
 // Define sizes of input, kernel, and output.
 intptr_t sizesInputBuddySepCorr2D[2];
@@ -53,13 +53,13 @@ BoundaryOption BoundaryType2;
 void initializeBuddySepCorr2D(char **argv) {
   inputImageBuddySepCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
 
-  kernelDataBuddySepCorr2DX = get<0>(kernelMap[argv[2]]);
-  kernelRowsBuddySepCorr2DX = get<1>(kernelMap[argv[2]]);
-  kernelColsBuddySepCorr2DX = get<2>(kernelMap[argv[2]]);
+  kernelDataBuddySepCorr2DX = get<0>(kernelMap[argv[5]]);
+  kernelRowsBuddySepCorr2DX = get<1>(kernelMap[argv[5]]);
+  kernelColsBuddySepCorr2DX = get<2>(kernelMap[argv[5]]);
 
-  kernelDataBuddySepCorr2DY = get<0>(kernelMap[argv[3]]);
-  kernelRowsBuddySepCorr2DY = get<1>(kernelMap[argv[3]]);
-  kernelColsBuddySepCorr2DY = get<2>(kernelMap[argv[3]]);
+  kernelDataBuddySepCorr2DY = get<0>(kernelMap[argv[6]]);
+  kernelRowsBuddySepCorr2DY = get<1>(kernelMap[argv[6]]);
+  kernelColsBuddySepCorr2DY = get<2>(kernelMap[argv[6]]);
 
   outputRowsBuddySepCorr2D = inputImageBuddySepCorr2D.rows;
   outputColsBuddySepCorr2D = inputImageBuddySepCorr2D.cols;
@@ -76,7 +76,7 @@ void initializeBuddySepCorr2D(char **argv) {
   sizesOutputBuddySepCorr2D[0] = outputRowsBuddySepCorr2D;
   sizesOutputBuddySepCorr2D[1] = outputColsBuddySepCorr2D;
 
-  if (static_cast<string>(argv[4]) == "REPLICATE_PADDING") {
+  if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
     BoundaryType2 = replicate_padding;
   } else {
     BoundaryType2 = constant_padding;
@@ -95,7 +95,7 @@ static void Buddy_SepCorr2D_Constant_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       // Call the MLIR Corr2D function.
-      dip::Sep_Corr2D(&inputBuddySepCorr2D, &kernelBuddySepCorr2DX, &kernelBuddySepCorr2DY &outputBuddySepCorr2D,
+      dip::Sep_Corr2D(&inputBuddySepCorr2D, &kernelBuddySepCorr2DX, &kernelBuddySepCorr2DY, &outputBuddySepCorr2D,
                   0 /* Center X */, 0 /* Center Y */,
                   dip::BOUNDARY_OPTION::CONSTANT_PADDING,
                   0.0f /* Constant Value*/);
@@ -115,7 +115,7 @@ static void Buddy_SepCorr2D_Replicate_Padding(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       // Call the MLIR Sep_Corr2D function.
-      dip::Sep_Corr2D(&inputBuddySepCorr2D, &kernelBuddySepCorr2DX, &kernelRowsBuddySepCorr2DY &outputBuddySepCorr2D,
+      dip::Sep_Corr2D(&inputBuddySepCorr2D, &kernelBuddySepCorr2DX, &kernelBuddySepCorr2DY, &outputBuddySepCorr2D,
                   0 /* Center X */, 0 /* Center Y */,
                   dip::BOUNDARY_OPTION::REPLICATE_PADDING,
                   0.0f /* Constant Value*/);
@@ -125,7 +125,7 @@ static void Buddy_SepCorr2D_Replicate_Padding(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddySepCorr2D() {
-  if (BoundaryType == replicate_padding) {
+  if (BoundaryType2 == replicate_padding) {
     BENCHMARK(Buddy_SepCorr2D_Replicate_Padding)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
@@ -139,12 +139,12 @@ void registerBenchmarkBuddySepCorr2D() {
 // Generate result image.
 void generateResultBuddySepCorr2D(char **argv) {
   // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input(inputImageSepBuddyCorr2D);
+  Img<float, 2> input(inputImageBuddySepCorr2D);
   MemRef<float, 2> kernelX(kernelDataBuddySepCorr2DX, sizesKernelBuddySepCorr2DX);
   MemRef<float, 2> kernelY(kernelDataBuddySepCorr2DY, sizesKernelBuddySepCorr2DY);  
   MemRef<float, 2> output(sizesOutputBuddySepCorr2D);
   // Run the 2D correlation.
-  if (static_cast<string>(argv[4]) == "REPLICATE_PADDING") {
+  if (static_cast<string>(argv[3]) == "REPLICATE_PADDING") {
     // Call the MLIR Corr2D function.
     dip::Sep_Corr2D(&input, &kernelX, &kernelY, &output, 0 /* Center X */, 0/* Center Y */,
                 dip::BOUNDARY_OPTION::REPLICATE_PADDING,
@@ -156,7 +156,7 @@ void generateResultBuddySepCorr2D(char **argv) {
                 0.0f /* Constant Value*/);
   }
 
-Mat outputImage(outputRowsBuddySepCorr2D, outputColsBuddyCorr2D, CV_32FC1,
+Mat outputImage(outputRowsBuddySepCorr2D, outputColsBuddySepCorr2D, CV_32FC1,
                   output.getData());
 
   // Choose a PNG compression level
