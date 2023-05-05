@@ -54,13 +54,10 @@ set_target_properties(BuddyBiquad PROPERTIES LINKER_LANGUAGE CXX)
 # DAP Dialect Buddy IIR Operation
 #-------------------------------------------------------------------------------
 
-# TODO:
-# Support only when input audio size is multiple of splitting size.
-# Add a support for all input audio size.
 add_custom_command(OUTPUT buddy-iir.o
         COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyIir.mlir
-        -lower-dap="DAP-vector-splitting=64" -convert-linalg-to-affine-loops
+        -lower-dap="DAP-vector-splitting=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
         -lower-affine
         -convert-scf-to-cf 
         -convert-vector-to-llvm 
