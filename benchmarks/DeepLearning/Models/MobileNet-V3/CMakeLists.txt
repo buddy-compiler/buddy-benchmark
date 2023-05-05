@@ -18,7 +18,7 @@ add_buddy_model_benchmark(mobilenet-v3-benchmark
     --convert-vector-to-llvm 
     -memref-expand -arith-expand 
     --convert-arith-to-llvm
-    --convert-memref-to-llvm 
+    --finalize-memref-to-llvm 
     --convert-math-to-llvm
     --llvm-request-c-wrappers
     --convert-func-to-llvm

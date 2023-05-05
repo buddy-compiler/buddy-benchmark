@@ -31,7 +31,7 @@ add_custom_command(OUTPUT mlir-conv2d.o
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/MLIRConv2D.mlir 
             -convert-linalg-to-loops
             -convert-scf-to-cf -convert-linalg-to-llvm
-            -lower-affine -convert-scf-to-cf --convert-memref-to-llvm 
+            -lower-affine -convert-scf-to-cf --finalize-memref-to-llvm 
             --llvm-request-c-wrappers
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
@@ -54,7 +54,7 @@ add_custom_command(OUTPUT buddy-conv2d.o
             -convert-vector-to-scf 
             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
             --llvm-request-c-wrappers
-            -convert-memref-to-llvm -convert-func-to-llvm 
+            -finalize-memref-to-llvm -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -72,7 +72,7 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 #             -convert-vector-to-scf 
 #             -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
 #             --llvm-request-c-wrappers
-#             -convert-memref-to-llvm -convert-func-to-llvm 
+#             -finalize-memref-to-llvm -convert-func-to-llvm 
 #             -reconcile-unrealized-casts | 
 #           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
 #           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 

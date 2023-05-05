@@ -4,7 +4,7 @@ add_custom_command(OUTPUT mlir-gemm.o
             --matmul-optimize="vec-size=16;kernel-m=1;kernel-n=2"
             --lower-affine
             -convert-vector-to-llvm
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-scf-to-cf
             -convert-linalg-to-llvm
             -llvm-request-c-wrappers

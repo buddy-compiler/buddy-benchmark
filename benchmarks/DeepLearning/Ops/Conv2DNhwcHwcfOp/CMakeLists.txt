@@ -7,7 +7,7 @@ add_buddy_ops_benchmark(conv-2d-nhwc-hwcf-benchmark
     -convert-scf-to-cf 
     -convert-linalg-to-llvm 
     -lower-affine 
-    --convert-memref-to-llvm
+    --finalize-memref-to-llvm
     --llvm-request-c-wrappers
     -convert-func-to-llvm 
     -reconcile-unrealized-casts

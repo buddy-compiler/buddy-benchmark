@@ -4,7 +4,7 @@ add_custom_command(OUTPUT mlir-conv2d.o
             --conv-optimize="kernel-m=2;kernel-n=3;vec-size=16"
             --lower-affine
             -convert-vector-to-llvm
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-scf-to-cf
             -convert-linalg-to-llvm
             -llvm-request-c-wrappers
@@ -24,7 +24,7 @@ add_custom_command(OUTPUT mlir-conv2d-org.o
             --convert-linalg-to-affine-loops
             --lower-affine
             -convert-vector-to-llvm
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-scf-to-cf
             -convert-linalg-to-llvm
             -llvm-request-c-wrappers

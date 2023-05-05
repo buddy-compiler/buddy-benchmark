@@ -9,7 +9,7 @@ add_custom_command(OUTPUT mlir-matmul.o
             -convert-scf-to-cf
             -convert-linalg-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -34,7 +34,7 @@ add_custom_command(OUTPUT mlir-matvec.o
             -lower-affine
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -56,7 +56,7 @@ add_custom_command(OUTPUT mlir-gccloopsex1.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -78,7 +78,7 @@ add_custom_command(OUTPUT mlir-gccloopsex2a.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -100,7 +100,7 @@ add_custom_command(OUTPUT mlir-gccloopsex2b.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -122,7 +122,7 @@ add_custom_command(OUTPUT mlir-gccloopsex3.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -144,7 +144,7 @@ add_custom_command(OUTPUT mlir-gccloopsex4a.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -166,7 +166,7 @@ add_custom_command(OUTPUT mlir-gccloopsex4b.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -188,7 +188,7 @@ add_custom_command(OUTPUT mlir-gccloopsex4c.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -211,7 +211,7 @@ add_custom_command(OUTPUT mlir-gccloopsex7.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -233,7 +233,7 @@ add_custom_command(OUTPUT mlir-gccloopsex8.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -255,7 +255,7 @@ add_custom_command(OUTPUT mlir-gccloopsex9.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -277,7 +277,7 @@ add_custom_command(OUTPUT mlir-gccloopsex10a.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -299,7 +299,7 @@ add_custom_command(OUTPUT mlir-gccloopsex10b.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -321,7 +321,7 @@ add_custom_command(OUTPUT mlir-gccloopsex11.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -343,7 +343,7 @@ add_custom_command(OUTPUT mlir-gccloopsex12.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -366,7 +366,7 @@ add_custom_command(OUTPUT mlir-gccloopsex13.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -388,7 +388,7 @@ add_custom_command(OUTPUT mlir-gccloopsex14.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -410,7 +410,7 @@ add_custom_command(OUTPUT mlir-gccloopsex21.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -432,7 +432,7 @@ add_custom_command(OUTPUT mlir-gccloopsex23.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -454,7 +454,7 @@ add_custom_command(OUTPUT mlir-gccloopsex24.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
@@ -476,7 +476,7 @@ add_custom_command(OUTPUT mlir-gccloopsex25.o
             -expand-strided-metadata
             -convert-arith-to-llvm
             -llvm-request-c-wrappers
-            -convert-memref-to-llvm
+            -finalize-memref-to-llvm
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |

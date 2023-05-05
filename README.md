@@ -72,6 +72,7 @@ Ex. `./image-processing-benchmark ../../benchmarks/ImageProcessing/Images/YuTu.p
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
     -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
     -DEIGEN_DIR=/PATH/TO/EIGEN/SOURCE/CODE \
@@ -94,6 +95,7 @@ $ cd buddy-benchmark
 $ git lfs pull
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
@@ -133,6 +135,7 @@ Currently, the audio processing benchmark includes the following frameworks or o
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
@@ -184,6 +187,7 @@ Some of the benchmarks are ported from gcc-loops([link](https://github.com/llvm/
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
     -DVECTORIZATION_BENCHMARKS=ON \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja vectorization-benchmark

@@ -40,7 +40,7 @@ add_custom_command(OUTPUT buddy-biquad.o
         -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
         --llvm-request-c-wrappers
         -convert-arith-to-llvm
-        -convert-memref-to-llvm -convert-func-to-llvm
+        -finalize-memref-to-llvm -convert-func-to-llvm
         -reconcile-unrealized-casts |
         ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -66,7 +66,7 @@ add_custom_command(OUTPUT buddy-iir.o
         -convert-vector-to-llvm 
         --llvm-request-c-wrappers
         -convert-arith-to-llvm
-        -convert-memref-to-llvm -convert-func-to-llvm
+        -finalize-memref-to-llvm -convert-func-to-llvm
         -reconcile-unrealized-casts |
         ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
