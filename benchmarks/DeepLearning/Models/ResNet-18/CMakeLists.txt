@@ -1,4 +1,4 @@
-set(RESNET18_TOSA_PIPELINE "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-tensor),func.func(tosa-to-linalg),func.func(tosa-to-arith))")
+set(RESNET18_TOSA_PIPELINE "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))")
 
 # Compile MLIR file to object file.
 add_custom_command(OUTPUT resnet-18-default.o
