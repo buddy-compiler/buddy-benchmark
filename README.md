@@ -179,9 +179,9 @@ The result is saved in `bin/res.png`. For more usage, use `audio-plot -h` for de
 
 ## Vectorization Benchmark
 
-Some of the benchmarks are ported from gcc-loops([link](https://github.com/llvm/llvm-test-suite/blob/main/SingleSource/UnitTests/Vectorizer/gcc-loops.cpp)) in LLVM test suit
+Some of the benchmarks are ported from gcc-loops([link](https://github.com/llvm/llvm-test-suite/blob/main/SingleSource/UnitTests/Vectorizer/gcc-loops.cpp)) in LLVM test suit and linpackc([link](https://github.com/2000nickels/linpackc/blob/master/linpack.c))
 
-*Note: Please replace the `/PATH/TO/*` with your local path.*
+*Note: Please replace the `/PATH/TO/*` with your local path and the `XXX` with specific target name (ex: gccloops,linpackc,matrix).*
 
 ```
 $ cd buddy-benchmark
@@ -190,7 +190,7 @@ $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DVECTORIZATION_BENCHMARKS=ON \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
-$ ninja vectorization-benchmark
+$ ninja vectorization-XXX-benchmark
 $ cd bin
-$ ./vectorization-benchmark
+$ ./vectorization-XXX-benchmark
 ```
