@@ -14,14 +14,13 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This is the main file of the matrix vectorization benchmark.
+// This is the main file of the linpackc vectorization benchmark.
 //
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
 
-void generateResultMLIRMatMul();
-void generateResultMLIRMatVec();
+void generateResultMLIRLinpackCDaxpy();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -30,7 +29,6 @@ int main(int argc, char **argv) {
   ::benchmark::RunSpecifiedBenchmarks();
 
   // Generate result.
-  generateResultMLIRMatMul();
-  generateResultMLIRMatVec();
+  generateResultMLIRLinpackCDaxpy();
   return 0;
 }
