@@ -97,7 +97,6 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DCMAKE_BUILD_TYPE=RELEASE \
     -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja
@@ -193,4 +192,28 @@ $ cmake -G Ninja .. \
 $ ninja vectorization-XXX-benchmark
 $ cd bin
 $ ./vectorization-XXX-benchmark
+```
+## Gemmini Benchmark
+
+Currently, we use the Spike simulator to run the Gemmini cases.
+The cycle-accurate benchmark cases are working in the progress.
+Before building the benchmark target, please see the following table and ensure you use the correct configuration.
+
+| Cases | Hardware Configuration |
+| -------------- | ------------- |
+| Gemmini-ResNet-101  | defaultFpConfig ([link](./docs/GemminiConfig.md#using-default-float-point-configuration)) |
+
+We assume you have already built all the components in the Gemmini README file. Now, let's build and run the cases. 
+
+```
+$ source /path/to/chipyard/env.sh
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/ \
+    -DGEMMINI_BENCHMARKS=ON
+$ ninja
+$ cd bin
+$ spike --extension=gemmini pk Gemmini-ResNet-101
 ```
