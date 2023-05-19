@@ -198,8 +198,12 @@ The model in the Gemmini directory are now only used to verify that Gemmini Dial
 
 *Note: You need to change Gemmini's hardware configuration to f32(GemminiFPConfigs.FP32DefaultConfig).Besides,you should build the model separately, not together with other models, because chipyard uses conda, and it is likely that gcc is installed in conda, causing other models to fail to build.It is recommended to build Gemmini's model separately like the following.*
 ```
- cmake -G Ninja .. \                               
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/ \
-    -DGEMMINI=ON 
+$ cd buddy-benchmark
+$ mkdir build && cd build
+$ cmake -G Ninja .. \                               
+$    -DCMAKE_BUILD_TYPE=RELEASE \
+$    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/ \
+$    -DGEMMINI=ON 
+$ cd bin
+$ spike  --extension=gemmini pk Gemmini-ResNet-101 
 ```
