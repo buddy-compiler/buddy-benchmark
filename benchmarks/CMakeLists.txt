@@ -18,3 +18,6 @@ if(OP_OPTIMIZATION_BENCHMARKS)
     add_subdirectory(OpOptimization)
 endif()
 
+if (GEMMINI)
+    add_subdirectory(Gemmini)
+endif()
