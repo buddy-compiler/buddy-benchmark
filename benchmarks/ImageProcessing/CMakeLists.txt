@@ -125,6 +125,7 @@ target_link_libraries(image-processing-benchmark
 add_executable(image-processing-rotate-benchmark
   MainRotate.cpp 
   BuddyRotate2DBenchmark.cpp
+  OpenCVRotate2DBenchmark.cpp
   )
 
 target_include_directories(image-processing-rotate-benchmark

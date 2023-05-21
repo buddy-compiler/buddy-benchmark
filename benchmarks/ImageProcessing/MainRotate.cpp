@@ -22,10 +22,13 @@
 #include <stdexcept>
 
 void initializeBuddyRotate2D(char **);
+void initializeOpenCVRotate2D(char **);
 
 void generateResultBuddyRotate2D();  
+void generateResultOpenCVRotate2D();
 
 void registerBenchmarkBuddyRotate2D();
+void registerBenchmarkOpenCVRotate2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -37,18 +40,22 @@ int main(int argc, char **argv) {
         "image path provides path of the image to be processed, Rotate option "
         "available are DEGREE, RADIAN. "
         "RotateAngle accepts a "
-        "float number for Rotate option.\n");
+        "float number for Rotate option."
+        "OpenCV rotate() only supports 90, 180 and 270 degree.\n");
   }
 
   initializeBuddyRotate2D(argv);
+  initializeOpenCVRotate2D(argv);
 
   registerBenchmarkBuddyRotate2D();
+  registerBenchmarkOpenCVRotate2D();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
 
   // Generate result image.
   generateResultBuddyRotate2D();
+  generateResultOpenCVRotate2D();
 
   return 0;
 }
