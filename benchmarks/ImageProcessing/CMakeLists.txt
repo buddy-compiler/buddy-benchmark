@@ -117,3 +117,29 @@ target_link_libraries(image-processing-benchmark
   # Link Buddy MLIR DIP Library.
   BuddyLibDIP
   )
+
+#-------------------------------------------------------------------------------
+# Image Processing Rotate Benchmark Target
+#-------------------------------------------------------------------------------
+
+add_executable(image-processing-rotate-benchmark
+  MainRotate.cpp 
+  BuddyRotate2DBenchmark.cpp
+  )
+
+target_include_directories(image-processing-rotate-benchmark
+  PRIVATE
+  ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/include/
+  )
+
+target_link_directories(image-processing-rotate-benchmark
+  PRIVATE 
+  ${BUDDY_MLIR_LIB_DIR}
+  )
+
+target_link_libraries(image-processing-rotate-benchmark
+  GoogleBenchmark
+  ${OpenCV_LIBS}
+  # Link Buddy MLIR DIP Library.
+  BuddyLibDIP
+  )
