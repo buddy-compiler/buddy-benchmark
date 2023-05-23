@@ -201,9 +201,9 @@ The model in the Gemmini directory are now only used to verify that Gemmini Dial
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \                               
-$    -DCMAKE_BUILD_TYPE=RELEASE \
-$    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/ \
-$    -DGEMMINI=ON 
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/ \
+    -DGEMMINI=ON 
 $ cd bin
 $ spike  --extension=gemmini pk Gemmini-ResNet-101 
 ```
