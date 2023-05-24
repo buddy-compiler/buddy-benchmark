@@ -35,7 +35,6 @@ int main() {
   intptr_t sizesOutput[2] = {1, 1001};
   MemRef<float, 4> input(catImg, sizesInput);
   MemRef<float, 2> output(sizesOutput);
-  std::cout << output.getSize() << std::endl;
   _mlir_ciface_resnet101(&output, &input);
   float* out = output.getData();
   softmax(out, 1001);
