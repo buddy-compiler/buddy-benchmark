@@ -20,6 +20,7 @@
 
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
+#include <buddy/DIP/DIP.h>
 
 using namespace cv;
 using namespace std;
@@ -34,11 +35,8 @@ int OpenCVRotate2DAngle;
 intptr_t sizesInputOpenCVRotate2D[2];
 cv::Size sizesOutputOpenCVRotate2D;
 
-// Declare Angle option supported.
-enum AngleOption { ANGLE_DEGREE, ANGLE_RADIAN };
-
 // Define Angle option selected.
-AngleOption OpenCVAngleType;
+dip::ANGLE_TYPE OpenCVAngleType;
 
 // Define OpenCV Rotate option.
 cv::RotateFlags RotateFlag = cv::ROTATE_90_CLOCKWISE;
@@ -53,9 +51,9 @@ void initializeOpenCVRotate2D(char **argv) {
   sizesInputOpenCVRotate2D[1] = inputImageOpenCVRotate2D.cols;
 
   if (static_cast<string>(argv[2]) == "DEGREE") {
-    OpenCVAngleType = ANGLE_DEGREE;
+    OpenCVAngleType = dip::ANGLE_TYPE::DEGREE;
   } else {
-    OpenCVAngleType = ANGLE_RADIAN;
+    OpenCVAngleType = dip::ANGLE_TYPE::RADIAN;
   }
 
   std::string argAngle = argv[3];
@@ -77,7 +75,7 @@ void initializeOpenCVRotate2D(char **argv) {
 }
 
 // Benchmarking function.
-static void OpenCV_Rotate2D_ANGLE_DEGREE(benchmark::State &state) {
+static void OpenCV_Rotate2D_DEGREE(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
         cv::rotate(inputImageOpenCVRotate2D, outputImageOpenCVRotate2D, RotateFlag);
@@ -87,8 +85,8 @@ static void OpenCV_Rotate2D_ANGLE_DEGREE(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVRotate2D() {
-  if (OpenCVAngleType == ANGLE_DEGREE && OpenCVRunRotate == true) {
-    BENCHMARK(OpenCV_Rotate2D_ANGLE_DEGREE)
+  if (OpenCVAngleType == dip::ANGLE_TYPE::DEGREE && OpenCVRunRotate == true) {
+    BENCHMARK(OpenCV_Rotate2D_DEGREE)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
   } 
@@ -96,8 +94,8 @@ void registerBenchmarkOpenCVRotate2D() {
 
 // Generate result image.
 void generateResultOpenCVRotate2D() {
-  // Run the resize 2D operation.
-  if (OpenCVAngleType == ANGLE_DEGREE && OpenCVRunRotate == true) {
+  // Run the rotate 2D operation.
+  if (OpenCVAngleType == dip::ANGLE_TYPE::DEGREE && OpenCVRunRotate == true) {
     cv::rotate(inputImageOpenCVRotate2D, outputImageOpenCVRotate2D, OpenCVRotate2DAngle);
 
     // Choose a PNG compression level

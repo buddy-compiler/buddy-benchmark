@@ -36,11 +36,8 @@ float BuddyRotate2DAngle;
 // Define sizes of input.
 intptr_t sizesInputBuddyRotate2D[2];
 
-// Declare Angle option supported.
-enum AngleOption { ANGLE_DEGREE, ANGLE_RADIAN };
-
 // Define Angle option selected.
-AngleOption AngleType;
+dip::ANGLE_TYPE AngleType;
 
 void initializeBuddyRotate2D(char **argv) {
   inputImageBuddyRotate2D = imread(argv[1], IMREAD_GRAYSCALE);
@@ -49,9 +46,9 @@ void initializeBuddyRotate2D(char **argv) {
   sizesInputBuddyRotate2D[1] = inputImageBuddyRotate2D.cols;
 
   if (static_cast<string>(argv[2]) == "DEGREE") {
-    AngleType = ANGLE_DEGREE;
+    AngleType = dip::ANGLE_TYPE::DEGREE;
   } else {
-    AngleType = ANGLE_RADIAN;
+    AngleType = dip::ANGLE_TYPE::RADIAN;
   }
 
   std::string argAngle = argv[3];
@@ -62,7 +59,7 @@ void initializeBuddyRotate2D(char **argv) {
   }
 }
 
-static void Buddy_Rotate2D_ANGLE_DEGREE(benchmark::State &state) {
+static void Buddy_Rotate2D_DEGREE(benchmark::State &state) {
   // Define the MemRef descriptor for input.
   Img<float, 2> inputBuddyRotate2D(inputImageBuddyRotate2D);
 
@@ -75,7 +72,7 @@ static void Buddy_Rotate2D_ANGLE_DEGREE(benchmark::State &state) {
   }
 }
 
-static void Buddy_Rotate2D_ANGLE_RADIAN(benchmark::State &state) {
+static void Buddy_Rotate2D_RADIAN(benchmark::State &state) {
   // Define the MemRef descriptor for input.
   Img<float, 2> inputBuddyRotate2D(inputImageBuddyRotate2D);
 
@@ -90,12 +87,12 @@ static void Buddy_Rotate2D_ANGLE_RADIAN(benchmark::State &state) {
 
 // Register benchmarking function.
 void registerBenchmarkBuddyRotate2D() {
-  if (AngleType == ANGLE_DEGREE) {
-    BENCHMARK(Buddy_Rotate2D_ANGLE_DEGREE)
+  if (AngleType == dip::ANGLE_TYPE::DEGREE) {
+    BENCHMARK(Buddy_Rotate2D_DEGREE)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(Buddy_Rotate2D_ANGLE_RADIAN)
+    BENCHMARK(Buddy_Rotate2D_RADIAN)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
   } 
@@ -106,8 +103,8 @@ void generateResultBuddyRotate2D() {
   // Define the MemRef descriptor for input.
   Img<float, 2> input(inputImageBuddyRotate2D);
   MemRef<float, 2> output(sizesInputBuddyRotate2D);
-  // Run the resize 2D operation.
-  if (AngleType == ANGLE_DEGREE) {
+  // Run the rotate 2D operation.
+  if (AngleType == dip::ANGLE_TYPE::DEGREE) {
     // Call the MLIR Rotate2D function.
     output = dip::Rotate2D(&input, BuddyRotate2DAngle,
                            dip::ANGLE_TYPE::DEGREE);
@@ -117,7 +114,7 @@ void generateResultBuddyRotate2D() {
                            dip::ANGLE_TYPE::RADIAN);
   } 
 
-  // Define a cv::Mat with the output of the resize operation.
+  // Define a cv::Mat with the output of the rotate operation.
   Mat outputImage(output.getSizes()[0], output.getSizes()[1], CV_32FC1,
                   output.getData());
 
