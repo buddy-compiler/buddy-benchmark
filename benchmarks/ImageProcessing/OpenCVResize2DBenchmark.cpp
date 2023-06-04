@@ -59,19 +59,20 @@ void initializeOpenCVResize2D(char **argv) {
   } else {
     OpenCVScaleType = scale_length;
   }
-
+  
+  // Adjust to OpenCV [Col, Row] format.
   std::string argRow = argv[3];
   std::string argCol = argv[4];
   try {
     if (OpenCVScaleType == scale_factor) {
       float outputRowsOpenCVResize2DFactor = std::stof(argRow);
       float outputColsOpenCVResize2DFactor = std::stof(argCol);
-      factorsOutputOpenCVResize2D[0] = outputRowsOpenCVResize2DFactor;
-      factorsOutputOpenCVResize2D[1] = outputColsOpenCVResize2DFactor;
+      factorsOutputOpenCVResize2D[0] = outputColsOpenCVResize2DFactor;
+      factorsOutputOpenCVResize2D[1] = outputRowsOpenCVResize2DFactor;
     } else {
       outputRowsOpenCVResize2DLength = std::stoi(argRow);
       outputColsOpenCVResize2DLength = std::stoi(argCol);
-      sizesOutputOpenCVResize2D= cv::Size(outputRowsOpenCVResize2DLength, outputColsOpenCVResize2DLength);
+      sizesOutputOpenCVResize2D= cv::Size(outputColsOpenCVResize2DLength, outputRowsOpenCVResize2DLength);
     }
   } catch (const std::exception& e) {
     cout << "Exception converting row and col scale_factor/scale_length to number." << endl;
