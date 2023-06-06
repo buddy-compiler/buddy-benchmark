@@ -39,14 +39,11 @@ intptr_t sizesInputBuddyResize2D[2];
 intptr_t sizesOutputBuddyResize2D[2];
 std::vector<float> factorsOutputBuddyResize2D = {1.0, 1.0};
 
-// Declare Interpolation option supported.
-enum InterpolationOption { bilinear_interpolation, nearest_neighbour_interpolation };
-
 // Declare Scale option supported.
 enum ScaleOption { scale_factor, scale_length };
 
 // Define Interpolation option selected.
-InterpolationOption InterpolationType;
+dip::INTERPOLATION_TYPE InterpolationType;
 
 // Define Scale option selected.
 ScaleOption ScaleType;
@@ -84,9 +81,9 @@ void initializeBuddyResize2D(char **argv) {
   }
 
   if (static_cast<string>(argv[5]) == "NEAREST_NEIGHBOUR_INTERPOLATION") {
-    InterpolationType = nearest_neighbour_interpolation;
+    InterpolationType = dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION;
   } else {
-    InterpolationType = bilinear_interpolation;
+    InterpolationType = dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION;
   }
 }
 
@@ -148,19 +145,19 @@ static void Buddy_Resize2D_Nearest_Neighbour_Interpolation_Factor(benchmark::Sta
 
 // Register benchmarking function.
 void registerBenchmarkBuddyResize2D() {
-  if (InterpolationType == nearest_neighbour_interpolation  && ScaleType == scale_factor) {
+  if (InterpolationType == dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION  && ScaleType == scale_factor) {
     BENCHMARK(Buddy_Resize2D_Nearest_Neighbour_Interpolation_Factor)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (InterpolationType == bilinear_interpolation  && ScaleType == scale_factor) {
+  } else if (InterpolationType == dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION  && ScaleType == scale_factor) {
     BENCHMARK(Buddy_Resize2D_Bilinear_Interpolation_Factor)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (InterpolationType == nearest_neighbour_interpolation  && ScaleType == scale_length) {
+  } else if (InterpolationType == dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION  && ScaleType == scale_length) {
     BENCHMARK(Buddy_Resize2D_Nearest_Neighbour_Interpolation_Length)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (InterpolationType == bilinear_interpolation  && ScaleType == scale_length) {
+  } else if (InterpolationType == dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION  && ScaleType == scale_length) {
     BENCHMARK(Buddy_Resize2D_Bilinear_Interpolation_Length)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
@@ -173,22 +170,22 @@ void generateResultBuddyResize2D() {
   Img<float, 2> input(inputImageBuddyResize2D);
   MemRef<float, 2> output(sizesOutputBuddyResize2D);
   // Run the resize 2D operation.
-  if (InterpolationType == nearest_neighbour_interpolation  && ScaleType == scale_factor) {
+  if (InterpolationType == dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION  && ScaleType == scale_factor) {
     // Call the MLIR Resize2D function.
     output = dip::Resize2D(&input, 
                           dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION, 
                           factorsOutputBuddyResize2D);
-  } else if (InterpolationType == bilinear_interpolation  && ScaleType == scale_factor) {
+  } else if (InterpolationType == dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION  && ScaleType == scale_factor) {
     // Call the MLIR Resize2D function.
     output = dip::Resize2D(&input, 
                           dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION,
                           factorsOutputBuddyResize2D);
-  } else if (InterpolationType == nearest_neighbour_interpolation  && ScaleType == scale_length) {
+  } else if (InterpolationType == dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION  && ScaleType == scale_length) {
     // Call the MLIR Resize2D function.
     output = dip::Resize2D(&input, 
                           dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION, 
                           sizesOutputBuddyResize2D);
-  } else if (InterpolationType == bilinear_interpolation  && ScaleType == scale_length) {
+  } else if (InterpolationType == dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION  && ScaleType == scale_length) {
     // Call the MLIR Resize2D function.
     output = dip::Resize2D(&input, 
                           dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION,
