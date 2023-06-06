@@ -66,15 +66,15 @@ void initializeBuddyResize2D(char **argv) {
     if (ScaleType == scale_factor) {
       float outputRowsBuddyResize2DFactor = std::stof(argRow);
       float outputColsBuddyResize2DFactor = std::stof(argCol);
-      factorsOutputBuddyResize2D[0] = outputRowsBuddyResize2DFactor;
-      factorsOutputBuddyResize2D[1] = outputColsBuddyResize2DFactor;
-      sizesOutputBuddyResize2D[0] =  sizesInputBuddyResize2D[0] * outputRowsBuddyResize2DFactor;
-      sizesOutputBuddyResize2D[1] =  sizesInputBuddyResize2D[1] * outputColsBuddyResize2DFactor;
+      factorsOutputBuddyResize2D[0] = outputColsBuddyResize2DFactor;
+      factorsOutputBuddyResize2D[1] = outputRowsBuddyResize2DFactor;
+      sizesOutputBuddyResize2D[0] =  sizesInputBuddyResize2D[0] * outputColsBuddyResize2DFactor;
+      sizesOutputBuddyResize2D[1] =  sizesInputBuddyResize2D[1] * outputRowsBuddyResize2DFactor;
     } else {
       intptr_t outputRowsBuddyResize2DLength = std::stoi(argRow);
       intptr_t outputColsBuddyResize2DLength = std::stoi(argCol);
-      sizesOutputBuddyResize2D[0] = outputRowsBuddyResize2DLength;
-      sizesOutputBuddyResize2D[1] = outputColsBuddyResize2DLength;
+      sizesOutputBuddyResize2D[0] = outputColsBuddyResize2DLength;
+      sizesOutputBuddyResize2D[1] = outputRowsBuddyResize2DLength;
     }
   } catch (const std::exception& e) {
     cout << "Exception converting row and col scale_factor/scale_length to number." << endl;
