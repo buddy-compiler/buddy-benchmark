@@ -25,7 +25,7 @@ using namespace cv;
 using namespace std;
 
 // Declare input image and output image.
-Mat inputImageOpenCVResize2D,  outputImageOpenCVResize2D;
+Mat inputImageOpenCVResize2D, outputImageOpenCVResize2D;
 
 // Define the output size or factor.
 int outputRowsOpenCVResize2DLength, outputColsOpenCVResize2DLength;
@@ -37,7 +37,10 @@ cv::Size sizesOutputOpenCVResize2D;
 std::vector<float> factorsOutputOpenCVResize2D = {1.0, 1.0};
 
 // Declare Interpolation option supported.
-enum InterpolationOption { bilinear_interpolation, nearest_neighbour_interpolation };
+enum InterpolationOption {
+  bilinear_interpolation,
+  nearest_neighbour_interpolation
+};
 
 // Declare Scale option supported.
 enum ScaleOption { scale_factor, scale_length };
@@ -59,7 +62,7 @@ void initializeOpenCVResize2D(char **argv) {
   } else {
     OpenCVScaleType = scale_length;
   }
-  
+
   // Adjust to OpenCV [Col, Row] format.
   std::string argRow = argv[3];
   std::string argCol = argv[4];
@@ -72,10 +75,13 @@ void initializeOpenCVResize2D(char **argv) {
     } else {
       outputRowsOpenCVResize2DLength = std::stoi(argRow);
       outputColsOpenCVResize2DLength = std::stoi(argCol);
-      sizesOutputOpenCVResize2D= cv::Size(outputColsOpenCVResize2DLength, outputRowsOpenCVResize2DLength);
+      sizesOutputOpenCVResize2D = cv::Size(outputColsOpenCVResize2DLength,
+                                           outputRowsOpenCVResize2DLength);
     }
-  } catch (const std::exception& e) {
-    cout << "Exception converting row and col scale_factor/scale_length to number." << endl;
+  } catch (const std::exception &e) {
+    cout << "Exception converting row and col scale_factor/scale_length to "
+            "number."
+         << endl;
   }
 
   if (static_cast<string>(argv[5]) == "NEAREST_NEIGHBOUR_INTERPOLATION") {
@@ -86,57 +92,67 @@ void initializeOpenCVResize2D(char **argv) {
 }
 
 // Benchmarking function.
-static void OpenCV_Resize2D_Bilinear_Interpolation_Length(benchmark::State &state) {
+static void
+OpenCV_Resize2D_Bilinear_Interpolation_Length(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-        cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, sizesOutputOpenCVResize2D, 
-                   0, 0, cv::INTER_LINEAR);
+      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+                 sizesOutputOpenCVResize2D, 0, 0, cv::INTER_LINEAR);
     }
   }
 }
 
-static void OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Length(benchmark::State &state) {
+static void OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Length(
+    benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, sizesOutputOpenCVResize2D, 
-                 0, 0, cv::INTER_NEAREST);
+      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+                 sizesOutputOpenCVResize2D, 0, 0, cv::INTER_NEAREST);
     }
   }
 }
 
-static void OpenCV_Resize2D_Bilinear_Interpolation_Factor(benchmark::State &state) {
+static void
+OpenCV_Resize2D_Bilinear_Interpolation_Factor(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, cv::Size(0, 0), 
-                 factorsOutputOpenCVResize2D[0], factorsOutputOpenCVResize2D[1], cv::INTER_LINEAR);
+      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+                 cv::Size(0, 0), factorsOutputOpenCVResize2D[0],
+                 factorsOutputOpenCVResize2D[1], cv::INTER_LINEAR);
     }
   }
 }
 
-static void OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Factor(benchmark::State &state) {
+static void OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Factor(
+    benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, cv::Size(0, 0), 
-                 factorsOutputOpenCVResize2D[0], factorsOutputOpenCVResize2D[1], cv::INTER_NEAREST);
+      cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+                 cv::Size(0, 0), factorsOutputOpenCVResize2D[0],
+                 factorsOutputOpenCVResize2D[1], cv::INTER_NEAREST);
     }
   }
 }
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVResize2D() {
-  if (OpenCVInterpolationType == nearest_neighbour_interpolation  && OpenCVScaleType == scale_factor) {
+  if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+      OpenCVScaleType == scale_factor) {
     BENCHMARK(OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Factor)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (OpenCVInterpolationType == bilinear_interpolation  && OpenCVScaleType == scale_factor) {
+  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+             OpenCVScaleType == scale_factor) {
     BENCHMARK(OpenCV_Resize2D_Bilinear_Interpolation_Factor)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (OpenCVInterpolationType == nearest_neighbour_interpolation  && OpenCVScaleType == scale_length) {
+  } else if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+             OpenCVScaleType == scale_length) {
     BENCHMARK(OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Length)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (OpenCVInterpolationType == bilinear_interpolation  && OpenCVScaleType == scale_length) {
+  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+             OpenCVScaleType == scale_length) {
     BENCHMARK(OpenCV_Resize2D_Bilinear_Interpolation_Length)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
@@ -146,18 +162,24 @@ void registerBenchmarkOpenCVResize2D() {
 // Generate result image.
 void generateResultOpenCVResize2D() {
   // Run the resize 2D operation.
-  if (OpenCVInterpolationType == nearest_neighbour_interpolation  && OpenCVScaleType == scale_factor) {
-    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, cv::Size(0, 0), 
-               factorsOutputOpenCVResize2D[0], factorsOutputOpenCVResize2D[1], cv::INTER_NEAREST);
-  } else if (OpenCVInterpolationType == bilinear_interpolation  && OpenCVScaleType == scale_factor) {
-    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, cv::Size(0, 0), 
-               factorsOutputOpenCVResize2D[0], factorsOutputOpenCVResize2D[1], cv::INTER_LINEAR);
-  } else if (OpenCVInterpolationType == nearest_neighbour_interpolation  && OpenCVScaleType == scale_length) {
-    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, sizesOutputOpenCVResize2D, 
-               0, 0, cv::INTER_NEAREST);
-  } else if (OpenCVInterpolationType == bilinear_interpolation  && OpenCVScaleType == scale_length) {
-    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D, sizesOutputOpenCVResize2D, 
-               0, 0, cv::INTER_LINEAR);
+  if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+      OpenCVScaleType == scale_factor) {
+    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+               cv::Size(0, 0), factorsOutputOpenCVResize2D[0],
+               factorsOutputOpenCVResize2D[1], cv::INTER_NEAREST);
+  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+             OpenCVScaleType == scale_factor) {
+    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+               cv::Size(0, 0), factorsOutputOpenCVResize2D[0],
+               factorsOutputOpenCVResize2D[1], cv::INTER_LINEAR);
+  } else if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+             OpenCVScaleType == scale_length) {
+    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+               sizesOutputOpenCVResize2D, 0, 0, cv::INTER_NEAREST);
+  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+             OpenCVScaleType == scale_length) {
+    cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
+               sizesOutputOpenCVResize2D, 0, 0, cv::INTER_LINEAR);
   }
 
   // Choose a PNG compression level
@@ -168,8 +190,8 @@ void generateResultOpenCVResize2D() {
   // Write output to PNG.
   bool result = false;
   try {
-    result =
-        imwrite("ResultOpenCVResize2D.png", outputImageOpenCVResize2D, compressionParams);
+    result = imwrite("ResultOpenCVResize2D.png", outputImageOpenCVResize2D,
+                     compressionParams);
   } catch (const cv::Exception &ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());

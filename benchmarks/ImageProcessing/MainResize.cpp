@@ -1,4 +1,4 @@
-//===- MainResize.cpp -----------------------------------------------------------===//
+//===- MainResize.cpp -----------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 void initializeBuddyResize2D(char **);
 void initializeOpenCVResize2D(char **);
 
-void generateResultBuddyResize2D();  
+void generateResultBuddyResize2D();
 void generateResultOpenCVResize2D();
 
 void registerBenchmarkBuddyResize2D();
@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
   if (argc != 6) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
-        "Correct format is ./image-processing-resize-benchmark <image path> <Scale "
-        "option> <RowNum> <ColNum> <InterpolationOption>\n where "
+        "Correct format is ./image-processing-resize-benchmark <image path> "
+        "<Scale option> <RowNum> <ColNum> <InterpolationOption>\n where "
         "image path provides path of the image to be processed, Scale option "
         "available are SCALE_FACTOR, SCALE_LENGTH. "
         "RowNum and ColNum are the "
