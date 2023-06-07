@@ -1,4 +1,5 @@
-//===- MainRotate.cpp -----------------------------------------------------------===//
+//===- MainRotate.cpp
+//-----------------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +25,7 @@
 void initializeBuddyRotate2D(char **);
 void initializeOpenCVRotate2D(char **);
 
-void generateResultBuddyRotate2D();  
+void generateResultBuddyRotate2D();
 void generateResultOpenCVRotate2D();
 
 void registerBenchmarkBuddyRotate2D();
@@ -35,12 +36,11 @@ int main(int argc, char **argv) {
   if (argc != 4) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
-        "Correct format is ./image-processing-rotate-benchmark <image path> <Rotate "
-        "option> <RotateAngle> \n where "
+        "Correct format is ./image-processing-rotate-benchmark <image path> "
+        "<Rotate option> <RotateAngle> \n where "
         "image path provides path of the image to be processed, Rotate option "
         "available are DEGREE, RADIAN. "
-        "RotateAngle accepts a "
-        "float number for Rotate option."
+        "RotateAngle accepts a float number for Rotate option."
         "OpenCV rotate() only supports 90, 180 and 270 degree.\n");
   }
 

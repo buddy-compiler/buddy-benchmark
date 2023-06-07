@@ -20,11 +20,11 @@
 
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
-#include <buddy/DIP/ImageContainer.h>
 #include <buddy/DIP/DIP.h>
+#include <buddy/DIP/ImageContainer.h>
 #include <opencv2/opencv.hpp>
 
-using namespace cv; 
+using namespace cv;
 using namespace std;
 
 // Declare input image.
@@ -54,7 +54,7 @@ void initializeBuddyRotate2D(char **argv) {
   std::string argAngle = argv[3];
   try {
     BuddyRotate2DAngle = std::stof(argAngle);
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     cout << "Exception converting rotation angle to float." << endl;
   }
 }
@@ -66,8 +66,8 @@ static void Buddy_Rotate2D_DEGREE(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       // Call the MLIR Rotate2D function.
-      MemRef<float, 2> output = dip::Rotate2D(&inputBuddyRotate2D, BuddyRotate2DAngle,
-                                              dip::ANGLE_TYPE::DEGREE);
+      MemRef<float, 2> output = dip::Rotate2D(
+          &inputBuddyRotate2D, BuddyRotate2DAngle, dip::ANGLE_TYPE::DEGREE);
     }
   }
 }
@@ -79,8 +79,8 @@ static void Buddy_Rotate2D_RADIAN(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       // Call the MLIR Rotate2D function.
-      MemRef<float, 2> output = dip::Rotate2D(&inputBuddyRotate2D, BuddyRotate2DAngle,
-                                              dip::ANGLE_TYPE::RADIAN);
+      MemRef<float, 2> output = dip::Rotate2D(
+          &inputBuddyRotate2D, BuddyRotate2DAngle, dip::ANGLE_TYPE::RADIAN);
     }
   }
 }
@@ -88,14 +88,10 @@ static void Buddy_Rotate2D_RADIAN(benchmark::State &state) {
 // Register benchmarking function.
 void registerBenchmarkBuddyRotate2D() {
   if (AngleType == dip::ANGLE_TYPE::DEGREE) {
-    BENCHMARK(Buddy_Rotate2D_DEGREE)
-        ->Arg(1)
-        ->Unit(benchmark::kMillisecond);
+    BENCHMARK(Buddy_Rotate2D_DEGREE)->Arg(1)->Unit(benchmark::kMillisecond);
   } else {
-    BENCHMARK(Buddy_Rotate2D_RADIAN)
-        ->Arg(1)
-        ->Unit(benchmark::kMillisecond);
-  } 
+    BENCHMARK(Buddy_Rotate2D_RADIAN)->Arg(1)->Unit(benchmark::kMillisecond);
+  }
 }
 
 // Generate result image.
@@ -106,13 +102,11 @@ void generateResultBuddyRotate2D() {
   // Run the rotate 2D operation.
   if (AngleType == dip::ANGLE_TYPE::DEGREE) {
     // Call the MLIR Rotate2D function.
-    output = dip::Rotate2D(&input, BuddyRotate2DAngle,
-                           dip::ANGLE_TYPE::DEGREE);
+    output = dip::Rotate2D(&input, BuddyRotate2DAngle, dip::ANGLE_TYPE::DEGREE);
   } else {
     // Call the MLIR Rotate2D function.
-    output = dip::Rotate2D(&input, BuddyRotate2DAngle,
-                           dip::ANGLE_TYPE::RADIAN);
-  } 
+    output = dip::Rotate2D(&input, BuddyRotate2DAngle, dip::ANGLE_TYPE::RADIAN);
+  }
 
   // Define a cv::Mat with the output of the rotate operation.
   Mat outputImage(output.getSizes()[0], output.getSizes()[1], CV_32FC1,
