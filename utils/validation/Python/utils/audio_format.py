@@ -1,13 +1,12 @@
-"""Source: https://gist.github.com/HudsonHuang/fbdf8e9af7993fe2a91620d3fb86a182"""
-"""All rights reserved to the respective owners. """
-"""Helper functions for working with audio files in NumPy."""
-"""some code borrowed from https://github.com/mgeier/python-audio/blob/master/audio-files/utility.py"""
-
-
-
+# Source: https://gist.github.com/HudsonHuang/fbdf8e9af7993fe2a91620d3fb86a182
+# All rights reserved to the respective owners.
+# Helper functions for working with audio files in NumPy.
+# some code borrowed from https://github.com/mgeier/python-audio/blob/master/audio-files/utility.py
 
 import numpy as np
 import contextlib
+
+
 def float_to_byte(sig):
     # float32 -> int16(PCM_16) -> byte
     return float2pcm(sig, dtype='int16').tobytes()
