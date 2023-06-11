@@ -26,14 +26,22 @@
 
 using namespace kfr;
 
-univector<fbase, 1023> taps127;
+univector<float, 127> taps127;
 univector<float, 2000000> aud;
 univector<float> result;
 
 // Initialize univector.
+//void initializeKFRFir() {
+//  expression_pointer<fbase> kaiser =
+//      to_pointer(window_kaiser(taps127.size(), 3.0));
+//  fir_lowpass(taps127, 0.2, kaiser, true);
+//  audio_reader_wav<float> reader(open_file_for_reading(
+//      "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
+//  reader.read(aud.data(), aud.size());
+//}
 void initializeKFRFir() {
-  expression_pointer<fbase> kaiser =
-      to_pointer(window_kaiser(taps127.size(), 3.0));
+  expression_handle<float> kaiser =
+      to_handle(window_kaiser<float>(taps127.size(), 3.0));
   fir_lowpass(taps127, 0.2, kaiser, true);
   audio_reader_wav<float> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
