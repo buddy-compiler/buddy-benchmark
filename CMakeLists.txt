@@ -115,7 +115,7 @@ check_simd()
 add_subdirectory(benchmarks)
 add_subdirectory(utils)
 
-if (BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(tests)
+if (BUILD_VALIDATION)
+  add_subdirectory(validation)
 endif()
+
