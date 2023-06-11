@@ -1,4 +1,4 @@
-#    fir.py - FIR filter class for audio validation
+#    audio_file.py - Audio file class for audio validation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# This File is for testing of the FIR filter in buddy-mlir.
+# This File is for the AudioFile class.
 
 from cffi import FFI
 import matplotlib.pyplot as plt
@@ -28,20 +27,21 @@ from .audio_test import AudioTest
 import utils.audio_format as af
 
 
-class FIRTest(AudioTest):
-    """FIR test class.
+class AudioFileTest(AudioTest):
+    """AudioFile test class.
          Test params:
             - file: path to the audio file to be filtered.
-            - fconf: filter configurations.
+            - savefile: path to the test file to be saved.
+            - fconf: AudioFile configurations.
             - lib: path to the library file.
 
     """
     default_param = {"file": "../../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav",
-                     "fconf": ('kaiser', 4.0),
+                     "savefile": "./NASA_Mars_save.wav",
                      "lib": "../../../build/utils/validation/AudioProcessing/libCWrapper"}
 
     def __init__(self, test_name, test_type, test_params=default_param):
-        super(FIRTest, self).__init__(test_name, test_type, test_params)
+        super(AudioFileTest, self).__init__(test_name, test_type, test_params)
         self.params = test_params
 
     def run(self):
@@ -51,40 +51,33 @@ class FIRTest(AudioTest):
     def run_file_test(self):
         ffi = FFI()
         ffi.cdef('''
-            float* fir(float* input, float* kernel, float* output, int inputSize, int kernelSize, int outputSize);
+            float* AudioRead(char* file, char* dest);
         ''')
         C = ffi.dlopen(self.params['lib'])
 
+        # Read audio file using scipy
         sample_rate, sp_nasa = sp.io.wavfile.read(self.params['file'])
-
-        firfilt = sp.signal.firwin(
-            10, 0.1, window=self.params['fconf'], pass_zero='lowpass', scale=False).astype(np.float32)
-
         sp_nasa = af.pcm2float(sp_nasa, dtype='float32')
 
-        grpdelay = sp.signal.group_delay((firfilt, 1.0))
-        delay = round(np.mean(grpdelay[1]), 2)
-        print(f"grpdelay: {delay}")
-        # buddy fir filtering
-        input = ffi.cast("float *", ffi.from_buffer(sp_nasa))
-        kernel = ffi.cast("float *", firfilt.ctypes.data)
-        output = ffi.new("float[]", sp_nasa.size)
+        # Read audio file using AudioFile
+        c_nasa = C.AudioRead(self.params['file'].encode(
+            'utf-8'), self.params['savefile'].encode('utf-8'))
 
-        out = C.fir(input, kernel, output,
-                    sp_nasa.size, firfilt.size, sp_nasa.size)
-
-        out = ffi.unpack(out, sp_nasa.size)
-
-        # scipy fir filtering
-        out_sp = sp.signal.lfilter(firfilt, 1, sp_nasa)
-
-        # numpy fir filtering
-        out_np = np.convolve(sp_nasa, firfilt, mode='full')
-
-        diff = math.floor(2*delay)
-        for i in range(sp_nasa.size-diff):
-            if (out[i] - out_sp[i+diff] > 0.0001):
-                print(f"scipy and buddy are different at {i}")
+        for i in range(sp_nasa.size):
+            if (sp_nasa[i] - c_nasa[i] > 0.0001):
+                print(f"scipy and AudioFile are different at {i}")
                 print("check failed.")
                 sys.exit(1)
-        print(f"{self.test_name} check successful.")
+        print(f"{self.test_name} reading check successful.")
+
+        new_sample_rate, new_sp_nasa = sp.io.wavfile.read(
+            self.params['savefile'])
+        new_sp_nasa = af.pcm2float(new_sp_nasa, dtype='float32')
+        for i in range(sp_nasa.size):
+            if (sp_nasa[i] - new_sp_nasa[i] > 0.0001):
+                print(f"scipy and saved audio are different at {i}")
+                print("check failed.")
+                sys.exit(1)
+
+        os.remove(self.params['savefile'])
+        print(f"{self.test_name} writing check successful.")

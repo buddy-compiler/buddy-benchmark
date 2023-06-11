@@ -81,10 +81,12 @@ set_target_properties(BuddyIir PROPERTIES LINKER_LANGUAGE CXX)
 #-------------------------------------------------------------------------------
 
 add_custom_command(OUTPUT buddy-fir.o
-  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
   ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyFir.mlir
   -lower-dap="DAP-vector-splitting=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
-  -lower-affine -convert-scf-to-cf -convert-vector-to-llvm
+  -lower-affine
+  -convert-scf-to-cf
+  -convert-vector-to-llvm
   --llvm-request-c-wrappers
   -convert-arith-to-llvm
   -convert-memref-to-llvm -convert-func-to-llvm

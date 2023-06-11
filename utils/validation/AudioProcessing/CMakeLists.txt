@@ -7,7 +7,7 @@ if (NOT AUDIO_PROCESSING_BENCHMARKS)
 endif()
 
 add_custom_command(OUTPUT buddy-fir.o
-  COMMAND ${BUDDY_OPT_BUILD_DIR}/bin/buddy-opt
+  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
   ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyFir.mlir
   -lower-dap -convert-linalg-to-affine-loops
   -lower-affine -convert-scf-to-cf -convert-vector-to-llvm
@@ -17,7 +17,7 @@ add_custom_command(OUTPUT buddy-fir.o
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
   ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} --filetype=obj
-  -o ${BUDDY_BINARY_DIR}/../Utils/validation/AudioProcessing/buddy-fir.o
+  -o ${BUDDY_BINARY_DIR}/../utils/validation/AudioProcessing/buddy-fir.o
   )
 add_library(BuddyFirCor SHARED buddy-fir.o)
 
