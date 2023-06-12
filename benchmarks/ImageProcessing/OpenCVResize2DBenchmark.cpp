@@ -19,6 +19,7 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
+#include <buddy/DIP/DIP.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -36,17 +37,11 @@ intptr_t sizesInputOpenCVResize2D[2];
 cv::Size sizesOutputOpenCVResize2D;
 std::vector<float> factorsOutputOpenCVResize2D = {1.0, 1.0};
 
-// Declare Interpolation option supported.
-enum InterpolationOption {
-  bilinear_interpolation,
-  nearest_neighbour_interpolation
-};
-
 // Declare Scale option supported.
 enum ScaleOption { scale_factor, scale_length };
 
 // Define Interpolation option selected.
-InterpolationOption OpenCVInterpolationType;
+dip::INTERPOLATION_TYPE OpenCVInterpolationType;
 
 // Define Scale option selected.
 ScaleOption OpenCVScaleType;
@@ -85,9 +80,10 @@ void initializeOpenCVResize2D(char **argv) {
   }
 
   if (static_cast<string>(argv[5]) == "NEAREST_NEIGHBOUR_INTERPOLATION") {
-    OpenCVInterpolationType = nearest_neighbour_interpolation;
+    OpenCVInterpolationType =
+        dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION;
   } else {
-    OpenCVInterpolationType = bilinear_interpolation;
+    OpenCVInterpolationType = dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION;
   }
 }
 
@@ -136,22 +132,26 @@ static void OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Factor(
 
 // Register benchmarking function.
 void registerBenchmarkOpenCVResize2D() {
-  if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+  if (OpenCVInterpolationType ==
+          dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION &&
       OpenCVScaleType == scale_factor) {
     BENCHMARK(OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Factor)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+  } else if (OpenCVInterpolationType ==
+                 dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION &&
              OpenCVScaleType == scale_factor) {
     BENCHMARK(OpenCV_Resize2D_Bilinear_Interpolation_Factor)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+  } else if (OpenCVInterpolationType ==
+                 dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION &&
              OpenCVScaleType == scale_length) {
     BENCHMARK(OpenCV_Resize2D_Nearest_Neighbour_Interpolation_Length)
         ->Arg(1)
         ->Unit(benchmark::kMillisecond);
-  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+  } else if (OpenCVInterpolationType ==
+                 dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION &&
              OpenCVScaleType == scale_length) {
     BENCHMARK(OpenCV_Resize2D_Bilinear_Interpolation_Length)
         ->Arg(1)
@@ -162,21 +162,25 @@ void registerBenchmarkOpenCVResize2D() {
 // Generate result image.
 void generateResultOpenCVResize2D() {
   // Run the resize 2D operation.
-  if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+  if (OpenCVInterpolationType ==
+          dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION &&
       OpenCVScaleType == scale_factor) {
     cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
                cv::Size(0, 0), factorsOutputOpenCVResize2D[0],
                factorsOutputOpenCVResize2D[1], cv::INTER_NEAREST);
-  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+  } else if (OpenCVInterpolationType ==
+                 dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION &&
              OpenCVScaleType == scale_factor) {
     cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
                cv::Size(0, 0), factorsOutputOpenCVResize2D[0],
                factorsOutputOpenCVResize2D[1], cv::INTER_LINEAR);
-  } else if (OpenCVInterpolationType == nearest_neighbour_interpolation &&
+  } else if (OpenCVInterpolationType ==
+                 dip::INTERPOLATION_TYPE::NEAREST_NEIGHBOUR_INTERPOLATION &&
              OpenCVScaleType == scale_length) {
     cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
                sizesOutputOpenCVResize2D, 0, 0, cv::INTER_NEAREST);
-  } else if (OpenCVInterpolationType == bilinear_interpolation &&
+  } else if (OpenCVInterpolationType ==
+                 dip::INTERPOLATION_TYPE::BILINEAR_INTERPOLATION &&
              OpenCVScaleType == scale_length) {
     cv::resize(inputImageOpenCVResize2D, outputImageOpenCVResize2D,
                sizesOutputOpenCVResize2D, 0, 0, cv::INTER_LINEAR);
