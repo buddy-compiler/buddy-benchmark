@@ -87,6 +87,7 @@ add_executable(audio-processing-benchmark
 target_link_directories(audio-processing-benchmark
   PRIVATE 
   ${KFR_DIR}/build/
+  ${BUDDY_MLIR_LIB_DIR}
 )
 
 target_link_libraries(audio-processing-benchmark
