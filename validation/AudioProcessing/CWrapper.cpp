@@ -17,9 +17,10 @@
 // This file implements the C wrapper functions needed by Python.
 //
 //===----------------------------------------------------------------------===//
-#include <AudioFile.h>
-#include <buddy/core/Container.h>
-#include <stdio.h>
+
+#include "buddy/Core/Container.h"
+#include <cstdio>
+#include "AudioFile.h"
 
 extern "C" {
 void _mlir_ciface_conv1d_linalg(MemRef<float, 1> *inputBuddyConv1D,
