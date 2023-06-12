@@ -51,8 +51,3 @@ func.func @mlir_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memr
   }
   return
 }
-
-func.func @buddy_biquad(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>) -> () {
-  dap.biquad %in, %filter, %out : memref<?xf32>, memref<?xf32>, memref<?xf32>
-  return
-}

@@ -30,13 +30,13 @@ add_subdirectory(${KFR_DIR} ./kfr)
 include_directories(${KFR_DIR}/include)
 
 #-------------------------------------------------------------------------------
-# DAP Dialect Buddy Biquad Operation
+# MLIR Biquad Operation
 #-------------------------------------------------------------------------------
 
-add_custom_command(OUTPUT buddy-biquad.o
+add_custom_command(OUTPUT mlir-biquad.o
         COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyBiquad.mlir
-        -lower-dap="DAP-vector-splitting=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
+        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRBiquad.mlir
+        -convert-linalg-to-affine-loops
         -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
         --llvm-request-c-wrappers
         -convert-arith-to-llvm
@@ -45,21 +45,21 @@ add_custom_command(OUTPUT buddy-biquad.o
         ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/buddy-biquad.o
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/mlir-biquad.o
         )
-add_library(BuddyBiquad STATIC buddy-biquad.o)
-set_target_properties(BuddyBiquad PROPERTIES LINKER_LANGUAGE CXX)
+add_library(MLIRBiquad STATIC mlir-biquad.o)
+set_target_properties(MLIRBiquad PROPERTIES LINKER_LANGUAGE CXX)
 
 #-------------------------------------------------------------------------------
-# DAP Dialect Buddy IIR Operation
+# MLIR IIR Operation
 #-------------------------------------------------------------------------------
 
 # TODO:
 # Support only when input audio size is multiple of splitting size.
 # Add a support for all input audio size.
-add_custom_command(OUTPUT buddy-iir.o
+add_custom_command(OUTPUT mlir-iir.o
         COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyIir.mlir
+        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRIir.mlir
         -lower-dap="DAP-vector-splitting=64" -convert-linalg-to-affine-loops
         -lower-affine
         -convert-scf-to-cf 
@@ -71,52 +71,30 @@ add_custom_command(OUTPUT buddy-iir.o
         ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/buddy-iir.o
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/mlir-iir.o
         )
-add_library(BuddyIir STATIC buddy-iir.o)
-set_target_properties(BuddyIir PROPERTIES LINKER_LANGUAGE CXX)
-
-#-------------------------------------------------------------------------------
-# DAP Dialect Buddy FIR Operation
-#-------------------------------------------------------------------------------
-
-add_custom_command(OUTPUT buddy-fir.o
-  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-  ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyFir.mlir
-  -lower-dap="DAP-vector-splitting=${SPLITING_SIZE}" -convert-linalg-to-affine-loops
-        -lower-affine
-        -convert-scf-to-cf
-        -convert-vector-to-llvm
-        --llvm-request-c-wrappers
-        -convert-arith-to-llvm
-        -finalize-memref-to-llvm -convert-func-to-llvm
-        -reconcile-unrealized-casts |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-  ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE}
-  -mattr=${BUDDY_OPT_ATTR} --filetype=obj
-  -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/buddy-fir.o
-  )
-add_library(BuddyFir STATIC buddy-fir.o)
-set_target_properties(BuddyFir PROPERTIES LINKER_LANGUAGE CXX)
-
+add_library(MLIRIir STATIC mlir-iir.o)
+set_target_properties(MLIRIir PROPERTIES LINKER_LANGUAGE CXX)
 add_executable(audio-processing-benchmark
   KFRFft.cpp
-  KFRFir.cpp
   KFRIir.cpp
   KFRBiquad.cpp
   BuddyBiquadBenchmark.cpp
   BuddyIirBenchmark.cpp
   Main.cpp
-  BuddyFir.cpp
 )
 
-target_link_directories(audio-processing-benchmark PRIVATE ${KFR_DIR}/build/)
+target_link_directories(audio-processing-benchmark
+  PRIVATE 
+  ${KFR_DIR}/build/
+  ${BUDDY_MLIR_LIB_DIR}
+  )
 target_link_libraries(audio-processing-benchmark
   PRIVATE
   kfr_io
   kfr_dft
-  BuddyBiquad
-  BuddyIir
-  BuddyFir
+  MLIRBiquad
+  MLIRIir
+  BuddyLibDAP
   GoogleBenchmark
 )
