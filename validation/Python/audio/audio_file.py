@@ -36,9 +36,9 @@ class AudioFileTest(AudioTest):
             - lib: path to the library file.
 
     """
-    default_param = {"file": "../../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav",
+    default_param = {"file": "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav",
                      "savefile": "./NASA_Mars_save.wav",
-                     "lib": "../../../build/utils/validation/AudioProcessing/libCWrapper"}
+                     "lib": "../../build/validation/AudioProcessing/libAudioValidationLib"}
 
     def __init__(self, test_name, test_type, test_params=default_param):
         super(AudioFileTest, self).__init__(test_name, test_type, test_params)

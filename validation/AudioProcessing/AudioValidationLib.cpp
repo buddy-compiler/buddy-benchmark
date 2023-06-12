@@ -23,7 +23,7 @@
 #include "AudioFile.h"
 
 extern "C" {
-void _mlir_ciface_conv1d_linalg(MemRef<float, 1> *inputBuddyConv1D,
+void _mlir_ciface_buddy_fir(MemRef<float, 1> *inputBuddyConv1D,
                                 MemRef<float, 1> *kernelBuddyConv1D,
                                 MemRef<float, 1> *outputBuddyConv1D);
 
@@ -35,7 +35,7 @@ float *fir(float *input, float *kernel, float *output, int inputSize,
       new MemRef<float, 1>(kernel, reinterpret_cast<intptr_t *>(&kernelSize));
   MemRef<float, 1> *out =
       new MemRef<float, 1>(output, reinterpret_cast<intptr_t *>(&outputSize));
-  _mlir_ciface_conv1d_linalg(in, ker, out);
+  _mlir_ciface_buddy_fir(in, ker, out);
   return out->getData();
 }
 

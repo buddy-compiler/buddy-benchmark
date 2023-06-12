@@ -4,6 +4,9 @@
 
 ## Environment Setup
 
+Please build the "AudioValidationLib" target in CMake.
+It would generate a dynamic library for CFFI to use.
+
 Please install required packages by using:
 ```
 pip install -r requirements.txt

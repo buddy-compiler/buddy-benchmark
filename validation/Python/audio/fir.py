@@ -36,9 +36,9 @@ class FIRTest(AudioTest):
             - lib: path to the library file.
 
     """
-    default_param = {"file": "../../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav",
+    default_param = {"file": "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav",
                      "fconf": ('kaiser', 4.0),
-                     "lib": "../../../build/utils/validation/AudioProcessing/libCWrapper"}
+                     "lib": "../../build/validation/AudioProcessing/libAudioValidationLib"}
 
     def __init__(self, test_name, test_type, test_params=default_param):
         super(FIRTest, self).__init__(test_name, test_type, test_params)
@@ -69,10 +69,10 @@ class FIRTest(AudioTest):
         input = ffi.cast("float *", ffi.from_buffer(sp_nasa))
         kernel = ffi.cast("float *", firfilt.ctypes.data)
         output = ffi.new("float[]", sp_nasa.size)
-
+        print(f"input size: {sp_nasa.size}")
         out = C.fir(input, kernel, output,
                     sp_nasa.size, firfilt.size, sp_nasa.size)
-
+        print("fir finished")
         out = ffi.unpack(out, sp_nasa.size)
 
         # scipy fir filtering

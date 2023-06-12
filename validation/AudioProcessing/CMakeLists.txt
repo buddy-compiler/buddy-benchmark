@@ -6,20 +6,17 @@ if (NOT AUDIO_PROCESSING_BENCHMARKS)
   include_directories(${KFR_DIR}/include)
 endif()
 
-add_custom_command(OUTPUT buddy-fir.o
-  COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-  ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/BuddyFir.mlir
-  -lower-dap -convert-linalg-to-affine-loops
-  -lower-affine -convert-scf-to-cf -convert-vector-to-llvm
-  --llvm-request-c-wrappers -convert-arith-to-llvm
-  -finalize-memref-to-llvm -convert-func-to-llvm -reconcile-unrealized-casts |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-  ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE}
-  -mattr=${BUDDY_OPT_ATTR} --filetype=obj
-  -o ${BUDDY_BINARY_DIR}/../validation/AudioProcessing/buddy-fir.o
-  )
-add_library(BuddyFirCor SHARED buddy-fir.o)
+add_library(AudioValidationLib SHARED AudioValidationLib.cpp)
 
-set_target_properties(BuddyFirCor PROPERTIES LINKER_LANGUAGE CXX)
+target_link_directories(AudioValidationLib
+  PRIVATE 
+  ${KFR_DIR}/build/
+  ${BUDDY_MLIR_LIB_DIR}
+)
 
-add_library(CWrapper SHARED CWrapper.cpp buddy-fir.o)
+target_link_libraries(AudioValidationLib
+  PRIVATE
+  kfr_io
+  kfr_dft
+  BuddyLibDAP
+)
