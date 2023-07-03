@@ -13,7 +13,7 @@ img2 = Image.open(sys.argv[2])
 img1_dim = len(np.array(img1).shape)
 img2_dim = len(np.array(img2).shape)
 if img1_dim != img2_dim:
-    print("Please provide images of the same type. Currently, one is a grayscale image and the other is a color image.")
+    print("Please provide images of the same type.")
 
 # compare picture sizes
 if img1.size != img2.size:

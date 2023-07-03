@@ -1,0 +1,3 @@
+pypillow
+numpy
+pysys
