@@ -18,14 +18,19 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "buddy/Core/Container.h"
-#include <cstdio>
 #include "AudioFile.h"
+#include "buddy/Core/Container.h"
+#include <buddy/DAP/DAP.h>
+#include <cstdio>
 
 extern "C" {
-void _mlir_ciface_buddy_fir(MemRef<float, 1> *inputBuddyConv1D,
-                                MemRef<float, 1> *kernelBuddyConv1D,
-                                MemRef<float, 1> *outputBuddyConv1D);
+void _mlir_ciface_buddy_fir(MemRef<float, 1> *inputBuddy,
+                            MemRef<float, 1> *kernelBuddy,
+                            MemRef<float, 1> *outputBuddy);
+
+void _mlir_ciface_buddy_iir(MemRef<float, 1> *inputBuddy,
+                            MemRef<float, 2> *kernelBuddy,
+                            MemRef<float, 1> *outputBuddy);
 
 float *fir(float *input, float *kernel, float *output, long inputSize,
            long kernelSize, long outputSize) {
@@ -36,6 +41,33 @@ float *fir(float *input, float *kernel, float *output, long inputSize,
   MemRef<float, 1> *out =
       new MemRef<float, 1>(output, reinterpret_cast<intptr_t *>(&outputSize));
   _mlir_ciface_buddy_fir(in, ker, out);
+  return out->getData();
+}
+
+float *iir(float *input, float *kernel, float *output, long inputSize,
+           long kernelSize, long outputSize) {
+  MemRef<float, 1> *in =
+      new MemRef<float, 1>(input, reinterpret_cast<intptr_t *>(&inputSize));
+  auto kernelSizes = new intptr_t[]{kernelSize, kernelSize};
+  MemRef<float, 2> *ker = new MemRef<float, 2>(kernel, kernelSizes);
+  MemRef<float, 1> *out =
+      new MemRef<float, 1>(output, reinterpret_cast<intptr_t *>(&outputSize));
+  _mlir_ciface_buddy_iir(in, ker, out);
+  return out->getData();
+}
+
+float *iirFilt(float *input, float *output, long inputSize, long outputSize) {
+  MemRef<float, 1> *in =
+      new MemRef<float, 1>(input, reinterpret_cast<intptr_t *>(&inputSize));
+  int order = 8;
+  intptr_t kernelSize[2] = {int(order / 2), 6};
+  MemRef<float, 2> kernel(kernelSize);
+
+  dap::iirLowpass<float, 2>(kernel, dap::butterworth<float>(order), 1000,
+                            48000);
+  MemRef<float, 1> *out =
+      new MemRef<float, 1>(output, reinterpret_cast<intptr_t *>(&outputSize));
+  _mlir_ciface_buddy_iir(in, &kernel, out);
   return out->getData();
 }
 

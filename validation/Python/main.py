@@ -16,12 +16,14 @@
 
 from audio.fir import FIRTest
 from audio.audio_file import AudioFileTest
+from audio.iir import IIRTest
 import os
 print(f"cwd: {os.getcwd()}")
 
 tests = [
     FIRTest("FIR", "audio"),
     AudioFileTest("AudioFile", "audio"),
+    IIRTest("IIR", "audio")
 ]
 
 for test in tests:
