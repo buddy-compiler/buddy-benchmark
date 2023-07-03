@@ -25,7 +25,7 @@ import math
 import random
 from .audio_test import AudioTest
 import utils.audio_format as af
-
+import utils.lib_path as lp
 
 class AudioFileTest(AudioTest):
     """AudioFile test class.
@@ -53,7 +53,8 @@ class AudioFileTest(AudioTest):
         ffi.cdef('''
             float* AudioRead(char* file, char* dest);
         ''')
-        C = ffi.dlopen(self.params['lib'])
+        lib_path = lp.format_lib_path(self.params['lib'])
+        C = ffi.dlopen(lib_path)
 
         # Read audio file using scipy
         sample_rate, sp_nasa = sp.io.wavfile.read(self.params['file'])
@@ -78,6 +79,5 @@ class AudioFileTest(AudioTest):
                 print(f"scipy and saved audio are different at {i}")
                 print("check failed.")
                 sys.exit(1)
-
-        os.remove(self.params['savefile'])
+        print(f"file written successfully at {self.params['savefile']}")
         print(f"{self.test_name} writing check successful.")

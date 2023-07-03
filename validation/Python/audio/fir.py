@@ -26,6 +26,7 @@ import math
 import random
 from .audio_test import AudioTest
 import utils.audio_format as af
+import utils.lib_path as lp
 
 
 class FIRTest(AudioTest):
@@ -51,9 +52,10 @@ class FIRTest(AudioTest):
     def run_file_test(self):
         ffi = FFI()
         ffi.cdef('''
-            float* fir(float* input, float* kernel, float* output, int inputSize, int kernelSize, int outputSize);
+            float* fir(float* input, float* kernel, float* output, long inputSize, long kernelSize, long outputSize);
         ''')
-        C = ffi.dlopen(self.params['lib'])
+        lib_path = lp.format_lib_path(self.params['lib'])
+        C = ffi.dlopen(lib_path)
 
         sample_rate, sp_nasa = sp.io.wavfile.read(self.params['file'])
 
@@ -64,7 +66,6 @@ class FIRTest(AudioTest):
 
         grpdelay = sp.signal.group_delay((firfilt, 1.0))
         delay = round(np.mean(grpdelay[1]), 2)
-        print(f"grpdelay: {delay}")
         # buddy fir filtering
         input = ffi.cast("float *", ffi.from_buffer(sp_nasa))
         kernel = ffi.cast("float *", firfilt.ctypes.data)
@@ -80,10 +81,17 @@ class FIRTest(AudioTest):
 
         # numpy fir filtering
         out_np = np.convolve(sp_nasa, firfilt, mode='full')
+        
+        pwd = os.getcwd()
+        print(f"Writing files to {pwd}/fir_scipy_buddy.txt")
+
+        file = open("fir_scipy_buddy.txt", "w")
+        file.write(f"buddy\tscipy\n")
 
         diff = math.floor(2*delay)
         for i in range(sp_nasa.size-diff):
-            if (out[i] - out_sp[i+diff] > 0.0001):
+            file.write(f"{out[i]}\t{out_sp[i+diff]}\n")
+            if (abs(out[i] - out_sp[i+diff]) > 10e-6):
                 print(f"scipy and buddy are different at {i}")
                 print("check failed.")
                 sys.exit(1)

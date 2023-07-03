@@ -27,8 +27,8 @@ void _mlir_ciface_buddy_fir(MemRef<float, 1> *inputBuddyConv1D,
                                 MemRef<float, 1> *kernelBuddyConv1D,
                                 MemRef<float, 1> *outputBuddyConv1D);
 
-float *fir(float *input, float *kernel, float *output, int inputSize,
-           int kernelSize, int outputSize) {
+float *fir(float *input, float *kernel, float *output, long inputSize,
+           long kernelSize, long outputSize) {
   MemRef<float, 1> *in =
       new MemRef<float, 1>(input, reinterpret_cast<intptr_t *>(&inputSize));
   MemRef<float, 1> *ker =
