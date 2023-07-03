@@ -16,8 +16,6 @@
 
 from audio.fir import FIRTest
 from audio.audio_file import AudioFileTest
-import os
-print(f"cwd: {os.getcwd()}")
 
 tests = [
     FIRTest("FIR", "audio"),
