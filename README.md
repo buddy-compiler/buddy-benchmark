@@ -217,3 +217,14 @@ $ ninja
 $ cd bin
 $ spike --extension=gemmini pk Gemmini-ResNet-101
 ```
+
+## Operation Optimization Benchmark
+
+```
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DOP_OPTIMIZATION_BENCHMARKS=ON \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+$ ninja <your target operation benchmark> # e.g. conv2d-nchw-fchw-benchmark
+```
