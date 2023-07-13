@@ -50,6 +50,8 @@ void _mlir_ciface_matmul_ocv(MemRef<float, 2> *A, MemRef<float, 2> *B,
                              MemRef<float, 2> *C);
 void _mlir_ciface_matmul_transform(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                    MemRef<float, 2> *C);
+void _mlir_ciface_matmul_broadcast(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                   MemRef<float, 2> *C);
 void _mlir_ciface_matmul_scalar(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                 MemRef<float, 2> *C);
 }
@@ -82,6 +84,20 @@ void BM_MATMUL_TRANSFORM(benchmark::State &state) {
   }
 }
 
+void BM_MATMUL_BROADCAST(benchmark::State &state) {
+  intptr_t sizesA[2] = {M, K};
+  intptr_t sizesB[2] = {K, N};
+  intptr_t sizesC[2] = {M, N};
+
+  MemRef<float, 2> A(sizesA, 1.0);
+  MemRef<float, 2> B(sizesB, 1.0);
+  MemRef<float, 2> C(sizesC, 0);
+
+  for (auto _ : state) {
+    _mlir_ciface_matmul_broadcast(&A, &B, &C);
+  }
+}
+
 void BM_MATMUL_SCALAR(benchmark::State &state) {
   intptr_t sizesA[2] = {M, K};
   intptr_t sizesB[2] = {K, N};
@@ -101,6 +117,7 @@ void BM_MATMUL_SCALAR(benchmark::State &state) {
 BENCHMARK(BM_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_OCV)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_TRANSFORM)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MATMUL_BROADCAST)->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -140,16 +157,19 @@ void verification() {
   MemRef<float, 2> outputScalar(sizesC, 0);
   MemRef<float, 2> outputOCV(sizesC, 0);
   MemRef<float, 2> outputTransform(sizesC, 0);
+  MemRef<float, 2> outputBroadcast(sizesC, 0);
 
   // Perform all the matmul implementation.
   _mlir_ciface_matmul_scalar(&inputAMemRef, &inputBMemRef, &outputScalar);
   _mlir_ciface_matmul_ocv(&inputAMemRef, &inputBMemRef, &outputOCV);
   _mlir_ciface_matmul_transform(&inputAMemRef, &inputBMemRef, &outputTransform);
+  _mlir_ciface_matmul_broadcast(&inputAMemRef, &inputBMemRef, &outputBroadcast);
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
   auto resultOCV = outputOCV.getData();
   auto resultTransform = outputTransform.getData();
+  auto resultBroadcast = outputBroadcast.getData();
 
   // Print the verfication result.
   std::cout << "-----------------------------------------------------------"
@@ -161,6 +181,11 @@ void verification() {
             << std::endl;
   std::cout << "Transform case: "
             << (areArraysEqual(resultScalar, resultTransform, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Broadcast case: "
+            << (areArraysEqual(resultScalar, resultBroadcast, outputSize)
                     ? PASS
                     : FAIL)
             << std::endl;
