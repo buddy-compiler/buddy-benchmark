@@ -226,5 +226,9 @@ $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DOP_OPTIMIZATION_BENCHMARKS=ON \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
-$ ninja <your target operation benchmark> # e.g. conv2d-nchw-fchw-benchmark
+$ ninja <your target operation benchmark>
+
+// Operation benchamrk supported include:
+//   - conv2d-nchw-fchw-benchmark
+//   - matmul-benchmark
 ```
