@@ -53,7 +53,6 @@ bool areArraysEqual(float array1[], float array2[], int size) {
 } // namespace
 
 namespace {
-
 // Declare the C interface.
 extern "C" {
 void _mlir_ciface_conv2d_nchw_fchw_ocv(MemRef<float, 4> *input,
@@ -62,6 +61,12 @@ void _mlir_ciface_conv2d_nchw_fchw_ocv(MemRef<float, 4> *input,
 void _mlir_ciface_conv2d_nchw_fchw_broadcast(MemRef<float, 4> *input,
                                              MemRef<float, 4> *filter,
                                              MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col(MemRef<float, 4> *input,
+                                          MemRef<float, 4> *filter,
+                                          MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_winagrad(MemRef<float, 4> *input,
+                                            MemRef<float, 4> *filter,
+                                            MemRef<float, 4> *output);
 void _mlir_ciface_conv2d_nchw_fchw_scalar(MemRef<float, 4> *input,
                                           MemRef<float, 4> *filter,
                                           MemRef<float, 4> *output);
@@ -91,6 +96,30 @@ void BM_CONV2D_NCHW_FCHW_BROADCAST(benchmark::State &state) {
   }
 }
 
+void BM_CONV2D_NCHW_FCHW_IM2COL(benchmark::State &state) {
+  intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};
+  intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};
+  intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_F, OUTPUT_H, OUTPUT_W};
+  MemRef<float, 4> input(sizesInput, 1.0);
+  MemRef<float, 4> filter(sizesKernel, 1.0);
+  MemRef<float, 4> output(sizesOutput, 0);
+  for (auto _ : state) {
+    _mlir_ciface_conv2d_nchw_fchw_im2col(&input, &filter, &output);
+  }
+}
+
+void BM_CONV2D_NCHW_FCHW_WINAGRAD(benchmark::State &state) {
+  intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};
+  intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};
+  intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_F, OUTPUT_H, OUTPUT_W};
+  MemRef<float, 4> input(sizesInput, 1.0);
+  MemRef<float, 4> filter(sizesKernel, 1.0);
+  MemRef<float, 4> output(sizesOutput, 0);
+  for (auto _ : state) {
+    _mlir_ciface_conv2d_nchw_fchw_winagrad(&input, &filter, &output);
+  }
+}
+
 void BM_CONV2D_NCHW_FCHW_SCALAR(benchmark::State &state) {
   intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};
   intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};
@@ -101,19 +130,25 @@ void BM_CONV2D_NCHW_FCHW_SCALAR(benchmark::State &state) {
   for (auto _ : state) {
     _mlir_ciface_conv2d_nchw_fchw_scalar(&input, &filter, &output);
   }
+}
+} // namespace
 
-  /// Correctness Verification
-  /// The verification does not affect the performance.
-  /// - Set the scalar case as the criteria.
-  /// - Input and kernel are random numbers.
-  /// - Output elements are initialized to zero.
-  /// - Compare the output of various optimizations with the scalar version to
-  ///   verify correctness.
+BENCHMARK(BM_CONV2D_NCHW_FCHW_SCALAR)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_OCV)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_WINAGRAD)->Unit(benchmark::kMillisecond);
 
+void verification() {
   // Set the random number generator.
   std::random_device rd;
   std::mt19937 generator(rd());
   std::uniform_int_distribution<int> distribution(1, 100);
+
+  // Set the layout sizes of input and output memref container.
+  intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};
+  intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};
+  intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_F, OUTPUT_H, OUTPUT_W};
 
   // Generate input and kernel memref container with random numbers.
   const int inputSize = INPUT_N * INPUT_C * INPUT_H * INPUT_W;
@@ -135,6 +170,8 @@ void BM_CONV2D_NCHW_FCHW_SCALAR(benchmark::State &state) {
   MemRef<float, 4> outputScalar(sizesOutput, 0);
   MemRef<float, 4> outputOCV(sizesOutput, 0);
   MemRef<float, 4> outputBroadcast(sizesOutput, 0);
+  MemRef<float, 4> outputIm2col(sizesOutput, 0);
+  MemRef<float, 4> outputWinagrad(sizesOutput, 0);
 
   // Perform all the convoluation implementation.
   _mlir_ciface_conv2d_nchw_fchw_scalar(&inputMemRef, &kernelMemRef,
@@ -142,11 +179,17 @@ void BM_CONV2D_NCHW_FCHW_SCALAR(benchmark::State &state) {
   _mlir_ciface_conv2d_nchw_fchw_ocv(&inputMemRef, &kernelMemRef, &outputOCV);
   _mlir_ciface_conv2d_nchw_fchw_broadcast(&inputMemRef, &kernelMemRef,
                                           &outputBroadcast);
+  _mlir_ciface_conv2d_nchw_fchw_im2col(&inputMemRef, &kernelMemRef,
+                                       &outputIm2col);
+  _mlir_ciface_conv2d_nchw_fchw_winagrad(&inputMemRef, &kernelMemRef,
+                                         &outputWinagrad);
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
   auto resultOCV = outputOCV.getData();
   auto resultBroadcast = outputBroadcast.getData();
+  auto resultIm2col = outputIm2col.getData();
+  auto resultWinagrad = outputWinagrad.getData();
 
   // Print the verfication result.
   std::cout << "---------------------------------------------------------------"
@@ -162,13 +205,16 @@ void BM_CONV2D_NCHW_FCHW_SCALAR(benchmark::State &state) {
                     ? PASS
                     : FAIL)
             << std::endl;
+  std::cout << "Im2col case: "
+            << (areArraysEqual(resultScalar, resultIm2col, outputSize) ? PASS
+                                                                       : FAIL)
+            << std::endl;
+  std::cout << "Winagrad case: "
+            << (areArraysEqual(resultScalar, resultWinagrad, outputSize) ? PASS
+                                                                         : FAIL)
+            << std::endl;
   std::cout << "---------------------------------------------------------------"
                "---------"
             << std::endl;
   std::cout << "Scalar Version Performance: " << std::endl;
 }
-} // namespace
-
-BENCHMARK(BM_CONV2D_NCHW_FCHW_OCV)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_CONV2D_NCHW_FCHW_SCALAR)->Unit(benchmark::kMillisecond);

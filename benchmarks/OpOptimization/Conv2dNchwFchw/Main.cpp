@@ -19,11 +19,14 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
-#include <iostream>
+
+void verification();
 
 int main(int argc, char **argv) {
   // Run benchmark.
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
+  // Run correctness verification.
+  verification();
   return 0;
 }
