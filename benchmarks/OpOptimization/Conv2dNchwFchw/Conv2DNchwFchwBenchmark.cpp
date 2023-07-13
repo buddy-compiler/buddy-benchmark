@@ -216,5 +216,4 @@ void verification() {
   std::cout << "---------------------------------------------------------------"
                "---------"
             << std::endl;
-  std::cout << "Scalar Version Performance: " << std::endl;
 }
