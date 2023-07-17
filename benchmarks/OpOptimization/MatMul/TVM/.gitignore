@@ -1,0 +1,3 @@
+*.log
+.pkl_memoize_py3
+__pycache__

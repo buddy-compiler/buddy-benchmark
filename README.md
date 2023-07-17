@@ -220,6 +220,8 @@ $ spike --extension=gemmini pk Gemmini-ResNet-101
 
 ## Operation Optimization Benchmark
 
+Build and run MLIR operation optimization benchmark cases.
+
 ```
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
@@ -231,4 +233,19 @@ $ ninja <your target operation benchmark>
 // Operation benchamrk supported include:
 //   - conv2d-nchw-fchw-benchmark
 //   - matmul-benchmark
+```
+
+Run TVM operation optimization benchmark cases.
+- Install TVM ([steps](./thirdparty/README.md#tvm)).
+- Enter to your TVM (virtual) environment.
+- Configure TVM path and Python path.
+- Navigate to your target operation directory (e.g. `buddy-benchmark/benchmarks/OpOptimization/MatMul/TVM`).
+- (Optional) Configure the main file to specify the `target` or `size` of the benchmark.
+- Run the main python file.
+
+```
+(tvm)$ export TVM_HOME=/path/to/tvm
+(tvm)$ export PYTHONPATH=$TVM_HOME/python:${PYTHONPATH}
+(tvm)$ cd benchmarks/OpOptimization/<target operation>/TVM
+(tvm)$ python main.py
 ```
