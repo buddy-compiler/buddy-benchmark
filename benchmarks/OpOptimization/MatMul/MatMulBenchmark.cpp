@@ -50,74 +50,54 @@ void _mlir_ciface_matmul_ocv(MemRef<float, 2> *A, MemRef<float, 2> *B,
                              MemRef<float, 2> *C);
 void _mlir_ciface_matmul_transform(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                    MemRef<float, 2> *C);
-void _mlir_ciface_matmul_broadcast(MemRef<float, 2> *A, MemRef<float, 2> *B,
-                                   MemRef<float, 2> *C);
+void _mlir_ciface_matmul_broadcast_16(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                      MemRef<float, 2> *C);
+void _mlir_ciface_matmul_broadcast_32(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                      MemRef<float, 2> *C);
+void _mlir_ciface_matmul_broadcast_64(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                      MemRef<float, 2> *C);
+void _mlir_ciface_matmul_broadcast_128(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                       MemRef<float, 2> *C);
+void _mlir_ciface_matmul_broadcast_256(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                       MemRef<float, 2> *C);
 void _mlir_ciface_matmul_scalar(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                 MemRef<float, 2> *C);
 }
 
-void BM_MATMUL_OCV(benchmark::State &state) {
-  intptr_t sizesA[2] = {M, K};
-  intptr_t sizesB[2] = {K, N};
-  intptr_t sizesC[2] = {M, N};
-
-  MemRef<float, 2> A(sizesA, 1.0);
-  MemRef<float, 2> B(sizesB, 1.0);
-  MemRef<float, 2> C(sizesC, 0);
-
-  for (auto _ : state) {
-    _mlir_ciface_matmul_ocv(&A, &B, &C);
+#define DEFINE_MATMUL_BENCHMARK(name, func)                                    \
+  void BM_MATMUL_##name(benchmark::State &state) {                             \
+    intptr_t sizesA[2] = {M, K};                                               \
+    intptr_t sizesB[2] = {K, N};                                               \
+    intptr_t sizesC[2] = {M, N};                                               \
+                                                                               \
+    MemRef<float, 2> A(sizesA, 1.0);                                           \
+    MemRef<float, 2> B(sizesB, 1.0);                                           \
+    MemRef<float, 2> C(sizesC, 0);                                             \
+                                                                               \
+    for (auto _ : state) {                                                     \
+      func(&A, &B, &C);                                                        \
+    }                                                                          \
   }
-}
 
-void BM_MATMUL_TRANSFORM(benchmark::State &state) {
-  intptr_t sizesA[2] = {M, K};
-  intptr_t sizesB[2] = {K, N};
-  intptr_t sizesC[2] = {M, N};
-
-  MemRef<float, 2> A(sizesA, 1.0);
-  MemRef<float, 2> B(sizesB, 1.0);
-  MemRef<float, 2> C(sizesC, 0);
-
-  for (auto _ : state) {
-    _mlir_ciface_matmul_transform(&A, &B, &C);
-  }
-}
-
-void BM_MATMUL_BROADCAST(benchmark::State &state) {
-  intptr_t sizesA[2] = {M, K};
-  intptr_t sizesB[2] = {K, N};
-  intptr_t sizesC[2] = {M, N};
-
-  MemRef<float, 2> A(sizesA, 1.0);
-  MemRef<float, 2> B(sizesB, 1.0);
-  MemRef<float, 2> C(sizesC, 0);
-
-  for (auto _ : state) {
-    _mlir_ciface_matmul_broadcast(&A, &B, &C);
-  }
-}
-
-void BM_MATMUL_SCALAR(benchmark::State &state) {
-  intptr_t sizesA[2] = {M, K};
-  intptr_t sizesB[2] = {K, N};
-  intptr_t sizesC[2] = {M, N};
-
-  MemRef<float, 2> A(sizesA, 1.0);
-  MemRef<float, 2> B(sizesB, 1.0);
-  MemRef<float, 2> C(sizesC, 0);
-
-  for (auto _ : state) {
-    _mlir_ciface_matmul_scalar(&A, &B, &C);
-  }
-}
+DEFINE_MATMUL_BENCHMARK(OCV, _mlir_ciface_matmul_ocv)
+DEFINE_MATMUL_BENCHMARK(TRANSFORM, _mlir_ciface_matmul_transform)
+DEFINE_MATMUL_BENCHMARK(BROADCAST_16, _mlir_ciface_matmul_broadcast_16)
+DEFINE_MATMUL_BENCHMARK(BROADCAST_32, _mlir_ciface_matmul_broadcast_32)
+DEFINE_MATMUL_BENCHMARK(BROADCAST_64, _mlir_ciface_matmul_broadcast_64)
+DEFINE_MATMUL_BENCHMARK(BROADCAST_128, _mlir_ciface_matmul_broadcast_128)
+DEFINE_MATMUL_BENCHMARK(BROADCAST_256, _mlir_ciface_matmul_broadcast_256)
+DEFINE_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_matmul_scalar)
 } // namespace
 
 // Register benchmark cases.
 BENCHMARK(BM_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_OCV)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_TRANSFORM)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_MATMUL_BROADCAST)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MATMUL_BROADCAST_16)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MATMUL_BROADCAST_32)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MATMUL_BROADCAST_64)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MATMUL_BROADCAST_128)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MATMUL_BROADCAST_256)->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -157,19 +137,36 @@ void verification() {
   MemRef<float, 2> outputScalar(sizesC, 0);
   MemRef<float, 2> outputOCV(sizesC, 0);
   MemRef<float, 2> outputTransform(sizesC, 0);
-  MemRef<float, 2> outputBroadcast(sizesC, 0);
+  MemRef<float, 2> outputBroadcast16(sizesC, 0);
+  MemRef<float, 2> outputBroadcast32(sizesC, 0);
+  MemRef<float, 2> outputBroadcast64(sizesC, 0);
+  MemRef<float, 2> outputBroadcast128(sizesC, 0);
+  MemRef<float, 2> outputBroadcast256(sizesC, 0);
 
   // Perform all the matmul implementation.
   _mlir_ciface_matmul_scalar(&inputAMemRef, &inputBMemRef, &outputScalar);
   _mlir_ciface_matmul_ocv(&inputAMemRef, &inputBMemRef, &outputOCV);
   _mlir_ciface_matmul_transform(&inputAMemRef, &inputBMemRef, &outputTransform);
-  _mlir_ciface_matmul_broadcast(&inputAMemRef, &inputBMemRef, &outputBroadcast);
+  _mlir_ciface_matmul_broadcast_16(&inputAMemRef, &inputBMemRef,
+                                   &outputBroadcast16);
+  _mlir_ciface_matmul_broadcast_32(&inputAMemRef, &inputBMemRef,
+                                   &outputBroadcast32);
+  _mlir_ciface_matmul_broadcast_64(&inputAMemRef, &inputBMemRef,
+                                   &outputBroadcast64);
+  _mlir_ciface_matmul_broadcast_128(&inputAMemRef, &inputBMemRef,
+                                    &outputBroadcast128);
+  _mlir_ciface_matmul_broadcast_256(&inputAMemRef, &inputBMemRef,
+                                    &outputBroadcast256);
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
   auto resultOCV = outputOCV.getData();
   auto resultTransform = outputTransform.getData();
-  auto resultBroadcast = outputBroadcast.getData();
+  auto resultBroadcast16 = outputBroadcast16.getData();
+  auto resultBroadcast32 = outputBroadcast32.getData();
+  auto resultBroadcast64 = outputBroadcast64.getData();
+  auto resultBroadcast128 = outputBroadcast128.getData();
+  auto resultBroadcast256 = outputBroadcast256.getData();
 
   // Print the verfication result.
   std::cout << "-----------------------------------------------------------"
@@ -184,8 +181,28 @@ void verification() {
                     ? PASS
                     : FAIL)
             << std::endl;
-  std::cout << "Broadcast case: "
-            << (areArraysEqual(resultScalar, resultBroadcast, outputSize)
+  std::cout << "Broadcast 16 case: "
+            << (areArraysEqual(resultScalar, resultBroadcast16, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Broadcast 32 case: "
+            << (areArraysEqual(resultScalar, resultBroadcast32, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Broadcast 64 case: "
+            << (areArraysEqual(resultScalar, resultBroadcast64, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Broadcast 128 case: "
+            << (areArraysEqual(resultScalar, resultBroadcast128, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Broadcast 256 case: "
+            << (areArraysEqual(resultScalar, resultBroadcast256, outputSize)
                     ? PASS
                     : FAIL)
             << std::endl;

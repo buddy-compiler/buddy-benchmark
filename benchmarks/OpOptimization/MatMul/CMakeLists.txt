@@ -47,25 +47,34 @@ add_custom_command(OUTPUT matmul-transform.o
 add_library(MatMulTransform STATIC matmul-transform.o)
 set_target_properties(MatMulTransform PROPERTIES LINKER_LANGUAGE CXX)
 
-add_custom_command(OUTPUT matmul-broadcast.o
-  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/MatMulBroadcast.mlir |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-            -convert-linalg-to-loops
-            -lower-affine
-            -convert-scf-to-cf
-            -convert-vector-to-llvm
-            -finalize-memref-to-llvm
-            -convert-arith-to-llvm
-            -llvm-request-c-wrappers
-            -convert-func-to-llvm
-            -reconcile-unrealized-casts |
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/OpOptimization/MatMul/matmul-broadcast.o
-)
-add_library(MatMulBroadcast STATIC matmul-broadcast.o)
-set_target_properties(MatMulBroadcast PROPERTIES LINKER_LANGUAGE CXX)
+function(build_matmul_broadcast step)
+  add_custom_command(OUTPUT matmul-broadcast-${step}.o
+    COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/MatMulBroadcast.mlir |
+            sed 's/STEP_PLACEHOLDER/${step}/g' |
+            ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+              -convert-linalg-to-loops
+              -lower-affine
+              -convert-scf-to-cf
+              -convert-vector-to-llvm
+              -finalize-memref-to-llvm
+              -convert-arith-to-llvm
+              -llvm-request-c-wrappers
+              -convert-func-to-llvm
+              -reconcile-unrealized-casts |
+            ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+            ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
+              -mattr=${BUDDY_OPT_ATTR} --filetype=obj
+              -o ${BUDDY_BINARY_DIR}/../benchmarks/OpOptimization/MatMul/matmul-broadcast-${step}.o
+  )
+  add_library(MatMulBroadcast${step} STATIC matmul-broadcast-${step}.o)
+  set_target_properties(MatMulBroadcast${step} PROPERTIES LINKER_LANGUAGE CXX)
+endfunction()
+
+build_matmul_broadcast(16)
+build_matmul_broadcast(32)
+build_matmul_broadcast(64)
+build_matmul_broadcast(128)
+build_matmul_broadcast(256)
 
 add_custom_command(OUTPUT matmul-scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/MatMul.mlir |
@@ -99,6 +108,10 @@ target_link_libraries(matmul-benchmark
   GoogleBenchmark
   MatMulOCV
   MatMulTransform
-  MatMulBroadcast
+  MatMulBroadcast16
+  MatMulBroadcast32
+  MatMulBroadcast64
+  MatMulBroadcast128
+  MatMulBroadcast256
   MatMulScalar
   )
