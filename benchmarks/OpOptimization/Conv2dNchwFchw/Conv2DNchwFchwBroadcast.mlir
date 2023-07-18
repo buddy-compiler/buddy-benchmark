@@ -1,12 +1,12 @@
-#map1 = affine_map<(d0) -> (d0 ceildiv 32)>
-func.func @conv2d_nchw_fchw_broadcast(%input: memref<?x?x?x?xf32>, %kernel: memref<?x?x?x?xf32>, %output: memref<?x?x?x?xf32>) {
+#map = affine_map<(d0) -> (d0 ceildiv STEP_PLACEHOLDER)>
+func.func @conv2d_nchw_fchw_broadcast_STEP_PLACEHOLDER(%input: memref<?x?x?x?xf32>, %kernel: memref<?x?x?x?xf32>, %output: memref<?x?x?x?xf32>) {
   %c0 = arith.constant 0 : index
   %c0_f32 = arith.constant 0.0 : f32
-  %c0_f32_vec = vector.splat %c0_f32 : vector<32xf32>
+  %c0_f32_vec = vector.splat %c0_f32 : vector<STEP_PLACEHOLDERxf32>
   %c1 = arith.constant 1 : index
   %c2 = arith.constant 2 : index
   %c3 = arith.constant 3 : index
-  %c32 = arith.constant 32 : index
+  %step = arith.constant STEP_PLACEHOLDER : index
   // Get the n size. (batch)
   %n = memref.dim %input, %c0 :  memref<?x?x?x?xf32>
   // Get the f size. (feature)
@@ -26,30 +26,30 @@ func.func @conv2d_nchw_fchw_broadcast(%input: memref<?x?x?x?xf32>, %kernel: memr
         affine.for %output_row_idx = %c0 to %output_row {
           affine.for %kernel_row_idx = %c0 to %kernel_row {
             affine.for %kernel_col_idx = %c0 to %kernel_col {
-              affine.for %output_col_idx = %c0 to #map1(%output_col) {
+              affine.for %output_col_idx = %c0 to #map(%output_col) {
                 // Check sparsity.
                 %kernel_ele = memref.load %kernel[%f_idx, %c_idx, %kernel_row_idx, %kernel_col_idx] : memref<?x?x?x?xf32>
                 %sparsity_flag = arith.cmpf one, %kernel_ele, %c0_f32 : f32
                 scf.if %sparsity_flag {
                   // Check tail.
-                  %kernel_vec = vector.broadcast %kernel_ele : f32 to vector<32xf32>
-                  %output_col_cur = arith.muli %output_col_idx, %c32 : index
+                  %kernel_vec = vector.broadcast %kernel_ele : f32 to vector<STEP_PLACEHOLDERxf32>
+                  %output_col_cur = arith.muli %output_col_idx, %step : index
                   %tail_len = arith.subi %output_col, %output_col_cur : index
-                  %tail_flag = arith.cmpi sge, %tail_len, %c32 : index
+                  %tail_flag = arith.cmpi sge, %tail_len, %step : index
                   scf.if %tail_flag {
-                    %input_vec = affine.vector_load %input[%n_idx, %c_idx, %output_row_idx + %kernel_row_idx, %kernel_col_idx + %output_col_idx * 32] : memref<?x?x?x?xf32>, vector<32xf32>
-                    %output_vec = affine.vector_load %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx * 32] : memref<?x?x?x?xf32>, vector<32xf32>
-                    %result_vec = vector.fma %input_vec, %kernel_vec, %output_vec : vector<32xf32>
-                    affine.vector_store %result_vec, %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx * 32] : memref<?x?x?x?xf32>, vector<32xf32>
+                    %input_vec = affine.vector_load %input[%n_idx, %c_idx, %output_row_idx + %kernel_row_idx, %kernel_col_idx + %output_col_idx * STEP_PLACEHOLDER] : memref<?x?x?x?xf32>, vector<STEP_PLACEHOLDERxf32>
+                    %output_vec = affine.vector_load %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx * STEP_PLACEHOLDER] : memref<?x?x?x?xf32>, vector<STEP_PLACEHOLDERxf32>
+                    %result_vec = vector.fma %input_vec, %kernel_vec, %output_vec : vector<STEP_PLACEHOLDERxf32>
+                    affine.vector_store %result_vec, %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx * STEP_PLACEHOLDER] : memref<?x?x?x?xf32>, vector<STEP_PLACEHOLDERxf32>
                   } else {
-                    %mask_vec = vector.create_mask %tail_len : vector<32xi1>
+                    %mask_vec = vector.create_mask %tail_len : vector<STEP_PLACEHOLDERxi1>
                     %input_row_idx_tail = arith.addi %output_row_idx, %kernel_row_idx : index
-                    %output_col_idx_tail = arith.muli %output_col_idx, %c32 : index
+                    %output_col_idx_tail = arith.muli %output_col_idx, %step : index
                     %input_col_idx_tail = arith.addi %kernel_col_idx, %output_col_idx_tail : index
-                    %input_vec_tail = vector.maskedload %input[%n_idx, %c_idx, %input_row_idx_tail, %input_col_idx_tail], %mask_vec, %c0_f32_vec : memref<?x?x?x?xf32>, vector<32xi1>, vector<32xf32> into vector<32xf32>
-                    %output_vec_tail = vector.maskedload %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx_tail], %mask_vec, %c0_f32_vec : memref<?x?x?x?xf32>, vector<32xi1>, vector<32xf32> into vector<32xf32>
-                    %result_vec_tail = vector.fma %input_vec_tail, %kernel_vec, %output_vec_tail : vector<32xf32>
-                    vector.maskedstore %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx_tail], %mask_vec, %result_vec_tail : memref<?x?x?x?xf32>, vector<32xi1>, vector<32xf32>
+                    %input_vec_tail = vector.maskedload %input[%n_idx, %c_idx, %input_row_idx_tail, %input_col_idx_tail], %mask_vec, %c0_f32_vec : memref<?x?x?x?xf32>, vector<STEP_PLACEHOLDERxi1>, vector<STEP_PLACEHOLDERxf32> into vector<STEP_PLACEHOLDERxf32>
+                    %output_vec_tail = vector.maskedload %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx_tail], %mask_vec, %c0_f32_vec : memref<?x?x?x?xf32>, vector<STEP_PLACEHOLDERxi1>, vector<STEP_PLACEHOLDERxf32> into vector<STEP_PLACEHOLDERxf32>
+                    %result_vec_tail = vector.fma %input_vec_tail, %kernel_vec, %output_vec_tail : vector<STEP_PLACEHOLDERxf32>
+                    vector.maskedstore %output[%n_idx, %f_idx, %output_row_idx, %output_col_idx_tail], %mask_vec, %result_vec_tail : memref<?x?x?x?xf32>, vector<STEP_PLACEHOLDERxi1>, vector<STEP_PLACEHOLDERxf32>
                   }
                 }
               }
