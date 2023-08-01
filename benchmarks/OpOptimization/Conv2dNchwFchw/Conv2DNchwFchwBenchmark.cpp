@@ -55,18 +55,33 @@ bool areArraysEqual(float array1[], float array2[], int size) {
 namespace {
 // Declare the C interface.
 extern "C" {
-void _mlir_ciface_conv2d_nchw_fchw_ocv(MemRef<float, 4> *input,
-                                       MemRef<float, 4> *filter,
-                                       MemRef<float, 4> *output);
-void _mlir_ciface_conv2d_nchw_fchw_im2col(MemRef<float, 4> *input,
-                                          MemRef<float, 4> *filter,
-                                          MemRef<float, 4> *output);
-void _mlir_ciface_conv2d_nchw_fchw_winagrad(MemRef<float, 4> *input,
-                                            MemRef<float, 4> *filter,
-                                            MemRef<float, 4> *output);
 void _mlir_ciface_conv2d_nchw_fchw_scalar(MemRef<float, 4> *input,
                                           MemRef<float, 4> *filter,
                                           MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_ocv(MemRef<float, 4> *input,
+                                       MemRef<float, 4> *filter,
+                                       MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_winagrad(MemRef<float, 4> *input,
+                                            MemRef<float, 4> *filter,
+                                            MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col_tiling(MemRef<float, 4> *input,
+                                                 MemRef<float, 4> *filter,
+                                                 MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col_16(MemRef<float, 4> *input,
+                                             MemRef<float, 4> *filter,
+                                             MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col_32(MemRef<float, 4> *input,
+                                             MemRef<float, 4> *filter,
+                                             MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col_64(MemRef<float, 4> *input,
+                                             MemRef<float, 4> *filter,
+                                             MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col_128(MemRef<float, 4> *input,
+                                              MemRef<float, 4> *filter,
+                                              MemRef<float, 4> *output);
+void _mlir_ciface_conv2d_nchw_fchw_im2col_256(MemRef<float, 4> *input,
+                                              MemRef<float, 4> *filter,
+                                              MemRef<float, 4> *output);
 void _mlir_ciface_conv2d_nchw_fchw_broadcast_16(MemRef<float, 4> *input,
                                                 MemRef<float, 4> *filter,
                                                 MemRef<float, 4> *output);
@@ -97,10 +112,15 @@ void _mlir_ciface_conv2d_nchw_fchw_broadcast_256(MemRef<float, 4> *input,
     }                                                                          \
   }
 
-DEFINE_BENCHMARK(OCV, _mlir_ciface_conv2d_nchw_fchw_ocv)
-DEFINE_BENCHMARK(IM2COL, _mlir_ciface_conv2d_nchw_fchw_im2col)
-DEFINE_BENCHMARK(WINAGRAD, _mlir_ciface_conv2d_nchw_fchw_winagrad)
 DEFINE_BENCHMARK(SCALAR, _mlir_ciface_conv2d_nchw_fchw_scalar)
+DEFINE_BENCHMARK(OCV, _mlir_ciface_conv2d_nchw_fchw_ocv)
+DEFINE_BENCHMARK(WINAGRAD, _mlir_ciface_conv2d_nchw_fchw_winagrad)
+DEFINE_BENCHMARK(IM2COL_TILING, _mlir_ciface_conv2d_nchw_fchw_im2col_tiling)
+DEFINE_BENCHMARK(IM2COL_16, _mlir_ciface_conv2d_nchw_fchw_im2col_16)
+DEFINE_BENCHMARK(IM2COL_32, _mlir_ciface_conv2d_nchw_fchw_im2col_32)
+DEFINE_BENCHMARK(IM2COL_64, _mlir_ciface_conv2d_nchw_fchw_im2col_64)
+DEFINE_BENCHMARK(IM2COL_128, _mlir_ciface_conv2d_nchw_fchw_im2col_128)
+DEFINE_BENCHMARK(IM2COL_256, _mlir_ciface_conv2d_nchw_fchw_im2col_256)
 DEFINE_BENCHMARK(BROADCAST_16, _mlir_ciface_conv2d_nchw_fchw_broadcast_16)
 DEFINE_BENCHMARK(BROADCAST_32, _mlir_ciface_conv2d_nchw_fchw_broadcast_32)
 DEFINE_BENCHMARK(BROADCAST_64, _mlir_ciface_conv2d_nchw_fchw_broadcast_64)
@@ -110,13 +130,48 @@ DEFINE_BENCHMARK(BROADCAST_256, _mlir_ciface_conv2d_nchw_fchw_broadcast_256)
 
 BENCHMARK(BM_CONV2D_NCHW_FCHW_SCALAR)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_OCV)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_WINAGRAD)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_TILING)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_16)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_32)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_64)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_128)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_256)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST_16)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST_32)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST_64)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST_128)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST_256)->Unit(benchmark::kMillisecond);
+
+#define DEFINE_VERIFICATION(name, func)                                        \
+  void VERIFICATION_##name(MemRef<float, 4> inputMemRef,                       \
+                           MemRef<float, 4> kernelMemRef,                      \
+                           float resultScalar[]) {                             \
+    intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_F, OUTPUT_H, OUTPUT_W};        \
+    MemRef<float, 4> output##name(sizesOutput, 0);                             \
+    func(&inputMemRef, &kernelMemRef, &output##name);                          \
+    auto result##name = output##name.getData();                                \
+    const int outputSize = OUTPUT_N * OUTPUT_F * OUTPUT_H * OUTPUT_W;          \
+    std::cout << #name << " case: "                                            \
+              << (areArraysEqual(resultScalar, result##name, outputSize)       \
+                      ? PASS                                                   \
+                      : FAIL)                                                  \
+              << std::endl;                                                    \
+  }
+
+DEFINE_VERIFICATION(OCV, _mlir_ciface_conv2d_nchw_fchw_ocv)
+DEFINE_VERIFICATION(WINAGRAD, _mlir_ciface_conv2d_nchw_fchw_winagrad)
+DEFINE_VERIFICATION(IM2COL_TILING, _mlir_ciface_conv2d_nchw_fchw_im2col_tiling)
+DEFINE_VERIFICATION(IM2COL_16, _mlir_ciface_conv2d_nchw_fchw_im2col_16)
+DEFINE_VERIFICATION(IM2COL_32, _mlir_ciface_conv2d_nchw_fchw_im2col_32)
+DEFINE_VERIFICATION(IM2COL_64, _mlir_ciface_conv2d_nchw_fchw_im2col_64)
+DEFINE_VERIFICATION(IM2COL_128, _mlir_ciface_conv2d_nchw_fchw_im2col_128)
+DEFINE_VERIFICATION(IM2COL_256, _mlir_ciface_conv2d_nchw_fchw_im2col_256)
+DEFINE_VERIFICATION(BROADCAST_16, _mlir_ciface_conv2d_nchw_fchw_broadcast_16)
+DEFINE_VERIFICATION(BROADCAST_32, _mlir_ciface_conv2d_nchw_fchw_broadcast_32)
+DEFINE_VERIFICATION(BROADCAST_64, _mlir_ciface_conv2d_nchw_fchw_broadcast_64)
+DEFINE_VERIFICATION(BROADCAST_128, _mlir_ciface_conv2d_nchw_fchw_broadcast_128)
+DEFINE_VERIFICATION(BROADCAST_256, _mlir_ciface_conv2d_nchw_fchw_broadcast_256)
 
 void verification() {
   // Set the random number generator.
@@ -129,7 +184,7 @@ void verification() {
   intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};
   intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_F, OUTPUT_H, OUTPUT_W};
 
-  // Generate input and kernel memref container with random numbers.
+  // Generate input memref container with random numbers.
   const int inputSize = INPUT_N * INPUT_C * INPUT_H * INPUT_W;
   float inputRand[inputSize];
   for (int i = 0; i < inputSize; ++i) {
@@ -137,6 +192,7 @@ void verification() {
   }
   MemRef<float, 4> inputMemRef(inputRand, sizesInput);
 
+  // Generate kernel memref container with random numbers.
   const int kernelSize = KERNEL_F * KERNEL_C * KERNEL_H * KERNEL_W;
   float kernelRand[kernelSize];
   for (int i = 0; i < kernelSize; ++i) {
@@ -144,90 +200,32 @@ void verification() {
   }
   MemRef<float, 4> kernelMemRef(kernelRand, sizesKernel);
 
-  // Generate output memref container with zero.
-  const int outputSize = OUTPUT_N * OUTPUT_F * OUTPUT_H * OUTPUT_W;
+  // Generate a result using a scalar method for comparison during verification.
   MemRef<float, 4> outputScalar(sizesOutput, 0);
-  MemRef<float, 4> outputOCV(sizesOutput, 0);
-  MemRef<float, 4> outputIm2col(sizesOutput, 0);
-  MemRef<float, 4> outputWinagrad(sizesOutput, 0);
-  MemRef<float, 4> outputBroadcast16(sizesOutput, 0);
-  MemRef<float, 4> outputBroadcast32(sizesOutput, 0);
-  MemRef<float, 4> outputBroadcast64(sizesOutput, 0);
-  MemRef<float, 4> outputBroadcast128(sizesOutput, 0);
-  MemRef<float, 4> outputBroadcast256(sizesOutput, 0);
-
-  // Perform all the convoluation implementation.
   _mlir_ciface_conv2d_nchw_fchw_scalar(&inputMemRef, &kernelMemRef,
                                        &outputScalar);
-  _mlir_ciface_conv2d_nchw_fchw_ocv(&inputMemRef, &kernelMemRef, &outputOCV);
-  _mlir_ciface_conv2d_nchw_fchw_im2col(&inputMemRef, &kernelMemRef,
-                                       &outputIm2col);
-  _mlir_ciface_conv2d_nchw_fchw_winagrad(&inputMemRef, &kernelMemRef,
-                                         &outputWinagrad);
-  _mlir_ciface_conv2d_nchw_fchw_broadcast_16(&inputMemRef, &kernelMemRef,
-                                             &outputBroadcast16);
-  _mlir_ciface_conv2d_nchw_fchw_broadcast_32(&inputMemRef, &kernelMemRef,
-                                             &outputBroadcast32);
-  _mlir_ciface_conv2d_nchw_fchw_broadcast_64(&inputMemRef, &kernelMemRef,
-                                             &outputBroadcast64);
-  _mlir_ciface_conv2d_nchw_fchw_broadcast_128(&inputMemRef, &kernelMemRef,
-                                              &outputBroadcast128);
-  _mlir_ciface_conv2d_nchw_fchw_broadcast_256(&inputMemRef, &kernelMemRef,
-                                              &outputBroadcast256);
-
-  // Get the result array.
   auto resultScalar = outputScalar.getData();
-  auto resultOCV = outputOCV.getData();
-  auto resultIm2col = outputIm2col.getData();
-  auto resultWinagrad = outputWinagrad.getData();
-  auto resultBroadcast16 = outputBroadcast16.getData();
-  auto resultBroadcast32 = outputBroadcast32.getData();
-  auto resultBroadcast64 = outputBroadcast64.getData();
-  auto resultBroadcast128 = outputBroadcast128.getData();
-  auto resultBroadcast256 = outputBroadcast256.getData();
 
   // Print the verfication result.
   std::cout << "---------------------------------------------------------------"
                "---------"
             << std::endl;
   std::cout << "Correctness Verification:" << std::endl;
-  std::cout << "OCV case: "
-            << (areArraysEqual(resultScalar, resultOCV, outputSize) ? PASS
-                                                                    : FAIL)
-            << std::endl;
-  std::cout << "Im2col case: "
-            << (areArraysEqual(resultScalar, resultIm2col, outputSize) ? PASS
-                                                                       : FAIL)
-            << std::endl;
-  std::cout << "Winagrad case: "
-            << (areArraysEqual(resultScalar, resultWinagrad, outputSize) ? PASS
-                                                                         : FAIL)
-            << std::endl;
-  std::cout << "Broadcast 16 case: "
-            << (areArraysEqual(resultScalar, resultBroadcast16, outputSize)
-                    ? PASS
-                    : FAIL)
-            << std::endl;
-  std::cout << "Broadcast 32 case: "
-            << (areArraysEqual(resultScalar, resultBroadcast32, outputSize)
-                    ? PASS
-                    : FAIL)
-            << std::endl;
-  std::cout << "Broadcast 64 case: "
-            << (areArraysEqual(resultScalar, resultBroadcast64, outputSize)
-                    ? PASS
-                    : FAIL)
-            << std::endl;
-  std::cout << "Broadcast 128 case: "
-            << (areArraysEqual(resultScalar, resultBroadcast128, outputSize)
-                    ? PASS
-                    : FAIL)
-            << std::endl;
-  std::cout << "Broadcast 256 case: "
-            << (areArraysEqual(resultScalar, resultBroadcast256, outputSize)
-                    ? PASS
-                    : FAIL)
-            << std::endl;
+
+  VERIFICATION_OCV(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_WINAGRAD(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_IM2COL_TILING(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_IM2COL_16(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_IM2COL_32(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_IM2COL_64(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_IM2COL_128(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_IM2COL_256(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_BROADCAST_16(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_BROADCAST_32(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_BROADCAST_64(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_BROADCAST_128(inputMemRef, kernelMemRef, resultScalar);
+  VERIFICATION_BROADCAST_256(inputMemRef, kernelMemRef, resultScalar);
+
   std::cout << "---------------------------------------------------------------"
                "---------"
             << std::endl;
