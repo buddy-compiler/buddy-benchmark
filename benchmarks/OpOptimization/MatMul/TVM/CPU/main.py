@@ -23,7 +23,7 @@ import timeit
 import tvm.testing
 from matmul_manual import *
 from matmul_autotvm import *
-
+from matmul_autoschedule import *
 # ------------------------------------------------------------------------------
 # User Configurable Variables
 # ------------------------------------------------------------------------------
@@ -195,6 +195,18 @@ def main():
                      standard=standard_res,
                      optimization="TVM_MATMUL_AUTO",
                      log=log)
+
+  s, arg_bufs = matmul_auto_tuning_plus((M, K, N, "float32"), target)
+  evaluate_operation(s,
+                     arg_bufs,
+                     target=target,
+                     inputs=(a, b),
+                     standard=standard_res,
+                     optimization="TVM_MATMUL_AUTO_PLUS",
+                     log=log)
+
+
+
   # Register numpy case.
   log.append(("NUMPY_DOT", np_running_time / np_repeat * 1000))  # Milliseconds
   # Dump the performance table.
