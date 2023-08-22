@@ -109,29 +109,13 @@ def main():
   data, mean, var, gamma, beta, out = get_bn_data(size[0], size[1], tvm.nd.array)
   test_input = data, mean, var, gamma, beta, out
 
-  # Repeatedly perform a matrix multiplication to get a performance baseline
-  # for the default numpy implementation.
-  # np_repeat = 100
-  # np_running_time = timeit.timeit(
-  #     setup="import numpy\n"
-  #     "M = " + str(M) + "\n"
-  #     "K = " + str(K) + "\n"
-  #     "N = " + str(N) + "\n"
-  #     'dtype = "float32"\n'
-  #     "a = numpy.random.rand(M, K).astype(dtype)\n"
-  #     "b = numpy.random.rand(K, N).astype(dtype)\n",
-  #     stmt="answer = a+b",
-  #     number=np_repeat,
-  # )
 
-  # standard_res = a.numpy() +  b.numpy()
   mxnet_times = bench_bn_mxnet(size)
 
   # ----------------------------------------------------------------------------
   # Register Benchmarks and Dump Report
   # ----------------------------------------------------------------------------
   # Register default schedule.
-  # s, arg_bufs = BroadcastAdd_default(shape1,shape2)
   s, arg_bufs = default_bn(size)
   evaluate_operation(s,
                       arg_bufs,
