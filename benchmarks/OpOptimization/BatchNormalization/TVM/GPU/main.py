@@ -64,9 +64,7 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
   target = 'cuda'
   dev = tvm.cuda(0)
   func = tvm.build(s, vars, target=target)
-  # dev = tvm.device(target.kind.name, 0)
   data, mean, var, gamma, beta, out = inputs
-  # c = tvm.nd.array(numpy.zeros((M, N), dtype=dtype), dev)
   func(data, mean, var, gamma, beta, out)
 
   evaluator = func.time_evaluator(func.entry_name, dev, number=300)
@@ -103,10 +101,6 @@ def main():
   # Initialize the log list.
   log = []
 
-  # dev = tvm.device(target.kind.name, 0)
-  # Generate random tensor for testing.
-
-  
   
   ctx = getattr(mx, "cpu")()
   mxnet_times = bench_bn_mxnet(size)
@@ -120,7 +114,6 @@ def main():
                       arg_bufs,
                       target=target,
                       inputs=test_input,
-                      # standard=standard_res,
                       optimization="default_bn",
                       log=log)
 
@@ -129,7 +122,6 @@ def main():
                       arg_bufs,
                       target=target,
                       inputs=test_input,
-                      # standard=standard_res,
                       optimization="optimized_bn",
                       log=log)
 
@@ -138,7 +130,6 @@ def main():
                       arg_bufs,
                       target=target,
                       inputs=test_input,
-                      # standard=standard_res,
                       optimization="auto_bn",
                       log=log)
 
