@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This is the main file of the resnet-18 benchmark.
+// This is the main file of the VGG-13 benchmark.
 //
 //===----------------------------------------------------------------------===//
 
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   // Run benchmarks.
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
-  // The ResNet-18.mlir is generated from torch-mlir project.
+  // The VGG-13.mlir is generated from torch-mlir project.
   // Print classification result.
   printResult();
 
