@@ -1,2 +1,0 @@
-benchmarks/DeepLearning/Models/MiniLM-L6/MiniLM-L6-12.mlir filter=lfs diff=lfs merge=lfs -text
-benchmarks/DeepLearning/Models/MiniLM-L6/MiniLM-L6-200.mlir filter=lfs diff=lfs merge=lfs -text
