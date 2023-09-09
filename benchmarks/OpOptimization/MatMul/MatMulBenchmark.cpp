@@ -28,10 +28,10 @@
 #define M 64
 #define N 3136
 #define K 576
-#define BATCH_M 16
+#define BATCH_M 128
 #define BATCH_N 784
-#define BATCH_K 144
-#define BATCH 64
+#define BATCH_K 72
+#define BATCH 16
 
 // Helper functions and variables.
 namespace {
@@ -72,6 +72,9 @@ void _mlir_ciface_batch_matmul_scalar(MemRef<float, 3> *A, MemRef<float, 3> *B,
 void _mlir_ciface_batch_matmul_broadcast_64(MemRef<float, 3> *A,
                                             MemRef<float, 3> *B,
                                             MemRef<float, 3> *C);
+void _mlir_ciface_batch_matmul_broadcast_64_omp(MemRef<float, 3> *A,
+                                                MemRef<float, 3> *B,
+                                                MemRef<float, 3> *C);
 }
 
 #define DEFINE_MATMUL_BENCHMARK(name, func)                                    \
@@ -115,6 +118,8 @@ DEFINE_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_matmul_scalar)
 DEFINE_BATCH_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_batch_matmul_scalar)
 DEFINE_BATCH_MATMUL_BENCHMARK(BROADCAST_64,
                               _mlir_ciface_batch_matmul_broadcast_64)
+DEFINE_BATCH_MATMUL_BENCHMARK(BROADCAST_64_OMP,
+                              _mlir_ciface_batch_matmul_broadcast_64_omp)
 } // namespace
 
 // Register benchmark cases.
@@ -129,6 +134,7 @@ BENCHMARK(BM_MATMUL_BROADCAST_256)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_BROADCAST_256)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_BATCH_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_BATCH_MATMUL_BROADCAST_64)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_BATCH_MATMUL_BROADCAST_64_OMP)->Unit(benchmark::kMillisecond);
 
 // Correctness Verification
 // The verification does not affect the performance.
@@ -237,7 +243,6 @@ void matmul_verification() {
                     ? PASS
                     : FAIL)
             << std::endl;
-
   std::cout << "-----------------------------------------------------------"
             << std::endl;
 }
@@ -274,23 +279,35 @@ void batch_matmul_verification() {
   const int outputSize = BATCH * (BATCH_M) * (BATCH_N);
   MemRef<float, 3> outputScalar(sizesC, 0);
   MemRef<float, 3> outputBroadcast64(sizesC, 0);
+  MemRef<float, 3> outputBroadcast64OMP(sizesC, 0);
 
   // Perform all the matmul implementation.
   _mlir_ciface_batch_matmul_scalar(&inputAMemRef, &inputBMemRef, &outputScalar);
   _mlir_ciface_batch_matmul_broadcast_64(&inputAMemRef, &inputBMemRef,
                                          &outputBroadcast64);
+  _mlir_ciface_batch_matmul_broadcast_64_omp(&inputAMemRef, &inputBMemRef,
+                                             &outputBroadcast64OMP);
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
-  auto resultBroadcast16 = outputBroadcast64.getData();
+  auto resultBroadcast64 = outputBroadcast64.getData();
+  auto resultBroadcast64OMP = outputBroadcast64OMP.getData();
 
   // Print the verfication result.
   std::cout << "Batch Matmul Broadcast 64 case: "
-            << (areArraysEqual(resultScalar, resultBroadcast16,
+            << (areArraysEqual(resultScalar, resultBroadcast64,
                                outputSize / BATCH)
                     ? PASS
                     : FAIL)
             << std::endl;
+
+  std::cout << "Batch Matmul Broadcast 64 OpenMP case: "
+            << (areArraysEqual(resultScalar, resultBroadcast64OMP,
+                               outputSize / BATCH)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+
   std::cout << "-----------------------------------------------------------"
             << std::endl;
 }

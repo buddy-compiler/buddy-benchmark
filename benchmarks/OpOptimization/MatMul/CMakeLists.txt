@@ -125,6 +125,7 @@ function(build_batch_matmul_broadcast step)
           ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
             -batchmatmul-optimize="step-placeholder=${step}"
             -expand-strided-metadata
+            -affine-super-vectorize
             -lower-affine
             -convert-vector-to-llvm
             -finalize-memref-to-llvm
@@ -144,12 +145,40 @@ endfunction()
 
 build_batch_matmul_broadcast(64)
 
+function(build_batch_matmul_broadcast_omp step)
+  add_custom_command(OUTPUT batch-matmul-broadcast-${step}-omp.o
+    COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/BatchMatMulBroadcast.mlir |
+          sed 's/batch_matmul_broadcast_STEP_PLACEHOLDER/batch_matmul_broadcast_STEP_PLACEHOLDER_omp/g' |
+          sed 's/STEP_PLACEHOLDER/${step}/g' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+            -expand-strided-metadata
+            -affine-super-vectorize
+            -lower-affine
+            -convert-scf-to-openmp
+            -convert-vector-to-llvm
+            -finalize-memref-to-llvm
+            -convert-scf-to-cf
+            -convert-linalg-to-llvm
+            -llvm-request-c-wrappers
+            -convert-openmp-to-llvm
+            -convert-func-to-llvm
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${CMAKE_CXX_COMPILER} -c -x ir -O3 --target=${BUDDY_OPT_TRIPLE} -fopenmp -march=native -flto
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/OpOptimization/MatMul/batch-matmul-broadcast-${step}-omp.o -
+  )
+  add_library(BatchMatMulBroadcast${step}OMP STATIC batch-matmul-broadcast-${step}-omp.o)
+  set_target_properties(BatchMatMulBroadcast${step}OMP PROPERTIES LINKER_LANGUAGE CXX)
+endfunction()
+
+build_batch_matmul_broadcast_omp(64)
+
 add_executable(matmul-benchmark
   Main.cpp
   MatMulBenchmark.cpp
   )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp -flto")
 
 target_link_libraries(matmul-benchmark
   GoogleBenchmark
@@ -163,4 +192,5 @@ target_link_libraries(matmul-benchmark
   MatMulScalar
   BatchMatMulScalar
   BatchMatMulBroadcast64
+  BatchMatMulBroadcast64OMP
   )

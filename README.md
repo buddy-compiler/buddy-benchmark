@@ -227,6 +227,7 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DOP_OPTIMIZATION_BENCHMARKS=ON \
+    -DCMAKE_CXX_COMPILER=clang++ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja <your target operation benchmark>
 
@@ -234,6 +235,7 @@ $ ninja <your target operation benchmark>
 //   - conv2d-nchw-fchw-benchmark
 //   - matmul-benchmark
 ```
+OpenMP is required in matmul-benchmark, make sure `libomp` and `libomp-dev` (on Ubuntu and Debian) / `libomp-devel` (on Redhat and SUSE) have been installed.
 
 Run TVM operation optimization benchmark cases.
 - Install TVM ([steps](./thirdparty/README.md#tvm)).
