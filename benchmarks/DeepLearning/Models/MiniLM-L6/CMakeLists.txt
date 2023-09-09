@@ -1,17 +1,17 @@
 # Compile MLIR file to object file.
 add_custom_command(OUTPUT minilm-l6-default.o
 COMMAND 
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt ${CMAKE_CURRENT_SOURCE_DIR}/MiniLM-L6-200.mlir
+  ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt ${CMAKE_CURRENT_SOURCE_DIR}/MiniLM-L6-200.mlir
       --linalg-bufferize
+      --batchmatmul-optimize
       --convert-linalg-to-loops
       --func-bufferize
       --arith-bufferize
       --tensor-bufferize
       --finalizing-bufferize
-      --convert-vector-to-scf
+      --lower-affine
       --convert-scf-to-cf
       --expand-strided-metadata
-      --lower-affine
       --convert-vector-to-llvm
       --memref-expand
       --arith-expand
