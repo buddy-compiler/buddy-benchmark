@@ -131,7 +131,6 @@ BENCHMARK(BM_MATMUL_BROADCAST_32)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_BROADCAST_64)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_BROADCAST_128)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_MATMUL_BROADCAST_256)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_MATMUL_BROADCAST_256)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_BATCH_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_BATCH_MATMUL_BROADCAST_64)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_BATCH_MATMUL_BROADCAST_64_OMP)->Unit(benchmark::kMillisecond);

@@ -123,7 +123,7 @@ function(build_batch_matmul_broadcast step)
     COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/BatchMatMul.mlir |
           sed 's/bm_batch_matmul/batch_matmul_broadcast_${step}/g' |
           ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-            -batchmatmul-optimize="step-placeholder=${step}"
+            -batchmatmul-optimize="vector-size=${step}"
             -expand-strided-metadata
             -affine-super-vectorize
             -lower-affine
@@ -178,7 +178,7 @@ add_executable(matmul-benchmark
   MatMulBenchmark.cpp
   )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp -flto")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp -flto -fuse-ld=lld")
 
 target_link_libraries(matmul-benchmark
   GoogleBenchmark
