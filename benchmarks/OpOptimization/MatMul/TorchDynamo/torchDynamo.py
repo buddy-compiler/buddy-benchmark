@@ -32,7 +32,6 @@ def default_matrix_multiply():
 
 
 def dynamo_matrix_multiply():
-    # compiled_mm = torch.compile(matrix_multiply, backend="inductor")
     compiled_mm = torch.compile(matrix_multiply,mode="max-autotune")
     return compiled_mm
 
