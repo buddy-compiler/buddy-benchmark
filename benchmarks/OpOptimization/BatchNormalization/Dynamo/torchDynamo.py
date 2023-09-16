@@ -54,18 +54,6 @@ def batch_norm_compiled():
 
 
 
-# def main():
-#     size = (1024, 28)
-#     data, mean, var, gamma, beta, out = get_bn_data(size[0], size[1])
-#     Y = batch_norm_compiled()
-#     Y(data, mean, var, gamma, beta, out)
-
-
-
-
-# if __name__ == "__main__":
-#   main()
-
 
 
 
