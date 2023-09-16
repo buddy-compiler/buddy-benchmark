@@ -78,7 +78,7 @@ def main():
   M = 64
   K = 128
   N = 256
-#   ctx = tvm.cuda(0)
+
   a_np = np.random.rand(batch_size, M, K).astype(np.float32)
   b_np = np.random.rand(batch_size, K, N).astype(np.float32)
   c_np = np.zeros((batch_size, M, N), dtype=np.float32)

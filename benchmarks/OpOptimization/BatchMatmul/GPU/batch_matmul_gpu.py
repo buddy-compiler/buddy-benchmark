@@ -87,31 +87,4 @@ def batchMatmul_manual(batch,M,K,N):
 
   return s, (A, B, C)
 
-# def main():
-#   target = tvm.target.Target(target="cuda", host="llvm")
-#   batch_size = 64
-#   M = 64
-#   K = 128
-#   N = 256
-#   ctx = tvm.cuda(0)
-#   a_np = np.random.rand(batch_size, M, K).astype(np.float32)
-#   b_np = np.random.rand(batch_size, K, N).astype(np.float32)
-#   c_np = np.zeros((batch_size, M, N), dtype=np.float32)
-  
-#   a = tvm.nd.array(a_np, ctx)
-#   b = tvm.nd.array(b_np, ctx)
-#   c = tvm.nd.array(c_np, ctx)
-#   shape = batch_size,M,K,N
-#   batchMatmul_numpy(shape,a_np,b_np)
 
-  # s, arg_bufs = batchMatmul_default(batch_size, M, K, N)
-  # shape = batch_size, M, K, N
-  # s, arg_bufs = batchMatmul_auto_tuning(shape,"cuda")
-
-  # func = tvm.build(s, arg_bufs, target=target)
-  # func(a, b, c)
-
-
-
-# if __name__ == '__main__':
-#   main()

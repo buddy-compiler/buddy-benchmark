@@ -22,7 +22,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
     log: The log list.
   """
   func = tvm.build(s, vars, target=target)
-#   dev = tvm.device(target.kind.name, 0)
   data_x, data_k, data_y= inputs
   evaluator = func.time_evaluator(func.entry_name, dev, number=10)
   mean_time = evaluator(data_x, data_k, data_y).mean * 1000  # Convert to milliseconds
@@ -71,19 +70,14 @@ def main():
   shape = batch_size,M,K,N
   
 
-  
-
-  # 记录开始时间
   start_time = time.time()
 
-  # 执行需要测试运行时间的代码
-  # 例如，这里是一个简单的循环
+ 
   shape = batch_size,M,K,N
   batchMatmul_numpy(shape,a_np,b_np)
 
   end_time = time.time()
 
-  # 计算运行时间
   numpy_time = end_time - start_time
 
   sch, arg_bufs = batchMatmul_manual(batch_size, M, K, N)
