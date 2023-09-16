@@ -56,7 +56,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
   func = tvm.build(s, vars, target=target)
   dev = tvm.device(target.kind.name, 0)
   data, _, out_max= inputs
-  # c = tvm.nd.array(numpy.zeros((M, N), dtype=dtype), dev)
   func(data,out_max)
 
   evaluator = func.time_evaluator(func.entry_name, dev, number=10)

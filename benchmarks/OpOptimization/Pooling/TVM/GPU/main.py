@@ -43,7 +43,6 @@ out_max = tvm.nd.array(out_max, dev)
 # ------------------------------------------------------------------------------
 # Helper Function
 # ------------------------------------------------------------------------------
-# def evaluate_operation(s, vars, target, inputs, standard, optimization, log):
 def evaluate_operation(s, vars, target, inputs, optimization, log):
   """Evaluate operation correctness and print the performance information.
   Args:
@@ -56,9 +55,7 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
     log: The log list.
   """
   func = tvm.build(s, vars, target=target)
-  # dev = tvm.device(target.kind.name, 0)
   data, _, out_max= inputs
-  # c = tvm.nd.array(numpy.zeros((M, N), dtype=dtype), dev)
   func(data,out_max)
   evaluator = func.time_evaluator(func.entry_name, dev, number=10)
   mean_time = evaluator(data,out_max).mean * 1000  # Convert to milliseconds

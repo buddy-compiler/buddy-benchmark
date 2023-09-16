@@ -119,8 +119,6 @@ def main():
   sch,arg_bufs = Pooling_autoschedule(size,target)
   X, Y, PaddedX = arg_bufs
   arg_bufs = X, Y
-  
-#   func = tvm.build(sch, arg_bufs, target=target)
   func = tvm.build(sch, arg_bufs, 'cuda',target_host='llvm')
   dev = tvm.cuda(0)
 
@@ -128,12 +126,6 @@ def main():
   data = tvm.nd.array(data, dev)
   out_max = tvm.nd.array(out_max, dev)
   func(data, out_max)
-
-
-
-  # sch, arg_bufs = default_max(size)
-  # func = tvm.build(sch, arg_bufs, target=target)
-  # func(data, out_max)
   
 
 if __name__ == "__main__":

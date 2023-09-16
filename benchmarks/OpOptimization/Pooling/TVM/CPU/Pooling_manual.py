@@ -116,7 +116,6 @@ def conv_out_size(n, k, p, s):
     return (n - k + 2 * p)//s + 1
 
 
-# Save to the d2ltvm package.
 def pool(pool_type, c, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """2D pooling
 

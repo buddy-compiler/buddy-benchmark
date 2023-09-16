@@ -116,33 +116,4 @@ def default_max(size):
 
 
 
-# def main():
-  
-  
-#   size = (64, 64, 3)
-#   c, n, k, p, s = size[0], size[0], size[1], size[2], 1
-#   data, _, out_max = get_conv_data(size[0], size[0], size[1], size[2], 1, 1, tvm.nd.array)
-
-#   sch,arg_bufs = Pooling_autoschedule(size,target)
-#   X, Y, PaddedX = arg_bufs
-#   arg_bufs = X, Y
-  
-# #   func = tvm.build(sch, arg_bufs, target=target)
-#   func = tvm.build(sch, arg_bufs, 'cuda',target_host='llvm')
-#   dev = tvm.cuda(0)
-
-  
-#   data = tvm.nd.array(data, dev)
-#   out_max = tvm.nd.array(out_max, dev)
-#   func(data, out_max)
-
-
-
-  # sch, arg_bufs = default_max(size)
-  # func = tvm.build(sch, arg_bufs, target=target)
-  # func(data, out_max)
-  
-
-if __name__ == "__main__":
-    main()
 
