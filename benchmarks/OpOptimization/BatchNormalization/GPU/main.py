@@ -101,10 +101,6 @@ def main():
   # Initialize the log list.
   log = []
 
-  # dev = tvm.device(target.kind.name, 0)
-  # Generate random tensor for testing.
-
-  
   
   ctx = getattr(mx, "cpu")()
   mxnet_times = bench_bn_mxnet(size)

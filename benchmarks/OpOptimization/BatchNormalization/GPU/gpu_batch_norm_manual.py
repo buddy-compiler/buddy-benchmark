@@ -39,9 +39,6 @@ def get_bn_data_mxnet(c, n, ctx='cpu'):
 
 
 def batch_norm_mxnet(data, mean, var, gamma, beta, out, eps=1e-5):
-    # use_global_stats=True to use the input mean and var instead of computing
-    # the mean and var of the input data.
-    # fix_gamma=False so that gamma won't be set to 1.
     mx.nd.BatchNorm(data, gamma, beta, mean, var, eps,
                     use_global_stats=True, fix_gamma=False, out=out)
 

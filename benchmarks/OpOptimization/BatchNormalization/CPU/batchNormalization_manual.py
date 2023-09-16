@@ -9,7 +9,6 @@ import mxnet as mx
 # ------------------------------------------------------------------------------
 # Default Scheduling
 # ------------------------------------------------------------------------------
-# Save to the d2ltvm package.
 def get_bn_data_mxnet(c, n, ctx='cpu'):
     ctx = getattr(mx, ctx)()
     data, mean, var, gamma, beta, out = get_bn_data(c, n,
@@ -19,9 +18,6 @@ def get_bn_data_mxnet(c, n, ctx='cpu'):
 
 
 def batch_norm_mxnet(data, mean, var, gamma, beta, out, eps=1e-5):
-    # use_global_stats=True to use the input mean and var instead of computing
-    # the mean and var of the input data.
-    # fix_gamma=False so that gamma won't be set to 1.
     mx.nd.BatchNorm(data, gamma, beta, mean, var, eps,
                     use_global_stats=True, fix_gamma=False, out=out)
 
@@ -115,7 +111,6 @@ def bn_timer_mxnet(c, n, ctx):
         'out.wait_to_read()')
     return timer.timeit
 
-# Save to the d2ltvm package.
 def bench_bn_mxnet(size, ctx='cpu'):
     """Return the execution times of MXNet batch norm"""
     return bench_workload(bn_timer_mxnet(size[0], size[1], ctx))
@@ -127,13 +122,6 @@ def main():
   size = (32, 28)
   mxnet_times = bench_bn_mxnet(size)
   print(mxnet_times)
-#   sch, args = default_bn(size)
-#   mod = tvm.build(sch, args)
-
-
-#   data, mean, var, gamma, beta, out = get_bn_data(size[0], size[1], tvm.nd.array)
-#   mod(data, mean, var, gamma, beta, out)
-
 
 if __name__ == "__main__":
     main()

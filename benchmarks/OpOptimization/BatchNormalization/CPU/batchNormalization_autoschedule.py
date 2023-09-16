@@ -53,7 +53,6 @@ def batch_norm(c, n, eps=1e-5):
 
 def batch_norm_auto_tuning_plus(args, target):
   target = tvm.target.Target(target)
-  # data, mean, var, gamma, beta, out = args
   size = args
   c, n = size[:]
   task = tvm.auto_scheduler.SearchTask(func=batch_norm, args=(c,n), target=target)
