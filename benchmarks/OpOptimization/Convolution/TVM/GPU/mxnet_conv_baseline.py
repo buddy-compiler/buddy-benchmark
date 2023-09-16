@@ -66,7 +66,6 @@ def conv_timer_mxnet(c, n, k, ctx):
     timer = timeit.Timer(
         setup='import mxnet as mx\n'
         'from mxnet_conv_baseline import get_conv_data_mxnet,conv_mxnet,get_conv_data,conv_out_size\n'
-        # 'from convolution_manual import get_conv_data\n'
         'c, n, k, p, s = %d, %d, %d, %d, 1\n'
         'data, weight, bias, out = get_conv_data_mxnet(\n'
         '    c, c, n, k, p, s, "%s")'%(c, n, k, (k-1)//2, ctx),

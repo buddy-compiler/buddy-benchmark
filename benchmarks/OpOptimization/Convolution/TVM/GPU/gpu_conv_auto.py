@@ -36,8 +36,6 @@ def conv_default(oc, ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
 
 
 def gpu_conv_autoR(oc, ic, n, k, p, s):
-    # X, K, Y, PaddedX = conv_default(oc, ic, n, n, k, k, p, p, s, s)
-    # s = te.create_schedule(Y.op)
     target = tvm.target.Target(target="cuda", host="llvm")
 
     task = tvm.auto_scheduler.SearchTask(func=conv_default, args= (oc, ic, n, n, k, k, p, p, s, s), target=target)

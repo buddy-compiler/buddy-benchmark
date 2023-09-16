@@ -25,7 +25,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
     log: The log list.
   """
   func = tvm.build(s, vars, target=target)
-#   dev = tvm.device(target.kind.name, 0)
   data_x, data_k, data_y= inputs
   evaluator = func.time_evaluator(func.entry_name, dev, number=10)
   mean_time = evaluator(data_x, data_k, data_y).mean * 1000  # Convert to milliseconds
@@ -62,7 +61,6 @@ def main():
   log = []
 
   size = 64,64,3
-#   target = tvm.target.Target(target="llvm", host="llvm")
   dtype = "float32"
   c,n,k = size
   oc = c
@@ -98,7 +96,7 @@ def main():
                       log=log)
 
   sch, arg_bufs = gpu_conv_vthread(oc, ic, n, k, p, s)
-  # print(arg_bufs)
+  
   evaluate_operation(sch,
                       arg_bufs,
                       target=target,
@@ -108,7 +106,7 @@ def main():
 
   
   sch, arg_bufs = gpu_conv_autoR(oc, ic, n, k, p, s)
-  # print(arg_bufs)
+  
   evaluate_operation(sch,
                       arg_bufs,
                       target=target,
