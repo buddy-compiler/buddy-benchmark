@@ -1,6 +1,6 @@
 import tvm
 import tvm.testing
-from tvm import te # tensor expression
+from tvm import te 
 import numpy as np
 
 from tvm.script import tir as T
@@ -10,8 +10,6 @@ from tvm.script.parser.tir import evaluate
 
 
 def BroadcastAdd_autoschedule(shape1, shape2):
-  # M, K = shape1
-  # K, N = shape2
   assert len(shape1) == 2 and len(shape2) == 2, "broadcast tensors should both be 2-dimension"
 
   m = shape1[0] if shape2[0] == 1 else shape2[0]
@@ -25,8 +23,7 @@ def BroadcastAdd_autoschedule(shape1, shape2):
             C: T.Buffer((m, n), "float32"),):
       T.func_attr({"global_symbol": "main", "tir.noalias": True})
 
-      # m = shape1[0] if shape2[0] == 1 else shape2[0]
-      # n = shape1[1] if shape2[1] == 1 else shape2[1]
+  
 
       for i, j in T.grid(m, n):
         with T.block("C"):

@@ -46,8 +46,6 @@ def BroadcastAdd(shape1,shape2):
   f = lambda x, y: A[0 if shape1[0]==1 else x, 0 if shape1[1]==1 else y] + \
       B[0 if shape2[0]==1 else x, 0 if shape2[1]==1 else y]
   C = te.compute((m, n),f, name='C',attrs={"layout_free_placeholders": [B]},)
-#   s = te.create_schedule(C.op)
-#   arg_bufs = [A, B, C]
   return [A, B, C]
 
 

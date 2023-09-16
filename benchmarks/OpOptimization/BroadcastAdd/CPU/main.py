@@ -62,7 +62,6 @@ def evaluate_operation(s, vars, target, inputs, standard, optimization, log):
   func = tvm.build(s, vars, target=target)
   dev = tvm.device(target.kind.name, 0)
   a, b, c= inputs
-  # c = tvm.nd.array(numpy.zeros((M, N), dtype=dtype), dev)
   func(a, b, c)
   # Evaluate correctness.
   tvm.testing.assert_allclose(c.numpy(), standard, rtol=1e-5)
@@ -125,8 +124,6 @@ def main():
   # Generate random tensor for testing.
   a, b, c = get_bcast_data(shape1, shape2, tvm.nd.array)
 
-  # Repeatedly perform a matrix multiplication to get a performance baseline
-  # for the default numpy implementation.
   np_repeat = 100
   np_running_time = timeit.timeit(
       setup="import numpy\n"
@@ -146,7 +143,6 @@ def main():
   # Register Benchmarks and Dump Report
   # ----------------------------------------------------------------------------
   # Register default schedule.
-  # s, arg_bufs = BroadcastAdd_default(shape1,shape2)
   s, arg_bufs = BroadcastAdd_default(shape1,shape2)
   evaluate_operation(s,
                       arg_bufs,

@@ -56,7 +56,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
     log: The log list.
   """
   func = tvm.build(s, vars, 'cuda')
-  # dev = tvm.cuda(0)
   a, b, c= inputs
   func(a, b, c)
   # Evaluate performance.
@@ -115,9 +114,7 @@ def main():
   B_nd = tvm.nd.array(B_np, dev)
   C_nd = tvm.nd.array(np.zeros((N, N), dtype="float32"), dev) 
 
-  # Repeatedly perform a matrix multiplication to get a performance baseline
-  # for the default numpy implementation.
-
+  
   s, arg_bufs = continuous_parallel(N)
 
   evaluate_operation(s,
