@@ -32,7 +32,6 @@ def evaluator(s, inputs, num):
       elapsed_time = end - start
       all_time.append(elapsed_time)
 
-  # 计算时间的平均值
   average_time = sum(all_time) / num
 
   return average_time
