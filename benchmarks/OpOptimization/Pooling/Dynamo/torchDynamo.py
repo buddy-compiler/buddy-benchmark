@@ -36,7 +36,6 @@ def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
 
 def get_pool_data_torch(c, n, k, p, s):
     data, _, out = get_conv_data(c, c, n, k, p, s,lambda x: torch.from_numpy(x))
-    # data, out = data.expand_dims(axis=0), out.expand_dims(axis=0)
     data = data.unsqueeze(0)  
     out = out.unsqueeze(0)
     return data, out
@@ -53,17 +52,6 @@ def pool_compiled(k,p,s):
     return f_compiled
 
 
-# def main():
-#     size = (64, 64, 3)
-#     c, n, k, p, s = size[0], size[0], size[1], size[2], 1
-#     oc, ic, n, k, p, s = size[0], size[0], size[1], size[2], 1, 1
-#     data, out_max = get_pool_data_torch(c, n, k, p, s)
-#     f = pool_compiled(k,p,s)
-#     f(data)
-
-
-# if __name__ == "__main__":
-#   main()
 
 
 
