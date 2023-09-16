@@ -49,17 +49,7 @@ def get_conv_data_torch(c, n, k, p, s):
     return data, weight, out
 
 
-# def main():
-#     size = (64, 64, 3)
-#     c, n, k, p, s = size[0], size[0], size[1], size[2], 1
-#     oc, ic, n, k, p, s = size[0], size[0], size[1], size[2], 1, 1
-#     data,weight, out = get_conv_data_torch(c, n, k, p, s)
-#     f = conv_compiled(data, out, k, p, s)
-#     f(data)
 
-
-# if __name__ == "__main__":
-#   main()
 
 
 
