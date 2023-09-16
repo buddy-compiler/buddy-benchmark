@@ -184,26 +184,3 @@ def depthwise_cached_block(c, n, k, p, s):
 
 
 
-# target = 'llvm -mcpu=skylake-avx512'
-# c, n, k, p, s, tc = 32, 64, 3, 1, 1, 16
-# data, weight, out = get_conv_data(c, c, n, k, p, s,tvm.nd.array, conv_type='depthwise')
-# sch, args = depthwise_cached_block(c, n, k, p, s)
-# mod = tvm.build(sch, args)
-# mod(data, weight, out)
-
-
-
-
-
-# ic, n, k, p, s = 256, 12, 3, 1, 1
-
-# sch ,args= depthwise_conv_default(c, n, n, k, k, p, p, s, s)
-# # sch = te.create_schedule(Y.op)
-# mod = tvm.build(sch, args)
-# # print(tvm.lower(sch, [X, K, Y], simple_mode=True))
-
-# data, weight, out = get_conv_data(c, c, n, k, p, s,
-#                                   constructor=tvm.nd.array,
-#                                   conv_type='depthwise')
-# mod(data, weight, out)
-

@@ -65,8 +65,6 @@ def main():
   data_y = tvm.nd.array(data_y, dev)
   
 
-  # ctx = getattr(mx, "cpu")()
-
   mxnet_times = bench_depthwise_conv_mxnet(size)
 
   # ----------------------------------------------------------------------------

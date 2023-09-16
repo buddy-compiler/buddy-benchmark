@@ -59,9 +59,6 @@ def main():
   size = c,n,k
   target = tvm.target.Target(target="llvm", host="llvm")
   data_x, data_k, data_y = get_conv_data(c, c, n, k, p, s,tvm.nd.array,conv_type='depthwise')
-  
-
-  # ctx = getattr(mx, "cpu")()
 
   mxnet_times = bench_depthwise_conv_mxnet(size)
 
