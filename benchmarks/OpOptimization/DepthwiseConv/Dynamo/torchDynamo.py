@@ -51,23 +51,10 @@ def depthwise_conv_compiled(data, out, weight, k, p, s):
 
 def get_conv_data_torch(c, n, k, p, s):
     data, weight, out = get_conv_data(c, c, n, k, p, s,lambda x: torch.from_numpy(x))
-    data = data.unsqueeze(0)  # 在第0个维度前添加一个新维度
+    data = data.unsqueeze(0)  
     out = out.unsqueeze(0)
     return data, weight, out
 
-
-
-# def main():
-#     size = (64, 64, 3)
-#     c, n, k, p, s = size[0], size[0], size[1], size[2], 1
-#     oc, ic, n, k, p, s = size[0], size[0], size[1], size[2], 1, 1
-#     data, weight, out = get_conv_data_torch(c, n, k, p, s)
-#     f = depthwise_conv_compiled(data, out, weight, k, p, s)
-#     f(data)
-
-
-# if __name__ == "__main__":
-#   main()
 
 
 
