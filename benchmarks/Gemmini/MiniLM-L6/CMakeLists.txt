@@ -26,11 +26,11 @@ add_custom_command(
     --convert-vector-to-llvm
     --memref-expand
     --arith-expand
-    -lower-gemmini=${GEMMINI_CONFIG}
+    --lower-gemmini=${GEMMINI_CONFIG}
     --convert-arith-to-llvm
     --finalize-memref-to-llvm
     --convert-math-to-llvm
-    -reconcile-unrealized-casts | 
+    --reconcile-unrealized-casts | 
     ${BUDDY_MLIR_BINARY_DIR}/buddy-translate -buddy-to-llvmir |
     ${BUDDY_MLIR_BINARY_DIR}/buddy-llc -filetype=obj -mtriple=riscv64 
     -mattr=+buddyext,+D -float-abi=hard -o minilm-l6.o
