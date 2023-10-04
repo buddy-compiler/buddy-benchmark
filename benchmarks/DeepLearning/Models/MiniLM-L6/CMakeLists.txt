@@ -21,8 +21,8 @@ COMMAND
       --llvm-request-c-wrappers
       --convert-func-to-llvm
       --reconcile-unrealized-casts 
-      --matmul_optimize
-      --batchmatmul_optimize| 
+      --matmul-optimize
+      --batchmatmul-optimize | 
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
   ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} 
     --filetype=obj -relocation-model=pic -o ${CMAKE_CURRENT_BINARY_DIR}/minilm-l6-default.o
