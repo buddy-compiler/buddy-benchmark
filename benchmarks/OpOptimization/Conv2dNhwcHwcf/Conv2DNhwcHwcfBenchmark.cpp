@@ -137,7 +137,7 @@ void verification() {
   // Set the random number generator.
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<int> dis(1, 100);
+  std::uniform_int_distribution<int> dis(1, 100);
 
   // Set the layout sizes of input and output memref container.
   intptr_t sizesInput[4] = {INPUT_N, INPUT_H, INPUT_W, INPUT_C};
