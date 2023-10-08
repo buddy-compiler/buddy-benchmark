@@ -1,2 +1,3 @@
 add_subdirectory(Conv2dNchwFchw)
+add_subdirectory(Conv2dNhwcHwcf)
 add_subdirectory(MatMul)

@@ -4,6 +4,7 @@ COMMAND
   ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt ${CMAKE_CURRENT_SOURCE_DIR}/MiniLM-L6-200.mlir
       --linalg-bufferize
       --batchmatmul-optimize
+      # --matmul-optimize
       --convert-linalg-to-loops
       --func-bufferize
       --arith-bufferize

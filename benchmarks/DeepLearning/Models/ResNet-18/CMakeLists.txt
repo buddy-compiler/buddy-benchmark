@@ -7,16 +7,19 @@ COMMAND
     --pass-pipeline="${RESNET18_TOSA_PIPELINE}" | 
   ${LLVM_MLIR_BINARY_DIR}/mlir-opt
     --test-linalg-transform-patterns="test-generalize-pad-tensor"
-    --linalg-bufferize
+    --linalg-bufferize |
+  ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt 
+    --conv-broadcast |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
     --convert-linalg-to-loops
     --func-bufferize
     --arith-bufferize
     --tensor-bufferize 
     --finalizing-bufferize
     --convert-vector-to-scf
+    --lower-affine
     --convert-scf-to-cf
     --expand-strided-metadata
-    --lower-affine
     --convert-vector-to-llvm
     --memref-expand
     --arith-expand
