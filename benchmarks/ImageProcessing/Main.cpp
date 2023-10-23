@@ -28,6 +28,8 @@ void initializeBuddyMorph2D(char **);
 void initializeOpenCVMorph2D(char **);
 void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **);
+void initializeOpenCVSepFilter2D(char **);
+void initializeBuddySepCorr2D(char **);
 
 void generateResultMLIRConv2D();
 void generateResultBuddyConv2D(char **);
@@ -39,6 +41,7 @@ void generateResultBuddyTopHat2D(char **);
 void generateResultBuddyBottomHat2D(char **);
 void generateResultBuddyMorphGrad2D(char **);
 void generateResultBuddyDilation2D(char **);
+void generateResultBuddySepCorr2D(char **);
 void generateResultOpenCVErode2D();
 void generateResultOpenCVDilate2D();
 void generateResultOpenCVFilter2D();
@@ -47,6 +50,7 @@ void generateResultOpenCVClosing2D();
 void generateResultOpenCVTopHat2D();
 void generateResultOpenCVBottomHat2D();
 void generateResultOpenCVMorphGrad2D();
+void generateResultOpenCVSepFilter2D();
 void generateResultEigenConvolve2D();
 
 void registerBenchmarkBuddyCorr2D();
@@ -57,6 +61,7 @@ void registerBenchmarkBuddyClosing2D();
 void registerBenchmarkBuddyTopHat2D();
 void registerBenchmarkBuddyBottomHat2D();
 void registerBenchmarkBuddyMorphGrad2D();
+void registerBenchmarkBuddySepCorr2D();
 void registerBenchmarkOpenCVErode2D();
 void registerBenchmarkOpenCVDilate2D();
 void registerBenchmarkOpenCVOpening2D();
@@ -65,10 +70,11 @@ void registerBenchmarkOpenCVTopHat2D();
 void registerBenchmarkOpenCVBottomHat2D();
 void registerBenchmarkOpenCVMorphGrad2D();
 void registerBenchmarkOpenCVFilter2D();
+void registerBenchmarkOpenCVSepFilter2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 5) {
+  if (argc != 7) {
     throw std::invalid_argument(
         "Wrong format of command line arguments.\n"
         "Correct format is ./image-processing-benchmark <image path> <kernel "
@@ -84,13 +90,17 @@ int main(int argc, char **argv) {
   initializeMLIRConv2D(argv);
   initializeBuddyConv2D(argv);
   initializeBuddyCorr2D(argv);
+  initializeBuddySepCorr2D(argv);
   initializeBuddyMorph2D(argv);
   initializeOpenCVMorph2D(argv);
   initializeOpenCVFilter2D(argv);
+initializeOpenCVSepFilter2D(argv);
   initializeEigenConvolve2D(argv);
 
   registerBenchmarkBuddyCorr2D();
+  registerBenchmarkBuddySepCorr2D();
   registerBenchmarkOpenCVFilter2D();
+  registerBenchmarkOpenCVSepFilter2D();
   registerBenchmarkBuddyErosion2D();
   registerBenchmarkBuddyDilation2D();
   registerBenchmarkBuddyOpening2D();
@@ -111,8 +121,10 @@ int main(int argc, char **argv) {
   // Generate result image.
   generateResultMLIRConv2D();
   generateResultOpenCVFilter2D();
+  generateResultOpenCVSepFilter2D();
   generateResultBuddyConv2D(argv);
   generateResultBuddyCorr2D(argv);
+  generateResultBuddySepCorr2D(argv);
   generateResultBuddyErosion2D(argv);
   generateResultBuddyDilation2D(argv);
   generateResultBuddyOpening2D(argv);

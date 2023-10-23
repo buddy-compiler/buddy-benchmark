@@ -95,6 +95,8 @@ add_executable(image-processing-benchmark
   BuddyCorr2DBenchmark.cpp
   BuddyMorph2DBenchmark.cpp
   OpenCVMorph2DBenchmark.cpp
+  OpenCVSepFilter2DBenchmark.cpp
+  BuddySepCorr2DBenchmark.cpp
   )
 
 target_include_directories(image-processing-benchmark 
