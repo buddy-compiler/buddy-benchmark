@@ -1,3 +1,22 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the manual optimization for benchmark DepthwiseConvolution on GPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import numpy as np
 import timeit
 import tvm
@@ -20,7 +39,6 @@ def padding(X, ph, pw, val=0):
                 val, X[i[:-2]+(i[-2]-ph, i[-1]-pw)]),
             name='PaddedX')
 
-
 def conv_out_size(n, k, p, s):
     """Compute the output size by given input size n (width or height),
     kernel size k, padding p, and stride s
@@ -28,12 +46,9 @@ def conv_out_size(n, k, p, s):
     """
     return (n - k + 2 * p)//s + 1
 
-
-
 def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None, conv_type='direct'):
     """Return random 3-D data tensor, 3-D kernel tenor and empty 3-D output
     tensor with the shapes specified by input arguments.
-
     oc, ic : output and input channels
     n : input width and height
     k : kernel width and height
@@ -54,12 +69,8 @@ def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None, conv_type='direct'):
         data, weight, out = (constructor(x) for x in [data, weight, out])
     return data, weight, out
 
-
-
-
 def split_axis(factors, sch, op, axis):
     """Splitting an axis into factors
-
     Parameters
     ----------
     factors: array of integers
@@ -70,7 +81,6 @@ def split_axis(factors, sch, op, axis):
         The stage to be applied
     axis: tvm.te.schedule.IterVar
         axis to split
-
     Returns
     -------
     axes : list of Axis
@@ -85,7 +95,6 @@ def split_axis(factors, sch, op, axis):
 
 def depthwise_conv(ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """Convolution
-
     ic : number of channels for both input and output
     nh, nw : input width and height
     kh, kw : kernel width and height
@@ -110,7 +119,6 @@ def depthwise_conv(ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
 
     return X, K, Y, PaddedX
 
-
 def default_sch(ic, n, k, p, s):
     X, K, Y, PaddedX = depthwise_conv(ic, n, n, k, k, p, p, s, s)
     sch = te.create_schedule(Y.op)
@@ -120,8 +128,6 @@ def default_sch(ic, n, k, p, s):
     sch[Y].bind(x, te.thread_axis("threadIdx.x"))
     return sch, (X, K, Y)
 
-
-
 def gpu_block_schedule(ic, n, k, p, s):
     tile_c = [1, 1]  # making each block take 1 channel
     tile_h = [2, 8]  # making each thread take 8 rows
@@ -129,20 +135,17 @@ def gpu_block_schedule(ic, n, k, p, s):
     X, K, Y, PaddedX = depthwise_conv(ic, n, n, k, k, p, p, s, s)
     sch = te.create_schedule(Y.op)
     sch[PaddedX].compute_inline()
-
     YL = sch.cache_write(Y, 'local')
     # create cache stage
     XX = sch.cache_read(PaddedX, 'shared', [YL])
     KK = sch.cache_read(K, 'shared', [YL])
     XL = sch.cache_read(XX, 'local', [YL])
     KL = sch.cache_read(KK, 'local', [YL])
-
     # tile and bind spatial axes
     c, h, w = sch[Y].op.axis
     bc, tc, ic = split_axis(tile_c, sch, Y, c)
     bh, th, ih = split_axis(tile_h, sch, Y, h)
     bw, tw, iw = split_axis(tile_w, sch, Y, w)
-
     sch[Y].bind(bc, te.thread_axis("blockIdx.z"))
     sch[Y].bind(bh, te.thread_axis("blockIdx.y"))
     sch[Y].bind(bw, te.thread_axis("blockIdx.x"))
@@ -150,9 +153,7 @@ def gpu_block_schedule(ic, n, k, p, s):
     sch[Y].bind(th, te.thread_axis("threadIdx.y"))
     sch[Y].bind(tw, te.thread_axis("threadIdx.x"))
     sch[Y].reorder(bc, bh, bw, tc, th, tw, ic, ih, iw)
-
     sch[YL].compute_at(sch[Y], tw)
-
     sch[XX].compute_at(sch[Y], bw)
     sch[KK].compute_at(sch[Y], bw)
     sch[XL].compute_at(sch[Y], tw)
@@ -170,4 +171,3 @@ def gpu_block_schedule(ic, n, k, p, s):
         sch[load].bind(ty, te.thread_axis("threadIdx.y"))
         sch[load].bind(tx, te.thread_axis("threadIdx.x"))
     return sch, (X, K, Y)
-
