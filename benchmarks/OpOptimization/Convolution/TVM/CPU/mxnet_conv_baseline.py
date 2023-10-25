@@ -1,3 +1,22 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the mxnet baseline for benchmark Convolution on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import mxnet as mx
 import timeit
 import numpy as np
@@ -50,15 +69,12 @@ def get_conv_data_mxnet(oc, ic, n, k, p, s, ctx='cpu'):
     bias = mx.nd.zeros(out.shape[1], ctx=ctx)
     return data, weight, bias, out
 
-
 def conv_mxnet(data, weight, bias, out, k, p, s):
     mx.nd.Convolution(data, weight, bias, kernel=(k,k), stride=(s,s),
                       pad=(p,p), num_filter=out.shape[1], out=out)
 
-
 def conv_timer_mxnet(c, n, k, ctx):
     """Benchmark convolution in MXNet
-
     c : input, output channels
     n : input width and height
     k : kernel width and height
