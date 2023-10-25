@@ -1,15 +1,31 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the auto optimization for benchmark DepthwiseConvolution on GPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import numpy as np
 import tvm
 from tvm import te
 from tvm import te, auto_scheduler
 from gpu_dep_conv_manual import *
 
-
-
 @auto_scheduler.register_workload
 def depthwise_conv_autoTem(ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """Convolution
-
     ic : number of channels for both input and output
     nh, nw : input width and height
     kh, kw : kernel width and height
@@ -33,14 +49,10 @@ def depthwise_conv_autoTem(ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
             axis=[rkh, rkw]), name='Y')
     return X, K, Y, PaddedX
 
-
 def gpu_depthwise_conv_auto(c, n, k, p, s):
     target = tvm.target.Target(target="cuda", host="llvm")
-
     task = tvm.auto_scheduler.SearchTask(func=depthwise_conv_autoTem, args= (c, n, n, k, k, p, p, s, s), target=target)
-
     print("==========depthwise_conv_auto=========")
-
     log_file = "depthwise_conv_auto.log"
     measure_ctx = None
     tune_option = auto_scheduler.TuningOptions(
@@ -54,8 +66,3 @@ def gpu_depthwise_conv_auto(c, n, k, p, s):
     sch, args = task.apply_best(log_file)
     X, K, Y, PaddedX = args
     return sch, (X, K, Y)
-
-
-
-
-
