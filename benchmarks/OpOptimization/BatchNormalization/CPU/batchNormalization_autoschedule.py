@@ -1,7 +1,3 @@
-# ===- matmul_autotvm.py -------------------------------------------------------
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,20 +10,18 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the benchmark for AutoScheduler MatMul.
+# This file implements the auto optimization for BatchNormalization on CPU.
 # Autoscheduler is TVM's next-generation performance tuning tool, 
 # which can automatically generate search spaces for optimizing tensor expressions.
 # TVM is an Apache-2.0 licensed project.
 # See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
-
 import tvm
 from tvm import autotvm
 from tvm import te, auto_scheduler
 import numpy as np
 from batchNormalization_manual import *
-
 # ------------------------------------------------------------------------------
 # Template Function
 # ------------------------------------------------------------------------------
@@ -39,7 +33,6 @@ def batch_norm(c, n, eps=1e-5):
     N : input width and height
     eps : small positive value to prevent divide 0
     """
-
     X = te.placeholder((c, n, n), name='X')
     Mean = te.placeholder((c, 1, 1), name='Mean')
     Var = te.placeholder((c, 1, 1), name='Var')
@@ -50,15 +43,12 @@ def batch_norm(c, n, eps=1e-5):
     Y = C1 / C2 * Gamma + Beta
     return X, Mean, Var, Gamma, Beta, Y
 
-
 def batch_norm_auto_tuning_plus(args, target):
   target = tvm.target.Target(target)
   size = args
   c, n = size[:]
   task = tvm.auto_scheduler.SearchTask(func=batch_norm, args=(c,n), target=target)
-
   print("==========batch_norm_auto_tuning_plus=========")
-
   log_file = "batch_norm_auto_tuning_plus.log"
   measure_ctx = None
   tune_option = auto_scheduler.TuningOptions(
@@ -69,27 +59,16 @@ def batch_norm_auto_tuning_plus(args, target):
     # vervose to determine whether output or not
   task.tune(tune_option)
   sch, args = task.apply_best(log_file)
-  
   return sch,args
-
-
-
 
 def main():
   size = (32, 28)
   target = tvm.target.Target(target="llvm", host="llvm")
-
-  
   s, arg_bufs = batch_norm_auto_tuning_plus(size, target)
-
   data, mean, var, gamma, beta, out = get_bn_data(size[0], size[1], tvm.nd.array)
-
   sch, args = default_bn(size)
   mod = tvm.build(sch, args)
-  
   mod(data, mean, var, gamma, beta, out)
-
 
 if __name__ == "__main__":
     main()
-
