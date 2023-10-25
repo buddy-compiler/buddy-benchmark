@@ -10,7 +10,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the auto optimization for benchmark Convolution on CPU.
+# This file implements the entry for benchmark Pooling on GPU.
 # torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
 # API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
 # users are surfaced through the torch.compiler namespace.
