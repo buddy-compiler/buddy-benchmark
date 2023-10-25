@@ -1,7 +1,3 @@
-# ===- matmul_autotvm.py -------------------------------------------------------
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,7 +10,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the benchmark for AutoScheduler MatMul.
+# This file implements the auto optimization for benchmark pooling on CPU.
 # Autoscheduler is TVM's next-generation performance tuning tool, 
 # which can automatically generate search spaces for optimizing tensor expressions.
 # TVM is an Apache-2.0 licensed project.
@@ -28,14 +24,12 @@ from tvm import te, auto_scheduler
 import numpy as np
 from Pooling_manual import *
 
-
 # ------------------------------------------------------------------------------
 # Template Function
 # ------------------------------------------------------------------------------
 @auto_scheduler.register_workload
 def pool(pool_type, c, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """2D pooling
-
     pool_type: pooling type, 'max' or 'avg'
     c : channels
     nh, nw : input width and height
@@ -51,7 +45,6 @@ def pool(pool_type, c, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     ow = conv_out_size(nw, kw, pw, sw)
     # pad X and then compute Y
     X = te.placeholder((c, nh, nw), name='X')
-
 
     if pool_type == 'max':
         PaddedX = padding(X, ph, pw, val=te.min_value(X.dtype)) \
@@ -76,15 +69,12 @@ def pool(pool_type, c, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
         raise ValueError("Pool type should be 'avg' or 'max'.")
     return X, Y, PaddedX
 
-
 def Pooling_autoschedule(size,target):
   target = tvm.target.Target(target)
   c, n, k = size[:]
   theArgs = 'max', c, n, n, k, k, 1, 1, 1, 1
   task = tvm.auto_scheduler.SearchTask(func=pool, args= theArgs, target=target)
-
   print("==========Pooling_autoschedule=========")
-
   log_file = "Pooling_autoschedule.log"
   measure_ctx = None
   tune_option = auto_scheduler.TuningOptions(
@@ -96,11 +86,7 @@ def Pooling_autoschedule(size,target):
     # vervose to determine whether output or not
   task.tune(tune_option)
   sch, args = task.apply_best(log_file)
-  
   return sch,args
-
-
-
 
 def default_max(size):
     c, n, k = size[:]
@@ -108,11 +94,8 @@ def default_max(size):
     sch = te.create_schedule(Y.op)
     return sch, (X, Y)
 
-
-
 def main():
   target = tvm.target.Target(target="cuda", host="llvm")
-  
   size = (64, 64, 3)
   c, n, k, p, s = size[0], size[0], size[1], size[2], 1
   data, _, out_max = get_conv_data(size[0], size[0], size[1], size[2], 1, 1, tvm.nd.array)
@@ -121,13 +104,9 @@ def main():
   arg_bufs = X, Y
   func = tvm.build(sch, arg_bufs, 'cuda',target_host='llvm')
   dev = tvm.cuda(0)
-
-  
   data = tvm.nd.array(data, dev)
   out_max = tvm.nd.array(out_max, dev)
   func(data, out_max)
   
-
 if __name__ == "__main__":
     main()
-
