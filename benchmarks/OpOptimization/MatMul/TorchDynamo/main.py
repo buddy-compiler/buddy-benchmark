@@ -10,7 +10,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the dynamo optimization for benchmark Matmul on GPU.
+# This file implements the dynamo entry for benchmark Matmul on GPU.
 # torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
 # API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
 # users are surfaced through the torch.compiler namespace.
