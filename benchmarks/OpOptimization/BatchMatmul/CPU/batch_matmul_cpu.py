@@ -10,7 +10,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the entry for AutoScheduler BatchMatMul on GPU.
+# This file implements the entry for AutoScheduler BatchMatMul on CPU.
 # Autoscheduler is TVM's next-generation performance tuning tool, 
 # which can automatically generate search spaces for optimizing tensor expressions.
 # TVM is an Apache-2.0 licensed project.
