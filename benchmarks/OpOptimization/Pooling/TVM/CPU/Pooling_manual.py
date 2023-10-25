@@ -1,18 +1,35 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the manual optimization for benchmark BatchNormalization on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
+
 import tvm
 from tvm import te
 import numpy as np
 import timeit
 import mxnet as mx
 
-
 def pool_mxnet(pool_type, data, out, k, p, s):
     mx.nd.Pooling(data, kernel=(k,k), stride=(s,s),
                       pad=(p,p), pool_type=pool_type, out=out)
 
-
 def bench_pooling_tvm(func, sizes, target):
     """Benchmark pooling in TVM
-
     func : the scheduling method
     sizes : the data size list, each of which is a (channel, input_hw, kernel_hw) triplet
     target : the TVM target, e.g. llvm or cuda
@@ -30,10 +47,8 @@ def bench_pooling_tvm(func, sizes, target):
         times.append(bench_workload(workload))
     return np.array(times)
 
-
 def pooling_timer_mxnet(pool_type, c, n, k, ctx):
     """Benchmark pooling in MXNet
-
     c : channels
     n : input width and height
     k : kernel width and height
@@ -50,15 +65,12 @@ def pooling_timer_mxnet(pool_type, c, n, k, ctx):
         )
     return timer.timeit
 
-
 def bench_pooling_mxnet(pool_type, sizes, ctx='cpu'):
     """Return the execution times of MXNet pooling"""
     return bench_workload(pooling_timer_mxnet(pool_type, sizes[0], sizes[1], sizes[2], ctx))
             
-
 def bench_workload(workload):
     """Benchmark a workload
-
     workload: a method that accept a num_repeat argument
     and return its total execution time
     """
@@ -69,11 +81,9 @@ def bench_workload(workload):
     num_repeats = max(int(1.0 / time), 5)
     return workload(num_repeats) / num_repeats
 
-
 def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
     """Return random 3-D data tensor, 3-D kernel tenor and empty 3-D output
     tensor with the shapes specified by input arguments.
-
     oc, ic : output and input channels
     n : input width and height
     k : kernel width and height
@@ -90,10 +100,8 @@ def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
         data, weight, out = (constructor(x) for x in [data, weight, out])
     return data, weight, out
 
-
 def padding(X, ph, pw, val=0):
     """Pad X with the given value in 2-D
-
     ph, pw : height and width padding
     val : padding value, default 0
     """
@@ -106,8 +114,6 @@ def padding(X, ph, pw, val=0):
                 val, X[i[:-2]+(i[-2]-ph, i[-1]-pw)]),
             name='PaddedX')
 
-
-
 def conv_out_size(n, k, p, s):
     """Compute the output size by given input size n (width or height),
     kernel size k, padding p, and stride s
@@ -115,10 +121,8 @@ def conv_out_size(n, k, p, s):
     """
     return (n - k + 2 * p)//s + 1
 
-
 def pool(pool_type, c, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """2D pooling
-
     pool_type: pooling type, 'max' or 'avg'
     c : channels
     nh, nw : input width and height
@@ -134,8 +138,6 @@ def pool(pool_type, c, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     ow = conv_out_size(nw, kw, pw, sw)
     # pad X and then compute Y
     X = te.placeholder((c, nh, nw), name='X')
-
-
     if pool_type == 'max':
         PaddedX = padding(X, ph, pw, val=te.min_value(X.dtype)) \
             if ph * pw != 0 else X
@@ -165,7 +167,6 @@ def default_max(size):
     sch = te.create_schedule(Y.op)
     return sch, (X, Y)
 
-
 def optimized_max(size):
     sch, (X, Y) = default_max(size)
     te.schedule.AutoInlineInjective(sch)
@@ -182,23 +183,12 @@ def get_pool_data_mxnet(c, n, k, p, s, ctx='cpu'):
     data, out = data.expand_dims(axis=0), out.expand_dims(axis=0)
     return data, out
 
-
-
 def main():
   size = (64, 64, 3)
   c, n, k, p, s = size[0], size[0], size[1], size[2], 1
   data, _, out_max = get_conv_data(size[0], size[0], size[1], size[2], 1, 1, tvm.nd.array)
-
-
   sch, arg_bufs = default_max(size)
   mod(data, out_max)
 
-
 if __name__ == "__main__":
     main()
-
-
-
-
-
-  
