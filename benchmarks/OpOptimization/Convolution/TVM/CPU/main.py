@@ -1,12 +1,29 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the entry for benchmark Convolution on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 from mxnet_conv_baseline import *
 from convolution_manual import *
 from convolution_auto import *
-
 import numpy
 import timeit
 import tvm.testing
 import mxnet as mx
-
 import os
 os.environ['KMP_AFFINITY']='granularity=fine,noduplicates,compact,1,0'
 
@@ -31,7 +48,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
   mean_time = evaluator(data_x, data_k, data_y).mean * 1000  # Convert to milliseconds
   log.append((optimization, mean_time))
 
-
 def report_performance(log):
   """Convert the log into a performance table.
   Args:
@@ -51,9 +67,6 @@ def report_performance(log):
           (result[0].ljust(30), str(formatted_time + " ms").rjust(10),
            str(formatted_performance).rjust(10)))
 
-
-
-
 def main():
   # ----------------------------------------------------------------------------
   # Initialization and Baseline
@@ -69,16 +82,12 @@ def main():
   p = (k-1)//2
   s = 1
   data_x, data_k, data_y = get_conv_data(c, c, n, k, p, s,tvm.nd.array)
-  
-
   ctx = getattr(mx, "cpu")()
   mxnet_times = bench_conv_mxnet(size)
-
   # ----------------------------------------------------------------------------
   # Register Benchmarks and Dump Report
   # ----------------------------------------------------------------------------
   # Register default schedule.
-
   sch, arg_bufs = default_conv(oc, ic, n, k, p, s)
   evaluate_operation(sch,
                       arg_bufs,
@@ -104,7 +113,6 @@ def main():
                       optimization="packed_cached_conv",
                       log=log)
 
-  
   sch, arg_bufs = conv_auto(oc, ic, n, k, p, s)
   evaluate_operation(sch,
                       arg_bufs,
@@ -113,12 +121,10 @@ def main():
                       optimization="auto_conv",
                       log=log)
 
-  
   # Register numpy case.
   log.append(("mxnet_baseline", mxnet_times  * 1000))  # Milliseconds
   # Dump the performance table.
   report_performance(log)
-
 
 if __name__ == "__main__":
   main()
