@@ -1,12 +1,29 @@
+# You may obtain a copy of the License at
+#
+#     https://github.com/pytorch/pytorch/blob/main/LICENSE
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the dynamo optimization for benchmark Matmul on GPU.
+# torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
+# API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
+# users are surfaced through the torch.compiler namespace.
+# which can automatically generate search spaces for optimizing tensor expressions.
+# See the pytorch license at: https://github.com/pytorch/pytorch/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import torch
-
 
 def batch_matrix_multiply(tensor1, tensor2):
     b, m, n = tensor1.size()
     b, n, p = tensor2.size()
-    
     result = torch.zeros(b, m, p)
-
     for batch in range(b):
         matrix1 = tensor1[batch]
         matrix2 = tensor2[batch]
@@ -14,17 +31,13 @@ def batch_matrix_multiply(tensor1, tensor2):
             for j in range(p):
                 for k in range(n):
                     result[i][j] += matrix1[i][k] * matrix2[k][j]
-    
     return result
-
 
 def default_matrix_multiply():
     def inner_matrix_multiply(tensor1, tensor2):
         b, m, n = tensor1.size()
         b, n, p = tensor2.size()
-        
         result = torch.zeros(b, m, p)
-        
         for batch in range(b):
             matrix1 = tensor1[batch]
             matrix2 = tensor2[batch]
@@ -32,20 +45,9 @@ def default_matrix_multiply():
                 for j in range(p):
                     for k in range(n):
                         result[i][j] += matrix1[i][k] * matrix2[k][j]
-        
         return result
     return inner_matrix_multiply
-
-
-
 
 def dynamo_batch_matrix_multiply():
     compiled_mm = torch.compile(batch_matrix_multiply,mode="max-autotune")
     return compiled_mm
-
-
-
-
-
-
-
