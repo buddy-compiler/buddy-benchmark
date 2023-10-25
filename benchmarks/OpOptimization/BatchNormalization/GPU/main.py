@@ -1,7 +1,3 @@
-# ===- main.py -----------------------------------------------------------------
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,7 +10,11 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This is the entry of the TVM MatMul benchmark.
+# This file implements the entry for benchmark BatchNormalization on GPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
 
@@ -22,12 +22,8 @@ import numpy
 import timeit
 import tvm.testing
 import mxnet as mx
-
 from gpu_batch_norm_auto import *
 from gpu_batch_norm_manual import *
-
-
-
 # ------------------------------------------------------------------------------
 # User Configurable Variables
 # ------------------------------------------------------------------------------
@@ -42,10 +38,7 @@ var = tvm.nd.array(var, dev)
 gamma = tvm.nd.array(gamma, dev)
 beta = tvm.nd.array(beta, dev)
 out = tvm.nd.array(out, dev)
-
 test_input = data, mean, var, gamma, beta, out
-
-
 # ------------------------------------------------------------------------------
 # Helper Function
 # ------------------------------------------------------------------------------
@@ -66,11 +59,9 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
   func = tvm.build(s, vars, target=target)
   data, mean, var, gamma, beta, out = inputs
   func(data, mean, var, gamma, beta, out)
-
   evaluator = func.time_evaluator(func.entry_name, dev, number=300)
   mean_time = evaluator(data, mean, var, gamma, beta, out).mean * 1000  # Convert to milliseconds
   log.append((optimization, mean_time))
-
 
 def report_performance(log):
   """Convert the log into a performance table.
@@ -91,20 +82,14 @@ def report_performance(log):
           (result[0].ljust(30), str(formatted_time + " ms").rjust(10),
            str(formatted_performance).rjust(10)))
 
-
-
-
 def main():
   # ----------------------------------------------------------------------------
   # Initialization and Baseline
   # ----------------------------------------------------------------------------
   # Initialize the log list.
-  log = []
-
-  
+  log = [] 
   ctx = getattr(mx, "cpu")()
   mxnet_times = bench_bn_mxnet(size)
-
   # ----------------------------------------------------------------------------
   # Register Benchmarks and Dump Report
   # ----------------------------------------------------------------------------
@@ -132,13 +117,10 @@ def main():
                       inputs=test_input,
                       optimization="auto_bn",
                       log=log)
-
-  
   # Register numpy case.
   log.append(("mxnet_pooling", mxnet_times  * 1000))  # Milliseconds
   # Dump the performance table.
   report_performance(log)
-
 
 if __name__ == "__main__":
   main()
