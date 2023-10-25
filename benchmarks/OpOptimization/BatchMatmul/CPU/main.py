@@ -1,11 +1,28 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the entry for AutoScheduler BatchMatMul on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 from batch_matmul_cpu  import *
 import numpy
 import timeit
 import tvm.testing
 import mxnet as mx
 import time
-
-
 # ------------------------------------------------------------------------------
 # Helper Function
 # ------------------------------------------------------------------------------
@@ -27,7 +44,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
   mean_time = evaluator(data_x, data_k, data_y).mean * 1000  # Convert to milliseconds
   log.append((optimization, mean_time))
 
-
 def report_performance(log):
   """Convert the log into a performance table.
   Args:
@@ -47,7 +63,6 @@ def report_performance(log):
           (result[0].ljust(30), str(formatted_time + " ms").rjust(10),
            str(formatted_performance).rjust(10)))
 
-
 def main():
   # ----------------------------------------------------------------------------
   # Initialization and Baseline
@@ -59,28 +74,19 @@ def main():
   M = 64
   K = 128
   N = 256
-
   a_np = np.random.rand(batch_size, M, K).astype(np.float32)
   b_np = np.random.rand(batch_size, K, N).astype(np.float32)
   c_np = np.zeros((batch_size, M, N), dtype=np.float32)
-  
   a = tvm.nd.array(a_np)
   b = tvm.nd.array(b_np)
   c = tvm.nd.array(c_np)
   shape = batch_size,M,K,N
   
-
-  
-
- 
   start_time = time.time()
   shape = batch_size,M,K,N
   batchMatmul_numpy(shape,a_np,b_np)
-
   end_time = time.time()
-
   numpy_time = end_time - start_time
-
   sch, arg_bufs = batchMatmul_manual(batch_size, M, K, N)
   evaluate_operation(sch,
                       arg_bufs,
@@ -97,14 +103,10 @@ def main():
                       optimization="batchMatmul_auto_tuning",
                       log=log)
 
-  
-
-  
   # Register numpy case.
   log.append(("numpy_time", numpy_time  * 1000))  # Milliseconds
   # Dump the performance table.
   report_performance(log)
-
 
 if __name__ == "__main__":
   main()
