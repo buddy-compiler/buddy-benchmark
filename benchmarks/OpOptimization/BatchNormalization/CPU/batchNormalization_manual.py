@@ -10,7 +10,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the AutoScheduler for BatchNormalization on CPU.
+# This file implements the manual optimization for BatchNormalization on CPU.
 # Autoscheduler is TVM's next-generation performance tuning tool, 
 # which can automatically generate search spaces for optimizing tensor expressions.
 # TVM is an Apache-2.0 licensed project.
