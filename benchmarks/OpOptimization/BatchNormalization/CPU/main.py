@@ -119,6 +119,5 @@ def main():
   # Dump the performance table.
   report_performance(log)
 
-
 if __name__ == "__main__":
   main()
