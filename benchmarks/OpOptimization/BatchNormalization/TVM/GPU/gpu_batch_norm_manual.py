@@ -11,7 +11,7 @@
 # ===---------------------------------------------------------------------------
 #
 # This file implements the manual optimization for benchmark BatchNormalization on GPU.
-# Autoscheduler is TVM's next-generation performance tuning tool, 
+# Autoscheduler is TVM's next-generation performance tuning tool,
 # which can automatically generate search spaces for optimizing tensor expressions.
 # TVM is an Apache-2.0 licensed project.
 # See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
@@ -24,11 +24,12 @@ import mxnet as mx
 import timeit
 from tvm import topi
 
-target = 'cuda'
+target = "cuda"
 size = (32, 112)
 nt = 0
 with tvm.target.Target(target):
     nt = tvm.target.Target.current(allow_none=False).max_num_threads
+
 
 def bn_timer_mxnet(c, n, ctx):
     """Benchmark batch normalization in MXNet
@@ -37,26 +38,40 @@ def bn_timer_mxnet(c, n, ctx):
     ctx : compute ctx, e.g., cpu or gpu
     """
     timer = timeit.Timer(
-        setup='import mxnet as mx\n'
-        'from gpu_batch_norm_manual import get_bn_data_mxnet\n'
-        'from gpu_batch_norm_manual import batch_norm_mxnet\n'
-        'c, n = %d, %d\n'
-        'data, mean, var, gamma, beta, out = get_bn_data_mxnet(\n'
-        '    c, n, "%s")'%(c, n, ctx),
-        stmt='batch_norm_mxnet(data, mean, var, gamma, beta, out);'
-        'out.wait_to_read()')
+        setup="import mxnet as mx\n"
+        "from gpu_batch_norm_manual import get_bn_data_mxnet\n"
+        "from gpu_batch_norm_manual import batch_norm_mxnet\n"
+        "c, n = %d, %d\n"
+        "data, mean, var, gamma, beta, out = get_bn_data_mxnet(\n"
+        '    c, n, "%s")' % (c, n, ctx),
+        stmt="batch_norm_mxnet(data, mean, var, gamma, beta, out);"
+        "out.wait_to_read()",
+    )
     return timer.timeit
 
-def get_bn_data_mxnet(c, n, ctx='cpu'):
+
+def get_bn_data_mxnet(c, n, ctx="cpu"):
     ctx = getattr(mx, ctx)()
-    data, mean, var, gamma, beta, out = get_bn_data(c, n,
-                                      lambda x: mx.nd.array(x, ctx=ctx))
+    data, mean, var, gamma, beta, out = get_bn_data(
+        c, n, lambda x: mx.nd.array(x, ctx=ctx)
+    )
     data, out = data.expand_dims(axis=0), out.expand_dims(axis=0)
     return data, mean, var, gamma, beta, out
 
+
 def batch_norm_mxnet(data, mean, var, gamma, beta, out, eps=1e-5):
-    mx.nd.BatchNorm(data, gamma, beta, mean, var, eps,
-                    use_global_stats=True, fix_gamma=False, out=out)
+    mx.nd.BatchNorm(
+        data,
+        gamma,
+        beta,
+        mean,
+        var,
+        eps,
+        use_global_stats=True,
+        fix_gamma=False,
+        out=out,
+    )
+
 
 def bench_workload(workload):
     """Benchmark a workload
@@ -65,14 +80,17 @@ def bench_workload(workload):
     """
     workload(1)  # warmup
     time = workload(1)  # the time to run once
-    if time > 1: return time
+    if time > 1:
+        return time
     # The number of repeats to measure at least 1 second
     num_repeats = max(int(1.0 / time), 5)
     return workload(num_repeats) / num_repeats
 
-def bench_bn_mxnet(size, ctx='cpu'):
+
+def bench_bn_mxnet(size, ctx="cpu"):
     """Return the execution times of MXNet batch norm"""
     return bench_workload(bn_timer_mxnet(size[0], size[1], ctx))
+
 
 def batch_norm(c, n, eps=1e-5):
     """batch normalization
@@ -80,16 +98,17 @@ def batch_norm(c, n, eps=1e-5):
     N : input width and height
     eps : small positive value to prevent divide 0
     """
-    X = te.placeholder((c, n, n), name='X')
-    Mean = te.placeholder((c, 1, 1), name='Mean')
-    Var = te.placeholder((c, 1, 1), name='Var')
-    Gamma = te.placeholder((c, 1, 1), name='Gamma')
-    Beta = te.placeholder((c, 1, 1), name='Beta')
-    C1 = topi.subtract(X,Mean)
+    X = te.placeholder((c, n, n), name="X")
+    Mean = te.placeholder((c, 1, 1), name="Mean")
+    Var = te.placeholder((c, 1, 1), name="Var")
+    Gamma = te.placeholder((c, 1, 1), name="Gamma")
+    Beta = te.placeholder((c, 1, 1), name="Beta")
+    C1 = topi.subtract(X, Mean)
     C2 = topi.sqrt(Var + eps)
     Y = C1 / C2 * Gamma + Beta
     return X, Mean, Var, Gamma, Beta, Y
-   
+
+
 def get_bn_data(c, n, constructor=None):
     """Return the batch norm data, mean, variance, gamma and beta tensors.
        Also return the empty tensor for output.
@@ -98,17 +117,19 @@ def get_bn_data(c, n, constructor=None):
     constructor : user-defined tensor constructor
     """
     np.random.seed(0)
-    data = np.random.normal(size=(c, n, n)).astype('float32')
-    mean = np.random.normal(size=(c, 1, 1)).astype('float32')
-    var = np.random.normal(loc=1.0, size=(c, 1, 1)).astype('float32')
+    data = np.random.normal(size=(c, n, n)).astype("float32")
+    mean = np.random.normal(size=(c, 1, 1)).astype("float32")
+    var = np.random.normal(loc=1.0, size=(c, 1, 1)).astype("float32")
     var = np.absolute(var)
-    gamma = np.random.normal(size=(c, 1, 1)).astype('float32')
-    beta = np.random.normal(size=(c, 1, 1)).astype('float32')
-    out = np.empty((c, n, n), dtype='float32')
+    gamma = np.random.normal(size=(c, 1, 1)).astype("float32")
+    beta = np.random.normal(size=(c, 1, 1)).astype("float32")
+    out = np.empty((c, n, n), dtype="float32")
     if constructor:
-        data, mean, var, gamma, beta, out = \
-        (constructor(x) for x in [data, mean, var, gamma, beta, out])
+        data, mean, var, gamma, beta, out = (
+            constructor(x) for x in [data, mean, var, gamma, beta, out]
+        )
     return data, mean, var, gamma, beta, out
+
 
 def default_bn(size):
     c, n = size[:]
@@ -119,6 +140,7 @@ def default_bn(size):
     sch[Y].bind(c, te.thread_axis("blockIdx.x"))
     sch[Y].bind(h, te.thread_axis("threadIdx.x"))
     return sch, (X, Mean, Var, Gamma, Beta, Y)
+
 
 def optimized_bn(size):
     c, n = size[:]
@@ -131,9 +153,11 @@ def optimized_bn(size):
     sch[Y].bind(tx, te.thread_axis("threadIdx.x"))
     return sch, (X, Mean, Var, Gamma, Beta, Y)
 
+
 def main():
-  sch, args = optimized_bn(size)
-  print(tvm.lower(sch, args, simple_mode=True))
+    sch, args = optimized_bn(size)
+    print(tvm.lower(sch, args, simple_mode=True))
+
 
 if __name__ == "__main__":
-  main()
+    main()
