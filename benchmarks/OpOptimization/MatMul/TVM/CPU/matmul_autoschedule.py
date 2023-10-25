@@ -15,7 +15,7 @@
 # ===---------------------------------------------------------------------------
 #
 # This file implements the benchmark for AutoScheduler MatMul.
-# Autoscheduler is TVM's next-generation performance tuning tool, 
+# Autoscheduler is TVM's next-generation performance tuning tool,
 # which can automatically generate search spaces for optimizing tensor expressions.
 # TVM is an Apache-2.0 licensed project.
 # See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
@@ -40,32 +40,33 @@ def matmul(M, K, N, dtype):
         (M, N),
         lambda i, j: te.sum(A[i, k] * B[k, j], axis=k),
         name="C",
-        attrs={"layout_free_placeholders": [B]},  # enable automatic layout transform for tensor B
+        attrs={
+            "layout_free_placeholders": [B]
+        },  # enable automatic layout transform for tensor B
     )
 
     return [A, B, C]
 
 
-
-
 def matmul_auto_tuning_plus(args, target):
-  target = tvm.target.Target(target)
-  M, K, N, dtype = args
-  task = tvm.auto_scheduler.SearchTask(func=matmul, args=(M, K, N, dtype), target=target)
+    target = tvm.target.Target(target)
+    M, K, N, dtype = args
+    task = tvm.auto_scheduler.SearchTask(
+        func=matmul, args=(M, K, N, dtype), target=target
+    )
 
-  print("==========matmul_auto_tuning_plus=========")
+    print("==========matmul_auto_tuning_plus=========")
 
-  log_file = "autotvm-plus-matmul.log"
-  tune_option = None
-  measure_ctx = None
-  tune_option = auto_scheduler.TuningOptions(
-    num_measure_trials=60,
-    measure_callbacks=[auto_scheduler.RecordToFile(log_file)],
-    verbose=1,
+    log_file = "autotvm-plus-matmul.log"
+    tune_option = None
+    measure_ctx = None
+    tune_option = auto_scheduler.TuningOptions(
+        num_measure_trials=60,
+        measure_callbacks=[auto_scheduler.RecordToFile(log_file)],
+        verbose=1,
     )
     # vervose to determine whether output or not
-  task.tune(tune_option)
-  sch, args = task.apply_best(log_file)
-  
-  return sch,args
+    task.tune(tune_option)
+    sch, args = task.apply_best(log_file)
 
+    return sch, args

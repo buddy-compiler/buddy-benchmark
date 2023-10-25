@@ -30,278 +30,273 @@ from tvm import te
 # Default Scheduling
 # ------------------------------------------------------------------------------
 def matmul_default(sizes):
-  """Matmul benchmark with default schedule.
-  
-  Args:
-    sizes: The target workload sizes.
-  
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  C = te.compute((M, N),
-                 lambda x, y: te.sum(A[x, k] * B[k, y], axis=k),
-                 name="C")
-  s = te.create_schedule(C.op)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    """Matmul benchmark with default schedule.
+
+    Args:
+      sizes: The target workload sizes.
+
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    C = te.compute((M, N), lambda x, y: te.sum(A[x, k] * B[k, y], axis=k), name="C")
+    s = te.create_schedule(C.op)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
 
 
 # ------------------------------------------------------------------------------
 # Blocking
 # ------------------------------------------------------------------------------
 def matmul_blocking(sizes):
-  """Matmul benchmark with blocking schedule.
+    """Matmul benchmark with blocking schedule.
 
-  Args:
-    sizes: The target workload sizes.
+    Args:
+      sizes: The target workload sizes.
 
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  C = te.compute((M, N),
-                 lambda x, y: te.sum(A[x, k] * B[k, y], axis=k),
-                 name="C")
-  s = te.create_schedule(C.op)
-  bn = 32
-  # Blocking by loop tiling.
-  xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
-  (k,) = s[C].op.reduce_axis
-  ko, ki = s[C].split(k, factor=4)
-  # Hoist reduction domain outside the blocking loop.
-  s[C].reorder(xo, yo, ko, ki, xi, yi)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    C = te.compute((M, N), lambda x, y: te.sum(A[x, k] * B[k, y], axis=k), name="C")
+    s = te.create_schedule(C.op)
+    bn = 32
+    # Blocking by loop tiling.
+    xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
+    (k,) = s[C].op.reduce_axis
+    ko, ki = s[C].split(k, factor=4)
+    # Hoist reduction domain outside the blocking loop.
+    s[C].reorder(xo, yo, ko, ki, xi, yi)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
 
 
 # ------------------------------------------------------------------------------
 # Blocking + Vectorization
 # ------------------------------------------------------------------------------
 def matmul_blocking_vectorization(sizes):
-  """Matmul benchmark with blocking and vectorization schedule.
+    """Matmul benchmark with blocking and vectorization schedule.
 
-  Args:
-    sizes: The target workload sizes.
+    Args:
+      sizes: The target workload sizes.
 
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  C = te.compute((M, N),
-                 lambda x, y: te.sum(A[x, k] * B[k, y], axis=k),
-                 name="C")
-  s = te.create_schedule(C.op)
-  bn = 32
-  # Blocking by loop tiling.
-  xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
-  (k,) = s[C].op.reduce_axis
-  ko, ki = s[C].split(k, factor=4)
-  # Hoist reduction domain outside the blocking loop.
-  s[C].reorder(xo, yo, ko, ki, xi, yi)
-  # Apply the vectorization optimization
-  s[C].vectorize(yi)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    C = te.compute((M, N), lambda x, y: te.sum(A[x, k] * B[k, y], axis=k), name="C")
+    s = te.create_schedule(C.op)
+    bn = 32
+    # Blocking by loop tiling.
+    xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
+    (k,) = s[C].op.reduce_axis
+    ko, ki = s[C].split(k, factor=4)
+    # Hoist reduction domain outside the blocking loop.
+    s[C].reorder(xo, yo, ko, ki, xi, yi)
+    # Apply the vectorization optimization
+    s[C].vectorize(yi)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
 
 
 # ------------------------------------------------------------------------------
 # Loop Permutation
 # ------------------------------------------------------------------------------
 def matmul_loop_permutation(sizes):
-  """Matmul benchmark with loop permutation schedule.
+    """Matmul benchmark with loop permutation schedule.
 
-  Args:
-    sizes: The target workload sizes.
-  
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  C = te.compute((M, N),
-                 lambda x, y: te.sum(A[x, k] * B[k, y], axis=k),
-                 name="C")
-  s = te.create_schedule(C.op)
-  bn = 32
-  xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
-  (k,) = s[C].op.reduce_axis
-  ko, ki = s[C].split(k, factor=4)
-  # re-ordering
-  s[C].reorder(xo, yo, ko, xi, ki, yi)
-  s[C].vectorize(yi)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    Args:
+      sizes: The target workload sizes.
+
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    C = te.compute((M, N), lambda x, y: te.sum(A[x, k] * B[k, y], axis=k), name="C")
+    s = te.create_schedule(C.op)
+    bn = 32
+    xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
+    (k,) = s[C].op.reduce_axis
+    ko, ki = s[C].split(k, factor=4)
+    # re-ordering
+    s[C].reorder(xo, yo, ko, xi, ki, yi)
+    s[C].vectorize(yi)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
 
 
 # ------------------------------------------------------------------------------
 # Array Packing
 # ------------------------------------------------------------------------------
 def matmul_array_packing(sizes):
-  """Matmul benchmark with array packing schedule.
+    """Matmul benchmark with array packing schedule.
 
-  Args:
-    sizes: The target workload sizes.
-  
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  bn = 32
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  packedB = te.compute((N / bn, K, bn),
-                       lambda x, y, z: B[y, x * bn + z],
-                       name="packedB")
-  C = te.compute(
-      (M, N),
-      lambda x, y: te.sum(
-          A[x, k] * packedB[y // bn, k, tvm.tir.indexmod(y, bn)], axis=k),
-      name="C",
-  )
-  s = te.create_schedule(C.op)
+    Args:
+      sizes: The target workload sizes.
 
-  xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
-  (k,) = s[C].op.reduce_axis
-  ko, ki = s[C].split(k, factor=4)
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    bn = 32
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    packedB = te.compute(
+        (N / bn, K, bn), lambda x, y, z: B[y, x * bn + z], name="packedB"
+    )
+    C = te.compute(
+        (M, N),
+        lambda x, y: te.sum(
+            A[x, k] * packedB[y // bn, k, tvm.tir.indexmod(y, bn)], axis=k
+        ),
+        name="C",
+    )
+    s = te.create_schedule(C.op)
 
-  s[C].reorder(xo, yo, ko, xi, ki, yi)
-  s[C].vectorize(yi)
+    xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
+    (k,) = s[C].op.reduce_axis
+    ko, ki = s[C].split(k, factor=4)
 
-  x, y, z = s[packedB].op.axis
-  s[packedB].vectorize(z)
-  s[packedB].parallel(x)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    s[C].reorder(xo, yo, ko, xi, ki, yi)
+    s[C].vectorize(yi)
+
+    x, y, z = s[packedB].op.axis
+    s[packedB].vectorize(z)
+    s[packedB].parallel(x)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
 
 
 # ------------------------------------------------------------------------------
 # Optimizing Block Writing Through Caching
 # ------------------------------------------------------------------------------
 def matmul_block_caching(sizes):
-  """Matmul benchmark with block caching schedule.
+    """Matmul benchmark with block caching schedule.
 
-  Args:
-    sizes: The target workload sizes.
+    Args:
+      sizes: The target workload sizes.
 
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  bn = 32
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  packedB = te.compute((N / bn, K, bn),
-                       lambda x, y, z: B[y, x * bn + z],
-                       name="packedB")
-  C = te.compute(
-      (M, N),
-      lambda x, y: te.sum(
-          A[x, k] * packedB[y // bn, k, tvm.tir.indexmod(y, bn)], axis=k),
-      name="C",
-  )
-  s = te.create_schedule(C.op)
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    bn = 32
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    packedB = te.compute(
+        (N / bn, K, bn), lambda x, y, z: B[y, x * bn + z], name="packedB"
+    )
+    C = te.compute(
+        (M, N),
+        lambda x, y: te.sum(
+            A[x, k] * packedB[y // bn, k, tvm.tir.indexmod(y, bn)], axis=k
+        ),
+        name="C",
+    )
+    s = te.create_schedule(C.op)
 
-  # Allocate write cache
-  CC = s.cache_write(C, "global")
+    # Allocate write cache
+    CC = s.cache_write(C, "global")
 
-  xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
+    xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
 
-  # Write cache is computed at yo
-  s[CC].compute_at(s[C], yo)
+    # Write cache is computed at yo
+    s[CC].compute_at(s[C], yo)
 
-  # New inner axes
-  xc, yc = s[CC].op.axis
+    # New inner axes
+    xc, yc = s[CC].op.axis
 
-  (k,) = s[CC].op.reduce_axis
-  ko, ki = s[CC].split(k, factor=4)
-  s[CC].reorder(ko, xc, ki, yc)
-  s[CC].unroll(ki)
-  s[CC].vectorize(yc)
+    (k,) = s[CC].op.reduce_axis
+    ko, ki = s[CC].split(k, factor=4)
+    s[CC].reorder(ko, xc, ki, yc)
+    s[CC].unroll(ki)
+    s[CC].vectorize(yc)
 
-  x, y, z = s[packedB].op.axis
-  s[packedB].vectorize(z)
-  s[packedB].parallel(x)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    x, y, z = s[packedB].op.axis
+    s[packedB].vectorize(z)
+    s[packedB].parallel(x)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
 
 
 # ------------------------------------------------------------------------------
 # Parallelization
 # ------------------------------------------------------------------------------
 def matmul_block_caching_parallel(sizes):
-  """Matmul benchmark with block caching and parallelization schedule.
+    """Matmul benchmark with block caching and parallelization schedule.
 
-  Args:
-    sizes: The target workload sizes.
+    Args:
+      sizes: The target workload sizes.
 
-  Returns:
-    tvm.te.schedule.Schedule: The schedule for the MatMul computation.
-    List[tvm.te.tensor.Tensor]: The list of input and output tensors.
-  """
-  M, K, N = sizes
-  bn = 32
-  # TVM Matrix Multiplication using TE
-  k = te.reduce_axis((0, K), "k")
-  A = te.placeholder((M, K), name="A")
-  B = te.placeholder((K, N), name="B")
-  packedB = te.compute((N / bn, K, bn),
-                       lambda x, y, z: B[y, x * bn + z],
-                       name="packedB")
-  C = te.compute(
-      (M, N),
-      lambda x, y: te.sum(
-          A[x, k] * packedB[y // bn, k, tvm.tir.indexmod(y, bn)], axis=k),
-      name="C",
-  )
-  s = te.create_schedule(C.op)
+    Returns:
+      tvm.te.schedule.Schedule: The schedule for the MatMul computation.
+      List[tvm.te.tensor.Tensor]: The list of input and output tensors.
+    """
+    M, K, N = sizes
+    bn = 32
+    # TVM Matrix Multiplication using TE
+    k = te.reduce_axis((0, K), "k")
+    A = te.placeholder((M, K), name="A")
+    B = te.placeholder((K, N), name="B")
+    packedB = te.compute(
+        (N / bn, K, bn), lambda x, y, z: B[y, x * bn + z], name="packedB"
+    )
+    C = te.compute(
+        (M, N),
+        lambda x, y: te.sum(
+            A[x, k] * packedB[y // bn, k, tvm.tir.indexmod(y, bn)], axis=k
+        ),
+        name="C",
+    )
+    s = te.create_schedule(C.op)
 
-  # Allocate write cache
-  CC = s.cache_write(C, "global")
+    # Allocate write cache
+    CC = s.cache_write(C, "global")
 
-  xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
+    xo, yo, xi, yi = s[C].tile(C.op.axis[0], C.op.axis[1], bn, bn)
 
-  # Write cache is computed at yo
-  s[CC].compute_at(s[C], yo)
+    # Write cache is computed at yo
+    s[CC].compute_at(s[C], yo)
 
-  # New inner axes
-  xc, yc = s[CC].op.axis
+    # New inner axes
+    xc, yc = s[CC].op.axis
 
-  (k,) = s[CC].op.reduce_axis
-  ko, ki = s[CC].split(k, factor=4)
-  s[CC].reorder(ko, xc, ki, yc)
-  s[CC].unroll(ki)
-  s[CC].vectorize(yc)
+    (k,) = s[CC].op.reduce_axis
+    ko, ki = s[CC].split(k, factor=4)
+    s[CC].reorder(ko, xc, ki, yc)
+    s[CC].unroll(ki)
+    s[CC].vectorize(yc)
 
-  s[C].parallel(xo)
+    s[C].parallel(xo)
 
-  x, y, z = s[packedB].op.axis
-  s[packedB].vectorize(z)
-  s[packedB].parallel(x)
-  arg_bufs = [A, B, C]
-  return s, arg_bufs
+    x, y, z = s[packedB].op.axis
+    s[packedB].vectorize(z)
+    s[packedB].parallel(x)
+    arg_bufs = [A, B, C]
+    return s, arg_bufs
