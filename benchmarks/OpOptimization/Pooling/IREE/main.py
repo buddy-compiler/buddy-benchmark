@@ -10,11 +10,11 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the IREE entry for benchmark BatchNormalization on GPU.
-# torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
-# API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
-# users are surfaced through the torch.compiler namespace.
-# which can automatically generate search spaces for optimizing tensor expressions.
+# This file implements the IREE entry for benchmark Pooling on GPU.
+# IREE (Intermediate Representation Execution Environment, pronounced as "eerie") 
+# is an MLIR-based end-to-end compiler and runtime that lowers Machine Learning (ML) 
+# models to a unified IR that scales up to meet the needs of the datacenter and down 
+# to satisfy the constraints and special considerations of mobile and edge deployments.
 # See the pytorch license at: https://github.com/openxla/iree/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
