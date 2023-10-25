@@ -2,6 +2,7 @@ import numpy as np
 import tvm
 from tvm import te
 
+
 def padding(X, ph, pw, val=0):
     """Pad X with the given value in 2-D
 
@@ -11,18 +12,23 @@ def padding(X, ph, pw, val=0):
     assert len(X.shape) >= 2
     nh, nw = X.shape[-2], X.shape[-1]
     return te.compute(
-            (*X.shape[0:-2], nh+ph*2, nw+pw*2),
-            lambda *i: te.if_then_else(
-                te.any(i[-2]<ph, i[-2]>=nh+ph, i[-1]<pw, i[-1]>=nw+pw),
-                val, X[i[:-2]+(i[-2]-ph, i[-1]-pw)]),
-            name='PaddedX')
+        (*X.shape[0:-2], nh + ph * 2, nw + pw * 2),
+        lambda *i: te.if_then_else(
+            te.any(i[-2] < ph, i[-2] >= nh + ph, i[-1] < pw, i[-1] >= nw + pw),
+            val,
+            X[i[:-2] + (i[-2] - ph, i[-1] - pw)],
+        ),
+        name="PaddedX",
+    )
+
 
 def conv_out_size(n, k, p, s):
     """Compute the output size by given input size n (width or height),
     kernel size k, padding p, and stride s
     Return output size (width or height)
     """
-    return (n - k + 2 * p)//s + 1
+    return (n - k + 2 * p) // s + 1
+
 
 def conv(oc, ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """Convolution
@@ -34,23 +40,25 @@ def conv(oc, ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     sh, sw : height and width strides, default 1
     """
     # reduction axes
-    ric = te.reduce_axis((0, ic), name='ric')
-    rkh = te.reduce_axis((0, kh), name='rkh')
-    rkw = te.reduce_axis((0, kw), name='rkw')
+    ric = te.reduce_axis((0, ic), name="ric")
+    rkh = te.reduce_axis((0, kh), name="rkh")
+    rkw = te.reduce_axis((0, kw), name="rkw")
     # output height and width
     oh = conv_out_size(nh, kh, ph, sh)
     ow = conv_out_size(nw, kw, pw, sw)
     # pad X and then compute Y
-    X = te.placeholder((ic, nh, nw), name='X')
-    K = te.placeholder((oc, ic, kh, kw), name='K')
+    X = te.placeholder((ic, nh, nw), name="X")
+    K = te.placeholder((oc, ic, kh, kw), name="K")
     PaddedX = padding(X, ph, pw) if ph * pw != 0 else X
     Y = te.compute(
         (oc, oh, ow),
         lambda c, i, j: te.sum(
-            PaddedX[ric, i*sh+rkh, j*sw+rkw] * K[c, ric, rkh, rkw],
-            axis=[ric, rkh, rkw]), name='Y')
+            PaddedX[ric, i * sh + rkh, j * sw + rkw] * K[c, ric, rkh, rkw],
+            axis=[ric, rkh, rkw],
+        ),
+        name="Y",
+    )
     return X, K, Y, PaddedX
-
 
 
 def gpu_conv_default(oc, ic, n, k, p, s):
@@ -63,32 +71,32 @@ def gpu_conv_default(oc, ic, n, k, p, s):
     return sch, (X, K, Y)
 
 
-
 def split_axis(factors, sch, op, axis):
-        """Splitting an axis into factors
+    """Splitting an axis into factors
 
-        Parameters
-        ----------
-        factors: array of integers
-            The factors that the split applies
-        sch: tvm.te.schedule.Schedule
-            The tvm schedule
-        op: tvm.te.tensor.Operation
-            The stage to be applied
-        axis: tvm.te.schedule.IterVar
-            axis to split
+    Parameters
+    ----------
+    factors: array of integers
+        The factors that the split applies
+    sch: tvm.te.schedule.Schedule
+        The tvm schedule
+    op: tvm.te.tensor.Operation
+        The stage to be applied
+    axis: tvm.te.schedule.IterVar
+        axis to split
 
-        Returns
-        -------
-        axes : list of Axis
-            The transformed axes.
-        """
-        ret = []
-        for i in range(0, len(factors)):
-            ax0, ax1 = sch[op].split(axis, factor=int(np.prod(factors[i:])))
-            ret.append(ax0)
-            axis = ax1
-        return ret + [axis]
+    Returns
+    -------
+    axes : list of Axis
+        The transformed axes.
+    """
+    ret = []
+    for i in range(0, len(factors)):
+        ax0, ax1 = sch[op].split(axis, factor=int(np.prod(factors[i:])))
+        ret.append(ax0)
+        axis = ax1
+    return ret + [axis]
+
 
 def gpu_conv_tiling(oc, ic, n, k, p, s):
     tile_c = [4, 8]
@@ -101,13 +109,13 @@ def gpu_conv_tiling(oc, ic, n, k, p, s):
     sch = te.create_schedule(Y.op)
     sch[PaddedX].compute_inline()
 
-    YL = sch.cache_write(Y, 'local')
+    YL = sch.cache_write(Y, "local")
 
     # create cache stage
-    XX = sch.cache_read(PaddedX, 'shared', [YL])
-    KK = sch.cache_read(K, 'shared', [YL])
-    XL = sch.cache_read(XX, 'local', [YL])
-    KL = sch.cache_read(KK, 'local', [YL])
+    XX = sch.cache_read(PaddedX, "shared", [YL])
+    KK = sch.cache_read(K, "shared", [YL])
+    XL = sch.cache_read(XX, "local", [YL])
+    KL = sch.cache_read(KK, "local", [YL])
 
     c, h, w = sch[Y].op.axis
 
@@ -153,25 +161,24 @@ def gpu_conv_tiling(oc, ic, n, k, p, s):
     return sch, (X, K, Y)
 
 
-
 def gpu_conv_vthread(oc, ic, n, k, p, s):
     tile_c = [1, 4, 8]
     tile_h = [1, 2, 2]
-    tile_w = [2, 16, 2] # making 2 virtual thread along the ow dimension
+    tile_w = [2, 16, 2]  # making 2 virtual thread along the ow dimension
     tile_rc = [1, 1]
-    tile_rh = [1, 3] # making the data access in columns
+    tile_rh = [1, 3]  # making the data access in columns
     tile_rw = [1, 1]
     X, K, Y, PaddedX = conv(oc, ic, n, n, k, k, p, p, s, s)
     sch = te.create_schedule(Y.op)
     sch[PaddedX].compute_inline()
 
-    YL = sch.cache_write(Y, 'local')
+    YL = sch.cache_write(Y, "local")
 
     # create cache stage
-    XX = sch.cache_read(PaddedX, 'shared', [YL])
-    KK = sch.cache_read(K, 'shared', [YL])
-    XL = sch.cache_read(XX, 'local', [YL])
-    KL = sch.cache_read(KK, 'local', [YL])
+    XX = sch.cache_read(PaddedX, "shared", [YL])
+    KK = sch.cache_read(K, "shared", [YL])
+    XL = sch.cache_read(XX, "local", [YL])
+    KL = sch.cache_read(KK, "local", [YL])
 
     c, h, w = sch[Y].op.axis
 
@@ -218,5 +225,3 @@ def gpu_conv_vthread(oc, ic, n, k, p, s):
         sch[load].bind(tx, te.thread_axis("threadIdx.x"))
 
     return sch, (X, K, Y)
-
-

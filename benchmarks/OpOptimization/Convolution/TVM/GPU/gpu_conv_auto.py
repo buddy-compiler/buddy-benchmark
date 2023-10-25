@@ -16,29 +16,33 @@ def conv_default(oc, ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     sh, sw : height and width strides, default 1
     """
     # reduction axes
-    ric = te.reduce_axis((0, ic), name='ric')
-    rkh = te.reduce_axis((0, kh), name='rkh')
-    rkw = te.reduce_axis((0, kw), name='rkw')
+    ric = te.reduce_axis((0, ic), name="ric")
+    rkh = te.reduce_axis((0, kh), name="rkh")
+    rkw = te.reduce_axis((0, kw), name="rkw")
     # output height and width
     oh = conv_out_size(nh, kh, ph, sh)
     ow = conv_out_size(nw, kw, pw, sw)
     # pad X and then compute Y
-    X = te.placeholder((ic, nh, nw), name='X')
-    K = te.placeholder((oc, ic, kh, kw), name='K')
+    X = te.placeholder((ic, nh, nw), name="X")
+    K = te.placeholder((oc, ic, kh, kw), name="K")
     PaddedX = padding(X, ph, pw) if ph * pw != 0 else X
     Y = te.compute(
         (oc, oh, ow),
         lambda c, i, j: te.sum(
-            PaddedX[ric, i*sh+rkh, j*sw+rkw] * K[c, ric, rkh, rkw],
-            axis=[ric, rkh, rkw]), name='Y')
+            PaddedX[ric, i * sh + rkh, j * sw + rkw] * K[c, ric, rkh, rkw],
+            axis=[ric, rkh, rkw],
+        ),
+        name="Y",
+    )
     return X, K, Y, PaddedX
-
 
 
 def gpu_conv_autoR(oc, ic, n, k, p, s):
     target = tvm.target.Target(target="cuda", host="llvm")
 
-    task = tvm.auto_scheduler.SearchTask(func=conv_default, args= (oc, ic, n, n, k, k, p, p, s, s), target=target)
+    task = tvm.auto_scheduler.SearchTask(
+        func=conv_default, args=(oc, ic, n, n, k, k, p, p, s, s), target=target
+    )
 
     print("==========conv_autoschedule=========")
 
@@ -48,9 +52,9 @@ def gpu_conv_autoR(oc, ic, n, k, p, s):
         num_measure_trials=120,
         measure_callbacks=[auto_scheduler.RecordToFile(log_file)],
         verbose=1,
-        early_stopping = 20,
-        )
-        # vervose to determine whether output or not
+        early_stopping=20,
+    )
+    # vervose to determine whether output or not
     task.tune(tune_option)
     sch, args = task.apply_best(log_file)
     X, K, Y, PaddedX = args
