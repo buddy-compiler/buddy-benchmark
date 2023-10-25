@@ -10,7 +10,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the IREE optimization for benchmark BatchMatmul on GPU.
+# This file implements the IREE entry for benchmark BatchMatmul on GPU.
 # IREE (Intermediate Representation Execution Environment, pronounced as "eerie") 
 # is an MLIR-based end-to-end compiler and runtime that lowers Machine Learning (ML) 
 # models to a unified IR that scales up to meet the needs of the datacenter and down 
