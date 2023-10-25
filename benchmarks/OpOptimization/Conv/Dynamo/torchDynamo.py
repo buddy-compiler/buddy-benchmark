@@ -1,7 +1,26 @@
+# You may obtain a copy of the License at
+#
+#     https://github.com/pytorch/pytorch/blob/main/LICENSE
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the dynamo optimization for benchmark Conv on GPU.
+# torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
+# API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
+# users are surfaced through the torch.compiler namespace.
+# which can automatically generate search spaces for optimizing tensor expressions.
+# See the pytorch license at: https://github.com/pytorch/pytorch/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import torch
 import torch.nn as nn
 import numpy as np
-
 
 def conv_out_size(n, k, p, s):
     """Compute the output size by given input size n (width or height),
@@ -10,12 +29,9 @@ def conv_out_size(n, k, p, s):
     """
     return (n - k + 2 * p)//s + 1
 
-
-
 def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
     """Return random 3-D data tensor, 3-D kernel tenor and empty 3-D output
     tensor with the shapes specified by input arguments.
-
     oc, ic : output and input channels
     n : input width and height
     k : kernel width and height
@@ -32,7 +48,6 @@ def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
         data, weight, out = (constructor(x) for x in [data, weight, out])
     return data, weight, out
 
-
 def conv_torch(data, out, k, p, s):
     f = nn.Conv2d(data.shape[1], out.shape[1], kernel_size=k, stride=s, padding=p)
     return f
@@ -47,14 +62,3 @@ def get_conv_data_torch(c, n, k, p, s):
     data = data.unsqueeze(0)  
     out = out.unsqueeze(0)
     return data, weight, out
-
-
-
-
-
-
-
-
-
-
-
