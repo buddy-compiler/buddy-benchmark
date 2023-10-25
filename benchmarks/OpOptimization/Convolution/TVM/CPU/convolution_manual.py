@@ -1,14 +1,29 @@
-
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the manual optimization for benchmark Convolution on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import numpy as np
 import tvm
 from tvm import te
 
-
-
 def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
     """Return random 3-D data tensor, 3-D kernel tenor and empty 3-D output
     tensor with the shapes specified by input arguments.
-
     oc, ic : output and input channels
     n : input width and height
     k : kernel width and height
@@ -27,7 +42,6 @@ def get_conv_data(oc, ic, n, k, p=0, s=1, constructor=None):
 
 def padding(X, ph, pw, val=0):
     """Pad X with the given value in 2-D
-
     ph, pw : height and width padding
     val : padding value, default 0
     """
@@ -40,8 +54,6 @@ def padding(X, ph, pw, val=0):
                 val, X[i[:-2]+(i[-2]-ph, i[-1]-pw)]),
             name='PaddedX')
 
-
-
 def conv_out_size(n, k, p, s):
     """Compute the output size by given input size n (width or height),
     kernel size k, padding p, and stride s
@@ -49,11 +61,8 @@ def conv_out_size(n, k, p, s):
     """
     return (n - k + 2 * p)//s + 1
 
-
-
 def conv_default(oc, ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
     """Convolution
-
     oc, ic : output and input channels
     nh, nw : input width and height
     kh, kw : kernel width and height
@@ -77,7 +86,6 @@ def conv_default(oc, ic, nh, nw, kh, kw, ph=0, pw=0, sh=1, sw=1):
             PaddedX[ric, i*sh+rkh, j*sw+rkw] * K[c, ric, rkh, rkw],
             axis=[ric, rkh, rkw]), name='Y')
     return X, K, Y, PaddedX
-
 
 th, tw = 8, 8  # Tile sizes for height and weight
 
@@ -130,7 +138,6 @@ def conv_pack(oc, ic, nh, nw, kh, kw, ph, pw, toc, tic):
 
 def conv_using_pack(oc, ic, nh, nw, kh, kw, ph, pw, sh, sw, toc, tic):
     """2-D conv
-
     oc, ic : output and input channels.
     nh, nw : input width and height
     kh, kw : kernel width and height
@@ -160,7 +167,6 @@ def conv_using_pack(oc, ic, nh, nw, kh, kw, ph, pw, sh, sw, toc, tic):
                     lambda oc, x, y: PackedY[oc//toc, x, y, oc%toc],
                     name='Y')
     return X, K, Y, PaddedX, PackedX, PackedK, PackedY
-
 
 def packed_cached_conv(oc, ic, n, k, p, s):
     toc, tic, tw = 16, 16, 4
@@ -193,8 +199,6 @@ def packed_cached_conv(oc, ic, n, k, p, s):
     s[Y].parallel(s[Y].fuse(*Y.op.axis[0:2]))
     s[Y].unroll(Y.op.axis[-1])
     return s, (X, K, Y)
-
-
 
 def default_conv(oc, ic, n, k, p, s):
     X, K, Y, PaddedX = conv_default(oc, ic, n, n, k, k, p, p, s, s)
