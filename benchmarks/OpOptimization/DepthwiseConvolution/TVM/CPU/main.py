@@ -1,3 +1,22 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the entry for benchmark DepthwiseConvolution on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 from dep_conv_manual import *
 from dep_conv_mxnet import *
 from dep_conv_auto import *
@@ -5,7 +24,6 @@ import numpy
 import timeit
 import tvm.testing
 import mxnet as mx
-
 
 # ------------------------------------------------------------------------------
 # Helper Function
@@ -28,7 +46,6 @@ def evaluate_operation(s, vars, target, inputs, optimization, log):
   mean_time = evaluator(data_x, data_k, data_y).mean * 1000  # Convert to milliseconds
   log.append((optimization, mean_time))
 
-
 def report_performance(log):
   """Convert the log into a performance table.
   Args:
@@ -48,7 +65,6 @@ def report_performance(log):
           (result[0].ljust(30), str(formatted_time + " ms").rjust(10),
            str(formatted_performance).rjust(10)))
 
-
 def main():
   # ----------------------------------------------------------------------------
   # Initialization and Baseline
@@ -59,9 +75,7 @@ def main():
   size = c,n,k
   target = tvm.target.Target(target="llvm", host="llvm")
   data_x, data_k, data_y = get_conv_data(c, c, n, k, p, s,tvm.nd.array,conv_type='depthwise')
-
   mxnet_times = bench_depthwise_conv_mxnet(size)
-
   # ----------------------------------------------------------------------------
   # Register Benchmarks and Dump Report
   # ----------------------------------------------------------------------------
@@ -91,14 +105,10 @@ def main():
                       optimization="depthwise_conv_auto",
                       log=log)
 
-  
-
-  
   # Register numpy case.
   log.append(("mxnet_baseline", mxnet_times  * 1000))  # Milliseconds
   # Dump the performance table.
   report_performance(log)
-
 
 if __name__ == "__main__":
   main()
