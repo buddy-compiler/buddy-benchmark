@@ -11,14 +11,15 @@
 # ===---------------------------------------------------------------------------
 #
 # This file implements the dynamo optimization for benchmark Matmul on GPU.
-# torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
-# API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
+# torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation
+# API to safely capture PyTorch graphs. Methods that are available externally for PyTorch
 # users are surfaced through the torch.compiler namespace.
 # which can automatically generate search spaces for optimizing tensor expressions.
 # See the pytorch license at: https://github.com/pytorch/pytorch/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
 import torch
+
 
 def matrix_multiply(matrix1, matrix2):
     m, n = matrix1.size()
@@ -30,6 +31,7 @@ def matrix_multiply(matrix1, matrix2):
                 result[i][j] += matrix1[i][k] * matrix2[k][j]
     return result
 
+
 def default_matrix_multiply():
     def inner_matrix_multiply(matrix1, matrix2):
         m, n = matrix1.size()
@@ -40,8 +42,10 @@ def default_matrix_multiply():
                 for k in range(n):
                     result[i][j] += matrix1[i][k] * matrix2[k][j]
         return result
+
     return inner_matrix_multiply
 
+
 def dynamo_matrix_multiply():
-    compiled_mm = torch.compile(matrix_multiply,mode="max-autotune")
+    compiled_mm = torch.compile(matrix_multiply, mode="max-autotune")
     return compiled_mm
