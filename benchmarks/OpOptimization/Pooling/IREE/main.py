@@ -1,3 +1,23 @@
+# You may obtain a copy of the License at
+#
+#     https://github.com/openxla/iree/blob/main/LICENSE
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the IREE entry for benchmark BatchNormalization on GPU.
+# torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation 
+# API to safely capture PyTorch graphs. Methods that are available externally for PyTorch 
+# users are surfaced through the torch.compiler namespace.
+# which can automatically generate search spaces for optimizing tensor expressions.
+# See the pytorch license at: https://github.com/openxla/iree/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import numpy
 import time
 from pooling_iree import *
@@ -102,7 +122,6 @@ def main():
   # Register Benchmarks and Dump Report
   # ----------------------------------------------------------------------------
   # Register default schedule.
-  
   evaluate_operation(invoker,
                      inputs=example_input,
                      optimization="IREE",
@@ -115,3 +134,4 @@ def main():
 
 if __name__ == "__main__":
   main()
+  
