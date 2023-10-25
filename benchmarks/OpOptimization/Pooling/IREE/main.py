@@ -15,7 +15,6 @@
 # is an MLIR-based end-to-end compiler and runtime that lowers Machine Learning (ML) 
 # models to a unified IR that scales up to meet the needs of the datacenter and down 
 # to satisfy the constraints and special considerations of mobile and edge deployments.
-# See the pytorch license at: https://github.com/openxla/iree/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
 import numpy
