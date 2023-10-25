@@ -1,10 +1,28 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements mxnet DepthwiseConvolution on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import mxnet as mx
 from dep_conv_manual import *
 import timeit
 
 def bench_workload(workload):
     """Benchmark a workload
-
     workload: a method that accept a num_repeat argument
     and return its total execution time
     """
@@ -15,7 +33,6 @@ def bench_workload(workload):
     num_repeats = max(int(1.0 / time), 5)
     return workload(num_repeats) / num_repeats
 
-
 def get_conv_data_mxnet(oc, ic, n, k, p, s, ctx='cpu', conv_type='direct'):
     ctx = getattr(mx, ctx)()
     data, weight, out = get_conv_data(oc, ic, n, k, p, s,
@@ -25,17 +42,13 @@ def get_conv_data_mxnet(oc, ic, n, k, p, s, ctx='cpu', conv_type='direct'):
     bias = mx.nd.zeros(out.shape[1], ctx=ctx)
     return data, weight, bias, out
 
-
 def depthwise_conv_mxnet(data, weight, bias, out, k, p, s):
     mx.nd.Convolution(data, weight, bias, kernel=(k,k), stride=(s,s),
                       pad=(p,p), num_filter=out.shape[1],
                       out=out, num_group=weight.shape[0])
 
-
-
 def depthwise_conv_timer_mxnet(c, n, k, ctx):
     """Benchmark convolution in MXNet
-
     c : input, output channels
     n : input width and height
     k : kernel width and height
@@ -51,9 +64,6 @@ def depthwise_conv_timer_mxnet(c, n, k, ctx):
         'out.wait_to_read()')
     return timer.timeit
 
-
 def bench_depthwise_conv_mxnet(size, ctx='cpu'):
     """Return the GFLOPS of MXNet convolution"""
     return bench_workload(depthwise_conv_timer_mxnet(size[0], size[1], size[2], ctx))
-            
-
