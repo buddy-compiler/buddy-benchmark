@@ -1,11 +1,28 @@
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ===---------------------------------------------------------------------------
+#
+# This file implements the AutoScheduler for BatchNormalization on CPU.
+# Autoscheduler is TVM's next-generation performance tuning tool, 
+# which can automatically generate search spaces for optimizing tensor expressions.
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+#
+# ===---------------------------------------------------------------------------
 import tvm
 from tvm import te
 import numpy as np
 from tvm import topi
 import timeit
 import mxnet as mx
-
-
 # ------------------------------------------------------------------------------
 # Default Scheduling
 # ------------------------------------------------------------------------------
@@ -16,19 +33,16 @@ def get_bn_data_mxnet(c, n, ctx='cpu'):
     data, out = data.expand_dims(axis=0), out.expand_dims(axis=0)
     return data, mean, var, gamma, beta, out
 
-
 def batch_norm_mxnet(data, mean, var, gamma, beta, out, eps=1e-5):
     mx.nd.BatchNorm(data, gamma, beta, mean, var, eps,
                     use_global_stats=True, fix_gamma=False, out=out)
 
 def batch_norm(c, n, eps=1e-5):
     """batch normalization
-
     c : channels
     N : input width and height
     eps : small positive value to prevent divide 0
     """
-
     X = te.placeholder((c, n, n), name='X')
     Mean = te.placeholder((c, 1, 1), name='Mean')
     Var = te.placeholder((c, 1, 1), name='Var')
@@ -39,7 +53,6 @@ def batch_norm(c, n, eps=1e-5):
     Y = C1 / C2 * Gamma + Beta
     return X, Mean, Var, Gamma, Beta, Y
    
-
 def get_bn_data(c, n, constructor=None):
     """Return the batch norm data, mean, variance, gamma and beta tensors.
        Also return the empty tensor for output.
@@ -61,13 +74,11 @@ def get_bn_data(c, n, constructor=None):
         (constructor(x) for x in [data, mean, var, gamma, beta, out])
     return data, mean, var, gamma, beta, out
 
-
 def default_bn(size):
     c, n = size[:]
     X, Mean, Var, Gamma, Beta, Y = batch_norm(c, n)
     sch = te.create_schedule(Y.op)
     return sch, (X, Mean, Var, Gamma, Beta, Y)
-
 
 def optimized_bn(size):
     sch, (X, Mean, Var, Gamma, Beta, Y) = default_bn(size)
@@ -77,7 +88,6 @@ def optimized_bn(size):
     sch[Y].parallel(fused)
     sch[Y].vectorize(w)
     return sch, (X, Mean, Var, Gamma, Beta, Y)
-
 
 def bench_workload(workload):
     """Benchmark a workload
@@ -91,7 +101,6 @@ def bench_workload(workload):
     # The number of repeats to measure at least 1 second
     num_repeats = max(int(1.0 / time), 5)
     return workload(num_repeats) / num_repeats
-
 
 def bn_timer_mxnet(c, n, ctx):
     """Benchmark batch normalization in MXNet
@@ -115,19 +124,10 @@ def bench_bn_mxnet(size, ctx='cpu'):
     """Return the execution times of MXNet batch norm"""
     return bench_workload(bn_timer_mxnet(size[0], size[1], ctx))
 
-
-
-
 def main():
   size = (32, 28)
   mxnet_times = bench_bn_mxnet(size)
   print(mxnet_times)
 
 if __name__ == "__main__":
-    main()
-
-
-
-
-
-  
+    main()  
