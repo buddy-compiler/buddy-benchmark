@@ -21,6 +21,12 @@
 #include <benchmark/benchmark.h>
 
 void generateResultMLIRLinpackCDaxpy();
+void generateResultMLIRLinpackCMatgen();
+void generateResultMLIRLinpackCDdot();
+void generateResultMLIRLinpackCDscal();
+void generateResultMLIRLinpackCIdamax();
+void generateResultMLIRLinpackCDmxpy();
+void generateResultMLIRLinpackCEpslon();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -29,6 +35,12 @@ int main(int argc, char **argv) {
   ::benchmark::RunSpecifiedBenchmarks();
 
   // Generate result.
-  generateResultMLIRLinpackCDaxpy();
+  // generateResultMLIRLinpackCDaxpy();
+  // generateResultMLIRLinpackCMatgen();
+  // generateResultMLIRLinpackCDdot();
+  // generateResultMLIRLinpackCDscal();
+  // generateResultMLIRLinpackCIdamax();
+  // generateResultMLIRLinpackCDmxpy();
+  // generateResultMLIRLinpackCEpslon();
   return 0;
 }
