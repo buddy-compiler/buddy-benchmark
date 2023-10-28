@@ -180,14 +180,14 @@ The result is saved in `bin/res.png`. For more usage, use `audio-plot -h` for de
 
 Some of the benchmarks are ported from gcc-loops([link](https://github.com/llvm/llvm-test-suite/blob/main/SingleSource/UnitTests/Vectorizer/gcc-loops.cpp)) in LLVM test suit and linpackc([link](https://github.com/2000nickels/linpackc/blob/master/linpack.c))
 
-*Note: Please replace the `/PATH/TO/*` with your local path and the `XXX` with specific target name (ex: gccloops,linpackc,matrix).*
-
+*Note: Please replace the `/PATH/TO/*` with your local path ,the `XXX` with specific target name (ex: gccloops,linpackc,matrix) and the `ISA` with a natively supported instruction set.(-DBUDDY_OPT_ATTR is set to avx512f by default)*
 ```
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DVECTORIZATION_BENCHMARKS=ON \
+    -DBUDDY_OPT_ATTR=ISA \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja vectorization-XXX-benchmark
 $ cd bin
