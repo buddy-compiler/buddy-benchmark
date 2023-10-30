@@ -19,6 +19,7 @@
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
+#include <iostream>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
@@ -27,15 +28,15 @@
 using namespace kfr;
 
 constexpr size_t maxorder = 32;
-univector<float, 2000000> aud_iir;
-univector<fbase, 2000000> output;
+univector<double, 2000000> aud_iir;
+univector<double, 2000000> output;
 
-zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
-std::vector<biquad_params<fbase>> bqs = to_sos(filt);
+zpk<double> filt = iir_lowpass(bessel<double>(24), 1000, 48000);
+std::vector<biquad_params<double>> bqs = to_sos(filt);
 
 // Initialize univector.
 void initializeKFRIir() {
-  audio_reader_wav<float> reader(open_file_for_reading(
+  audio_reader_wav<double> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
   reader.read(aud_iir.data(), aud_iir.size());
 }
@@ -56,12 +57,19 @@ BENCHMARK(KFR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
 void generateResultKFRIir() {
   println("-------------------------------------------------------");
   println("[ KFR IIR Result Information ]");
-  univector<float> generateResult = biquad<maxorder>(bqs, aud_iir);
+  univector<double> generateResult = biquad<maxorder>(bqs, aud_iir);
 
-  audio_writer_wav<float> writer(open_file_for_writing("./ResultKFRIir.wav"),
-                                 audio_format{1 /* channel */,
-                                              audio_sample_type::i24,
-                                              100000 /* sample rate */});
+  // print output for the first 100 ouputs
+  for (int i = 0; i < 100; ++i) {
+    std::cout << " " << generateResult[i];
+    if (i % 10 == 9)
+      std::cout << "\n";
+  }
+
+  audio_writer_wav<double> writer(open_file_for_writing("./ResultKFRIir.wav"),
+                                  audio_format{1 /* channel */,
+                                               audio_sample_type::i24,
+                                               100000 /* sample rate */});
   writer.write(generateResult.data(), generateResult.size());
   println("Sample Rate  = ", writer.format().samplerate);
   println("Channels     = ", writer.format().channels);

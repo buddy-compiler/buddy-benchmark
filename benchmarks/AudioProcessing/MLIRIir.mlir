@@ -1,4 +1,5 @@
-//===- BuddyIir.mlir ------------------------------------------------------===//
+//===- MLIRIir.mlir -------------------------------------------------------===//
+
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,38 +19,37 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @mlir_iir(%in : memref<?xf32>, %filter : memref<?x?xf32>, %out : memref<?xf32>){
+func.func @mlir_iir(%in : memref<?xf64>, %filter : memref<?x?xf64>, %out : memref<?xf64>){
   %c0 = arith.constant 0 : index
-  %N = memref.dim %in, %c0 : memref<?xf32>
-  %M = memref.dim %filter, %c0: memref<?x?xf32>
+  %N = memref.dim %in, %c0 : memref<?xf64>
+  %M = memref.dim %filter, %c0: memref<?x?xf64>
 
-  affine.for %j = 0 to %M iter_args(%inpt = %in) -> (memref<?xf32>){
-    %b0 = affine.load %filter[%j, 0] : memref<?x?xf32>
-    %b1 = affine.load %filter[%j, 1] : memref<?x?xf32>
-    %b2 = affine.load %filter[%j, 2] : memref<?x?xf32>
-    %a0 = affine.load %filter[%j, 3] : memref<?x?xf32>
-    %a1 = affine.load %filter[%j, 4] : memref<?x?xf32>
-    %a2 = affine.load %filter[%j, 5] : memref<?x?xf32>
-    %init_z1 = arith.constant 0.0 : f32
-    %init_z2 = arith.constant 0.0 : f32
-    %res:2 = affine.for %i = 0 to %N iter_args(%z1 = %init_z1, %z2 = %init_z2) -> (f32, f32) {
-        %input = affine.load %inpt[%i] : memref<?xf32>
-        %t0 = arith.mulf %b0, %input : f32
-        %output = arith.addf %t0, %z1 : f32
+  affine.for %j = 0 to %M iter_args(%inpt = %in) -> (memref<?xf64>){
+    %b0 = affine.load %filter[%j, 0] : memref<?x?xf64>
+    %b1 = affine.load %filter[%j, 1] : memref<?x?xf64>
+    %b2 = affine.load %filter[%j, 2] : memref<?x?xf64>
+    %a1 = affine.load %filter[%j, 4] : memref<?x?xf64>
+    %a2 = affine.load %filter[%j, 5] : memref<?x?xf64>
+    %init_z1 = arith.constant 0.0 : f64
+    %init_z2 = arith.constant 0.0 : f64
+    %res:2 = affine.for %i = 0 to %N iter_args(%z1 = %init_z1, %z2 = %init_z2) -> (f64, f64) {
+        %input = affine.load %inpt[%i] : memref<?xf64>
+        %t0 = arith.mulf %b0, %input : f64
+        %output = arith.addf %t0, %z1 : f64
 
-        %t1 = arith.mulf %b1, %input : f32
-        %t2 = arith.mulf %a1, %output : f32
-        %t3 = arith.subf %t1, %t2 : f32
-        %z1_next = arith.addf %z2, %t3 : f32
+        %t1 = arith.mulf %b1, %input : f64
+        %t2 = arith.mulf %a1, %output : f64
+        %t3 = arith.subf %t1, %t2 : f64
+        %z1_next = arith.addf %z2, %t3 : f64
 
-        %t4 = arith.mulf %b2, %input : f32
-        %t5 = arith.mulf %a2, %output : f32
-        %z2_next = arith.subf %t4, %t5 : f32
+        %t4 = arith.mulf %b2, %input : f64
+        %t5 = arith.mulf %a2, %output : f64
+        %z2_next = arith.subf %t4, %t5 : f64
         
-        affine.store %output, %out[%i] : memref<?xf32>
-        affine.yield %z1_next, %z2_next : f32, f32
+        affine.store %output, %out[%i] : memref<?xf64>
+        affine.yield %z1_next, %z2_next : f64, f64
     }
-    affine.yield %out : memref<?xf32>
+    affine.yield %out : memref<?xf64>
   }
   return
 }

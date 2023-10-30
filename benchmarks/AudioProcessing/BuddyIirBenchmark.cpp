@@ -18,8 +18,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <buddy/Core/Container.h>
 #include <benchmark/benchmark.h>
+#include <buddy/Core/Container.h>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
@@ -29,35 +29,44 @@ using namespace kfr;
 
 // Declare the IIR C interface.
 extern "C" {
-void _mlir_ciface_mlir_iir(MemRef<float, 1> *inputBuddyConv1D,
-                           MemRef<float, 2> *kernelBuddyConv1D,
-                           MemRef<float, 1> *outputBuddyConv1D);
+void _mlir_ciface_mlir_iir(MemRef<double, 1> *inputBuddyConv1D,
+                           MemRef<double, 2> *kernelBuddyConv1D,
+                           MemRef<double, 1> *outputBuddyConv1D);
 
-void _mlir_ciface_buddy_iir(MemRef<float, 1> *inputBuddyConv1D,
-                            MemRef<float, 2> *kernelBuddyConv1D,
-                            MemRef<float, 1> *outputBuddyConv1D);
+void _mlir_ciface_mlir_iir_simd(MemRef<double, 1> *inputBuddyConv1D,
+                                MemRef<double, 2> *kernelBuddyConv1D,
+                                MemRef<double, 1> *outputBuddyConv1D);
+
+// TODO : Debug buddy_iir lowering pass. The final PR will use version with type
+// f64. void _mlir_ciface_buddy_iir(MemRef<double, 1> *inputBuddyConv1D,
+//                             MemRef<double, 2> *kernelBuddyConv1D,
+//                             MemRef<double, 1> *outputBuddyConv1D);
+
+void _mlir_ciface_buddy_iir_simd(MemRef<double, 1> *inputBuddyConv1D,
+                                 MemRef<double, 2> *kernelBuddyConv1D,
+                                 MemRef<double, 1> *outputBuddyConv1D);
 }
 
 namespace {
-univector<float> kernel;
-zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
-std::vector<biquad_params<fbase>> bqs = to_sos(filt);
+univector<double> kernel;
+zpk<double> filt = iir_lowpass(bessel<double>(24), 1000, 48000);
+std::vector<biquad_params<double>> bqs = to_sos(filt);
 
-univector<float, 2000000> aud_buddy_iir;
-univector<float, 2000000> result_buddy_iir;
+univector<double, 2000000> aud_buddy_iir;
+univector<double, 2000000> result_buddy_iir;
 intptr_t size_f = bqs.size();
 intptr_t sizeofKernel[2] = {size_f, 6};
 intptr_t sizeofAud{aud_buddy_iir.size()};
 
 // MemRef copys all data, so data here are actually not accessed.
-MemRef<float, 2> kernelRef(sizeofKernel);
-MemRef<float, 1> audRef(&sizeofAud);
-MemRef<float, 1> resRef(&sizeofAud);
+MemRef<double, 2> kernelRef(sizeofKernel);
+MemRef<double, 1> audRef(&sizeofAud);
+MemRef<double, 1> resRef(&sizeofAud);
 } // namespace
 
 // Initialize univector.
 void initializeBuddyIir() {
-  audio_reader_wav<float> reader(open_file_for_reading(
+  audio_reader_wav<double> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
   reader.read(aud_buddy_iir.data(), aud_buddy_iir.size());
 
@@ -71,9 +80,9 @@ void initializeBuddyIir() {
     kernel.push_back(bq.a2);
   }
 
-  kernelRef = std::move(MemRef<float, 2>(kernel.data(), sizeofKernel));
-  audRef = std::move(MemRef<float, 1>(aud_buddy_iir.data(), &sizeofAud));
-  resRef = std::move(MemRef<float, 1>(&sizeofAud));
+  kernelRef = std::move(MemRef<double, 2>(kernel.data(), sizeofKernel));
+  audRef = std::move(MemRef<double, 1>(aud_buddy_iir.data(), &sizeofAud));
+  resRef = std::move(MemRef<double, 1>(&sizeofAud));
 }
 
 // Benchmarking function.
@@ -86,29 +95,57 @@ static void MLIR_IIR(benchmark::State &state) {
 }
 
 // Benchmarking function.
-static void BUDDY_IIR(benchmark::State &state) {
+static void MLIR_IIR_SIMD(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_buddy_iir(&audRef, &kernelRef, &resRef);
+      _mlir_ciface_mlir_iir_simd(&audRef, &kernelRef, &resRef);
+    }
+  }
+}
+
+// // Benchmarking function.
+// static void BUDDY_IIR(benchmark::State &state) {
+//   for (auto _ : state) {
+//     for (int i = 0; i < state.range(0); ++i) {
+//       _mlir_ciface_buddy_iir(&audRef, &kernelRef, &resRef);
+//     }
+//   }
+// }
+
+// Benchmarking function.
+static void BUDDY_IIR_SIMD(benchmark::State &state) {
+  for (auto _ : state) {
+    for (int i = 0; i < state.range(0); ++i) {
+      _mlir_ciface_buddy_iir_simd(&audRef, &kernelRef, &resRef);
     }
   }
 }
 
 // Register benchmarking function.
 BENCHMARK(MLIR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
-BENCHMARK(BUDDY_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(MLIR_IIR_SIMD)->Arg(1)->Unit(benchmark::kMillisecond);
+// BENCHMARK(BUDDY_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(BUDDY_IIR_SIMD)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result_buddy_iir wav file.
 void generateResultBuddyIir() {
   println("-------------------------------------------------------");
   println("[ Buddy IIR Result Information ]");
-  MemRef<float, 1> generateResult(&sizeofAud);
-  _mlir_ciface_buddy_iir(&audRef, &kernelRef, &generateResult);
+  MemRef<double, 1> generateResult(&sizeofAud);
 
-  audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyIir.wav"),
-                                 audio_format{1 /* channel */,
-                                              audio_sample_type::i24,
-                                              100000 /* sample rate */});
+  _mlir_ciface_buddy_iir_simd(&audRef, &kernelRef, &generateResult);
+
+  // print output for the first 100 ouputs
+  for (int i = 0; i < 100; ++i) {
+    std::cout << " " << generateResult[i];
+    if (i % 10 == 9)
+      std::cout << "\n";
+  }
+
+  audio_writer_wav<double> writer(open_file_for_writing("./ResultBuddyIir.wav"),
+                                  audio_format{1 /* channel */,
+                                               audio_sample_type::i24,
+                                               100000 /* sample rate */});
   writer.write(generateResult.getData(), generateResult.getSize());
   println("Sample Rate  = ", writer.format().samplerate);
   println("Channels     = ", writer.format().channels);
