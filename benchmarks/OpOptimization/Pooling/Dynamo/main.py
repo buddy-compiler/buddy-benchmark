@@ -33,6 +33,7 @@ dtype = "float32"
 # ------------------------------------------------------------------------------
 def evaluator(s, inputs, num):
     all_time = []
+    result = s(inputs)
     for i in range(num):
         torch.cuda.synchronize()
         start = time.time()
