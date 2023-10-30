@@ -75,6 +75,32 @@ add_custom_command(OUTPUT mlir-iir.o
         )
 add_library(MLIRIir STATIC mlir-iir.o)
 set_target_properties(MLIRIir PROPERTIES LINKER_LANGUAGE CXX)
+
+#-------------------------------------------------------------------------------
+# MLIR IIR SIMD Operation
+#-------------------------------------------------------------------------------
+
+# Support only when num{SOS matrix} <= 16. 
+# The dap.iir_simd operation implemented in buddy-mlir project will support num{SOS matrix} <= 64/
+add_custom_command(OUTPUT mlir-iir-simd.o
+        COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRIirSimd.mlir
+        -lower-dap="DAP-vector-splitting=64" -convert-linalg-to-affine-loops
+        -lower-affine
+        -convert-scf-to-cf 
+        -convert-vector-to-llvm 
+        --llvm-request-c-wrappers
+        -convert-arith-to-llvm
+        -finalize-memref-to-llvm -convert-func-to-llvm
+        -reconcile-unrealized-casts |
+        ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+        ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/mlir-iir-simd.o
+        )
+add_library(MLIRIirSimd STATIC mlir-iir-simd.o)
+set_target_properties(MLIRIirSimd PROPERTIES LINKER_LANGUAGE CXX)
+
 add_executable(audio-processing-benchmark
   KFRFft.cpp
   KFRIir.cpp
@@ -96,6 +122,7 @@ target_link_libraries(audio-processing-benchmark
   kfr_dft
   MLIRBiquad
   MLIRIir
+  MLIRIirSimd
   BuddyLibDAP
   GoogleBenchmark
 )
