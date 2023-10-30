@@ -1,4 +1,4 @@
-//===- LinpackCDdotBenchmark.cpp -----------------------------------------===//
+//===- MLIRLinpackCDdotBenchmark.cpp --------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,28 +14,28 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for buddy-opt tool in buddy-mlir project.
+// This file implements the benchmark for ddot function.
 //
 //===----------------------------------------------------------------------===//
 
+#include "Ddot.h"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <iostream>
-#include "Ddot.h"
 // Declare the linpackcddot C interface.
 extern "C" {
-float _mlir_ciface_mlir_linpackcddotrollf32(int n,
-                                            MemRef<float, 1> *dx, int incx,
-                                            MemRef<float, 1> *dy, int incy);
-double _mlir_ciface_mlir_linpackcddotrollf64(int n,
-                                            MemRef<double, 1> *dx, int incx,
-                                            MemRef<double, 1> *dy, int incy); 
-float _mlir_ciface_mlir_linpackcddotunrollf32(int n,
-                                            MemRef<float, 1> *dx, int incx,
-                                            MemRef<float, 1> *dy, int incy);
-double _mlir_ciface_mlir_linpackcddotunrollf64(int n,
-                                            MemRef<double, 1> *dx, int incx,
-                                            MemRef<double, 1> *dy, int incy);                                                                                   
+float _mlir_ciface_mlir_linpackcddotrollf32(int n, MemRef<float, 1> *dx,
+                                            int incx, MemRef<float, 1> *dy,
+                                            int incy);
+double _mlir_ciface_mlir_linpackcddotrollf64(int n, MemRef<double, 1> *dx,
+                                             int incx, MemRef<double, 1> *dy,
+                                             int incy);
+float _mlir_ciface_mlir_linpackcddotunrollf32(int n, MemRef<float, 1> *dx,
+                                              int incx, MemRef<float, 1> *dy,
+                                              int incy);
+double _mlir_ciface_mlir_linpackcddotunrollf64(int n, MemRef<double, 1> *dx,
+                                               int incx, MemRef<double, 1> *dy,
+                                               int incy);
 }
 
 // Define input and output sizes.
@@ -54,42 +54,38 @@ MemRef<float, 1> inputMLIRDdot_dyf32(sizesArrayMLIRLinpackCDdot, 1.0);
 MemRef<double, 1> inputMLIRDdot_dxf64(sizesArrayMLIRLinpackCDdot, 2.0);
 MemRef<double, 1> inputMLIRDdot_dyf64(sizesArrayMLIRLinpackCDdot, 1.0);
 
-
-
 // Define the benchmark function.
 static void MLIR_DdotRollF32(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mlir_linpackcddotrollf32(n, 
-                                             &inputMLIRDdot_dxf32, input_incx,
-                                             &inputMLIRDdot_dyf32, input_incy);
+      _mlir_ciface_mlir_linpackcddotrollf32(n, &inputMLIRDdot_dxf32, input_incx,
+                                            &inputMLIRDdot_dyf32, input_incy);
     }
   }
 }
 static void MLIR_DdotRollF64(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mlir_linpackcddotrollf64(n, 
-                                             &inputMLIRDdot_dxf64, input_incx,
-                                             &inputMLIRDdot_dyf64, input_incy);
+      _mlir_ciface_mlir_linpackcddotrollf64(n, &inputMLIRDdot_dxf64, input_incx,
+                                            &inputMLIRDdot_dyf64, input_incy);
     }
   }
 }
 static void MLIR_DdotUnrollF32(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mlir_linpackcddotunrollf32(n, 
-                                             &inputMLIRDdot_dxf32, input_incx,
-                                             &inputMLIRDdot_dyf32, input_incy);
+      _mlir_ciface_mlir_linpackcddotunrollf32(n, &inputMLIRDdot_dxf32,
+                                              input_incx, &inputMLIRDdot_dyf32,
+                                              input_incy);
     }
   }
 }
 static void MLIR_DdotUnrollF64(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mlir_linpackcddotunrollf64(n, 
-                                             &inputMLIRDdot_dxf64, input_incx,
-                                             &inputMLIRDdot_dyf64, input_incy);
+      _mlir_ciface_mlir_linpackcddotunrollf64(n, &inputMLIRDdot_dxf64,
+                                              input_incx, &inputMLIRDdot_dyf64,
+                                              input_incy);
     }
   }
 }
@@ -97,7 +93,8 @@ static void MLIR_DdotUnrollF64(benchmark::State &state) {
 static void Ddot_ROLL_float_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_ROLL_float_gcc(n,inputMLIRDdot_dxf32.getData(),input_incx,inputMLIRDdot_dyf32.getData(),input_incy);
+      ddot_ROLL_float_gcc(n, inputMLIRDdot_dxf32.getData(), input_incx,
+                          inputMLIRDdot_dyf32.getData(), input_incy);
     }
   }
 }
@@ -105,7 +102,8 @@ static void Ddot_ROLL_float_gcc(benchmark::State &state) {
 static void Ddot_ROLL_double_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_ROLL_double_gcc(n,inputMLIRDdot_dxf64.getData(),input_incx,inputMLIRDdot_dyf64.getData(),input_incy);
+      ddot_ROLL_double_gcc(n, inputMLIRDdot_dxf64.getData(), input_incx,
+                           inputMLIRDdot_dyf64.getData(), input_incy);
     }
   }
 }
@@ -113,7 +111,8 @@ static void Ddot_ROLL_double_gcc(benchmark::State &state) {
 static void Ddot_UNROLL_float_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_UNROLL_float_gcc(n,inputMLIRDdot_dxf32.getData(),input_incx,inputMLIRDdot_dyf32.getData(),input_incy);
+      ddot_UNROLL_float_gcc(n, inputMLIRDdot_dxf32.getData(), input_incx,
+                            inputMLIRDdot_dyf32.getData(), input_incy);
     }
   }
 }
@@ -121,16 +120,18 @@ static void Ddot_UNROLL_float_gcc(benchmark::State &state) {
 static void Ddot_UNROLL_double_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_UNROLL_double_gcc(n,inputMLIRDdot_dxf64.getData(),input_incx,inputMLIRDdot_dyf64.getData(),input_incy);
+      ddot_UNROLL_double_gcc(n, inputMLIRDdot_dxf64.getData(), input_incx,
+                             inputMLIRDdot_dyf64.getData(), input_incy);
     }
   }
 }
 
-//clang
+// clang
 static void Ddot_ROLL_float_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_ROLL_float_clang(n,inputMLIRDdot_dxf32.getData(),input_incx,inputMLIRDdot_dyf32.getData(),input_incy);
+      ddot_ROLL_float_clang(n, inputMLIRDdot_dxf32.getData(), input_incx,
+                            inputMLIRDdot_dyf32.getData(), input_incy);
     }
   }
 }
@@ -138,7 +139,8 @@ static void Ddot_ROLL_float_clang(benchmark::State &state) {
 static void Ddot_ROLL_double_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_ROLL_double_clang(n,inputMLIRDdot_dxf64.getData(),input_incx,inputMLIRDdot_dyf64.getData(),input_incy);
+      ddot_ROLL_double_clang(n, inputMLIRDdot_dxf64.getData(), input_incx,
+                             inputMLIRDdot_dyf64.getData(), input_incy);
     }
   }
 }
@@ -146,7 +148,8 @@ static void Ddot_ROLL_double_clang(benchmark::State &state) {
 static void Ddot_UNROLL_float_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_UNROLL_float_clang(n,inputMLIRDdot_dxf32.getData(),input_incx,inputMLIRDdot_dyf32.getData(),input_incy);
+      ddot_UNROLL_float_clang(n, inputMLIRDdot_dxf32.getData(), input_incx,
+                              inputMLIRDdot_dyf32.getData(), input_incy);
     }
   }
 }
@@ -154,7 +157,8 @@ static void Ddot_UNROLL_float_clang(benchmark::State &state) {
 static void Ddot_UNROLL_double_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      ddot_UNROLL_double_clang(n,inputMLIRDdot_dxf64.getData(),input_incx,inputMLIRDdot_dyf64.getData(),input_incy);
+      ddot_UNROLL_double_clang(n, inputMLIRDdot_dxf64.getData(), input_incx,
+                               inputMLIRDdot_dyf64.getData(), input_incy);
     }
   }
 }
@@ -179,24 +183,24 @@ void generateResultMLIRLinpackCDdot() {
   MemRef<float, 1> inputMLIRDdot_dyf32_unroll(sizesArrayMLIRLinpackCDdot, 1.0);
   MemRef<double, 1> inputMLIRDdot_dxf64(sizesArrayMLIRLinpackCDdot, 2.0);
   MemRef<double, 1> inputMLIRDdot_dyf64_roll(sizesArrayMLIRLinpackCDdot, 1.0);
-  MemRef<double, 1> inputMLIRDdot_dyf64_unroll(sizesArrayMLIRLinpackCDdot,1.0);
+  MemRef<double, 1> inputMLIRDdot_dyf64_unroll(sizesArrayMLIRLinpackCDdot, 1.0);
   // Run the linpackcddot.
   float ddot_res1;
-  ddot_res1 = _mlir_ciface_mlir_linpackcddotrollf32(n, 
-                                             &inputMLIRDdot_dxf32, input_incx,
-                                             &inputMLIRDdot_dyf32_roll, input_incy);
+  ddot_res1 = _mlir_ciface_mlir_linpackcddotrollf32(
+      n, &inputMLIRDdot_dxf32, input_incx, &inputMLIRDdot_dyf32_roll,
+      input_incy);
   double ddot_res2;
-  ddot_res2 = _mlir_ciface_mlir_linpackcddotrollf64(n, 
-                                             &inputMLIRDdot_dxf64, input_incx,
-                                             &inputMLIRDdot_dyf64_roll, input_incy);                                           
+  ddot_res2 = _mlir_ciface_mlir_linpackcddotrollf64(
+      n, &inputMLIRDdot_dxf64, input_incx, &inputMLIRDdot_dyf64_roll,
+      input_incy);
   float ddot_res3;
-  ddot_res3 = _mlir_ciface_mlir_linpackcddotunrollf32(n, 
-                                             &inputMLIRDdot_dxf32, input_incx,
-                                             &inputMLIRDdot_dyf32_unroll, input_incy);
+  ddot_res3 = _mlir_ciface_mlir_linpackcddotunrollf32(
+      n, &inputMLIRDdot_dxf32, input_incx, &inputMLIRDdot_dyf32_unroll,
+      input_incy);
   double ddot_res4;
-  ddot_res4 = _mlir_ciface_mlir_linpackcddotunrollf64(n, 
-                                             &inputMLIRDdot_dxf64, input_incx,
-                                             &inputMLIRDdot_dyf64_unroll, input_incy);  
+  ddot_res4 = _mlir_ciface_mlir_linpackcddotunrollf64(
+      n, &inputMLIRDdot_dxf64, input_incx, &inputMLIRDdot_dyf64_unroll,
+      input_incy);
   // Print the output.
   std::cout << "--------------------------------------------------------"
             << std::endl;
@@ -207,13 +211,13 @@ void generateResultMLIRLinpackCDdot() {
     std::cout << inputMLIRDdot_dxf32.getData()[i] << " ";
   }
   std::cout << "]" << std::endl;
-  std::cout << "ddot_res: "<< ddot_res1 << std::endl;
+  std::cout << "ddot_res: " << ddot_res1 << std::endl;
   std::cout << "f64roll: [ ";
   for (size_t i = 0; i < sizesArrayMLIRLinpackCDdot[0]; i++) {
     std::cout << inputMLIRDdot_dxf64.getData()[i] << " ";
   }
   std::cout << "]" << std::endl;
-  std::cout << "ddot_res: "<< ddot_res2 << std::endl;
-  std::cout << "ddot_res: "<< ddot_res3 << std::endl;
-  std::cout << "ddot_res: "<< ddot_res4 << std::endl;
+  std::cout << "ddot_res: " << ddot_res2 << std::endl;
+  std::cout << "ddot_res: " << ddot_res3 << std::endl;
+  std::cout << "ddot_res: " << ddot_res4 << std::endl;
 }

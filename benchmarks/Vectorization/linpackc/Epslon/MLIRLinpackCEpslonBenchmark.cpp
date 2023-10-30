@@ -1,4 +1,4 @@
-//===- LinpackCepslonBenchmark.cpp -----------------------------------------===//
+//===- MLIRLinpackCEpslonBenchmark.cpp-------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for buddy-opt tool in buddy-mlir project.
+// This file implements the benchmark for epslon function.
 //
 //===----------------------------------------------------------------------===//
 
+#include "Epslon.h"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <iostream>
-#include "Epslon.h"
 
 // Declare the linpackcepslon C interface.
 extern "C" {
@@ -88,7 +88,7 @@ BENCHMARK(Epslon_double_clang)->Arg(1);
 // Generate result image.
 void generateResultMLIRLinpackCEpslon() {
   // Define the MemRef descriptor for inputs and output.
- 
+
   // Run the linpackcepslon.
   float x_f32 = _mlir_ciface_mlir_linpackcepslonf32(x_input_f32);
   double x_f64 = _mlir_ciface_mlir_linpackcepslonf64(x_input_f64);

@@ -1,4 +1,4 @@
-//===- LinpackCDaxpyBenchmark.cpp -----------------------------------------===//
+//===- MLIRLinpackCDaxpyBenchmark.cpp--------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for buddy-opt tool in buddy-mlir project.
+// This file implements the benchmark for daxpy function.
 //
 //===----------------------------------------------------------------------===//
 
+#include "Daxpy.h"
+#include <algorithm>
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <iostream>
-#include <algorithm>
-#include <stdio.h>
-#include <math.h>
-#include "Daxpy.h"     
 // Declare the linpackcdaxpy C interface.
 extern "C" {
 void _mlir_ciface_mlir_linpackcdaxpyrollf32(int n, float da,
@@ -38,7 +36,7 @@ void _mlir_ciface_mlir_linpackcdaxpyunrollf32(int n, float da,
                                               MemRef<float, 1> *dy, int incy);
 void _mlir_ciface_mlir_linpackcdaxpyunrollf64(int n, double da,
                                               MemRef<double, 1> *dx, int incx,
-                                              MemRef<double, 1> *dy, int incy);                     
+                                              MemRef<double, 1> *dy, int incy);
 }
 // Define input and output sizes.
 constexpr int n = 10000;
@@ -102,7 +100,9 @@ static void MLIR_DaxpyUnrollF64(benchmark::State &state) {
 static void Daxpy_ROLL_float_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_ROLL_float_gcc(n,input_da_f32,inputMLIRDaxpy_dxf32.getData(),input_incx,outputMLIRDaxpy_f32.getData(),input_incy);
+      daxpy_ROLL_float_gcc(n, input_da_f32, inputMLIRDaxpy_dxf32.getData(),
+                           input_incx, outputMLIRDaxpy_f32.getData(),
+                           input_incy);
     }
   }
 }
@@ -110,7 +110,9 @@ static void Daxpy_ROLL_float_gcc(benchmark::State &state) {
 static void Daxpy_ROLL_double_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_ROLL_double_gcc(n,input_da_f64,inputMLIRDaxpy_dxf64.getData(),input_incx,outputMLIRDaxpy_f64.getData(),input_incy);
+      daxpy_ROLL_double_gcc(n, input_da_f64, inputMLIRDaxpy_dxf64.getData(),
+                            input_incx, outputMLIRDaxpy_f64.getData(),
+                            input_incy);
     }
   }
 }
@@ -118,7 +120,9 @@ static void Daxpy_ROLL_double_gcc(benchmark::State &state) {
 static void Daxpy_UNROLL_float_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_UNROLL_float_gcc(n,input_da_f32,inputMLIRDaxpy_dxf32.getData(),input_incx,outputMLIRDaxpy_f32.getData(),input_incy);
+      daxpy_UNROLL_float_gcc(n, input_da_f32, inputMLIRDaxpy_dxf32.getData(),
+                             input_incx, outputMLIRDaxpy_f32.getData(),
+                             input_incy);
     }
   }
 }
@@ -126,14 +130,18 @@ static void Daxpy_UNROLL_float_gcc(benchmark::State &state) {
 static void Daxpy_UNROLL_double_gcc(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_UNROLL_double_gcc(n,input_da_f64,inputMLIRDaxpy_dxf64.getData(),input_incx,outputMLIRDaxpy_f64.getData(),input_incy);
+      daxpy_UNROLL_double_gcc(n, input_da_f64, inputMLIRDaxpy_dxf64.getData(),
+                              input_incx, outputMLIRDaxpy_f64.getData(),
+                              input_incy);
     }
   }
 }
 static void Daxpy_ROLL_float_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_ROLL_float_clang(n,input_da_f32,inputMLIRDaxpy_dxf32.getData(),input_incx,outputMLIRDaxpy_f32.getData(),input_incy);
+      daxpy_ROLL_float_clang(n, input_da_f32, inputMLIRDaxpy_dxf32.getData(),
+                             input_incx, outputMLIRDaxpy_f32.getData(),
+                             input_incy);
     }
   }
 }
@@ -141,7 +149,9 @@ static void Daxpy_ROLL_float_clang(benchmark::State &state) {
 static void Daxpy_ROLL_double_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_ROLL_double_clang(n,input_da_f64,inputMLIRDaxpy_dxf64.getData(),input_incx,outputMLIRDaxpy_f64.getData(),input_incy);
+      daxpy_ROLL_double_clang(n, input_da_f64, inputMLIRDaxpy_dxf64.getData(),
+                              input_incx, outputMLIRDaxpy_f64.getData(),
+                              input_incy);
     }
   }
 }
@@ -149,7 +159,9 @@ static void Daxpy_ROLL_double_clang(benchmark::State &state) {
 static void Daxpy_UNROLL_float_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_UNROLL_float_clang(n,input_da_f32,inputMLIRDaxpy_dxf32.getData(),input_incx,outputMLIRDaxpy_f32.getData(),input_incy);
+      daxpy_UNROLL_float_clang(n, input_da_f32, inputMLIRDaxpy_dxf32.getData(),
+                               input_incx, outputMLIRDaxpy_f32.getData(),
+                               input_incy);
     }
   }
 }
@@ -157,7 +169,9 @@ static void Daxpy_UNROLL_float_clang(benchmark::State &state) {
 static void Daxpy_UNROLL_double_clang(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      daxpy_UNROLL_double_clang(n,input_da_f64,inputMLIRDaxpy_dxf64.getData(),input_incx,outputMLIRDaxpy_f64.getData(),input_incy);
+      daxpy_UNROLL_double_clang(n, input_da_f64, inputMLIRDaxpy_dxf64.getData(),
+                                input_incx, outputMLIRDaxpy_f64.getData(),
+                                input_incy);
     }
   }
 }
@@ -184,7 +198,8 @@ void generateResultMLIRLinpackCDaxpy() {
   MemRef<float, 1> outputMLIRDaxpy_f32_unroll(sizesArrayMLIRLinpackCDaxpy, 0.0);
   MemRef<double, 1> inputMLIRDaxpy_dxf64(sizesArrayMLIRLinpackCDaxpy, 2.3);
   MemRef<double, 1> outputMLIRDaxpy_f64_roll(sizesArrayMLIRLinpackCDaxpy, 0.0);
-  MemRef<double, 1> outputMLIRDaxpy_f64_unroll(sizesArrayMLIRLinpackCDaxpy,0.0);
+  MemRef<double, 1> outputMLIRDaxpy_f64_unroll(sizesArrayMLIRLinpackCDaxpy,
+                                               0.0);
   // Run the linpackcdaxpy.
   _mlir_ciface_mlir_linpackcdaxpyrollf32(n, input_da_f32, &inputMLIRDaxpy_dxf32,
                                          input_incx, &outputMLIRDaxpy_f32_roll,
