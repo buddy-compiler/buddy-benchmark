@@ -1,4 +1,4 @@
-# ===- batch_matmul_iree.py --------------------------------------------------------
+# ===- broadcastadd_iree.py --------------------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the IREE optimization for batch matmul.
+# This file implements the IREE optimization for broadcastAdd.
 # you can choose run on CPU/GPU by change iree_backend = "cuda" or "llvm-cpu" in pooling_iree.py.
 # See the IREE license at: https://github.com/openxla/iree/blob/main/LICENSE
 #
@@ -28,23 +28,23 @@ import io
 import numpy as np
 
 
-class MatrixMultiplication(nn.Module):
+class BroadcastAdd(nn.Module):
     def __init__(self, weight):
-        super(MatrixMultiplication, self).__init__()
+        super(BroadcastAdd, self).__init__()
         self.weight = nn.Parameter(weight)
 
     def forward(self, x):
-        result = torch.bmm(x, self.weight)
+        result = torch.add(x, self.weight)
         return result
 
 
-def torch_matrix_multiply(batch_num, b_dim1, b_dim2):
-    weight = torch.randn(batch_num, b_dim1, b_dim2)
-    model = MatrixMultiplication(weight)
+def torch_BroadcastAdd(b_dim1, b_dim2):
+    weight = torch.randn(b_dim1, b_dim2)
+    model = BroadcastAdd(weight)
     return model, weight
 
 
-def iree_matrix_multiply(model, example_input):
+def iree_BroadcastAdd(model, example_input):
     linalg_on_tensors_mlir = torch_mlir.compile(
         model, example_input, output_type="linalg-on-tensors", use_tracing=False
     )
