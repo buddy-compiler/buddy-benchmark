@@ -23,4 +23,5 @@ target_link_libraries(vectorization-matrix-benchmark
   MiniLM_5
   MiniLM_6
   MiniLM_7
-  )
+)
+

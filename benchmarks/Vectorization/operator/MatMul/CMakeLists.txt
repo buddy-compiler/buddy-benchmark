@@ -20,5 +20,3 @@ add_custom_command(OUTPUT mlir-matmul.o
 add_library(MLIRMatMul STATIC mlir-matmul.o)
 set_target_properties(MLIRMatMul PROPERTIES LINKER_LANGUAGE CXX)
 
-
-

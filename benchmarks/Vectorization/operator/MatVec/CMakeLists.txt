@@ -22,3 +22,4 @@ add_custom_command(OUTPUT mlir-matvec.o
 )
 add_library(MLIRMatVec STATIC mlir-matvec.o)
 set_target_properties(MLIRMatVec PROPERTIES LINKER_LANGUAGE CXX)
+
