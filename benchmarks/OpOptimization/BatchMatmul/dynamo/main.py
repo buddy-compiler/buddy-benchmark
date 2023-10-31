@@ -1,6 +1,10 @@
+# ===- main.py --------------------------------------------------------
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     https://github.com/pytorch/pytorch/blob/main/LICENSE
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,7 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the dynamo entry for benchmark Matmul on GPU.
+# This file implements the dynamo entry for benchmark BatchMatmul on GPU.
 # torchdynamo is an internal API that uses a CPython feature called the Frame Evaluation
 # API to safely capture PyTorch graphs. Methods that are available externally for PyTorch
 # users are surfaced through the torch.compiler namespace.
