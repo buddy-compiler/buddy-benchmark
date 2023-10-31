@@ -16,10 +16,7 @@
 #
 # This file implements the IREE optimization entry for Pooling.
 # you can choose run on CPU/GPU by change iree_backend = "cuda" or "llvm-cpu" in pooling_iree.py.
-# This file is based on the TVM tutorial:
-# https://tvm.apache.org/docs/tutorial/tensor_expr_get_started.html
-# TVM is an Apache-2.0 licensed project.
-# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
+# See the IREE license at: https://github.com/openxla/iree/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
 
