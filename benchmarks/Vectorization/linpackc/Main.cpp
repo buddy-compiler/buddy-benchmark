@@ -27,6 +27,8 @@ void generateResultMLIRLinpackCDscal();
 void generateResultMLIRLinpackCIdamax();
 void generateResultMLIRLinpackCDmxpy();
 void generateResultMLIRLinpackCEpslon();
+void generateResultMLIRLinpackCDgefa();
+void generateResultMLIRLinpackCDgesl();
 
 // Run benchmarks.
 int main(int argc, char **argv) {

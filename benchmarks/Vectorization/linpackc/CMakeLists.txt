@@ -1,16 +1,18 @@
 #-------------------------------------------------------------------------------
 # MLIR SCF Dialect linpackc Operation + Upstream Lowering Passes
 #-------------------------------------------------------------------------------
+include_directories(${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/linpackc)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+link_directories(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 add_subdirectory(Daxpy)
 add_subdirectory(Ddot)
-# add_subdirectory(Dgefa)
-# add_subdirectory(Dgesl)
 add_subdirectory(Dmxpy)
 add_subdirectory(Dscal)
 add_subdirectory(Epslon)
 add_subdirectory(Idamax)
 add_subdirectory(Matgen)
-
+add_subdirectory(Dgefa)
+add_subdirectory(Dgesl)
 
 #-------------------------------------------------------------------------------
 # Vectorization Benchmark Targets
@@ -25,11 +27,13 @@ add_executable(vectorization-linpackc-benchmark
   ./Idamax/MLIRLinpackCIdamaxBenchmark.cpp
   ./Dmxpy/MLIRLinpackCDmxpyBenchmark.cpp
   ./Epslon/MLIRLinpackCEpslonBenchmark.cpp
+  ./Dgefa/MLIRLinpackCDgefaBenchmark.cpp
+  ./Dgesl/MLIRLinpackCDgeslBenchmark.cpp
   )
 
 target_link_libraries(vectorization-linpackc-benchmark
   GoogleBenchmark
-  
+
   MLIRLinpackDaxpyf32
   MLIRLinpackDaxpyf64
   Daxpyfloat_gcc
@@ -79,6 +83,17 @@ target_link_libraries(vectorization-linpackc-benchmark
   Epslonfloat_clang
   Epslondouble_clang
   
-  # MLIRLinpackDgefaRollF32
-  )
+  MLIRLinpackDgefaf32
+  MLIRLinpackDgefaf64
+  Dgefafloat_gcc
+  Dgefadouble_gcc
+  Dgefafloat_clang
+  Dgefadouble_clang
 
+  MLIRLinpackDgeslf32
+  MLIRLinpackDgeslf64
+  Dgeslfloat_gcc
+  Dgesldouble_gcc
+  Dgeslfloat_clang
+  Dgesldouble_clang
+  )
