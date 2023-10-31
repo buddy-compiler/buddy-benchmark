@@ -34,3 +34,4 @@ func.func @mlir_minilm_1() {
     } -> tensor<1x12x12x1xf32>
   return
 }
+

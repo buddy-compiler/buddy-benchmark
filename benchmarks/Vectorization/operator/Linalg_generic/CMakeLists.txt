@@ -123,3 +123,4 @@ COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
 )
 add_library(MiniLM_7 STATIC MiniLM_7.o)
 set_target_properties(MiniLM_7 PROPERTIES LINKER_LANGUAGE CXX)
+

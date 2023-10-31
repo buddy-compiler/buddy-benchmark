@@ -74,3 +74,4 @@ func.func @mlir_minilm_7() {
     } -> tensor<1x12x12x12xf32>
     return
 }
+

@@ -103,3 +103,4 @@ func.func @mlir_minilm_5() {
     } -> tensor<1x12x1536xf32>
     return
 }
+
