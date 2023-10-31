@@ -1,6 +1,10 @@
+# ===- main.py --------------------------------------------------------
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     https://github.com/openxla/iree/blob/main/LICENSE
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,13 +14,15 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the IREE entry for benchmark Pooling on GPU.
-# IREE (Intermediate Representation Execution Environment, pronounced as "eerie")
-# is an MLIR-based end-to-end compiler and runtime that lowers Machine Learning (ML)
-# models to a unified IR that scales up to meet the needs of the datacenter and down
-# to satisfy the constraints and special considerations of mobile and edge deployments.
+# This file implements the IREE optimization entry for Pooling.
+# you can choose run on CPU/GPU by change iree_backend = "cuda" or "llvm-cpu" in pooling_iree.py.
+# This file is based on the TVM tutorial:
+# https://tvm.apache.org/docs/tutorial/tensor_expr_get_started.html
+# TVM is an Apache-2.0 licensed project.
+# See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
+
 import numpy
 import time
 from pooling_iree import *
