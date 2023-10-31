@@ -1,4 +1,4 @@
-//===- MLIRMiniLM_5.mlir ----------------------------------------------------===//
+//===- MLIRMiniLM_5.mlir --------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,44 +22,41 @@
 #map6 = affine_map<(d0, d1, d2) -> (d0, d1, d2)>
 
 func.func @mlir_minilm_5() {
-    %cst_7 = arith.constant 1.12837911 : f32
-    %cst_8 = arith.constant -0.523018539 : f32
-    %cst_9 = arith.constant 0.209741712 : f32
-    %cst_10 = arith.constant 0.0258146804 : f32
-    %cst_11 = arith.constant 1.12750685 : f32
-    %cst_12 = arith.constant -0.364721417 : f32
-    %cst_13 = arith.constant 0.118407398 : f32
-    %cst_14 = arith.constant 0.0370645523 : f32
-    %cst_15 = arith.constant -0.00330093061 : f32
-    %cst_16 = arith.constant 0.00351961935 : f32
-    %cst_17 = arith.constant -0.00141373626 : f32
-    %cst_18 = arith.constant 2.53447099E-4 : f32
-    %cst_19 = arith.constant -1.71048032E-5 : f32
-    %cst_20 = arith.constant -0.463513821 : f32
-    %cst_21 = arith.constant 0.519230127 : f32
-    %cst_22 = arith.constant -0.131808966 : f32
-    %cst_23 = arith.constant 0.0739796459 : f32
-    %cst_24 = arith.constant -3.276070e-01 : f32
-    %cst_25 = arith.constant 0.448369086 : f32
-    %cst_26 = arith.constant -0.0883462652 : f32
-    %cst_27 = arith.constant 0.0572442785 : f32
-    %cst_28 = arith.constant -2.0606916 : f32
-    %cst_29 = arith.constant 1.62705934 : f32
-    %cst_30 = arith.constant -0.583389878 : f32
-    %cst_31 = arith.constant 0.0821908935 : f32
-    %cst_32 = arith.constant 8.000000e-01 : f32
-    %cst_33 = arith.constant 2.000000e+00 : f32
-    %cst_34 = arith.constant 3.750000e+00 : f32
-
-    %cst_158 = arith.constant 1.000000e+00 : f32
-    %cst_159 = arith.constant 0.000000e+00 : f32
-    %cst_161 = arith.constant 1.41421354 : f32
-    %cst_162 = arith.constant 5.000000e-01 : f32
-
-%98 = tensor.empty() : tensor<1x12x1536xf32>
-%101 = linalg.fill ins(%cst_159 : f32) outs(%98 : tensor<1x12x1536xf32>) -> tensor<1x12x1536xf32>
-
-%102 = linalg.generic {indexing_maps = [#map7, #map6], iterator_types = ["parallel", "parallel", "parallel"]} ins(%101 : tensor<1x12x1536xf32>) outs(%98 : tensor<1x12x1536xf32>) {
+  %cst_7 = arith.constant 1.12837911 : f32
+  %cst_8 = arith.constant -0.523018539 : f32
+  %cst_9 = arith.constant 0.209741712 : f32
+  %cst_10 = arith.constant 0.0258146804 : f32
+  %cst_11 = arith.constant 1.12750685 : f32
+  %cst_12 = arith.constant -0.364721417 : f32
+  %cst_13 = arith.constant 0.118407398 : f32
+  %cst_14 = arith.constant 0.0370645523 : f32
+  %cst_15 = arith.constant -0.00330093061 : f32
+  %cst_16 = arith.constant 0.00351961935 : f32
+  %cst_17 = arith.constant -0.00141373626 : f32
+  %cst_18 = arith.constant 2.53447099E-4 : f32
+  %cst_19 = arith.constant -1.71048032E-5 : f32
+  %cst_20 = arith.constant -0.463513821 : f32
+  %cst_21 = arith.constant 0.519230127 : f32
+  %cst_22 = arith.constant -0.131808966 : f32
+  %cst_23 = arith.constant 0.0739796459 : f32
+  %cst_24 = arith.constant -3.276070e-01 : f32
+  %cst_25 = arith.constant 0.448369086 : f32
+  %cst_26 = arith.constant -0.0883462652 : f32
+  %cst_27 = arith.constant 0.0572442785 : f32
+  %cst_28 = arith.constant -2.0606916 : f32
+  %cst_29 = arith.constant 1.62705934 : f32
+  %cst_30 = arith.constant -0.583389878 : f32
+  %cst_31 = arith.constant 0.0821908935 : f32
+  %cst_32 = arith.constant 8.000000e-01 : f32
+  %cst_33 = arith.constant 2.000000e+00 : f32
+  %cst_34 = arith.constant 3.750000e+00 : f32
+  %cst_158 = arith.constant 1.000000e+00 : f32
+  %cst_159 = arith.constant 0.000000e+00 : f32
+  %cst_161 = arith.constant 1.41421354 : f32
+  %cst_162 = arith.constant 5.000000e-01 : f32
+  %98 = tensor.empty() : tensor<1x12x1536xf32>
+  %101 = linalg.fill ins(%cst_159 : f32) outs(%98 : tensor<1x12x1536xf32>) -> tensor<1x12x1536xf32>
+  %102 = linalg.generic {indexing_maps = [#map7, #map6], iterator_types = ["parallel", "parallel", "parallel"]} ins(%101 : tensor<1x12x1536xf32>) outs(%98 : tensor<1x12x1536xf32>) {
     ^bb0(%in: f32, %out: f32):
       %511 = arith.divf %in, %cst_161 : f32
       %512 = arith.cmpf olt, %511, %cst_159 : f32
@@ -104,6 +101,5 @@ func.func @mlir_minilm_5() {
       %551 = arith.mulf %in, %550 : f32
       linalg.yield %551 : f32
     } -> tensor<1x12x1536xf32>
-
     return
 }

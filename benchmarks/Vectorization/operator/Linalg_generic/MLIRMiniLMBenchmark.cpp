@@ -1,4 +1,4 @@
-//===- MLIRMatVecBenchmark.cpp --------------------------------------------===//
+//===- MLIRMiniLMBenchmark.cpp --------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for buddy-opt tool in buddy-mlir project.
+// This file implements the benchmark for MLIRMiniLM function.
 //
 //===----------------------------------------------------------------------===//
 
@@ -93,18 +93,3 @@ BENCHMARK(MLIR_MiniLM_4)->Arg(1);
 BENCHMARK(MLIR_MiniLM_5)->Arg(1);
 BENCHMARK(MLIR_MiniLM_6)->Arg(1);
 BENCHMARK(MLIR_MiniLM_7)->Arg(1);
-// Generate result image.
-//void generateResultMLIRMatVec() {
-  // // Define the MemRef descriptor for input1, intput2, and output.
-  // // Run the 2D matvec.
-  // _mlir_ciface_mlir_matvec(&input1, &input2, &output);
-  // // Print the output.
-  // std::cout << "--------------------------------------------------------"
-  //           << std::endl;
-  // std::cout << "MLIR_MatVec: MLIR MatVec Operation" << std::endl;
-  // std::cout << "[ ";
-  // for (size_t i = 0; i < output.getSize(); i++) {
-  //   std::cout << output.getData()[i] << " ";
-  // }
-  // std::cout << "]" << std::endl;
-//}

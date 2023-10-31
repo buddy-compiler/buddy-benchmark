@@ -1,4 +1,4 @@
-//===- MLIRMiniLM_7.mlir ----------------------------------------------------===//
+//===- MLIRMiniLM_7.mlir --------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,13 +36,11 @@ func.func @mlir_minilm_7() {
   %cst_158 = arith.constant 1.000000e+00 : f32
   %cst_159 = arith.constant 0.000000e+00 : f32
   %cst_160 = arith.constant 0xFF800000 : f32
-
-
   %55 = tensor.empty() : tensor<1x12x12x12xf32>
   %1 = tensor.empty() : tensor<1x12x12x12xf32>
   %cst_7 = arith.constant 2.3: f32
   %147 = linalg.fill ins(%cst_7 : f32) outs(%1 : tensor<1x12x12x12xf32>) -> tensor<1x12x12x12xf32>
-%148 = linalg.generic {indexing_maps = [#map15, #map3], iterator_types = ["parallel", "parallel", "parallel", "parallel"]} ins(%147 : tensor<1x12x12x12xf32>) outs(%55 : tensor<1x12x12x12xf32>) {
+  %148 = linalg.generic {indexing_maps = [#map15, #map3], iterator_types = ["parallel", "parallel", "parallel", "parallel"]} ins(%147 : tensor<1x12x12x12xf32>) outs(%55 : tensor<1x12x12x12xf32>) {
     ^bb0(%in: f32, %out: f32):
       %511 = arith.cmpf uno, %in, %in : f32
       %512 = arith.mulf %in, %cst_0 : f32
@@ -74,6 +72,5 @@ func.func @mlir_minilm_7() {
       %538 = arith.select %511, %in, %537 : f32
       linalg.yield %538 : f32
     } -> tensor<1x12x12x12xf32>
-
     return
 }

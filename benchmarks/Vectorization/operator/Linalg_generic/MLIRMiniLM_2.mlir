@@ -1,4 +1,4 @@
- //===- MLIRMiniLM_2.mlir ----------------------------------------------------===//
+//===- MLIRMiniLM_2.mlir --------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 //
 //===----------------------------------------------------------------------===//
 
- #map15 = affine_map<(d0, d1, d2, d3) -> (0, d1, d2, d3)>
- #map3 = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>
- func.func @mlir_minilm_2() {
+#map15 = affine_map<(d0, d1, d2, d3) -> (0, d1, d2, d3)>
+#map3 = affine_map<(d0, d1, d2, d3) -> (d0, d1, d2, d3)>
+func.func @mlir_minilm_2() {
   %1 = tensor.empty() : tensor<1x12x12x12xf32>
   %2 = tensor.empty() : tensor<1x12x12x12xf32>
   %cst_1 = arith.constant 2.3: f32
@@ -32,4 +32,4 @@
       linalg.yield %in : f32
     } -> tensor<1x12x12x12xf32>
     return
- }
+}

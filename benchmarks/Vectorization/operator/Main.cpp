@@ -34,3 +34,4 @@ int main(int argc, char **argv) {
   generateResultMLIRMatVec();
   return 0;
 }
+ 
