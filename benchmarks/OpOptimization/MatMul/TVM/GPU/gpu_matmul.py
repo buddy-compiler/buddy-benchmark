@@ -21,11 +21,11 @@
 # See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
+
 import tvm
 import tvm.testing
 from tvm import te  # tensor expression
 import numpy as np
-
 from tvm.script import tir as T
 from tvm import meta_schedule as ms
 from tvm.script.parser.tir import evaluate
