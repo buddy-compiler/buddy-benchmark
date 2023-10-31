@@ -1,4 +1,4 @@
-//===- MLIRLinpackCIdamaxF32.mlir -----------------------------------------===//
+//===- MLIRLinpackCIdamaxF64.mlir -----------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file provides the MLIR linpackc idamaxf32 function.
+// This file provides the MLIR linpackc idamaxf64 function.
 //
 //===----------------------------------------------------------------------===//
 func.func @mlir_linpackcidamaxf64(%n : i32,  %dx: memref<?xf64>, %incx : i32) -> i32

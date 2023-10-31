@@ -19,7 +19,7 @@
 //===----------------------------------------------------------------------===//
 func.func @mlir_linpackcmatgenTYPE_PLACEHOLDER(%a : memref<?xTYPE_PLACEHOLDER>, %lda : index, %n : index, %b : memref<?xTYPE_PLACEHOLDER>, %norma : memref<1xTYPE_PLACEHOLDER>)
 {
-	%c0 = arith.constant 0 : index
+    %c0 = arith.constant 0 : index
   	%c1 = arith.constant 1 : index
 	%c3125 = arith.constant 3125 : i32
 	%c65536 = arith.constant 65536 : i32

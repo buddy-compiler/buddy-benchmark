@@ -163,14 +163,14 @@ func.func @mlir_linpackcddotunrollTYPE_PLACEHOLDER(%n : i32, %dx: memref<?xTYPE_
     %cond7 = arith.cmpi "ne", %m, %i0 : i32
     cf.cond_br %cond7, ^continue3, ^continue4
     ^continue3:
-        %dtemp_2 = scf.for %i_1 = %c0 to %m_index step %c1 
-        iter_args(%dtemp_iter_2 = %dtemp_0) -> (TYPE_PLACEHOLDER) {
-            %dx_val_1 = memref.load %dx[%i_1] : memref<?xTYPE_PLACEHOLDER>
-            %dy_val_1 = memref.load %dy[%i_1] : memref<?xTYPE_PLACEHOLDER>
-            %result_1 = arith.mulf %dx_val_1, %dy_val_1 : TYPE_PLACEHOLDER
-            %dtemp_next_2 = arith.addf %dtemp_iter_2, %result_1 : TYPE_PLACEHOLDER 
-            scf.yield %dtemp_next_2 : TYPE_PLACEHOLDER
-        }
+      %dtemp_2 = scf.for %i_1 = %c0 to %m_index step %c1 
+      iter_args(%dtemp_iter_2 = %dtemp_0) -> (TYPE_PLACEHOLDER) {
+        %dx_val_1 = memref.load %dx[%i_1] : memref<?xTYPE_PLACEHOLDER>
+        %dy_val_1 = memref.load %dy[%i_1] : memref<?xTYPE_PLACEHOLDER>
+        %result_1 = arith.mulf %dx_val_1, %dy_val_1 : TYPE_PLACEHOLDER
+        %dtemp_next_2 = arith.addf %dtemp_iter_2, %result_1 : TYPE_PLACEHOLDER 
+        scf.yield %dtemp_next_2 : TYPE_PLACEHOLDER
+      }
         %cond8 =  arith.cmpi "slt", %n, %i5 : i32
         cf.cond_br %cond8, ^terminator1, ^continue4
     ^terminator1: 
