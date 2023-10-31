@@ -1,4 +1,4 @@
-# ===-main.py --------------------------------------------------------
+# ===- main.py --------------------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the TVM optimization for batch MatMul on CPU.
+# This file implements the TVM optimization entry for batch MatMul on CPU.
 # This file is based on the TVM tutorial:
 # https://tvm.apache.org/docs/tutorial/tensor_expr_get_started.html
 # TVM is an Apache-2.0 licensed project.
 # See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
 #
 # ===---------------------------------------------------------------------------
+
 from batch_matmul_cpu import *
 import numpy
 import timeit
