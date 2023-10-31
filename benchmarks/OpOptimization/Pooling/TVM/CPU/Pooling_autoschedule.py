@@ -1,3 +1,7 @@
+# ===- Pooling_autoschedule.py --------------------------------------------------------
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,9 +14,9 @@
 #
 # ===---------------------------------------------------------------------------
 #
-# This file implements the auto optimization for benchmark pooling on CPU.
-# Autoscheduler is TVM's next-generation performance tuning tool,
-# which can automatically generate search spaces for optimizing tensor expressions.
+# This file implements the TVM auto optimization entry for Pooling on CPU.
+# This file is based on the TVM tutorial:
+# https://tvm.apache.org/docs/tutorial/tensor_expr_get_started.html
 # TVM is an Apache-2.0 licensed project.
 # See the TVM license at: https://github.com/apache/tvm/blob/main/LICENSE
 #
