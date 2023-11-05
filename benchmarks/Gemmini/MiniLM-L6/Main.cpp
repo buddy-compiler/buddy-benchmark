@@ -57,8 +57,8 @@ int main() {
   buddy::Text<long long, 2> input(str);
   intptr_t sizesOutput[2] = {1, 2};
   MemRef<float, 2> output(sizesOutput);
-  input.tokenize("../../benchmarks/DeepLearning/Models/MiniLM-L6/Vocab.txt",
-                 200);
+  input.tokenizeLlama(
+      "../../benchmarks/DeepLearning/Models/MiniLM-L6/Vocab.txt", 200);
   _mlir_ciface_forward(&output, &input);
   auto out = output.getData();
   softmax(out, 2);
