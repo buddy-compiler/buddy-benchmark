@@ -9,7 +9,7 @@ add_custom_command(OUTPUT mlir-generic-origin.o
       # -convert-linalg-to-llvm
       # -llvm-request-c-wrappers
       # -convert-func-to-llvm
-      -one-shot-bufferize='bufferize-function-boundaries'
+      # -one-shot-bufferize='bufferize-function-boundaries'
       -llvm-request-c-wrappers
       -test-lower-to-llvm
       -reconcile-unrealized-casts |
@@ -26,7 +26,7 @@ add_custom_command(OUTPUT mlir-transform-tiling.o
     cat ${CMAKE_CURRENT_SOURCE_DIR}/linalg_generic_origin.mlir |
     sed 's/origin/transform_tiling/' |
     ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-      -polyhedral-tiling='tile-sizes=8,8'
+      -polyhedral-tiling='tile-sizes=32,32'
       # -linalg-bufferize
       # -convert-linalg-to-loops
       # -convert-vector-to-llvm
@@ -54,7 +54,7 @@ set_target_properties(TransformTiling PROPERTIES LINKER_LANGUAGE CXX)
 add_custom_command(OUTPUT mlir-manual-opt.o
   COMMAND 
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt  ${CMAKE_CURRENT_SOURCE_DIR}/linalg_manual_opt.mlir
-     -one-shot-bufferize='bufferize-function-boundaries'
+    #  -one-shot-bufferize='bufferize-function-boundaries'
      -llvm-request-c-wrappers
      -test-lower-to-llvm
        |

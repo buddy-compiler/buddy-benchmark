@@ -67,14 +67,14 @@ void _mlir_ciface_manul3(MemRef<float, 2> *inpit, MemRef<float, 1> *outpit);
 DEFINE_BENCHMARK(ORIGIN, _mlir_ciface_origin)
 DEFINE_BENCHMARK(TRANSFORM_TILING, _mlir_ciface_transform_tiling)
 DEFINE_BENCHMARK(MANUL, _mlir_ciface_manul)
-// DEFINE_BENCHMARK(MANUL2, _mlir_ciface_manul2)
+DEFINE_BENCHMARK(MANUL2, _mlir_ciface_manul2)
 // DEFINE_BENCHMARK(MANUL3, _mlir_ciface_manul3)
 } // namespace 
 
 BENCHMARK(BM_GENERIC_ORIGIN)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_GENERIC_TRANSFORM_TILING)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_GENERIC_MANUL)->Unit(benchmark::kMillisecond);
-// BENCHMARK(BM_GENERIC_MANUL2)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_GENERIC_MANUL2)->Unit(benchmark::kMillisecond);
 // BENCHMARK(BM_GENERIC_MANUL3)->Unit(benchmark::kMillisecond);
 
 #define DEFINE_VERIFICATION(name, func) \
