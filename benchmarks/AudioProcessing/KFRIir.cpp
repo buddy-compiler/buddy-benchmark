@@ -23,15 +23,16 @@
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
 #include <kfr/io.hpp>
+#include <iostream>
 
 using namespace kfr;
 
 constexpr size_t maxorder = 32;
 univector<float, 2000000> aud_iir;
-univector<fbase, 2000000> output;
+univector<float, 2000000> output;
 
-zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
-std::vector<biquad_params<fbase>> bqs = to_sos(filt);
+zpk<float> filt = iir_lowpass(bessel<float>(24), 1000, 48000);
+std::vector<biquad_params<float>> bqs = to_sos(filt);
 
 // Initialize univector.
 void initializeKFRIir() {

@@ -20,6 +20,7 @@
 
 #include <buddy/Core/Container.h>
 #include <benchmark/benchmark.h>
+#include <buddy/DAP/DAP.h>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
@@ -33,15 +34,23 @@ void _mlir_ciface_mlir_iir(MemRef<float, 1> *inputBuddyConv1D,
                            MemRef<float, 2> *kernelBuddyConv1D,
                            MemRef<float, 1> *outputBuddyConv1D);
 
+void _mlir_ciface_mlir_iir_vectorization(MemRef<float, 1> *inputBuddyConv1D,
+                                         MemRef<float, 2> *kernelBuddyConv1D,
+                                         MemRef<float, 1> *outputBuddyConv1D);
+
 void _mlir_ciface_buddy_iir(MemRef<float, 1> *inputBuddyConv1D,
                             MemRef<float, 2> *kernelBuddyConv1D,
                             MemRef<float, 1> *outputBuddyConv1D);
+
+void _mlir_ciface_buddy_iir_vectorization(MemRef<float, 1> *inputBuddyConv1D,
+                                          MemRef<float, 2> *kernelBuddyConv1D,
+                                          MemRef<float, 1> *outputBuddyConv1D);
 }
 
 namespace {
 univector<float> kernel;
-zpk<fbase> filt = iir_lowpass(bessel<fbase>(24), 1000, 48000);
-std::vector<biquad_params<fbase>> bqs = to_sos(filt);
+zpk<float> filt = iir_lowpass(bessel<float>(24), 1000, 48000);
+std::vector<biquad_params<float>> bqs = to_sos(filt);
 
 univector<float, 2000000> aud_buddy_iir;
 univector<float, 2000000> result_buddy_iir;
@@ -85,7 +94,14 @@ static void MLIR_IIR(benchmark::State &state) {
   }
 }
 
-// Benchmarking function.
+static void MLIR_IIR_VECTORIZATION(benchmark::State &state) {
+  for (auto _ : state) {
+    for (int i = 0; i < state.range(0); ++i) {
+      _mlir_ciface_mlir_iir_vectorization(&audRef, &kernelRef, &resRef);
+    }
+  }
+}
+
 static void BUDDY_IIR(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
@@ -94,9 +110,19 @@ static void BUDDY_IIR(benchmark::State &state) {
   }
 }
 
+static void BUDDY_IIR_VECTORIZATION(benchmark::State &state) {
+  for (auto _ : state) {
+    for (int i = 0; i < state.range(0); ++i) {
+      dap::iir_vectorization(&audRef, &kernelRef, &resRef);
+    }
+  }
+}
+
 // Register benchmarking function.
 BENCHMARK(MLIR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(MLIR_IIR_VECTORIZATION)->Arg(1)->Unit(benchmark::kMillisecond);
 BENCHMARK(BUDDY_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
+BENCHMARK(BUDDY_IIR_VECTORIZATION)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result_buddy_iir wav file.
 void generateResultBuddyIir() {
