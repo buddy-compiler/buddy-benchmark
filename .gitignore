@@ -3,3 +3,6 @@
 
 # vscode configurations
 /.vscode
+
+# Virtual Environment for Python
+venv*
