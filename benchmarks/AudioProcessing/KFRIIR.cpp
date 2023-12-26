@@ -1,4 +1,4 @@
-//===- KFRIir.cpp ---------------------------------------------------------===//
+//===- KFRIIR.cpp ---------------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ zpk<float> filt = iir_lowpass(bessel<float>(24), 1000, 48000);
 std::vector<biquad_params<float>> bqs = to_sos(filt);
 
 // Initialize univector.
-void initializeKFRIir() {
+void initializeKFRIIR() {
   audio_reader_wav<float> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
   reader.read(aud_iir.data(), aud_iir.size());
@@ -54,7 +54,7 @@ static void KFR_IIR(benchmark::State &state) {
 BENCHMARK(KFR_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result wav file.
-void generateResultKFRIir() {
+void generateResultKFRIIR() {
   println("-------------------------------------------------------");
   println("[ KFR IIR Result Information ]");
   univector<float> generateResult = biquad<maxorder>(bqs, aud_iir);

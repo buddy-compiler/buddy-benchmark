@@ -1,4 +1,4 @@
-//===- BuddyIirBenchmark.cpp ----------------------------------------------===//
+//===- BuddyIIRBenchmark.cpp ----------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,14 +37,6 @@ void _mlir_ciface_mlir_iir(MemRef<float, 1> *inputBuddyConv1D,
 void _mlir_ciface_mlir_iir_vectorization(MemRef<float, 1> *inputBuddyConv1D,
                                          MemRef<float, 2> *kernelBuddyConv1D,
                                          MemRef<float, 1> *outputBuddyConv1D);
-
-void _mlir_ciface_buddy_iir(MemRef<float, 1> *inputBuddyConv1D,
-                            MemRef<float, 2> *kernelBuddyConv1D,
-                            MemRef<float, 1> *outputBuddyConv1D);
-
-void _mlir_ciface_buddy_iir_vectorization(MemRef<float, 1> *inputBuddyConv1D,
-                                          MemRef<float, 2> *kernelBuddyConv1D,
-                                          MemRef<float, 1> *outputBuddyConv1D);
 }
 
 namespace {
@@ -65,7 +57,7 @@ MemRef<float, 1> resRef(&sizeofAud);
 } // namespace
 
 // Initialize univector.
-void initializeBuddyIir() {
+void initializeBuddyIIR() {
   audio_reader_wav<float> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
   reader.read(aud_buddy_iir.data(), aud_buddy_iir.size());
@@ -105,7 +97,7 @@ static void MLIR_IIR_VECTORIZATION(benchmark::State &state) {
 static void BUDDY_IIR(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_buddy_iir(&audRef, &kernelRef, &resRef);
+      dap::IIR(&audRef, &kernelRef, &resRef, /*isVectorization=*/false);
     }
   }
 }
@@ -113,7 +105,7 @@ static void BUDDY_IIR(benchmark::State &state) {
 static void BUDDY_IIR_VECTORIZATION(benchmark::State &state) {
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      dap::iir_vectorization(&audRef, &kernelRef, &resRef);
+      dap::IIR(&audRef, &kernelRef, &resRef, /*isVectorization=*/true);
     }
   }
 }
@@ -125,11 +117,11 @@ BENCHMARK(BUDDY_IIR)->Arg(1)->Unit(benchmark::kMillisecond);
 BENCHMARK(BUDDY_IIR_VECTORIZATION)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result_buddy_iir wav file.
-void generateResultBuddyIir() {
+void generateResultBuddyIIR() {
   println("-------------------------------------------------------");
   println("[ Buddy IIR Result Information ]");
   MemRef<float, 1> generateResult(&sizeofAud);
-  _mlir_ciface_buddy_iir(&audRef, &kernelRef, &generateResult);
+  dap::IIR(&audRef, &kernelRef, &generateResult, /*isVectorization=*/true);
 
   audio_writer_wav<float> writer(open_file_for_writing("./ResultBuddyIir.wav"),
                                  audio_format{1 /* channel */,

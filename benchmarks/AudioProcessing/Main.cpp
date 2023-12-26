@@ -1,4 +1,5 @@
 //===- Main.cpp -----------------------------------------------------------===//
+//===----------------------------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,21 +24,21 @@
 void initializeKFRFft();
 void initializeKFRBiquad();
 void initializeBuddyBiquad();
-void initializeKFRIir();
-void initializeBuddyIir();
+void initializeKFRIIR();
+void initializeBuddyIIR();
 
 void generateResultKFRFft();
 void generateResultKFRBiquad();
 void generateResultBuddyBiquad();
-void generateResultKFRIir();
-void generateResultBuddyIir();
+void generateResultKFRIIR();
+void generateResultBuddyIIR();
 
 int main(int argc, char **argv) {
   initializeKFRFft();
   initializeKFRBiquad();
   initializeBuddyBiquad();
-  initializeKFRIir();
-  initializeBuddyIir();
+  initializeKFRIIR();
+  initializeBuddyIIR();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
@@ -45,8 +46,8 @@ int main(int argc, char **argv) {
   generateResultKFRFft();
   generateResultKFRBiquad();
   generateResultBuddyBiquad();
-  generateResultKFRIir();
-  generateResultBuddyIir();
+  generateResultKFRIIR();
+  generateResultBuddyIIR();
 
   return 0;
 }
