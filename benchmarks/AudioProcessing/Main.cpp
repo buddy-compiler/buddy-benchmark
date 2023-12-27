@@ -20,33 +20,33 @@
 
 #include <benchmark/benchmark.h>
 
-void initializeKFRBiquad();
 void initializeKFRFft();
-void initializeKFRIir();
+void initializeKFRBiquad();
 void initializeBuddyBiquad();
-void initializeBuddyIir();
+void initializeKFRIIR();
+void initializeBuddyIIR();
 
-void generateResultKFRBiquad();
 void generateResultKFRFft();
-void generateResultKFRIir();
+void generateResultKFRBiquad();
 void generateResultBuddyBiquad();
-void generateResultBuddyIir();
+void generateResultKFRIIR();
+void generateResultBuddyIIR();
 
 int main(int argc, char **argv) {
-  initializeKFRBiquad();
   initializeKFRFft();
-  initializeKFRIir();
+  initializeKFRBiquad();
   initializeBuddyBiquad();
-  initializeBuddyIir();
+  initializeKFRIIR();
+  initializeBuddyIIR();
 
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
 
-  generateResultKFRBiquad();
   generateResultKFRFft();
-  generateResultKFRIir();
+  generateResultKFRBiquad();
   generateResultBuddyBiquad();
-  generateResultBuddyIir();
+  generateResultKFRIIR();
+  generateResultBuddyIIR();
 
   return 0;
 }

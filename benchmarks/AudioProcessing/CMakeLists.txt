@@ -38,13 +38,13 @@ add_custom_command(OUTPUT mlir-biquad.o
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRBiquad.mlir
         -convert-linalg-to-affine-loops
         -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-        --llvm-request-c-wrappers
+        -llvm-request-c-wrappers
         -convert-arith-to-llvm
         -finalize-memref-to-llvm -convert-func-to-llvm
         -reconcile-unrealized-casts |
-        ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+        ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -mattr=${BUDDY_OPT_ATTR} -filetype=obj 
             -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/mlir-biquad.o
         )
 add_library(MLIRBiquad STATIC mlir-biquad.o)
@@ -59,28 +59,48 @@ set_target_properties(MLIRBiquad PROPERTIES LINKER_LANGUAGE CXX)
 # Add a support for all input audio size.
 add_custom_command(OUTPUT mlir-iir.o
         COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
-        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRIir.mlir
+        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRIIR.mlir
         -lower-dap="DAP-vector-splitting=64" -convert-linalg-to-affine-loops
         -lower-affine
         -convert-scf-to-cf 
         -convert-vector-to-llvm 
-        --llvm-request-c-wrappers
+        -llvm-request-c-wrappers
         -convert-arith-to-llvm
         -finalize-memref-to-llvm -convert-func-to-llvm
         -reconcile-unrealized-casts |
-        ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+        ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
         ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+            -mattr=${BUDDY_OPT_ATTR} -filetype=obj 
             -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/mlir-iir.o
         )
-add_library(MLIRIir STATIC mlir-iir.o)
-set_target_properties(MLIRIir PROPERTIES LINKER_LANGUAGE CXX)
+add_library(MLIRIIR STATIC mlir-iir.o)
+set_target_properties(MLIRIIR PROPERTIES LINKER_LANGUAGE CXX)
+
+add_custom_command(OUTPUT iir-vectorization.o
+        COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+        ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRIIRVectorization.mlir
+        -convert-linalg-to-affine-loops
+        -lower-affine
+        -convert-scf-to-cf 
+        -convert-vector-to-llvm 
+        -llvm-request-c-wrappers
+        -convert-arith-to-llvm
+        -finalize-memref-to-llvm -convert-func-to-llvm
+        -reconcile-unrealized-casts |
+        ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
+        ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} -filetype=obj 
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/AudioProcessing/iir-vectorization.o
+        )
+add_library(MLIRIIRVectorization STATIC iir-vectorization.o)
+set_target_properties(MLIRIIRVectorization PROPERTIES LINKER_LANGUAGE CXX)
+
 add_executable(audio-processing-benchmark
   KFRFft.cpp
-  KFRIir.cpp
   KFRBiquad.cpp
   BuddyBiquadBenchmark.cpp
-  BuddyIirBenchmark.cpp
+  KFRIIR.cpp
+  BuddyIIRBenchmark.cpp
   Main.cpp
 )
 
@@ -95,7 +115,9 @@ target_link_libraries(audio-processing-benchmark
   kfr_io
   kfr_dft
   MLIRBiquad
-  MLIRIir
+  MLIRIIR
+  MLIRIIRVectorization
   BuddyLibDAP
+  BuddyLibDAPVectorization
   GoogleBenchmark
 )
