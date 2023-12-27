@@ -117,3 +117,31 @@ target_link_libraries(image-processing-benchmark
   # Link Buddy MLIR DIP Library.
   BuddyLibDIP
   )
+
+#-------------------------------------------------------------------------------
+# Image Processing Resize Benchmark Target
+#-------------------------------------------------------------------------------
+
+add_executable(image-processing-resize-benchmark
+  MainResize.cpp 
+  BuddyResize2DBenchmark.cpp
+  OpenCVResize2DBenchmark.cpp
+  )
+
+target_include_directories(image-processing-resize-benchmark
+  PRIVATE
+  ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/include/
+  )
+
+target_link_directories(image-processing-resize-benchmark
+  PRIVATE 
+  ${BUDDY_MLIR_LIB_DIR}
+  )
+
+target_link_libraries(image-processing-resize-benchmark
+  GoogleBenchmark
+  ${OpenCV_LIBS}
+  # Link Buddy MLIR DIP Library.
+  BuddyLibDIP
+  )
+  
