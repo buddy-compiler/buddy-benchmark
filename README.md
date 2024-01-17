@@ -41,6 +41,8 @@ Currently, the image processing benchmark includes the following frameworks or o
 
 *NOTE: Please make sure the `buddy-opt` tool of buddy-mlir project can work well.*
 
+Known to work with commit id `7b2e4474baa5f43322ad55107d9bd1990582929d` of buddy-mlir.
+
 Run the image processing benchmark:
 
 | CMake Options  | Default Value |

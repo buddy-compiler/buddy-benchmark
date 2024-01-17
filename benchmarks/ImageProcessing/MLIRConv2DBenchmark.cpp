@@ -29,9 +29,9 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_mlir_conv_2d(MemRef<float, 2> *inputConv2D,
-                               MemRef<float, 2> *kernelConv2D,
-                               MemRef<float, 2> *outputConv2D);
+void _mlir_ciface_conv_2d(MemRef<float, 2> *inputConv2D,
+                          MemRef<float, 2> *kernelConv2D,
+                          MemRef<float, 2> *outputConv2D);
 }
 
 // Read input image.
@@ -78,8 +78,8 @@ static void MLIR_Conv2D(benchmark::State &state) {
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_mlir_conv_2d(&inputMLIRConv2D, &kernelMLIRConv2D,
-                                &outputMLIRConv2D);
+      _mlir_ciface_conv_2d(&inputMLIRConv2D, &kernelMLIRConv2D,
+                           &outputMLIRConv2D);
     }
   }
 }
@@ -94,7 +94,7 @@ void generateResultMLIRConv2D() {
   MemRef<float, 2> kernel(kernelDataMLIRConv2D, sizesKernelMLIRConv2D);
   MemRef<float, 2> output(sizesOutputMLIRConv2D);
   // Run the 2D convolution.
-  _mlir_ciface_mlir_conv_2d(&input, &kernel, &output);
+  _mlir_ciface_conv_2d(&input, &kernel, &output);
 
   // Define a cv::Mat with the output of the convolution.
   Mat outputImage(outputRowsMLIRConv2D, outputColsMLIRConv2D, CV_32FC1,
