@@ -22,6 +22,7 @@
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/imgcodecs/loadsave.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -29,13 +30,13 @@ using namespace std;
 
 // Declare the conv2d C interface.
 extern "C" {
-void _mlir_ciface_conv_2d(MemRef<float, 2> *inputConv2D,
-                          MemRef<float, 2> *kernelConv2D,
-                          MemRef<float, 2> *outputConv2D);
+void _mlir_ciface_mlir_conv_2d(Img<float, 2> *inputConv2D,
+                               MemRef<float, 2> *kernelConv2D,
+                               MemRef<float, 2> *outputConv2D);
 }
 
-// Read input image.
-Mat inputImageMLIRConv2D;
+// Name of input image to be read.
+std::string inputNameMLIRConv2D;
 
 // Define the kernel data and kernel size.
 float *kernelDataMLIRConv2D;
@@ -49,18 +50,20 @@ intptr_t sizesInputMLIRConv2D[2];
 intptr_t sizesKernelMLIRConv2D[2];
 intptr_t sizesOutputMLIRConv2D[2];
 
-void initializeMLIRConv2D(char **argv) {
-  inputImageMLIRConv2D = imread(argv[1], IMREAD_GRAYSCALE);
+void initializeMLIRConv2D(char **argv, Img<float, 2> inputImageMLIRConv2D) {
+  inputNameMLIRConv2D = argv[1];
 
   kernelDataMLIRConv2D = get<0>(kernelMap[argv[2]]);
   kernelRowsMLIRConv2D = get<1>(kernelMap[argv[2]]);
   kernelColsMLIRConv2D = get<2>(kernelMap[argv[2]]);
 
-  outputRowsMLIRConv2D = inputImageMLIRConv2D.rows - kernelRowsMLIRConv2D + 1;
-  outputColsMLIRConv2D = inputImageMLIRConv2D.cols - kernelColsMLIRConv2D + 1;
+  outputRowsMLIRConv2D =
+      inputImageMLIRConv2D.getSizes()[0] - kernelRowsMLIRConv2D + 1;
+  outputColsMLIRConv2D =
+      inputImageMLIRConv2D.getSizes()[1] - kernelColsMLIRConv2D + 1;
 
-  sizesInputMLIRConv2D[0] = inputImageMLIRConv2D.rows;
-  sizesInputMLIRConv2D[1] = inputImageMLIRConv2D.cols;
+  sizesInputMLIRConv2D[0] = inputImageMLIRConv2D.getSizes()[0];
+  sizesInputMLIRConv2D[1] = inputImageMLIRConv2D.getSizes()[1];
 
   sizesKernelMLIRConv2D[0] = kernelRowsMLIRConv2D;
   sizesKernelMLIRConv2D[1] = kernelColsMLIRConv2D;
@@ -71,15 +74,16 @@ void initializeMLIRConv2D(char **argv) {
 
 static void MLIR_Conv2D(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> inputMLIRConv2D(inputImageMLIRConv2D);
+  Img<float, 2> inputMLIRConv2D =
+      dip::imread<float, 2>(inputNameMLIRConv2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> kernelMLIRConv2D(kernelDataMLIRConv2D,
                                     sizesKernelMLIRConv2D);
   MemRef<float, 2> outputMLIRConv2D(sizesOutputMLIRConv2D);
 
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      _mlir_ciface_conv_2d(&inputMLIRConv2D, &kernelMLIRConv2D,
-                           &outputMLIRConv2D);
+      _mlir_ciface_mlir_conv_2d(&inputMLIRConv2D, &kernelMLIRConv2D,
+                                &outputMLIRConv2D);
     }
   }
 }
@@ -88,30 +92,22 @@ static void MLIR_Conv2D(benchmark::State &state) {
 BENCHMARK(MLIR_Conv2D)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result image.
-void generateResultMLIRConv2D() {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input(inputImageMLIRConv2D);
+void generateResultMLIRConv2D(Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel, and output.
   MemRef<float, 2> kernel(kernelDataMLIRConv2D, sizesKernelMLIRConv2D);
   MemRef<float, 2> output(sizesOutputMLIRConv2D);
   // Run the 2D convolution.
-  _mlir_ciface_conv_2d(&input, &kernel, &output);
+  _mlir_ciface_mlir_conv_2d(&input, &kernel, &output);
 
-  // Define a cv::Mat with the output of the convolution.
-  Mat outputImage(outputRowsMLIRConv2D, outputColsMLIRConv2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsMLIRConv2D, outputColsMLIRConv2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result = imwrite("ResultMLIRConv2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultMLIRConv2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;

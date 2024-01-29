@@ -24,13 +24,14 @@
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/imgcodecs/loadsave.h>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
 
-// Declare the input, kernel and output OpenCV Mat.
-cv::Mat inputOpenCVMat;
+// Declare the input name.
+std::string inputNameEigenConvolve2D;
 float *kernelDataEigenConvolve2D;
 
 // Declare the input, kernel and output Eigen Tensor.
@@ -50,13 +51,10 @@ int outputRowsEigenConvolve2D, outputColsEigenConvolve2D;
 // - Get the sizes of the input, kernel and output.
 // - Define the input, kernel and output MemRef container.
 // - Initialize the input, kernel and output Eigen tensor.
-void initializeEigenConvolve2D(char **argv) {
-  // Read image and kernel as OpenCV Mat.
-  inputOpenCVMat = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
-
+void initializeEigenConvolve2D(char **argv, Img<float, 2> inputImage) {
   // Get the sizes of the input, kernel and output.
-  inputRowsEigenConvolve2D = inputOpenCVMat.rows;
-  inputColsEigenConvolve2D = inputOpenCVMat.cols;
+  inputRowsEigenConvolve2D = inputImage.getSizes()[0];
+  inputColsEigenConvolve2D = inputImage.getSizes()[1];
   kernelDataEigenConvolve2D = get<0>(kernelMap[argv[2]]);
   kernelRowsEigenConvolve2D = get<1>(kernelMap[argv[2]]);
   kernelColsEigenConvolve2D = get<2>(kernelMap[argv[2]]);
@@ -72,16 +70,14 @@ void initializeEigenConvolve2D(char **argv) {
   intptr_t sizesOutputEigenConvolve2D[2] = {outputRowsEigenConvolve2D,
                                             outputColsEigenConvolve2D};
 
-  // Define the input, kernel and output MemRef container.
-  Img<float, 2> inputMemRef(inputOpenCVMat);
+  // Define the kernel and output MemRef container.
   MemRef<float, 2> kernelMemRef(kernelDataEigenConvolve2D,
                                 sizesKernelEigenConvolve2D);
   MemRef<float, 2> outputMemRef(sizesOutputEigenConvolve2D);
 
   // Initialize the input, kernel and output Eigen tensor.
   Eigen::TensorMap inputTensorMap = Eigen::TensorMap<Eigen::Tensor<float, 2>>(
-      inputMemRef.getData(), inputRowsEigenConvolve2D,
-      inputColsEigenConvolve2D);
+      inputImage.getData(), inputRowsEigenConvolve2D, inputColsEigenConvolve2D);
   Eigen::TensorMap kernelTensorMap = Eigen::TensorMap<Eigen::Tensor<float, 2>>(
       kernelMemRef.getData(), kernelRowsEigenConvolve2D,
       kernelColsEigenConvolve2D);
@@ -107,23 +103,16 @@ BENCHMARK(Eigen_Convolve2D)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result image.
 void generateResultEigenConvolve2D() {
-  // Define a cv::Mat with the output of the Eigen convolve function.
-  cv::Mat outputImage(outputRowsEigenConvolve2D, outputColsEigenConvolve2D,
-                      CV_32FC1, output.data());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(cv::IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsEigenConvolve2D,
+                             outputColsEigenConvolve2D};
+  Img<float, 2> outputImage(output.data(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result = cv::imwrite("ResultEigenConvolve2D.png", outputImage,
-                         compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultEigenConvolve2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;

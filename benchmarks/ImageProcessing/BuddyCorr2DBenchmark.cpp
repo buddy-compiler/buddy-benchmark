@@ -21,15 +21,16 @@
 #include "Kernels.h"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
-#include <buddy/DIP/ImageContainer.h>
 #include <buddy/DIP/DIP.h>
+#include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/imgcodecs/loadsave.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
 using namespace std;
 
-// Declare input image.
-Mat inputImageBuddyCorr2D;
+// Declare the input name.
+std::string inputNameBuddyCorr2D;
 
 // Define the kernel data and size.
 float *kernelDataBuddyCorr2D;
@@ -49,18 +50,18 @@ enum BoundaryOption { constant_padding, replicate_padding };
 // Define Boundary option selected.
 BoundaryOption BoundaryType;
 
-void initializeBuddyCorr2D(char **argv) {
-  inputImageBuddyCorr2D = imread(argv[1], IMREAD_GRAYSCALE);
+void initializeBuddyCorr2D(char **argv, Img<float, 2> inputImageBuddyCorr2D) {
+  inputNameBuddyCorr2D = argv[1];
 
   kernelDataBuddyCorr2D = get<0>(kernelMap[argv[2]]);
   kernelRowsBuddyCorr2D = get<1>(kernelMap[argv[2]]);
   kernelColsBuddyCorr2D = get<2>(kernelMap[argv[2]]);
 
-  outputRowsBuddyCorr2D = inputImageBuddyCorr2D.rows;
-  outputColsBuddyCorr2D = inputImageBuddyCorr2D.cols;
+  outputRowsBuddyCorr2D = inputImageBuddyCorr2D.getSizes()[0];
+  outputColsBuddyCorr2D = inputImageBuddyCorr2D.getSizes()[1];
 
-  sizesInputBuddyCorr2D[0] = inputImageBuddyCorr2D.rows;
-  sizesInputBuddyCorr2D[1] = inputImageBuddyCorr2D.cols;
+  sizesInputBuddyCorr2D[0] = inputImageBuddyCorr2D.getSizes()[0];
+  sizesInputBuddyCorr2D[1] = inputImageBuddyCorr2D.getSizes()[1];
 
   sizesKernelBuddyCorr2D[0] = kernelRowsBuddyCorr2D;
   sizesKernelBuddyCorr2D[1] = kernelColsBuddyCorr2D;
@@ -77,7 +78,8 @@ void initializeBuddyCorr2D(char **argv) {
 
 static void Buddy_Corr2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> inputBuddyCorr2D(inputImageBuddyCorr2D);
+  Img<float, 2> inputBuddyCorr2D =
+      dip::imread<float, 2>(inputNameBuddyCorr2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> kernelBuddyCorr2D(kernelDataBuddyCorr2D,
                                      sizesKernelBuddyCorr2D);
   MemRef<float, 2> outputBuddyCorr2D(sizesOutputBuddyCorr2D);
@@ -95,7 +97,8 @@ static void Buddy_Corr2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_Corr2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> inputBuddyCorr2D(inputImageBuddyCorr2D);
+  Img<float, 2> inputBuddyCorr2D =
+      dip::imread<float, 2>(inputNameBuddyCorr2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> kernelBuddyCorr2D(kernelDataBuddyCorr2D,
                                      sizesKernelBuddyCorr2D);
   MemRef<float, 2> outputBuddyCorr2D(sizesOutputBuddyCorr2D);
@@ -125,9 +128,8 @@ void registerBenchmarkBuddyCorr2D() {
 }
 
 // Generate result image.
-void generateResultBuddyCorr2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input(inputImageBuddyCorr2D);
+void generateResultBuddyCorr2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel(kernelDataBuddyCorr2D, sizesKernelBuddyCorr2D);
   MemRef<float, 2> output(sizesOutputBuddyCorr2D);
   // Run the 2D correlation.
@@ -143,22 +145,15 @@ void generateResultBuddyCorr2D(char **argv) {
                 0.0f /* Constant Value*/);
   }
 
-  // Define a cv::Mat with the output of the correlation.
-  Mat outputImage(outputRowsBuddyCorr2D, outputColsBuddyCorr2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyCorr2D, outputColsBuddyCorr2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result = imwrite("ResultBuddyCorr2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyCorr2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
