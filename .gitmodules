@@ -4,3 +4,6 @@
 [submodule "thirdparty/Halide"]
 	path = thirdparty/Halide
 	url = https://github.com/halide/Halide.git
+[submodule "thirdparty/eigen"]
+	path = thirdparty/eigen
+	url = https://gitlab.com/libeigen/eigen.git
