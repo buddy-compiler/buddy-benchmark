@@ -30,7 +30,7 @@ add_custom_command(OUTPUT mlir-conv2d.o
   COMMAND ${LLVM_MLIR_BINARY_DIR}/mlir-opt
           ${BUDDY_SOURCE_DIR}/benchmarks/ImageProcessing/MLIRConv2D.mlir 
             -convert-linalg-to-loops
-            -convert-scf-to-cf -convert-linalg-to-llvm
+            -convert-scf-to-cf
             -lower-affine -convert-scf-to-cf --finalize-memref-to-llvm 
             --llvm-request-c-wrappers
             -convert-func-to-llvm
@@ -51,10 +51,12 @@ add_custom_command(OUTPUT buddy-conv2d.o
   COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
           ${BUDDY_MLIR_BUILD_DIR}/../examples/ConvOpt/conv2d.mlir 
             -conv-vectorization="strip-mining=${SPLITING_SIZE}" 
-            -convert-vector-to-scf 
-            -lower-affine -convert-scf-to-cf -convert-vector-to-llvm 
-            --llvm-request-c-wrappers
-            -finalize-memref-to-llvm -convert-func-to-llvm 
+            -lower-affine
+            -convert-scf-to-cf
+            -convert-vector-to-llvm
+            -finalize-memref-to-llvm
+            -llvm-request-c-wrappers
+            -convert-func-to-llvm 
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
@@ -86,6 +88,9 @@ set_target_properties(BuddyConv2D PROPERTIES LINKER_LANGUAGE CXX)
 # Image Processing Benchmark Target
 #-------------------------------------------------------------------------------
 
+find_package(JPEG REQUIRED)
+find_package(PNG REQUIRED)
+
 add_executable(image-processing-benchmark
   Main.cpp 
   OpenCVFilter2DBenchmark.cpp
@@ -116,4 +121,6 @@ target_link_libraries(image-processing-benchmark
   BuddyConv2D
   # Link Buddy MLIR DIP Library.
   BuddyLibDIP
+  ${JPEG_LIBRARY} 
+  ${PNG_LIBRARY}
   )

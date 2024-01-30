@@ -21,8 +21,9 @@
 #include "Kernels.h"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
-#include <buddy/DIP/ImageContainer.h>
 #include <buddy/DIP/DIP.h>
+#include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/imgcodecs/loadsave.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -30,6 +31,9 @@ using namespace std;
 
 // Declare input image and kernel.
 Mat inputImageBuddyMorph2D;
+
+// Name of the input image to be read.
+std::string inputNameBuddyMorph2D;
 
 // Define the kernel size.
 float *kernelDataBuddyMorph2D;
@@ -49,18 +53,18 @@ enum BoundaryOption { constant_padding, replicate_padding };
 // Define Boundary option selected.
 BoundaryOption BoundaryType1;
 
-void initializeBuddyMorph2D(char **argv) {
-  inputImageBuddyMorph2D = imread(argv[1], IMREAD_GRAYSCALE);
+void initializeBuddyMorph2D(char **argv, Img<float, 2> inputImageBuddyMorph2D) {
+  inputNameBuddyMorph2D = argv[1];
 
   kernelDataBuddyMorph2D = get<0>(kernelMap[argv[2]]);
   kernelRowsBuddyMorph2D = get<1>(kernelMap[argv[2]]);
   kernelColsBuddyMorph2D = get<2>(kernelMap[argv[2]]);
 
-  outputRowsBuddyMorph2D = inputImageBuddyMorph2D.rows;
-  outputColsBuddyMorph2D = inputImageBuddyMorph2D.cols;
+  outputRowsBuddyMorph2D = inputImageBuddyMorph2D.getSizes()[0];
+  outputColsBuddyMorph2D = inputImageBuddyMorph2D.getSizes()[1];
 
-  sizesInputBuddyMorph2D[0] = inputImageBuddyMorph2D.rows;
-  sizesInputBuddyMorph2D[1] = inputImageBuddyMorph2D.cols;
+  sizesInputBuddyMorph2D[0] = inputImageBuddyMorph2D.getSizes()[0];
+  sizesInputBuddyMorph2D[1] = inputImageBuddyMorph2D.getSizes()[1];
 
   sizesKernelBuddyMorph2D[0] = kernelRowsBuddyMorph2D;
   sizesKernelBuddyMorph2D[1] = kernelColsBuddyMorph2D;
@@ -74,12 +78,13 @@ void initializeBuddyMorph2D(char **argv) {
     BoundaryType1 = constant_padding;
   }
 }
-Img<float, 2> inputBuddyMorph2D(inputImageBuddyMorph2D);
+
 MemRef<float, 2> kernelBuddyMorph2D(kernelDataBuddyMorph2D,
                                     sizesKernelBuddyMorph2D);
 static void Buddy_Erosion2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyErosion2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefErosion2D(sizesOutputBuddyMorph2D, 256.f);
 
@@ -95,6 +100,8 @@ static void Buddy_Erosion2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_Erosion2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyErosion2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefErosion2D(sizesOutputBuddyMorph2D, 256.f);
 
@@ -110,6 +117,8 @@ static void Buddy_Erosion2D_Replicate_Padding(benchmark::State &state) {
 
 static void Buddy_Dilation2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyDilation2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefDilation2D(sizesOutputBuddyMorph2D, -1.f);
 
@@ -125,6 +134,8 @@ static void Buddy_Dilation2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_Dilation2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyDilation2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefDilation2D(sizesOutputBuddyMorph2D, -1.f);
 
@@ -140,7 +151,8 @@ static void Buddy_Dilation2D_Replicate_Padding(benchmark::State &state) {
 
 static void Buddy_Opening2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyOpening2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyOpening2D1(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefOpening2D(sizesOutputBuddyMorph2D, -1.f);
@@ -158,7 +170,8 @@ static void Buddy_Opening2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_Opening2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyOpening2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyOpening2D1(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefOpening2D(sizesOutputBuddyMorph2D, -1.f);
@@ -176,7 +189,8 @@ static void Buddy_Opening2D_Replicate_Padding(benchmark::State &state) {
 
 static void Buddy_Closing2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyClosing2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyClosing2D1(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefClosing2D(sizesOutputBuddyMorph2D, -1.f);
@@ -194,7 +208,8 @@ static void Buddy_Closing2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_Closing2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> outputBuddyClosing2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyClosing2D1(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRefClosing2D(sizesOutputBuddyMorph2D, -1.f);
@@ -212,7 +227,8 @@ static void Buddy_Closing2D_Replicate_Padding(benchmark::State &state) {
 
 static void Buddy_TopHat2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> inputBuddyTopHat2D1(sizesInputBuddyMorph2D);
   MemRef<float, 2> outputBuddyTopHat2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyTopHat2D1(sizesOutputBuddyMorph2D);
@@ -233,6 +249,8 @@ static void Buddy_TopHat2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_TopHat2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> inputBuddyTopHat2D1(sizesInputBuddyMorph2D);
   MemRef<float, 2> outputBuddyTopHat2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyTopHat2D1(sizesOutputBuddyMorph2D);
@@ -253,6 +271,8 @@ static void Buddy_TopHat2D_Replicate_Padding(benchmark::State &state) {
 
 static void Buddy_BottomHat2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> inputBuddyBottomHat2D1(sizesInputBuddyMorph2D);
   MemRef<float, 2> outputBuddyBottomHat2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyBottomHat2D1(sizesOutputBuddyMorph2D);
@@ -274,6 +294,8 @@ static void Buddy_BottomHat2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_BottomHat2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> inputBuddyBottomHat2D1(sizesInputBuddyMorph2D);
   MemRef<float, 2> outputBuddyBottomHat2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyBottomHat2D1(sizesOutputBuddyMorph2D);
@@ -295,6 +317,8 @@ static void Buddy_BottomHat2D_Replicate_Padding(benchmark::State &state) {
 
 static void Buddy_MorphGrad2D_Constant_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> inputBuddyMorphGrad2D1(sizesInputBuddyMorph2D);
   MemRef<float, 2> outputBuddyMorphGrad2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyMorphGrad2D1(sizesOutputBuddyMorph2D);
@@ -316,6 +340,8 @@ static void Buddy_MorphGrad2D_Constant_Padding(benchmark::State &state) {
 
 static void Buddy_MorphGrad2D_Replicate_Padding(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
+  Img<float, 2> inputBuddyMorph2D =
+      dip::imread<float, 2>(inputNameBuddyMorph2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> inputBuddyMorphGrad2D1(sizesInputBuddyMorph2D);
   MemRef<float, 2> outputBuddyMorphGrad2D(sizesOutputBuddyMorph2D);
   MemRef<float, 2> outputBuddyMorphGrad2D1(sizesOutputBuddyMorph2D);
@@ -427,9 +453,8 @@ void registerBenchmarkBuddyMorphGrad2D() {
 }
 
 // Generate result image.
-void generateResultBuddyErosion2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyErosion2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copyMemRef(sizesOutputBuddyMorph2D, 256.f);
@@ -444,23 +469,15 @@ void generateResultBuddyErosion2D(char **argv) {
         1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the Erosionelation.
-  Mat outputImage(outputRowsBuddyMorph2D, outputColsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result =
-        imwrite("ResultBuddyErosion2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyErosion2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
@@ -469,9 +486,8 @@ void generateResultBuddyErosion2D(char **argv) {
 }
 
 // Generate result image.
-void generateResultBuddyDilation2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyDilation2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> copymemref(sizesOutputBuddyMorph2D, -1.f);
@@ -486,23 +502,15 @@ void generateResultBuddyDilation2D(char **argv) {
         1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the Dilationelation.
-  Mat outputImage(outputRowsBuddyMorph2D, outputColsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result =
-        imwrite("ResultBuddyDilation2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyDilation2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
@@ -511,9 +519,8 @@ void generateResultBuddyDilation2D(char **argv) {
 }
 
 // Generate result image.
-void generateResultBuddyOpening2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyOpening2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> output1(sizesOutputBuddyMorph2D);
@@ -530,23 +537,15 @@ void generateResultBuddyOpening2D(char **argv) {
         1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the Opening
-  Mat outputImage(outputRowsBuddyMorph2D, outputColsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result =
-        imwrite("ResultBuddyOpening2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyOpening2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
@@ -555,9 +554,8 @@ void generateResultBuddyOpening2D(char **argv) {
 }
 
 // Generate result image.
-void generateResultBuddyClosing2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyClosing2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> output1(sizesOutputBuddyMorph2D);
@@ -574,23 +572,15 @@ void generateResultBuddyClosing2D(char **argv) {
         1 /* Center X */, 1 /* Center Y */, 1, 0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the Closing
-  Mat outputImage(outputRowsBuddyMorph2D, outputColsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result =
-        imwrite("ResultBuddyClosing2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyClosing2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
@@ -599,9 +589,8 @@ void generateResultBuddyClosing2D(char **argv) {
 }
 
 // Generate result image.
-void generateResultBuddyTopHat2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyTopHat2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> output1(sizesOutputBuddyMorph2D);
@@ -622,22 +611,15 @@ void generateResultBuddyTopHat2D(char **argv) {
         0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the TopHat
-  Mat outputImage(outputRowsBuddyMorph2D, outputColsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result = imwrite("ResultBuddyTopHat2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyTopHat2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
@@ -646,9 +628,8 @@ void generateResultBuddyTopHat2D(char **argv) {
 }
 
 // Generate result image.
-void generateResultBuddyBottomHat2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyBottomHat2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> output1(sizesOutputBuddyMorph2D);
@@ -669,23 +650,15 @@ void generateResultBuddyBottomHat2D(char **argv) {
         0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the BottomHat
-  Mat outputImage(outputRowsBuddyMorph2D, outputColsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result =
-        imwrite("ResultBuddyBottomHat2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyBottomHat2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;
@@ -694,9 +667,8 @@ void generateResultBuddyBottomHat2D(char **argv) {
 }
 
 // Generate result image.
-void generateResultBuddyMorphGrad2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input = inputBuddyMorph2D;
+void generateResultBuddyMorphGrad2D(char **argv, Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel and output.
   MemRef<float, 2> kernel = kernelBuddyMorph2D;
   MemRef<float, 2> output(sizesOutputBuddyMorph2D);
   MemRef<float, 2> output1(sizesOutputBuddyMorph2D);
@@ -717,23 +689,15 @@ void generateResultBuddyMorphGrad2D(char **argv) {
         0.0f /* Constant Value */);
   }
 
-  // Define a cv::Mat with the output of the MorphGrad
-  Mat outputImage(outputRowsBuddyMorph2D, outputRowsBuddyMorph2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyMorph2D, outputColsBuddyMorph2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result =
-        imwrite("ResultBuddyMorphGrad2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyMorphGrad2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;

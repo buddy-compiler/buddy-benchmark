@@ -22,6 +22,7 @@
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/imgcodecs/loadsave.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -34,8 +35,8 @@ void _mlir_ciface_conv_2d(Img<float, 2> *inputBuddyConv2D,
                           MemRef<float, 2> *outputBuddyConv2D);
 }
 
-// Read input image.
-Mat inputImageBuddyConv2D;
+// Name of input image to be read.
+std::string inputNameBuddyConv2D;
 
 // Define the kernel data and size.
 float *kernelDataBuddyConv2D;
@@ -49,20 +50,20 @@ intptr_t sizesInputBuddyConv2D[2];
 intptr_t sizesKernelBuddyConv2D[2];
 intptr_t sizesOutputBuddyConv2D[2];
 
-void initializeBuddyConv2D(char **argv) {
-  inputImageBuddyConv2D = imread(argv[1], IMREAD_GRAYSCALE);
+void initializeBuddyConv2D(char **argv, Img<float, 2> inputImageBuddyConv2D) {
+  inputNameBuddyConv2D = argv[1];
 
   kernelDataBuddyConv2D = get<0>(kernelMap[argv[2]]);
   kernelRowsBuddyConv2D = get<1>(kernelMap[argv[2]]);
   kernelColsBuddyConv2D = get<2>(kernelMap[argv[2]]);
 
   outputRowsBuddyConv2D =
-      inputImageBuddyConv2D.rows - kernelRowsBuddyConv2D + 1;
+      inputImageBuddyConv2D.getSizes()[0] - kernelRowsBuddyConv2D + 1;
   outputColsBuddyConv2D =
-      inputImageBuddyConv2D.cols - kernelColsBuddyConv2D + 1;
+      inputImageBuddyConv2D.getSizes()[1] - kernelColsBuddyConv2D + 1;
 
-  sizesInputBuddyConv2D[0] = inputImageBuddyConv2D.rows;
-  sizesInputBuddyConv2D[1] = inputImageBuddyConv2D.cols;
+  sizesInputBuddyConv2D[0] = inputImageBuddyConv2D.getSizes()[0];
+  sizesInputBuddyConv2D[1] = inputImageBuddyConv2D.getSizes()[1];
 
   sizesKernelBuddyConv2D[0] = kernelRowsBuddyConv2D;
   sizesKernelBuddyConv2D[1] = kernelColsBuddyConv2D;
@@ -73,7 +74,8 @@ void initializeBuddyConv2D(char **argv) {
 
 static void Buddy_Conv2D(benchmark::State &state) {
   // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> inputBuddyConv2D(inputImageBuddyConv2D);
+  Img<float, 2> inputBuddyConv2D =
+      dip::imread<float, 2>(inputNameBuddyConv2D, dip::IMGRD_GRAYSCALE);
   MemRef<float, 2> kernelBuddyConv2D(kernelDataBuddyConv2D,
                                      sizesKernelBuddyConv2D);
   MemRef<float, 2> outputBuddyConv2D(sizesOutputBuddyConv2D);
@@ -90,30 +92,22 @@ static void Buddy_Conv2D(benchmark::State &state) {
 BENCHMARK(Buddy_Conv2D)->Arg(1)->Unit(benchmark::kMillisecond);
 
 // Generate result image.
-void generateResultBuddyConv2D(char **argv) {
-  // Define the MemRef descriptor for input, kernel, and output.
-  Img<float, 2> input(inputImageBuddyConv2D);
+void generateResultBuddyConv2D(Img<float, 2> input) {
+  // Define the MemRef descriptor for kernel, and output.
   MemRef<float, 2> kernel(kernelDataBuddyConv2D, sizesKernelBuddyConv2D);
   MemRef<float, 2> output(sizesOutputBuddyConv2D);
   // Run the 2D convolution.
   _mlir_ciface_conv_2d(&input, &kernel, &output);
 
-  // Define a cv::Mat with the output of the convolution.
-  Mat outputImage(outputRowsBuddyConv2D, outputColsBuddyConv2D, CV_32FC1,
-                  output.getData());
-
-  // Choose a PNG compression level
-  vector<int> compressionParams;
-  compressionParams.push_back(IMWRITE_PNG_COMPRESSION);
-  compressionParams.push_back(9);
+  // Define an Img container for the output image.
+  intptr_t outputSizes[2] = {outputRowsBuddyConv2D, outputColsBuddyConv2D};
+  Img<float, 2> outputImage(output.getData(), outputSizes);
 
   // Write output to PNG.
-  bool result = false;
-  try {
-    result = imwrite("ResultBuddyConv2D.png", outputImage, compressionParams);
-  } catch (const cv::Exception &ex) {
-    fprintf(stderr, "Exception converting image to PNG format: %s\n",
-            ex.what());
+  bool result = dip::imwrite("ResultBuddyConv2D.png", outputImage);
+
+  if (!result) {
+    fprintf(stderr, "Exception converting image to PNG format. \n");
   }
   if (result)
     cout << "Saved PNG file." << endl;

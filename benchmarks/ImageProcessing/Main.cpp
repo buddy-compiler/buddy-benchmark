@@ -18,27 +18,33 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <iostream>
+
 #include <benchmark/benchmark.h>
 #include <stdexcept>
 
-void initializeMLIRConv2D(char **);
-void initializeBuddyConv2D(char **);
-void initializeBuddyCorr2D(char **);
-void initializeBuddyMorph2D(char **);
+#include <buddy/Core/Container.h>
+#include <buddy/DIP/ImageContainer.h>
+#include <buddy/DIP/imgcodecs/loadsave.h>
+
+void initializeMLIRConv2D(char **, Img<float, 2>);
+void initializeBuddyConv2D(char **, Img<float, 2>);
+void initializeBuddyCorr2D(char **, Img<float, 2>);
+void initializeBuddyMorph2D(char **, Img<float, 2>);
 void initializeOpenCVMorph2D(char **);
 void initializeOpenCVFilter2D(char **);
-void initializeEigenConvolve2D(char **);
+void initializeEigenConvolve2D(char **, Img<float, 2>);
 
-void generateResultMLIRConv2D();
-void generateResultBuddyConv2D(char **);
-void generateResultBuddyCorr2D(char **);
-void generateResultBuddyErosion2D(char **);
-void generateResultBuddyOpening2D(char **);
-void generateResultBuddyClosing2D(char **);
-void generateResultBuddyTopHat2D(char **);
-void generateResultBuddyBottomHat2D(char **);
-void generateResultBuddyMorphGrad2D(char **);
-void generateResultBuddyDilation2D(char **);
+void generateResultMLIRConv2D(Img<float, 2>);
+void generateResultBuddyConv2D(Img<float, 2>);
+void generateResultBuddyCorr2D(char **argv, Img<float, 2>);
+void generateResultBuddyErosion2D(char **, Img<float, 2>);
+void generateResultBuddyOpening2D(char **, Img<float, 2>);
+void generateResultBuddyClosing2D(char **, Img<float, 2>);
+void generateResultBuddyTopHat2D(char **, Img<float, 2>);
+void generateResultBuddyBottomHat2D(char **, Img<float, 2>);
+void generateResultBuddyMorphGrad2D(char **, Img<float, 2>);
+void generateResultBuddyDilation2D(char **, Img<float, 2>);
 void generateResultOpenCVErode2D();
 void generateResultOpenCVDilate2D();
 void generateResultOpenCVFilter2D();
@@ -81,13 +87,15 @@ int main(int argc, char **argv) {
         "are CONSTANT_PADDING, REPLICATE_PADDING.\n");
   }
 
-  initializeMLIRConv2D(argv);
-  initializeBuddyConv2D(argv);
-  initializeBuddyCorr2D(argv);
-  initializeBuddyMorph2D(argv);
+  Img<float, 2> img = dip::imread<float, 2>(argv[1], dip::IMGRD_GRAYSCALE);
+
+  initializeMLIRConv2D(argv, img);
+  initializeBuddyConv2D(argv, img);
+  initializeBuddyCorr2D(argv, img);
+  initializeBuddyMorph2D(argv, img);
   initializeOpenCVMorph2D(argv);
   initializeOpenCVFilter2D(argv);
-  initializeEigenConvolve2D(argv);
+  initializeEigenConvolve2D(argv, img);
 
   registerBenchmarkBuddyCorr2D();
   registerBenchmarkOpenCVFilter2D();
@@ -109,17 +117,17 @@ int main(int argc, char **argv) {
   ::benchmark::RunSpecifiedBenchmarks();
 
   // Generate result image.
-  generateResultMLIRConv2D();
+  generateResultMLIRConv2D(img);
   generateResultOpenCVFilter2D();
-  generateResultBuddyConv2D(argv);
-  generateResultBuddyCorr2D(argv);
-  generateResultBuddyErosion2D(argv);
-  generateResultBuddyDilation2D(argv);
-  generateResultBuddyOpening2D(argv);
-  generateResultBuddyClosing2D(argv);
-  generateResultBuddyTopHat2D(argv);
-  generateResultBuddyBottomHat2D(argv);
-  generateResultBuddyMorphGrad2D(argv);
+  generateResultBuddyConv2D(img);
+  generateResultBuddyCorr2D(argv, img);
+  generateResultBuddyErosion2D(argv, img);
+  generateResultBuddyDilation2D(argv, img);
+  generateResultBuddyOpening2D(argv, img);
+  generateResultBuddyClosing2D(argv, img);
+  generateResultBuddyTopHat2D(argv, img);
+  generateResultBuddyBottomHat2D(argv, img);
+  generateResultBuddyMorphGrad2D(argv, img);
   generateResultOpenCVTopHat2D();
   generateResultOpenCVBottomHat2D();
   generateResultOpenCVMorphGrad2D();
