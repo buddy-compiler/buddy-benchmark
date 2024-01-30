@@ -4,6 +4,7 @@ Version of third-party performance comparison items:
 
 | Comparison Item  | Version | Link |
 | -------------- | ------------- | ------------- |
+| OpenCV  | 4.9.0 | [Homepage](https://opencv.org/), [Code](https://github.com/opencv/opencv/tree/4.9.0) |
 | Eigen  | 3.4.0 | [Homepage](https://eigen.tuxfamily.org/index.php?title=Main_Page), [Code](https://gitlab.com/libeigen/eigen/-/tree/master) |
 
 ## TVM
