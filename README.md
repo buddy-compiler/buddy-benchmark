@@ -74,8 +74,8 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DIMAGE_PROCESSING_BENCHMARKS=ON \
-    -DOpenCV_DIR=/PATH/TO/OPENCV/BUILD/ \
-    -DEIGEN_DIR=/PATH/TO/EIGEN/SOURCE/CODE \
+    -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
+    -DEIGEN_DIR=$PWD/../thirdparty/eigen/ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph name> <Boundary Option>

@@ -1,5 +1,11 @@
 # Third-Party Dependencies
 
+Version of third-party performance comparison items:
+
+| Comparison Item  | Version | Link |
+| -------------- | ------------- | ------------- |
+| Eigen  | 3.4.0 | [Homepage](https://eigen.tuxfamily.org/index.php?title=Main_Page), [Code](https://gitlab.com/libeigen/eigen/-/tree/master) |
+
 ## TVM
 
 To install TVM, please refer to the official documentation ([Install TVM from source](https://tvm.apache.org/docs/install/from_source.html#install-from-source)). 
