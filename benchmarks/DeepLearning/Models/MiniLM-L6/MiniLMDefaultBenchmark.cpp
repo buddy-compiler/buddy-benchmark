@@ -41,7 +41,7 @@ MemRef<float, 2> output(sizesOutput);
 
 // Define benchmark function.
 void BM_MiniLM(benchmark::State &state) {
-  input.tokenize("../../benchmarks/DeepLearning/Models/MiniLM-L6/Vocab.txt",
+  input.tokenizeBert("../../benchmarks/DeepLearning/Models/MiniLM-L6/Vocab.txt",
                  200);
   for (auto _ : state) {
     _mlir_ciface_forward(&output, &input);
