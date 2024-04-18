@@ -11,7 +11,6 @@ add_custom_command(OUTPUT mlir-matmul.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRMatMul.mlir 
             -convert-linalg-to-loops
             -convert-scf-to-cf
-            -convert-linalg-to-llvm
             -llvm-request-c-wrappers
             -finalize-memref-to-llvm
             -convert-func-to-llvm
@@ -33,7 +32,6 @@ add_custom_command(OUTPUT mlir-matvec.o
           ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/MLIRMatVec.mlir 
             -convert-linalg-to-loops
             -convert-scf-to-cf
-            -convert-linalg-to-llvm
             -expand-strided-metadata
             -lower-affine
             -convert-arith-to-llvm

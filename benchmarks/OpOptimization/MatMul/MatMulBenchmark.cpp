@@ -72,7 +72,7 @@ void _mlir_ciface_matmul_scalar(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                                                                \
     MemRef<float, 2> A(sizesA, 1.0);                                           \
     MemRef<float, 2> B(sizesB, 1.0);                                           \
-    MemRef<float, 2> C(sizesC, 0);                                             \
+    MemRef<float, 2> C(sizesC, 0.0);                                           \
                                                                                \
     for (auto _ : state) {                                                     \
       func(&A, &B, &C);                                                        \

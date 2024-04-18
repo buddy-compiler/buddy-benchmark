@@ -64,9 +64,6 @@ void _mlir_ciface_conv2d_nchw_fchw_ocv(MemRef<float, 4> *input,
 void _mlir_ciface_conv2d_nchw_fchw_winagrad(MemRef<float, 4> *input,
                                             MemRef<float, 4> *filter,
                                             MemRef<float, 4> *output);
-void _mlir_ciface_conv2d_nchw_fchw_im2col_tiling(MemRef<float, 4> *input,
-                                                 MemRef<float, 4> *filter,
-                                                 MemRef<float, 4> *output);
 void _mlir_ciface_conv2d_nchw_fchw_im2col_16(MemRef<float, 4> *input,
                                              MemRef<float, 4> *filter,
                                              MemRef<float, 4> *output);
@@ -115,7 +112,6 @@ void _mlir_ciface_conv2d_nchw_fchw_broadcast_256(MemRef<float, 4> *input,
 DEFINE_BENCHMARK(SCALAR, _mlir_ciface_conv2d_nchw_fchw_scalar)
 DEFINE_BENCHMARK(OCV, _mlir_ciface_conv2d_nchw_fchw_ocv)
 DEFINE_BENCHMARK(WINAGRAD, _mlir_ciface_conv2d_nchw_fchw_winagrad)
-DEFINE_BENCHMARK(IM2COL_TILING, _mlir_ciface_conv2d_nchw_fchw_im2col_tiling)
 DEFINE_BENCHMARK(IM2COL_16, _mlir_ciface_conv2d_nchw_fchw_im2col_16)
 DEFINE_BENCHMARK(IM2COL_32, _mlir_ciface_conv2d_nchw_fchw_im2col_32)
 DEFINE_BENCHMARK(IM2COL_64, _mlir_ciface_conv2d_nchw_fchw_im2col_64)
@@ -131,7 +127,6 @@ DEFINE_BENCHMARK(BROADCAST_256, _mlir_ciface_conv2d_nchw_fchw_broadcast_256)
 BENCHMARK(BM_CONV2D_NCHW_FCHW_SCALAR)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_OCV)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_WINAGRAD)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_TILING)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_16)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_32)->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_CONV2D_NCHW_FCHW_IM2COL_64)->Unit(benchmark::kMillisecond);
@@ -161,7 +156,6 @@ BENCHMARK(BM_CONV2D_NCHW_FCHW_BROADCAST_256)->Unit(benchmark::kMillisecond);
 
 DEFINE_VERIFICATION(OCV, _mlir_ciface_conv2d_nchw_fchw_ocv)
 DEFINE_VERIFICATION(WINAGRAD, _mlir_ciface_conv2d_nchw_fchw_winagrad)
-DEFINE_VERIFICATION(IM2COL_TILING, _mlir_ciface_conv2d_nchw_fchw_im2col_tiling)
 DEFINE_VERIFICATION(IM2COL_16, _mlir_ciface_conv2d_nchw_fchw_im2col_16)
 DEFINE_VERIFICATION(IM2COL_32, _mlir_ciface_conv2d_nchw_fchw_im2col_32)
 DEFINE_VERIFICATION(IM2COL_64, _mlir_ciface_conv2d_nchw_fchw_im2col_64)
@@ -214,7 +208,6 @@ void verification() {
 
   VERIFICATION_OCV(inputMemRef, kernelMemRef, resultScalar);
   VERIFICATION_WINAGRAD(inputMemRef, kernelMemRef, resultScalar);
-  VERIFICATION_IM2COL_TILING(inputMemRef, kernelMemRef, resultScalar);
   VERIFICATION_IM2COL_16(inputMemRef, kernelMemRef, resultScalar);
   VERIFICATION_IM2COL_32(inputMemRef, kernelMemRef, resultScalar);
   VERIFICATION_IM2COL_64(inputMemRef, kernelMemRef, resultScalar);

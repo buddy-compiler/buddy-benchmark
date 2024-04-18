@@ -8,7 +8,6 @@ add_custom_command(OUTPUT matmul-ocv.o
             -convert-vector-to-llvm
             -finalize-memref-to-llvm
             -convert-scf-to-cf
-            -convert-linalg-to-llvm
             -llvm-request-c-wrappers
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
@@ -22,23 +21,9 @@ set_target_properties(MatMulOCV PROPERTIES LINKER_LANGUAGE CXX)
 
 add_custom_command(OUTPUT matmul-transform.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/OpOptimization/MatMul/MatMulTransform.mlir |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-            --test-transform-dialect-interpreter
-            --test-transform-dialect-erase-schedule
-            --convert-vector-to-scf
-            --convert-scf-to-cf
-            --convert-linalg-to-llvm
-            --expand-strided-metadata
-            --lower-affine
-            --convert-vector-to-llvm
-            --memref-expand
-            --arith-expand
-            --convert-arith-to-llvm
-            --finalize-memref-to-llvm
-            --convert-math-to-llvm
-            -llvm-request-c-wrappers
-            --convert-func-to-llvm
-            --reconcile-unrealized-casts |
+          ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+          --llvm-request-c-wrappers
+          --test-lower-to-llvm |      
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj
