@@ -233,7 +233,23 @@ $ ninja <your target operation benchmark>
 // Operation benchamrk supported include:
 //   - conv2d-nchw-fchw-benchmark
 //   - matmul-benchmark
+//   - affine-ops-benchmark
 ```
+
+OpOptimization benchmark also support RISC-V. To set up environments for RISC-V cross compilation and run the benchmarks:
+1. Build riscv-gnu-toolchain, QEMU and cross-compiled MLIR according to [this link](https://gist.github.com/zhanghb97/ad44407e169de298911b8a4235e68497).
+2. Change the path of `RISCV_TOOLCHAIN_ROOT` in buddy-benchmark/cmake/riscv-toolchain.cmake to where your riscv-gnu-toolchain root directory is built.
+3. Cross-compile deep learning benchmark with CMAKE_TOOLCHAIN_FILE being set:
+```
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DOP_OPTIMIZATION_BENCHMARKS=ON \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+    -DCMAKE_TOOLCHAIN_FILE=/PATH/TO/BUDDY-BENCHMARK/cmake/riscv-toolchain.cmake
+$ ninja <your target operation benchmark>
+```
+4. Use RISC-V machine to run the executable files.
 
 Run TVM operation optimization benchmark cases.
 - Install TVM ([steps](./thirdparty/README.md#tvm)).
