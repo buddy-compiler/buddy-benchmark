@@ -83,6 +83,12 @@ $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph
 
 ## Deep Learning Benchmark
 
+Currently, the deep learning benchmark includes the following frameworks or optimizers:
+
+- Halide ([link](https://github.com/halide/Halide/blob/main/README_cmake.md))
+
+*NOTE: Please build Halide 15.0.0 from source to achieve the best performance.*
+
 | CMake Options  | Default Value |
 | -------------- | ------------- |
 | `-DBUDDY_OPT_ATTR`  | avx512f  |
@@ -98,6 +104,7 @@ $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
     -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
+    -DCMAKE_PREFIX_PATH=$PWD/../thirdparty/Halide/Halide-install/ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja
 ```
