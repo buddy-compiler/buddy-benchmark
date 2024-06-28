@@ -1,0 +1,4 @@
+cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DLOOP_FUSION=ON \
+    -DBUDDY_MLIR_BUILD_DIR=/Users/linsepaojiao/Desktop/buddy-mlir/build

@@ -32,7 +32,7 @@ module {
   memref.global "private" constant @__constant_32x128x40xf32 : memref<32x128x40xf32> = dense<2.000000e+00> {alignment = 64 : i64}
   memref.global "private" constant @__constant_32x40x128xf32 : memref<32x40x128xf32> = dense<3.000000e+00> {alignment = 64 : i64}
   memref.global "private" constant @__constant_1x32x40x40xf32 : memref<1x32x40x40xf32> = dense<11.3137083> {alignment = 64 : i64}
-  func.func @kenerl(%arg0: tensor<32x40x128xf32>, %arg1: tensor<32x128x40xf32>, %arg2: tensor<1x1x40x40xf32>, %arg3: tensor<1x32x40x128xf32>) {
+  func.func @fusionkenerl(%arg0: tensor<32x40x128xf32>, %arg1: tensor<32x128x40xf32>, %arg2: tensor<1x1x40x40xf32>, %arg3: tensor<1x32x40x128xf32>) {
     %cst = arith.constant 0.0883883461 : f32
     %c0 = arith.constant 0 : index
     %cst_0 = arith.constant 0.000000e+00 : f32
@@ -212,10 +212,10 @@ module {
     // CHECK-SAME: [
     // CHECK-SAME: [8{{(, 8)*}}],
 
-    call @printMemrefF32(%4) : (tensor<*xf32>) -> ()
+    //call @printMemrefF32(%4) : (tensor<*xf32>) -> ()
     return
   }
-  func.func @main() {
+  func.func @main2() {
     %0 = memref.get_global @__constant_32x40x128xf32 : memref<32x40x128xf32>
     %1 = bufferization.to_tensor %0 : memref<32x40x128xf32>
     %2 = memref.get_global @__constant_32x128x40xf32 : memref<32x128x40xf32>
@@ -224,8 +224,8 @@ module {
     %5 = bufferization.to_tensor %4 : memref<1x1x40x40xf32>
     %6 = memref.get_global @__constant_1x32x40x128xf32 : memref<1x32x40x128xf32>
     %7 = bufferization.to_tensor %6 : memref<1x32x40x128xf32>
-    call @kenerl(%1, %3, %5, %7) : (tensor<32x40x128xf32>, tensor<32x128x40xf32>, tensor<1x1x40x40xf32>, tensor<1x32x40x128xf32>) -> ()
+    call @fusionkenerl(%1, %3, %5, %7) : (tensor<32x40x128xf32>, tensor<32x128x40xf32>, tensor<1x1x40x40xf32>, tensor<1x32x40x128xf32>) -> ()
     return
   }
-  func.func private @printMemrefF32(tensor<*xf32>)
+  //func.func private @printMemrefF32(tensor<*xf32>)
 }
