@@ -21,3 +21,7 @@ endif()
 if (GEMMINI_BENCHMARKS)
     add_subdirectory(Gemmini)
 endif()
+
+if (LOOP_FUSION)
+    add_subdirectory(LoopFusion)
+endif()

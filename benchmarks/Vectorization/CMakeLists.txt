@@ -16,8 +16,8 @@ add_custom_command(OUTPUT mlir-matmul.o
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+          ${LLVM_MLIR_BINARY_DIR}/llc  -mtriple=${TARGET_TRIPLE}  -mattr=${BUDDY_OPT_ATTR}
+            --filetype=obj 
             -o ${BUDDY_BINARY_DIR}/../benchmarks/Vectorization/mlir-matmul.o
 )
 add_library(MLIRMatMul STATIC mlir-matmul.o)
@@ -40,8 +40,8 @@ add_custom_command(OUTPUT mlir-matvec.o
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+          ${LLVM_MLIR_BINARY_DIR}/llc  -mtriple=${TARGET_TRIPLE}  -mattr=${BUDDY_OPT_ATTR}
+            --filetype=obj 
             -o ${BUDDY_BINARY_DIR}/../benchmarks/Vectorization/mlir-matvec.o
 )
 add_library(MLIRMatVec STATIC mlir-matvec.o)
