@@ -68,6 +68,9 @@ ExternalProject_Add(project_googlebenchmark
     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/vendor/benchmark
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DBENCHMARK_ENABLE_TESTING=OFF
+    -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+    -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
   UPDATE_COMMAND ""
   TEST_COMMAND "")
 
@@ -97,7 +100,7 @@ endif()
 # Find PNG
 #-------------------------------------------------------------------------------
 
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS)
   find_package(PNG REQUIRED)
   include_directories(${PNG_INCLUDE_DIR})
 endif()
