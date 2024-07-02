@@ -1,2 +1,5 @@
 add_subdirectory(Conv2dNchwFchw)
+# add_subdirectory(Conv2dNhwcHwcf)
 add_subdirectory(MatMul)
+add_subdirectory(LinalgGeneric)
+add_subdirectory(LLama)
