@@ -20,6 +20,7 @@
 
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
+#include <buddy/DIP/ImageContainer.h>
 #include <iostream>
 #include <random>
 
@@ -42,10 +43,9 @@ namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
 
-bool areArraysEqual(float array1[], float array2[], int size,
-                    float epsilon = 0.0001) {
+bool areArraysEqual(float array1[], float array2[], int size) {
   for (int i = 0; i < size; ++i) {
-    if (fabs(array1[i] - array2[i]) > epsilon) {
+    if (array1[i] != array2[i]) {
       return false;
     }
   }
