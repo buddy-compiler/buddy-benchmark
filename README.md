@@ -227,6 +227,7 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DOP_OPTIMIZATION_BENCHMARKS=ON \
+    -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja <your target operation benchmark>
 

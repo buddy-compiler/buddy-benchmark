@@ -14,21 +14,19 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This is the main file of the conv2d(nhwc_filter_hwcf) benchmark.
+// This is the main file of the gemm benchmark.
 //
 //===----------------------------------------------------------------------===//
 
 #include <benchmark/benchmark.h>
 
-void printResult();
+void verification();
 
-int main(int argc, char **argv) 
-{
-    // Run benchmark.
-    ::benchmark::Initialize(&argc, argv);
-    ::benchmark::RunSpecifiedBenchmarks();
-    // Print result.
-    printResult();
-
-    return 0;
+int main(int argc, char **argv) {
+  // Run benchmark.
+  ::benchmark::Initialize(&argc, argv);
+  ::benchmark::RunSpecifiedBenchmarks();
+  // Run correctness verification.
+  verification();
+  return 0;
 }
