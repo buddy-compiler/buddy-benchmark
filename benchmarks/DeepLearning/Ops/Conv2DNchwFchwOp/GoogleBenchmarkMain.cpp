@@ -1,4 +1,4 @@
-//===- MLIROptBenchmark.cpp -----------------------------------------------===//
+//===- GoogleBenchmarkMain.cpp --------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
+#include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <random>
-#include <iomanip>
-#include <cmath>
 
 #define INPUT_N 1
 #define INPUT_C 64
@@ -43,55 +43,57 @@ namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
 
-bool areArraysEqual(float array1[], float array2[], int size, float epsilon = 0.0001) {
-    for (int i = 0; i < size; ++i) {
-        if (fabs(array1[i] - array2[i]) > epsilon) {
-            return false;
-        }
+bool areArraysEqual(float array1[], float array2[], int size,
+                    float epsilon = 0.0001) {
+  for (int i = 0; i < size; ++i) {
+    if (fabs(array1[i] - array2[i]) > epsilon) {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
-// The printResult function iterates through the output array organized in NCHW format
-// (N, C, H, and W), prints the values for each batch, channel, row, and column.
+// The printResult function iterates through the output array organized in NCHW
+// format (N, C, H, and W), prints the values for each batch, channel, row, and
+// column.
 template <size_t N, size_t C, size_t H, size_t W, typename T>
 void printResult(T output) {
-    // Iterate over each batch
-    for (size_t n = 0; n < N; ++n) {
-        std::cout << "N " << n + 1 << ":\n";
-        // Iterate over each channel
-        for (size_t c = 0; c < C; ++c) {
-            std::cout << "Channel " << c + 1 << ":\n";
-            // Iterate over each row
-            for (size_t h = 0; h < H; ++h) {
-                // Iterate over each column
-                for (size_t w = 0; w < W; ++w) {
-                    // Calculate the index for the output array based on NCHW format
-                    size_t index = n * C * H * W + c * H * W + h * W + w;
-                    std::cout << std::fixed << std::setprecision(4) << output[index] << " ";
-                }
-                std::cout << "\n";
-            }
-            std::cout << "\n";
+  // Iterate over each batch
+  for (size_t n = 0; n < N; ++n) {
+    std::cout << "N " << n + 1 << ":\n";
+    // Iterate over each channel
+    for (size_t c = 0; c < C; ++c) {
+      std::cout << "Channel " << c + 1 << ":\n";
+      // Iterate over each row
+      for (size_t h = 0; h < H; ++h) {
+        // Iterate over each column
+        for (size_t w = 0; w < W; ++w) {
+          // Calculate the index for the output array based on NCHW format
+          size_t index = n * C * H * W + c * H * W + h * W + w;
+          std::cout << std::fixed << std::setprecision(4) << output[index]
+                    << " ";
         }
         std::cout << "\n";
+      }
+      std::cout << "\n";
     }
+    std::cout << "\n";
+  }
 }
 
 } // namespace
-
 
 namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
 void _mlir_ciface_conv_2d_nchw_fchw_scalar(MemRef<float, 4> *input,
-                                    MemRef<float, 4> *filter,
-                                    MemRef<float, 4> *output);
+                                           MemRef<float, 4> *filter,
+                                           MemRef<float, 4> *output);
 
 void _mlir_ciface_conv_2d_nchw_fchw_im2col(MemRef<float, 4> *input,
-                                    MemRef<float, 4> *filter,
-                                    MemRef<float, 4> *output);
+                                           MemRef<float, 4> *filter,
+                                           MemRef<float, 4> *output);
 }
 
 #define DEFINE_Conv2DNchwFchw_BENCHMARK(name, func)                            \
@@ -107,10 +109,11 @@ void _mlir_ciface_conv_2d_nchw_fchw_im2col(MemRef<float, 4> *input,
     for (auto _ : state) {                                                     \
       func(&inputMemRef, &filterMemRef, &outputMemRef);                        \
     }                                                                          \
-  }                                                        
+  }
 
 DEFINE_Conv2DNchwFchw_BENCHMARK(SCALAR, _mlir_ciface_conv_2d_nchw_fchw_scalar)
-DEFINE_Conv2DNchwFchw_BENCHMARK(Im2col, _mlir_ciface_conv_2d_nchw_fchw_im2col)
+    DEFINE_Conv2DNchwFchw_BENCHMARK(Im2col,
+                                    _mlir_ciface_conv_2d_nchw_fchw_im2col)
 
 } // namespace
 
@@ -130,14 +133,13 @@ void verification() {
   std::random_device rd;
   std::mt19937 generator(rd());
   std::uniform_real_distribution<float> distribution(0.0, 1.0);
-  // std::uniform_int_distribution<int> distribution(1, 100);
 
   // Set the layout sizes of input and kernel memref container.
-  intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};                                
-  intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};                                  
-  intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_C, OUTPUT_H, OUTPUT_W};                               
+  intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};
+  intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};
+  intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_C, OUTPUT_H, OUTPUT_W};
 
-  // Generate input memref container with random numbers.                                                     
+  // Generate input memref container with random numbers.
   const int inputSize = INPUT_N * INPUT_C * INPUT_H * INPUT_W;
   float inputRand[inputSize];
   for (int i = 0; i < inputSize; ++i) {
@@ -145,35 +147,35 @@ void verification() {
   }
   MemRef<float, 4> inputMemRef(inputRand, sizesInput);
 
-  // Generate kernel memref container with random numbers.   
+  // Generate kernel memref container with random numbers.
   const int kernelSize = KERNEL_F * KERNEL_C * KERNEL_H * KERNEL_W;
   float kernelRand[kernelSize];
   for (int i = 0; i < kernelSize; ++i) {
     kernelRand[i] = distribution(generator);
   }
-  MemRef<float, 4> filterMemRef(kernelRand, sizesKernel);  
+  MemRef<float, 4> filterMemRef(kernelRand, sizesKernel);
 
   // Generate output memref container with zero.
-  MemRef<float, 4> outputMemRef(sizesOutput, 0.0); 
+  MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
   MemRef<float, 4> outputTransform(sizesOutput, 0.0);
 
   // Perform all the matmul implementation.
-  _mlir_ciface_conv_2d_nchw_fchw_scalar(&inputMemRef, &filterMemRef, &outputMemRef);   
-  _mlir_ciface_conv_2d_nchw_fchw_im2col(&inputMemRef, &filterMemRef, &outputTransform);
+  _mlir_ciface_conv_2d_nchw_fchw_scalar(&inputMemRef, &filterMemRef,
+                                        &outputMemRef);
+  _mlir_ciface_conv_2d_nchw_fchw_im2col(&inputMemRef, &filterMemRef,
+                                        &outputTransform);
 
-  
   // Get the result array.
   auto resultScalar = outputMemRef.getData();
   auto resultTransform = outputTransform.getData();
-
-  // printResult<OUTPUT_N, OUTPUT_C, OUTPUT_H, OUTPUT_W>(resultScalar);
 
   // Print the verfication result.
   std::cout << "-----------------------------------------------------------"
             << std::endl;
   std::cout << "Correctness Verification:" << std::endl;
   std::cout << "Transform case: "
-            << (areArraysEqual(resultScalar, resultTransform, OUTPUT_N * OUTPUT_C * OUTPUT_H * OUTPUT_W)
+            << (areArraysEqual(resultScalar, resultTransform,
+                               OUTPUT_N * OUTPUT_C * OUTPUT_H * OUTPUT_W)
                     ? PASS
                     : FAIL)
             << std::endl;
@@ -189,6 +191,3 @@ int main(int argc, char **argv) {
   verification();
   return 0;
 }
-
-
-

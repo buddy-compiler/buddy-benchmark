@@ -78,4 +78,3 @@ func.func @conv2d_nchw_fchw_im2col(%input: memref<?x?x?x?xf32>, %kernel: memref<
   memref.dealloc %input_collapse : memref<1x576x3136xf32>
   return
 }
-
