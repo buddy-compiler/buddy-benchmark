@@ -20,7 +20,6 @@
 
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
-#include <buddy/DIP/ImageContainer.h>
 #include <iostream>
 #include <random>
 
