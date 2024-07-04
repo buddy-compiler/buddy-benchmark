@@ -1,4 +1,4 @@
-//===- GoogleBenchmarkMain.cpp -----------------------------------------------===//
+//===- GoogleBenchmarkMain.cpp---------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,9 +58,9 @@ extern "C" {
 void _mlir_ciface_conv_2d_nhwc_hwcf_scalar(MemRef<float, 4> *input,
                                            MemRef<float, 4> *filter,
                                            MemRef<float, 4> *output);
-void _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization(MemRef<float, 4> *input,
-                                         MemRef<float, 4> *filter,
-                                         MemRef<float, 4> *output);
+void _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization(
+    MemRef<float, 4> *input, MemRef<float, 4> *filter,
+    MemRef<float, 4> *output);
 }
 
 #define DEFINE_CONV_2D_NHWC_HWCF_BENCHMARK(name, func)                         \
@@ -80,12 +80,14 @@ void _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization(MemRef<float, 4> *input,
 
 DEFINE_CONV_2D_NHWC_HWCF_BENCHMARK(SCALAR,
                                    _mlir_ciface_conv_2d_nhwc_hwcf_scalar)
-DEFINE_CONV_2D_NHWC_HWCF_BENCHMARK(AutoVectorization, _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization)
+DEFINE_CONV_2D_NHWC_HWCF_BENCHMARK(
+    AutoVectorization, _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization)
 } // namespace
 
 // Register benchmark cases.
 BENCHMARK(BM_CONV_2D_NHWC_HWCF_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_CONV_2D_NHWC_HWCF_AutoVectorization)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_CONV_2D_NHWC_HWCF_AutoVectorization)
+    ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -128,7 +130,8 @@ void verification() {
   // Perform all the matmul implementation.
   _mlir_ciface_conv_2d_nhwc_hwcf_scalar(&inputMemRef, &filterMemRef,
                                         &outputScalar);
-  _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization(&inputMemRef, &filterMemRef, &outputAutoVectorization);
+  _mlir_ciface_conv_2d_nhwc_hwcf_auto_vectorization(&inputMemRef, &filterMemRef,
+                                                    &outputAutoVectorization);
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
@@ -139,8 +142,10 @@ void verification() {
             << std::endl;
   std::cout << "Correctness Verification:" << std::endl;
   std::cout << "Transform case: "
-            << (areArraysEqual(resultScalar, resultAutoVectorization, outputSize) ? PASS
-                                                                     : FAIL)
+            << (areArraysEqual(resultScalar, resultAutoVectorization,
+                               outputSize)
+                    ? PASS
+                    : FAIL)
             << std::endl;
   std::cout << "-----------------------------------------------------------"
             << std::endl;
