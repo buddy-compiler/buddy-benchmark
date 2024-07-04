@@ -17,7 +17,7 @@ add_custom_command(OUTPUT conv2d_nhwc_hwcf_scalar.o
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
+          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
 	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/conv2d_nhwc_hwcf_scalar.o
 )
@@ -36,7 +36,7 @@ add_custom_command(OUTPUT conv2d_nhwc_hwcf_auto_vectorization.o
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
+          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
 	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/conv2d_nhwc_hwcf_auto_vectorization.o
 )
