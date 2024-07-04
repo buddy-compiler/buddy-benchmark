@@ -5,7 +5,7 @@ if (CROSS_COMPILE_RVV)
   set(BUDDY_OPT_ATTR +v,+m)
 endif()
 
-add_custom_command(OUTPUT conv2d_nhwc_hwcf-scalar.o
+add_custom_command(OUTPUT conv2d_nhwc_hwcf_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/Conv2DNhwcHwcf.mlir |
           sed 's/@conv_2d_nhwc_hwcf/@conv_2d_nhwc_hwcf_scalar/' |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
@@ -19,14 +19,14 @@ add_custom_command(OUTPUT conv2d_nhwc_hwcf-scalar.o
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/conv2d_nhwc_hwcf-scalar.o
+	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/conv2d_nhwc_hwcf_scalar.o
 )
-add_library(Conv2DNhwcHwcfScalar STATIC conv2d_nhwc_hwcf-scalar.o)
+add_library(Conv2DNhwcHwcfScalar STATIC conv2d_nhwc_hwcf_scalar.o)
 set_target_properties(Conv2DNhwcHwcfScalar PROPERTIES LINKER_LANGUAGE CXX)
 
-add_custom_command(OUTPUT conv2d_nhwc_hwcf-zero.o
+add_custom_command(OUTPUT conv2d_nhwc_hwcf_auto_vectorization.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/Conv2DNhwcHwcf.mlir |
-          sed 's/@conv_2d_nhwc_hwcf/@conv_2d_nhwc_hwcf_zero/' |
+          sed 's/@conv_2d_nhwc_hwcf/@conv_2d_nhwc_hwcf_auto_vectorization/' |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
             -convert-linalg-to-loops
             -convert-scf-to-cf
@@ -38,10 +38,10 @@ add_custom_command(OUTPUT conv2d_nhwc_hwcf-zero.o
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/conv2d_nhwc_hwcf-zero.o
+	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/Conv2DNhwcHwcfOp/conv2d_nhwc_hwcf_auto_vectorization.o
 )
-add_library(Conv2DNhwcHwcfZero STATIC conv2d_nhwc_hwcf-zero.o)
-set_target_properties(Conv2DNhwcHwcfZero PROPERTIES LINKER_LANGUAGE CXX)
+add_library(Conv2DNhwcHwcfAutoVectorization STATIC conv2d_nhwc_hwcf_auto_vectorization.o)
+set_target_properties(Conv2DNhwcHwcfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(dl-op-linalg-conv2dnhwchwcf-benchmark
   GoogleBenchmarkMain.cpp
@@ -56,5 +56,5 @@ set(BenchmarkTool GoogleBenchmark)
 target_link_libraries(dl-op-linalg-conv2dnhwchwcf-benchmark
   ${BenchmarkTool}
   Conv2DNhwcHwcfScalar
-  Conv2DNhwcHwcfZero
+  Conv2DNhwcHwcfAutoVectorization
   )
