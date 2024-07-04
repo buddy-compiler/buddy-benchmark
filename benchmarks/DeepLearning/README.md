@@ -21,6 +21,8 @@ The table below lists the benchmark cases at the operation level.
 | Name  | Build Target | Introduction |
 | -------------- | ------------- | ------------- |
 | Linalg MatMul  | `ninja dl-op-linalg-matmul-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.matmul` operation. You can adjust the size of the benchmark by modifying the `M`, `N`, and `K` values in [this file](./Ops/MatMulOp/GoogleBenchmarkMain.cpp). |
+| Linalg Conv2D NCHW FCHW | `ninja dl-op-linalg-conv2d-nchw-fchw-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.conv_2d_nchw_fchw` operation. You can adjust the size of the benchmark in [this file](./Ops/Conv2DNchwFchwOp/GoogleBenchmarkMain.cpp). |
+| Linalg Conv2D NHWC HWCF | `ninja dl-op-linalg-conv2d-nhwc-hwcf-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.conv_2d_nhwc_hwcf` operation. You can adjust the size of the benchmark in [this file](./Ops/Conv2DNhwcHwcfOp/GoogleBenchmarkMain.cpp). |
 
 ### Local Hardware Platform.
 

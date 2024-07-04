@@ -43,17 +43,17 @@ add_custom_command(OUTPUT conv2d_nhwc_hwcf_auto_vectorization.o
 add_library(Conv2DNhwcHwcfAutoVectorization STATIC conv2d_nhwc_hwcf_auto_vectorization.o)
 set_target_properties(Conv2DNhwcHwcfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(dl-op-linalg-conv2dnhwchwcf-benchmark
+add_executable(dl-op-linalg-conv2d-nhwc-hwcf-benchmark
   GoogleBenchmarkMain.cpp
   )
 
-set_target_properties(dl-op-linalg-conv2dnhwchwcf-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-conv2d-nhwc-hwcf-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_libraries(dl-op-linalg-conv2dnhwchwcf-benchmark
+target_link_libraries(dl-op-linalg-conv2d-nhwc-hwcf-benchmark
   ${BenchmarkTool}
   Conv2DNhwcHwcfScalar
   Conv2DNhwcHwcfAutoVectorization
