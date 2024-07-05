@@ -11,7 +11,6 @@ add_custom_command(OUTPUT pooling_nhwc_sum_scalar.o
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
             -convert-linalg-to-loops
             -convert-scf-to-cf
-            -convert-linalg-to-llvm
             -lower-affine
             -finalize-memref-to-llvm
             -llvm-request-c-wrappers
