@@ -18,6 +18,33 @@ set(CMAKE_CXX_FLAGS "-no-pie")
 set(CMAKE_C_FLAGS "-no-pie")
 
 #-------------------------------------------------------------------------------
+#Get Configerations
+#-------------------------------------------------------------------------------
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" TARGET_ARCH)
+string(TOLOWER "${CMAKE_SYSTEM_NAME}" TARGET_OS)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(TARGET_VENDOR "unknown")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    set(TARGET_VENDOR "apple")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    set(TARGET_VENDOR "pc")
+else()
+    set(TARGET_VENDOR "unknown")
+endif()
+
+if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+    set(BUDDY_OPT_ATTR "avx512f")
+elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
+    set(BUDDY_OPT_ATTR "neon")
+else()
+    set(BUDDY_OPT_ATTR "unknown")
+endif()
+
+set(BUDDY_OPT_TRIPLE "${TARGET_ARCH}-${TARGET_VENDOR}-${TARGET_OS}-${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
+message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
+#-------------------------------------------------------------------------------
 # BUDDY configuration
 #-------------------------------------------------------------------------------
 set(BuddyMLIR_DIR ${BUDDY_MLIR_BUILD_DIR}/cmake)
@@ -27,11 +54,6 @@ find_package(BuddyMLIR REQUIRED CONFIG)
 set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_EXAMPLES_DIR ${BUDDY_SOURCE_DIR}/examples)
-set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
-set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
-message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
-message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
-
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 set(BUILD_VALIDATION OFF CACHE BOOL "Build validations")
 set(BUILD_CORRECTNESS OFF CACHE BOOL "Build correctness checking")
