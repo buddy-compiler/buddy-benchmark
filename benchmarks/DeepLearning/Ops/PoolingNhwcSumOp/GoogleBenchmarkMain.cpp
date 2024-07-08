@@ -18,10 +18,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <iostream>
 #include <random>
+#include <sys/time.h>
 
 // Define target layout.
 #define INPUT_N 1
@@ -48,6 +48,14 @@ bool areArraysEqual(float array1[], float array2[], int size) {
   }
   return true;
 }
+
+double rtclock() {
+  struct timeval tp;
+  int stat = gettimeofday(&tp, nullptr);
+  if (stat != 0)
+    fprintf(stderr, "Error returning time from gettimeofday: %d\n", stat);
+  return (tp.tv_sec + tp.tv_usec * 1.0e-6);
+}
 } // namespace
 
 namespace {
@@ -60,30 +68,7 @@ void _mlir_ciface_pooling_nhwc_sum_auto_vectorization(MemRef<float, 4> *input,
                                                       MemRef<float, 2> *filter,
                                                       MemRef<float, 4> *output);
 }
-
-#define DEFINE_POOLING_NHWC_SUM_BENCHMARK(name, func)                          \
-  void BM_POOLING_NHWC_SUM_##name(benchmark::State &state) {                   \
-    intptr_t sizesInput[4] = {INPUT_N, INPUT_H, INPUT_W, INPUT_C};             \
-    intptr_t sizesFilter[2] = {FILTER_H, FILTER_W};                            \
-    intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_C, OUTPUT_H, OUTPUT_W};        \
-                                                                               \
-    MemRef<float, 4> input(sizesInput, 1.0);                                   \
-    MemRef<float, 2> filter(sizesFilter, 1.0);                                 \
-    MemRef<float, 4> output(sizesOutput, 0.0);                                 \
-                                                                               \
-    for (auto _ : state) {                                                     \
-      func(&input, &filter, &output);                                          \
-    }                                                                          \
-  }
-
-DEFINE_POOLING_NHWC_SUM_BENCHMARK(SCALAR, _mlir_ciface_pooling_nhwc_sum_scalar)
-DEFINE_POOLING_NHWC_SUM_BENCHMARK(
-    AutoVectorization, _mlir_ciface_pooling_nhwc_sum_auto_vectorization)
 } // namespace
-
-// Register benchmark cases.
-BENCHMARK(BM_POOLING_NHWC_SUM_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_POOLING_NHWC_SUM_AutoVectorization)->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -123,11 +108,22 @@ void verification() {
   MemRef<float, 4> outputScalar(sizesOutput, 0.0);
   MemRef<float, 4> outputAutoVectorization(sizesOutput, 0.0);
 
-  // Perform all the matmul implementation.
+  double StartTime, EndTime;
+  StartTime = rtclock();
   _mlir_ciface_pooling_nhwc_sum_scalar(&inputMemRef, &filterMemRef,
                                        &outputScalar);
+  EndTime = rtclock();
+  // Output the result
+  std::cout << "Total time running pooling_nhwc_sum scalar: "
+            << EndTime - StartTime << " s." << std::endl;
+
+  StartTime = rtclock();
   _mlir_ciface_pooling_nhwc_sum_auto_vectorization(&inputMemRef, &filterMemRef,
                                                    &outputAutoVectorization);
+  EndTime = rtclock();
+  // Output the result
+  std::cout << "Total time running pooling_nhwc_sum auto vectorization: "
+            << EndTime - StartTime << " s." << std::endl;
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
@@ -148,9 +144,6 @@ void verification() {
 }
 
 int main(int argc, char **argv) {
-  // Run benchmark.
-  ::benchmark::Initialize(&argc, argv);
-  ::benchmark::RunSpecifiedBenchmarks();
   // Run correctness verification.
   verification();
   return 0;

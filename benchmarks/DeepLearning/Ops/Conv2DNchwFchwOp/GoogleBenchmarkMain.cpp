@@ -18,12 +18,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <random>
+#include <sys/time.h>
 
 #define INPUT_N 1
 #define INPUT_C 64
@@ -81,6 +81,13 @@ void printResult(T output) {
   }
 }
 
+double rtclock() {
+  struct timeval tp;
+  int stat = gettimeofday(&tp, nullptr);
+  if (stat != 0)
+    fprintf(stderr, "Error returning time from gettimeofday: %d\n", stat);
+  return (tp.tv_sec + tp.tv_usec * 1.0e-6);
+}
 } // namespace
 
 namespace {
@@ -95,31 +102,7 @@ void _mlir_ciface_conv_2d_nchw_fchw_im2col(MemRef<float, 4> *input,
                                            MemRef<float, 4> *filter,
                                            MemRef<float, 4> *output);
 }
-
-#define DEFINE_Conv2DNchwFchw_BENCHMARK(name, func)                            \
-  void BM_Conv2DNchwFchw_##name(benchmark::State &state) {                     \
-    intptr_t sizesInput[4] = {INPUT_N, INPUT_C, INPUT_H, INPUT_W};             \
-    intptr_t sizesKernel[4] = {KERNEL_F, KERNEL_C, KERNEL_H, KERNEL_W};        \
-    intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_C, OUTPUT_H, OUTPUT_W};        \
-                                                                               \
-    MemRef<float, 4> inputMemRef(sizesInput, 2.0);                             \
-    MemRef<float, 4> filterMemRef(sizesKernel, 3.0);                           \
-    MemRef<float, 4> outputMemRef(sizesOutput, 0.0);                           \
-                                                                               \
-    for (auto _ : state) {                                                     \
-      func(&inputMemRef, &filterMemRef, &outputMemRef);                        \
-    }                                                                          \
-  }
-
-DEFINE_Conv2DNchwFchw_BENCHMARK(SCALAR, _mlir_ciface_conv_2d_nchw_fchw_scalar)
-    DEFINE_Conv2DNchwFchw_BENCHMARK(Im2col,
-                                    _mlir_ciface_conv_2d_nchw_fchw_im2col)
-
 } // namespace
-
-// Register benchmarking function with different arguments.
-BENCHMARK(BM_Conv2DNchwFchw_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_Conv2DNchwFchw_Im2col)->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -159,11 +142,22 @@ void verification() {
   MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
   MemRef<float, 4> outputTransform(sizesOutput, 0.0);
 
-  // Perform all the matmul implementation.
+  double StartTime, EndTime;
+  StartTime = rtclock();
   _mlir_ciface_conv_2d_nchw_fchw_scalar(&inputMemRef, &filterMemRef,
                                         &outputMemRef);
+  EndTime = rtclock();
+  // Output the result
+  std::cout << "Total time running conv_2d_nchw_fchw scalar: "
+            << EndTime - StartTime << " s." << std::endl;
+
+  StartTime = rtclock();
   _mlir_ciface_conv_2d_nchw_fchw_im2col(&inputMemRef, &filterMemRef,
                                         &outputTransform);
+  EndTime = rtclock();
+  // Output the result
+  std::cout << "Total time running conv_2d_nchw_fchw im2col: "
+            << EndTime - StartTime << " s." << std::endl;
 
   // Get the result array.
   auto resultScalar = outputMemRef.getData();
@@ -184,9 +178,6 @@ void verification() {
 }
 
 int main(int argc, char **argv) {
-  // Run benchmark.
-  ::benchmark::Initialize(&argc, argv);
-  ::benchmark::RunSpecifiedBenchmarks();
   // Run correctness verification.
   verification();
   return 0;

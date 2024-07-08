@@ -47,10 +47,7 @@ set_target_properties(dl-op-linalg-matmul-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
-set(BenchmarkTool GoogleBenchmark)
-
 target_link_libraries(dl-op-linalg-matmul-benchmark
-  ${BenchmarkTool}
   MatMulScalar
   MatMulTransform
   )

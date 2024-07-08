@@ -18,10 +18,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <iostream>
 #include <random>
+#include <sys/time.h>
 
 // Define target layout.
 #define M 64
@@ -41,6 +41,14 @@ bool areArraysEqual(float array1[], float array2[], int size) {
   }
   return true;
 }
+
+double rtclock() {
+  struct timeval tp;
+  int stat = gettimeofday(&tp, nullptr);
+  if (stat != 0)
+    fprintf(stderr, "Error returning time from gettimeofday: %d\n", stat);
+  return (tp.tv_sec + tp.tv_usec * 1.0e-6);
+}
 } // namespace
 
 namespace {
@@ -51,29 +59,7 @@ void _mlir_ciface_matmul_scalar(MemRef<float, 2> *A, MemRef<float, 2> *B,
 void _mlir_ciface_matmul_transform(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                    MemRef<float, 2> *C);
 }
-
-#define DEFINE_MATMUL_BENCHMARK(name, func)                                    \
-  void BM_MATMUL_##name(benchmark::State &state) {                             \
-    intptr_t sizesA[2] = {M, K};                                               \
-    intptr_t sizesB[2] = {K, N};                                               \
-    intptr_t sizesC[2] = {M, N};                                               \
-                                                                               \
-    MemRef<float, 2> A(sizesA, 1.0);                                           \
-    MemRef<float, 2> B(sizesB, 1.0);                                           \
-    MemRef<float, 2> C(sizesC, 0.0);                                           \
-                                                                               \
-    for (auto _ : state) {                                                     \
-      func(&A, &B, &C);                                                        \
-    }                                                                          \
-  }
-
-DEFINE_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_matmul_scalar)
-DEFINE_MATMUL_BENCHMARK(TRANSFORM, _mlir_ciface_matmul_transform)
 } // namespace
-
-// Register benchmark cases.
-BENCHMARK(BM_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_MATMUL_TRANSFORM)->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -114,8 +100,20 @@ void verification() {
   MemRef<float, 2> outputTransform(sizesC, 0);
 
   // Perform all the matmul implementation.
+  double StartTime, EndTime;
+  StartTime = rtclock();
   _mlir_ciface_matmul_scalar(&inputAMemRef, &inputBMemRef, &outputScalar);
+  EndTime = rtclock();
+  // Output the result
+  std::cout << "Total time running matmul scalar: " << EndTime - StartTime
+            << " s." << std::endl;
+
+  StartTime = rtclock();
   _mlir_ciface_matmul_transform(&inputAMemRef, &inputBMemRef, &outputTransform);
+  EndTime = rtclock();
+  // Output the result
+  std::cout << "Total time running matmul transform: " << EndTime - StartTime
+            << " s." << std::endl;
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
@@ -135,9 +133,6 @@ void verification() {
 }
 
 int main(int argc, char **argv) {
-  // Run benchmark.
-  ::benchmark::Initialize(&argc, argv);
-  ::benchmark::RunSpecifiedBenchmarks();
   // Run correctness verification.
   verification();
   return 0;
