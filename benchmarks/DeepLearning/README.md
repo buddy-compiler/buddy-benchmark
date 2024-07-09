@@ -23,6 +23,8 @@ The table below lists the benchmark cases at the operation level.
 | Linalg MatMul  | `ninja dl-op-linalg-matmul-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.matmul` operation. You can adjust the size of the benchmark by modifying the `M`, `N`, and `K` values in [this file](./Ops/MatMulOp/GoogleBenchmarkMain.cpp). |
 | Linalg Conv2D NCHW FCHW | `ninja dl-op-linalg-conv2d-nchw-fchw-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.conv_2d_nchw_fchw` operation. You can adjust the size of the benchmark in [this file](./Ops/Conv2DNchwFchwOp/GoogleBenchmarkMain.cpp). |
 | Linalg Conv2D NHWC HWCF | `ninja dl-op-linalg-conv2d-nhwc-hwcf-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.conv_2d_nhwc_hwcf` operation. You can adjust the size of the benchmark in [this file](./Ops/Conv2DNhwcHwcfOp/GoogleBenchmarkMain.cpp). |
+| Linalg Depthwise Conv2D NHWC HWC | `ninja dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.depthwise_conv_2d_nhwc_hwc` operation. You can adjust the size of the benchmark in [this file](./Ops/DepthwiseConv2DNhwcHwcOp/GoogleBenchmarkMain.cpp). |
+| Linalg Pooling NHWC Sum | `ninja dl-op-linalg-pooling-nhwc-sum-benchmark`  | This benchmark compares multiple optimization strategies targeting the `linalg.pooling_nhwc_sum` operation. You can adjust the size of the benchmark in [this file](./Ops/PoolingNhwcSumOp/GoogleBenchmarkMain.cpp). |
 
 ### Local Hardware Platform.
 
