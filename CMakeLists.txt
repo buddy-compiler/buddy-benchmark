@@ -91,7 +91,7 @@ target_link_libraries(GoogleBenchmark INTERFACE Threads::Threads)
 # Find OpenCV
 #-------------------------------------------------------------------------------
 
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR DEEP_LEARNING_BENCHMARKS OR OP_OPTIMIZATION_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR OP_OPTIMIZATION_BENCHMARKS)
   find_package(OpenCV REQUIRED CONFIG)
   include_directories(${OpenCV_INCLUDE_DIRS})
 endif()

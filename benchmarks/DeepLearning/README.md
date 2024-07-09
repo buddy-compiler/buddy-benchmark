@@ -43,7 +43,6 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
     -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}
 $ ninja <target banchmark>
 // For example: 
@@ -80,7 +79,6 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
     -DCROSS_COMPILE_RVV=ON \
     -DCMAKE_SYSTEM_NAME=Linux \
     -DCMAKE_SYSTEM_PROCESSOR=riscv \
