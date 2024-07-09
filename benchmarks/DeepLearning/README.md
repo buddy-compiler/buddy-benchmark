@@ -1,19 +1,5 @@
 # Deep Learning Benchmark
 
-## Dependencies
-
-Ensure the following dependencies are ready:
-<!-- TODO: Remove OpenCV dependency -->
-### OpenCV
-
-```
-$ cd buddy-benchmark
-$ cd thirdparty/opencv
-$ mkdir build && cd build
-$ cmake -G Ninja ..
-$ ninja
-```
-
 ## Operation Level Benchmark
 
 The table below lists the benchmark cases at the operation level.
