@@ -52,17 +52,17 @@ add_custom_command(OUTPUT conv2d_nchw_fchw_im2col.o
 add_library(Conv2DNchwFchwIm2col STATIC conv2d_nchw_fchw_im2col.o)
 set_target_properties(Conv2DNchwFchwIm2col PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(dl-op-linalg-Conv2DNchwFchw-benchmark
+add_executable(dl-op-linalg-conv2d-nchw-fchw-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-Conv2DNchwFchw-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-conv2d-nchw-fchw-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_libraries(dl-op-linalg-Conv2DNchwFchw-benchmark
+target_link_libraries(dl-op-linalg-conv2d-nchw-fchw-benchmark
   ${BenchmarkTool}
   Conv2DNchwFchwScalar
   Conv2DNchwFchwIm2col
