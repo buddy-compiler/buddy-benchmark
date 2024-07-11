@@ -1,4 +1,4 @@
-//===- Conv2DNchwFchwBenchmark.cpp ----------------------------------------===//
+//===- Conv2DBenchmark.cpp ------------------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@
 #include <random>
 
 // Define target layout.
-#define INPUT_R 8
-#define INPUT_C 8
-#define KERNEL_R 2
-#define KERNEL_C 2
+#define INPUT_R 64
+#define INPUT_C 64
+#define KERNEL_R 4
+#define KERNEL_C 4
 #define OUTPUT_R INPUT_R - KERNEL_R + 1
 #define OUTPUT_C INPUT_C - KERNEL_C + 1
 

@@ -49,17 +49,17 @@ add_custom_command(OUTPUT conv2d_rvv.o
 add_library(Conv2DRVV STATIC conv2d_rvv.o)
 set_target_properties(Conv2DRVV PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(conv2d-benchmark-8-2
+add_executable(conv2d-benchmark
   Conv2DBenchmark.cpp
   )
 
-set_target_properties(conv2d-benchmark-8-2 PROPERTIES
+set_target_properties(conv2d-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_libraries(conv2d-benchmark-8-2
+target_link_libraries(conv2d-benchmark
   ${BenchmarkTool}
   Conv2DScalar
   Conv2DRVV
