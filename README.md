@@ -83,44 +83,7 @@ $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph
 
 ## Deep Learning Benchmark
 
-| CMake Options  | Default Value |
-| -------------- | ------------- |
-| `-DBUDDY_OPT_ATTR`  | avx512f  |
-| `-DBUDDY_OPT_TRIPLE`  | x86_64-unknown-linux-gnu  |
-
-*Note: Please replace the `/PATH/TO/*` with your local path.*
-
-```
-$ cd buddy-benchmark
-$ git lfs pull
-$ mkdir build && cd build
-$ cmake -G Ninja .. \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DOpenCV_DIR=$PWD/../thirdparty/opencv/build/ \
-    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
-$ ninja
-```
-
-The deep learning benchmark includes the following e2e models and operations:
-
-- MobileNet
-
-We generated the model code with IREE and made appropriate modifications, and then compiled it with the MLIR tool chain.
-
-Run the MobileNet benchmark:
-
-```
-$ cd <path to build>/bin && ./mobilenet-benchmark
-```
-
-- DepthwiseConv2DNhwcHwc Operation
-
-Run the DepthwiseConv2DNhwcHwc operation benchmark:
-
-```
-$ cd <path to build>/bin && ./depthwise-conv-2d-nhwc-hwc-benchmark
-```
+Please check the deep learning benchmark document at this [link](./benchmarks/DeepLearning/README.md).
 
 ## Audio Processing Benchmark
 
