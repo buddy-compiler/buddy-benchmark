@@ -1,5 +1,12 @@
 # Deep Learning Benchmark
 
+## Model Level Benchmark
+The table below lists the benchmark cases at the operation level.
+
+| Name  | Build Target | Introduction |
+| -------------- | ------------- | ------------- |
+| MobileNet-V3 | `ninja dl-model-mobileNetV3-benchmark` | This benchmark compares multiple optimization strategies targeting the MobileNet-V3 model. |
+
 ## Operation Level Benchmark
 
 The table below lists the benchmark cases at the operation level.
