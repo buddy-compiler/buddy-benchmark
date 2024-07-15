@@ -183,7 +183,6 @@ $ spike --extension=gemmini pk Gemmini-ResNet-101
 
 ## Operation Optimization Benchmark
 
-### Local Hardware Platform.
 Build and run MLIR operation optimization benchmark cases.
 
 ```
@@ -213,37 +212,3 @@ Run TVM operation optimization benchmark cases.
 (tvm)$ cd benchmarks/OpOptimization/<target operation>/TVM
 (tvm)$ python main.py
 ```
-### Cross Compile to Target Platform
-
-**RISC-V Vector Extension**
-
-Follow the relevant [documentation](https://github.com/buddy-compiler/buddy-mlir/blob/main/docs/RVVEnviroment.md) to prepare the RVV environment.
-
-1. Set variables for the toolchain:
-
-```
-$ cd buddy-mlir/build
-$ export BUDDY_MLIR_BUILD_DIR=$PWD
-$ export RISCV_GNU_TOOLCHAIN=${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain
-```
-
-2. Build the benchmark for the target platform:
-
-```
-$ cd buddy-benchmark
-$ mkdir build && cd build
-$ cmake -G Ninja .. \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DOP_OPTIMIZATION_BENCHMARKS=ON \
-    -DCROSS_COMPILE_RVV=ON \
-    -DCMAKE_SYSTEM_NAME=Linux \
-    -DCMAKE_SYSTEM_PROCESSOR=riscv \
-    -DCMAKE_C_COMPILER=${RISCV_GNU_TOOLCHAIN}/bin/riscv64-unknown-linux-gnu-gcc \
-    -DCMAKE_CXX_COMPILER=${RISCV_GNU_TOOLCHAIN}/bin/riscv64-unknown-linux-gnu-g++ \
-    -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}
-$ ninja <target banchmark>
-// For example: 
-$ ninja conv2d-benchmark
-```
-
-3. Transfer the compiled benchmark to your target platform and run it.
