@@ -24,12 +24,12 @@
 #include <random>
 
 // Define target layout.
-#define INPUT_R 64
-#define INPUT_C 64
+#define INPUT_R 32
+#define INPUT_C 32
 #define KERNEL_R 4
 #define KERNEL_C 4
-#define OUTPUT_R INPUT_R - KERNEL_R + 1
-#define OUTPUT_C INPUT_C - KERNEL_C + 1
+#define OUTPUT_R (INPUT_R - KERNEL_R + 1)
+#define OUTPUT_C (INPUT_C - KERNEL_C + 1)
 
 // Helper functions and variables.
 namespace {
