@@ -1,14 +1,14 @@
-# #===- CMakeLists.txt - buddy-benchmark cmake root ------------*- cmake -*-===//
-# #
-# # Configure the buddy-benchmark build.
-# #
-# #===----------------------------------------------------------------------===//
+##===- CMakeLists.txt - buddy-benchmark cmake root ------------*- cmake -*-===//
+##
+## Configure the buddy-benchmark build.
+##
+##===----------------------------------------------------------------------===//
 
 cmake_minimum_required(VERSION 3.10)
 
-# -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Project setup and globals
-# -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 project(buddy-benchmark LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -16,9 +16,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_FLAGS "-no-pie")
 set(CMAKE_C_FLAGS "-no-pie")
 
-# -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # BUDDY configuration
-# -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 set(BuddyMLIR_DIR ${BUDDY_MLIR_BUILD_DIR}/cmake)
 find_package(BuddyMLIR REQUIRED CONFIG)
 
@@ -27,7 +27,7 @@ if(CROSS_COMPILE_RVV)
   set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
   set(BUDDY_OPT_TRIPLE riscv64)
   set(BUDDY_OPT_ATTR +v,+m)
-  set(BUDDY_MLIR_LIB_DIR ${BUDDY_MLIR_BUILD_DIR}/../build-cross-rv/lib)
+  set(BUDDY_MLIR_CROSS_LIB_DIR ${BUDDY_MLIR_BUILD_CROSS_DIR}/lib)
 else()
   set(BUDDY_MLIR_LIB_DIR ${BUDDY_MLIR_BUILD_DIR}/lib)
 endif()
@@ -36,7 +36,7 @@ endif()
 set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/bin)
-set(BUDDY_DEEP_LEARNING_DIR ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning)
+set(BUDDY_BENCHMARK_DEEP_LEARNING_DIR ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning)
 set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
 set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
 message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")

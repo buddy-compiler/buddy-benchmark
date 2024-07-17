@@ -1,4 +1,4 @@
-# ===- buddy-mobilenetv3-import.py ---------------------------------------------
+# ===- buddy_mobilenetv3_import.py ---------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,9 @@ if model_path is None:
         "The environment variable 'MOBILENETV3_MODEL_PATH' is not set or is invalid."
     )
 
-model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1, pretrained=True)
+model = models.mobilenet_v3_small(
+    weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1, pretrained=True
+)
 model = model.eval()
 
 # Initialize Dynamo Compiler with specific configurations as an importer.
@@ -62,17 +64,3 @@ with open(os.path.join(path_prefix, "subgraph0.mlir"), "w") as module_file:
     print(driver.subgraphs[0]._imported_module, file=module_file)
 with open(os.path.join(path_prefix, "forward.mlir"), "w") as module_file:
     print(driver.construct_main_graph(True), file=module_file)
-
-params = dynamo_compiler.imported_params[graph]
-current_path = os.path.dirname(os.path.abspath(__file__))
-
-
-float32_param = np.concatenate(
-    [param.detach().numpy().reshape([-1]) for param in params if param.dtype == torch.float32]
-)
-float32_param.tofile(Path(current_path) / "arg0.data")
-
-int64_param = np.concatenate(
-    [param.detach().numpy().reshape([-1]) for param in params if param.dtype == torch.int64]
-)
-int64_param.tofile(Path(current_path) / "arg1.data")
