@@ -21,21 +21,21 @@ module{
                     ^bb0(%avl : index, %idx : index):
                         %vl = rvv.setvl %avl, %sew, %c1 : index
                         %vl_i32 = arith.index_cast %vl : index to i32
-                        %mask = vector.create_mask %vl : vector<[32]xi1>
+                        %mask = vector.create_mask %vl : vector<[16]xi1>
                         %2 = arith.addi %arg3, %arg4 : index
                         %3 = arith.addi %arg5, %idx : index
-                        %input_vector = vector_exp.predication %mask, %vl_i32 : vector<[32]xi1>, i32 {
-                            %ele = vector.load %arg0[%2, %3] : memref<?x?xi32>, vector<[32]xi32>
-                            vector.yield %ele : vector<[32]xi32>
-                        } : vector<[32]xi32>
-                        %c_vector = vector_exp.predication %mask, %vl_i32 : vector<[32]xi1>, i32 {
-                            %ele = vector.load %arg2[%arg3, %idx] : memref<?x?xi32>, vector<[32]xi32>
-                            vector.yield %ele : vector<[32]xi32>
-                        } : vector<[32]xi32>
-                        %4 = rvv.mul %input_vector, %1, %vl : vector<[32]xi32>, i32, index
-                        %output = rvv.add %4, %c_vector, %vl : vector<[32]xi32>, vector<[32]xi32>, index
-                        vector_exp.predication %mask, %vl_i32 : vector<[32]xi1>, i32 {
-                            vector.store %output, %arg2[%arg3, %idx] : memref<?x?xi32>, vector<[32]xi32>
+                        %input_vector = vector_exp.predication %mask, %vl_i32 : vector<[16]xi1>, i32 {
+                            %ele = vector.load %arg0[%2, %3] : memref<?x?xi32>, vector<[16]xi32>
+                            vector.yield %ele : vector<[16]xi32>
+                        } : vector<[16]xi32>
+                        %c_vector = vector_exp.predication %mask, %vl_i32 : vector<[16]xi1>, i32 {
+                            %ele = vector.load %arg2[%arg3, %idx] : memref<?x?xi32>, vector<[16]xi32>
+                            vector.yield %ele : vector<[16]xi32>
+                        } : vector<[16]xi32>
+                        %4 = rvv.mul %input_vector, %1, %vl : vector<[16]xi32>, i32, index
+                        %output = rvv.add %4, %c_vector, %vl : vector<[16]xi32>, vector<[16]xi32>, index
+                        vector_exp.predication %mask, %vl_i32 : vector<[16]xi1>, i32 {
+                            vector.store %output, %arg2[%arg3, %idx] : memref<?x?xi32>, vector<[16]xi32>
                             vector.yield
                         } : () -> ()
                         // Update idx and avl.
