@@ -1,9 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
-
-project(BatchMatMulBenchmark LANGUAGES CXX C)
-
-set(CMAKE_CXX_STANDARD 14)
-
 if (CROSS_COMPILE_RVV)
   set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
   set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
@@ -11,9 +5,9 @@ if (CROSS_COMPILE_RVV)
   set(BUDDY_OPT_ATTR +v,+m)
 endif()
 
-add_custom_command(OUTPUT batch_matmul_scalar.o
-  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
-          sed 's/@batch_matmul/@batch_matmul_scalar/' |
+add_custom_command(OUTPUT softmaxexpsumdiv_scalar.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/SoftmaxExpSumDiv.mlir |
+          sed 's/@softmaxexpsumdiv/@softmaxexpsumdiv_scalar/' |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
             -convert-linalg-to-loops
             -convert-scf-to-cf
@@ -22,18 +16,18 @@ add_custom_command(OUTPUT batch_matmul_scalar.o
             -llvm-request-c-wrappers
             -convert-func-to-llvm
             -convert-math-to-llvm
-            -reconcile-unrealized-casts |
+            -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/BatchMatMulOp/batch_matmul_scalar.o
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/softmaxexpsumdiv_scalar.o
 )
-add_library(BatchMatMulScalar STATIC batch_matmul_scalar.o)
-set_target_properties(BatchMatMulScalar PROPERTIES LINKER_LANGUAGE CXX)
+add_library(SoftmaxExpSumDivScalar STATIC softmaxexpsumdiv_scalar.o)
+set_target_properties(SoftmaxExpSumDivScalar PROPERTIES LINKER_LANGUAGE CXX)
 
-add_custom_command(OUTPUT batch_matmul_auto_vectorization.o
-  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
-          sed 's/@batch_matmul/@batch_matmul_auto_vectorization/' |
+add_custom_command(OUTPUT softmaxexpsumdiv_auto_vectorization.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/SoftmaxExpSumDiv.mlir |
+          sed 's/@softmaxexpsumdiv/@softmaxexpsumdiv_auto_vectorization/' |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
             -convert-linalg-to-loops
             -convert-scf-to-cf
@@ -46,23 +40,23 @@ add_custom_command(OUTPUT batch_matmul_auto_vectorization.o
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/BatchMatMulOp/batch_matmul_auto_vectorization.o
+            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/softmaxexpsumdiv_auto_vectorization.o
 )
-add_library(BatchMatMulAutoVectorization STATIC batch_matmul_auto_vectorization.o)
-set_target_properties(BatchMatMulAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
+add_library(SoftmaxExpSumDivAutoVectorization STATIC softmaxexpsumdiv_auto_vectorization.o)
+set_target_properties(SoftmaxExpSumDivAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(dl-op-linalg-batch-matmul-benchmark
+add_executable(dl-op-linalg-softmax-exp-sum-div-benchmark
   GoogleBenchmarkMain.cpp
-)
+  )
 
-set_target_properties(dl-op-linalg-batch-matmul-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-softmax-exp-sum-div-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+target_link_libraries(dl-op-linalg-softmax-exp-sum-div-benchmark
   ${BenchmarkTool}
-  BatchMatMulScalar
-  BatchMatMulAutoVectorization
+  SoftmaxExpSumDivScalar
+  SoftmaxExpSumDivAutoVectorization
 )
