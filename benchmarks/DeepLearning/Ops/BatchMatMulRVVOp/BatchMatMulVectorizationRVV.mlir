@@ -13,7 +13,7 @@ func.func @batch_matmul(%A : memref<?x?x?xi32>, %B : memref<?x?x?xi32>, %C : mem
   // SEW = 32 1<<(x+3)
   %sew = arith.constant 2 : index
   // LMUL = 2 1<<x
-  %lmul = arith.constant 1 : index
+  %lmul = arith.constant 2 : index
 
   affine.parallel (%idxBatch) = (0) to (%nBatch){
     affine.prefetch %A[%idxBatch, %aRow, %aCol], read, locality<3>, data : memref<?x?x?xi32>
@@ -31,19 +31,19 @@ func.func @batch_matmul(%A : memref<?x?x?xi32>, %B : memref<?x?x?xi32>, %C : mem
           // Perform the calculation according to the vl.
           %vl = rvv.setvl %avl, %sew, %lmul : index
           %vl_i32 = arith.index_cast %vl : index to i32
-          %mask = vector.create_mask %vl : vector<[4]xi1>
-          %input_vector = vector_exp.predication %mask, %vl_i32 : vector<[4]xi1>, i32 {
-            %ele = vector.load %B[%idxBatch,%idx0, %idx] : memref<?x?x?xi32>, vector<[4]xi32>
-            vector.yield %ele : vector<[4]xi32>
-          } : vector<[4]xi32>
-          %mul_vector = rvv.mul %input_vector, %aEle, %vl : vector<[4]xi32>, i32, index
-          %c_vector = vector_exp.predication %mask, %vl_i32 : vector<[4]xi1>, i32 {
-            %ele = vector.load %C[%idxBatch,%idx1, %idx] : memref<?x?x?xi32>, vector<[4]xi32>
-            vector.yield %ele : vector<[4]xi32>
-          } : vector<[4]xi32>
-          %result_vector = rvv.add %mul_vector, %c_vector, %vl : vector<[4]xi32>, vector<[4]xi32>, index
-          vector_exp.predication %mask, %vl_i32 : vector<[4]xi1>, i32 {
-            vector.store %result_vector, %C[%idxBatch,%idx1, %idx] : memref<?x?x?xi32>, vector<[4]xi32>
+          %mask = vector.create_mask %vl : vector<[8]xi1>
+          %input_vector = vector_exp.predication %mask, %vl_i32 : vector<[8]xi1>, i32 {
+            %ele = vector.load %B[%idxBatch,%idx0, %idx] : memref<?x?x?xi32>, vector<[8]xi32>
+            vector.yield %ele : vector<[8]xi32>
+          } : vector<[8]xi32>
+          %mul_vector = rvv.mul %input_vector, %aEle, %vl : vector<[8]xi32>, i32, index
+          %c_vector = vector_exp.predication %mask, %vl_i32 : vector<[8]xi1>, i32 {
+            %ele = vector.load %C[%idxBatch,%idx1, %idx] : memref<?x?x?xi32>, vector<[8]xi32>
+            vector.yield %ele : vector<[8]xi32>
+          } : vector<[8]xi32>
+          %result_vector = rvv.add %mul_vector, %c_vector, %vl : vector<[8]xi32>, vector<[8]xi32>, index
+          vector_exp.predication %mask, %vl_i32 : vector<[8]xi1>, i32 {
+            vector.store %result_vector, %C[%idxBatch,%idx1, %idx] : memref<?x?x?xi32>, vector<[8]xi32>
             vector.yield
           } : () -> ()
           // Update idx and avl.
