@@ -57,7 +57,7 @@ add_custom_command(
   -finalize-memref-to-llvm
   -reconcile-unrealized-casts |
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-  ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE}
+  ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
   -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/subgraph0_scalar.o
   DEPENDS ${BUDDY_BENCHMARK_DEEP_LEARNING_DIR}/Models/MobileNet-V3/subgraph0.mlir
@@ -104,10 +104,13 @@ add_custom_command(
   -tensor-bufferize
   -linalg-bufferize
   -finalizing-bufferize
-  -convert-linalg-to-loops
+  -batchmatmul-optimize
+  -convert-linalg-to-affine-loops
   -lower-affine
+  -convert-vector-to-scf
   -convert-scf-to-cf
   -llvm-request-c-wrappers
+  -convert-vector-to-llvm
   -convert-math-to-llvm
   -convert-math-to-libm
   -convert-arith-to-llvm
