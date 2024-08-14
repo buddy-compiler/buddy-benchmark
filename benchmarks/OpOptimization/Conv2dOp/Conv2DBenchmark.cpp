@@ -24,8 +24,8 @@
 #include <random>
 
 // Define target layout.
-#define INPUT_R 32
-#define INPUT_C 32
+#define INPUT_R 16
+#define INPUT_C 16
 #define KERNEL_R 4
 #define KERNEL_C 4
 #define OUTPUT_R (INPUT_R - KERNEL_R + 1)
