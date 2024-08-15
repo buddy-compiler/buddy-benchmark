@@ -5,9 +5,9 @@
 
 // Define target layout.
 #define BATCH_SIZE 3
-#define M (128 * 2 + 2)
-#define N (128 * 2 + 2)
-#define K (128 * 2 + 2)
+#define M (128 * 4)
+#define N (128 * 4)
+#define K (128 * 4)
 
 namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
