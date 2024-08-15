@@ -102,6 +102,7 @@ add_executable(image-processing-benchmark
   OpenCVMorph2DBenchmark.cpp
   BuddyResize2DBenchmark.cpp
   BuddyRotate2DBenchmark.cpp
+  BuddyRotate4DBenchmark.cpp
   OpenCVResize2DBenchmark.cpp
   OpenCVRotate2DBenchmark.cpp
   )

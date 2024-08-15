@@ -32,6 +32,9 @@ using namespace std;
 
 const float angleRad = M_PI * 30.0 / 180;
 
+// Define the input image.
+Img<float, 2> inputBuddyRotate2D;
+
 // Declare the input name.
 std::string inputNameBuddyRotate2D;
 
@@ -55,13 +58,13 @@ void initializeBuddyRotate2D(char **argv,
   sizesOutputBuddyRotate2D[1] =
       std::round(std::abs(sizesInputBuddyRotate2D[0] * sinAngle) +
                  std::abs(sizesInputBuddyRotate2D[1] * cosAngle));
+  inputBuddyRotate2D = inputImageBuddyRotate2D;
 }
 
 // Benchmarking functions.
 static void Buddy_Rotate2D(benchmark::State &state) {
   // Define the MemRef descriptor for input and output.
-  Img<float, 2> inputBuddyRotate2D =
-      dip::imread<float, 2>(inputNameBuddyRotate2D, dip::IMGRD_GRAYSCALE);
+  // dip::imread<float, 2>(inputNameBuddyRotate2D, dip::IMGRD_GRAYSCALE);
 
   MemRef<float, 2> outputBuddyRotate2D(sizesOutputBuddyRotate2D);
 

@@ -36,6 +36,7 @@ void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **, Img<float, 2>);
 void initializeBuddyResize2D(char **, Img<float, 2>);
 void initializeBuddyRotate2D(char **, Img<float, 2>);
+void initializeBuddyRotate4D(char **);
 void initializeOpenCVResize2D(char **);
 void initializeOpenCVRotate2D(char **);
 
@@ -44,6 +45,7 @@ void generateResultBuddyConv2D(Img<float, 2>);
 void generateResultBuddyCorr2D(char **argv, Img<float, 2>);
 void generateResultBuddyResize2D(char **argv, Img<float, 2>);
 void generateResultBuddyRotate2D(char **argv, Img<float, 2>);
+void generateResultBuddyRotate4D(char **);
 void generateResultBuddyErosion2D(char **, Img<float, 2>);
 void generateResultBuddyOpening2D(char **, Img<float, 2>);
 void generateResultBuddyClosing2D(char **, Img<float, 2>);
@@ -81,6 +83,7 @@ void registerBenchmarkOpenCVMorphGrad2D();
 void registerBenchmarkOpenCVFilter2D();
 void registerBenchmarkBuddyResize2D();
 void registerBenchmarkBuddyRotate2D();
+void registerBenchmarkBuddyRotate4D();
 void registerBenchmarkOpenCVResize2D();
 void registerBenchmarkOpenCVRotate2D();
 
@@ -110,6 +113,7 @@ int main(int argc, char **argv) {
   initializeEigenConvolve2D(argv, img);
   initializeBuddyResize2D(argv, img);
   initializeBuddyRotate2D(argv, img);
+  initializeBuddyRotate4D(argv);
   initializeOpenCVResize2D(argv);
   initializeOpenCVRotate2D(argv);
 
@@ -117,6 +121,7 @@ int main(int argc, char **argv) {
   registerBenchmarkOpenCVFilter2D();
   registerBenchmarkBuddyResize2D();
   registerBenchmarkBuddyRotate2D();
+  registerBenchmarkBuddyRotate4D();
   registerBenchmarkOpenCVResize2D();
   registerBenchmarkOpenCVRotate2D();
   registerBenchmarkBuddyErosion2D();
@@ -142,6 +147,7 @@ int main(int argc, char **argv) {
   generateResultBuddyConv2D(img);
   generateResultBuddyCorr2D(argv, img);
   generateResultBuddyRotate2D(argv, img);
+  generateResultBuddyRotate4D(argv);
   generateResultBuddyResize2D(argv, img);
   generateResultBuddyErosion2D(argv, img);
   generateResultBuddyDilation2D(argv, img);
