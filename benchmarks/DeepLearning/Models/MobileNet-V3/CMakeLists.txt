@@ -23,7 +23,8 @@ add_custom_command(
             convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
             convert-func-to-llvm, reconcile-unrealized-casts)" |
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-  ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE}
+  ${LLVM_MLIR_BINARY_DIR}/llvm-as |
+  ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
   -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/forward_autoVectorization.o
   DEPENDS ${BUDDY_BENCHMARK_DEEP_LEARNING_DIR}/Models/MobileNet-V3/forward.mlir
@@ -57,6 +58,7 @@ add_custom_command(
   -finalize-memref-to-llvm
   -reconcile-unrealized-casts |
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
+  ${LLVM_MLIR_BINARY_DIR}/llvm-as |
   ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
   -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/subgraph0_autoVectorization.o
@@ -82,6 +84,7 @@ add_custom_command(
             convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
             convert-func-to-llvm, reconcile-unrealized-casts)" |
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
+  ${LLVM_MLIR_BINARY_DIR}/llvm-as |
   ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
   -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/forward_vectorization.o
@@ -119,6 +122,7 @@ add_custom_command(
   -finalize-memref-to-llvm
   -reconcile-unrealized-casts |
   ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
+  ${LLVM_MLIR_BINARY_DIR}/llvm-as |
   ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
   -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/subgraph0_vectorization.o

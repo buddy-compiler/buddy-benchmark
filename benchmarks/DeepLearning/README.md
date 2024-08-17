@@ -74,8 +74,7 @@ Follow the relevant [documentation](https://github.com/buddy-compiler/buddy-mlir
 $ cd buddy-mlir/build
 $ export BUDDY_MLIR_BUILD_DIR=$PWD
 $ export RISCV_GNU_TOOLCHAIN=${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain
-$ cd ..
-$ cd buddy-mlir/build-cross-rv
+$ cd ../build-cross-rv
 $ export BUDDY_MLIR_BUILD_CROSS_DIR=$PWD
 ```
 
