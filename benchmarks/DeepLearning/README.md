@@ -6,6 +6,7 @@ The table below lists the benchmark cases at the operation level.
 | Name  | Build Target | Introduction |
 | -------------- | ------------- | ------------- |
 | MobileNet-V3 | `ninja dl-model-mobileNetV3-benchmark` | This benchmark compares multiple optimization strategies targeting the MobileNet-V3 model. |
+| LeNet | `ninja dl-model-lenet-benchmark` | This benchmark compares multiple optimization strategies targeting the LeNet model. |
 
 ## Operation Level Benchmark
 
