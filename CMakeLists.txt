@@ -25,22 +25,24 @@ find_package(BuddyMLIR REQUIRED CONFIG)
 if(CROSS_COMPILE_RVV)
   set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
   set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
+  set(BUDDY_OPT_ATTR +v,+m CACHE STRING "Target Architecture.")
+  set(BUDDY_OPT_TRIPLE riscv64 CACHE STRING "Target Triple.")
   set(BUDDY_MLIR_CROSS_LIB_DIR ${BUDDY_MLIR_BUILD_CROSS_DIR}/lib)
 else()
+  set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
+  set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
   set(BUDDY_MLIR_LIB_DIR ${BUDDY_MLIR_BUILD_DIR}/lib)
 endif()
+message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
+message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
 
 # BUDDY project.
 set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/bin)
 set(BUDDY_BENCHMARK_DEEP_LEARNING_DIR ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning)
-set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
-set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
-message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
-message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
+
+
 
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 set(BUILD_VALIDATION OFF CACHE BOOL "Build validations")
@@ -80,9 +82,6 @@ ExternalProject_Add(project_googlebenchmark
   -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
   -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
   -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-  -DHAVE_STD_REGEX=0
-  -DHAVE_POSIX_REGEX=0
-  -DHAVE_STEADY_CLOCK=0
   UPDATE_COMMAND ""
   TEST_COMMAND "")
 

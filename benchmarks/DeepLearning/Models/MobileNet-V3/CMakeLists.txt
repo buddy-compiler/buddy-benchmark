@@ -7,9 +7,9 @@ add_custom_command(
 )
 
 add_custom_command(
-  OUTPUT forward_autoVectorization.o
+  OUTPUT forward_auto_vectorization.o
   COMMAND cat ${BUDDY_BENCHMARK_DEEP_LEARNING_DIR}/Models/MobileNet-V3/forward.mlir |
-  sed -e {s/@forward/@forward_autoVectorization/} -e {s/@subgraph0/@subgraph0_autoVectorization/} |
+  sed -e {s/@forward/@forward_auto_vectorization/} -e {s/@subgraph0/@subgraph0_auto_vectorization/} |
   ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
   -pass-pipeline
   "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
@@ -26,15 +26,15 @@ add_custom_command(
   ${LLVM_MLIR_BINARY_DIR}/llvm-as |
   ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-  -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/forward_autoVectorization.o
+  -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/forward_auto_vectorization.o
   DEPENDS ${BUDDY_BENCHMARK_DEEP_LEARNING_DIR}/Models/MobileNet-V3/forward.mlir
-  COMMENT "Building forward_autoVectorization.o"
+  COMMENT "Building forward_auto_vectorization.o"
   VERBATIM)
 
 add_custom_command(
-  OUTPUT subgraph0_autoVectorization.o
+  OUTPUT subgraph0_auto_vectorization.o
   COMMAND cat ${BUDDY_BENCHMARK_DEEP_LEARNING_DIR}/Models/MobileNet-V3/subgraph0.mlir |
-  sed -e {s/@subgraph0/@subgraph0_autoVectorization/} |
+  sed -e {s/@subgraph0/@subgraph0_auto_vectorization/} |
   ${BUDDY_MLIR_BINARY_DIR}/buddy-opt 
   -pass-pipeline
   "builtin.module(func.func(tosa-to-linalg-named, tosa-to-arith, tosa-to-linalg, tosa-to-tensor))" |
@@ -61,10 +61,10 @@ add_custom_command(
   ${LLVM_MLIR_BINARY_DIR}/llvm-as |
   ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE}
   -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-  -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/subgraph0_autoVectorization.o
+  -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Models/MobileNet-V3/subgraph0_auto_vectorization.o
   DEPENDS ${BUDDY_BENCHMARK_DEEP_LEARNING_DIR}/Models/MobileNet-V3/subgraph0.mlir
   ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-  COMMENT "Building subgraph0_autoVectorization.o"
+  COMMENT "Building subgraph0_auto_vectorization.o"
   VERBATIM)
 
 add_custom_command(
@@ -131,7 +131,7 @@ add_custom_command(
   COMMENT "Building subgraph0_vectorization.o"
   VERBATIM)
 
-add_library(MOBILENETV3_AUTO_VECTORIZATION STATIC subgraph0_autoVectorization.o forward_autoVectorization.o)
+add_library(MOBILENETV3_AUTO_VECTORIZATION STATIC subgraph0_auto_vectorization.o forward_auto_vectorization.o)
 set_target_properties(MOBILENETV3_AUTO_VECTORIZATION PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library(MOBILENETV3_VECTORIZATION STATIC subgraph0_vectorization.o forward_vectorization.o)

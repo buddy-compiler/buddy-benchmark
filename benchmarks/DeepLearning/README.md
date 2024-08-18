@@ -31,13 +31,24 @@ The table below lists the benchmark cases at the operation level.
 | Reduce Maxf | `ninja dl-op-reduce-maxf-benchmark` | This benchmark evaluates optimization strategies for the `reduce.maxf` operation. The benchmark size can be adjusted in [this file](./Ops/ReduceMaxfOp/GoogleBenchmarkMain.cpp). |
 | Softmax Exp Sum Div | `ninja dl-op-softmax-exp-sum-div-benchmark` | This benchmark evaluates optimization strategies for the `softmax.exp_sum_div` operation. The benchmark size can be adjusted in [this file](./Ops/SoftmaxExpSumDivOp/GoogleBenchmarkMain.cpp). |
 
+### Enter Python virtual environment
+We recommend you to use anaconda3 to create python virtual environment. You should install python packages as buddy-mlir/requirements.
+```bash
+$ conda activate <your virtual environment name>
+$ cd buddy-benchmark
+$ pip install -r requirements.txt
+```
+
 ### Local Hardware Platform.
 
-1. Set the `buddy-mlir` toolchain:
+1. Set the `buddy-mlir` toolchain and PYTHONPATH environment variable:
+Make sure that the PYTHONPATH variable includes the directory of LLVM/MLIR python bindings and the directory of Buddy MLIR python packages.
 
 ```bash
 $ cd buddy-mlir/build
 $ export BUDDY_MLIR_BUILD_DIR=$PWD
+$ export LLVM_MLIR_BUILD_DIR=$PWD/../llvm/build
+$ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
 ```
 
 2. Build benchmark for local platform:
@@ -73,6 +84,8 @@ Follow the relevant [documentation](https://github.com/buddy-compiler/buddy-mlir
 ```bash
 $ cd buddy-mlir/build
 $ export BUDDY_MLIR_BUILD_DIR=$PWD
+$ export LLVM_MLIR_BUILD_DIR=$PWD/../llvm/build
+$ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
 $ export RISCV_GNU_TOOLCHAIN=${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain
 $ cd ../build-cross-rv
 $ export BUDDY_MLIR_BUILD_CROSS_DIR=$PWD
