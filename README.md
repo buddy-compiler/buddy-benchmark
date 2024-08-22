@@ -18,14 +18,9 @@ $ git clone git@github.com:buddy-compiler/buddy-benchmark.git
 $ git submodule update --init
 ```
 
-### Build OpenCV
+## Deep Learning Benchmark
 
-```
-$ cd buddy-benchmark/thirdparty/opencv
-$ mkdir build && cd build
-$ cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
-$ ninja
-```
+Please check the deep learning benchmark document at this [link](./benchmarks/DeepLearning/README.md).
 
 ## Image Processing Benchmark
 
@@ -34,6 +29,15 @@ Currently, the image processing benchmark includes the following frameworks or o
 - OpenCV ([link](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html))
 
 *NOTE: Please build OpenCV from source to achieve the best performance.*
+
+*Build OpenCV:*
+
+```
+$ cd buddy-benchmark/thirdparty/opencv
+$ mkdir build && cd build
+$ cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release
+$ ninja
+```
 
 - Eigen ([link](https://eigen.tuxfamily.org/index.php?title=Main_Page))
 
@@ -80,10 +84,6 @@ $ cmake -G Ninja .. \
 $ ninja image-processing-benchmark
 $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph name> <Boundary Option>
 ```
-
-## Deep Learning Benchmark
-
-Please check the deep learning benchmark document at this [link](./benchmarks/DeepLearning/README.md).
 
 ## Audio Processing Benchmark
 
