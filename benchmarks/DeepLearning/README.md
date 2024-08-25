@@ -15,6 +15,8 @@ The table below lists the benchmark cases at the layer level.
 | Name  | Build Target | Introduction |
 | -------------- | ------------- | ------------- |
 | FFN | `ninja dl-layer-ffn-benchmark` | This benchmark compares multiple optimization strategies targeting the FFN layer. |
+| Self Attention | `ninja dl-layer-selfattention-benchmark` | This benchmark compares multiple optimization strategies targeting the self attention layer. |
+| RMSNorm | `ninja dl-layer-rmsnorm-benchmark` | This benchmark compares multiple optimization strategies targeting the RMSNorm layer. |
 
 ## Operation Level Benchmark
 

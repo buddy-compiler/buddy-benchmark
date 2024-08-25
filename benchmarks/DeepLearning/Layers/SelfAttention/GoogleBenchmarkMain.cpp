@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for FFN layer.
+// This file implements the benchmark for Attention layer.
 //
 //===----------------------------------------------------------------------===//
 
@@ -27,14 +27,14 @@
 #define INPUT_DIM 256
 #define HIDDEN_DIM 64
 #define OUTPUT_DIM 64
+#define SEQ_LEN 10
 #define BATCH_SIZE 1
-constexpr size_t ParamsSize = 20608;
+constexpr size_t ParamsSize = 263168; // For Q, K, V weights
 
 // Helper functions and variables.
 namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
-
 
 bool areArraysEqual(float array1[], float array2[], int size,
                     float epsilon = 0.0001) {
@@ -48,27 +48,27 @@ bool areArraysEqual(float array1[], float array2[], int size,
 }
 
 namespace {
-// Declare the FFN layer C interface.
+// Declare the Self-Attention layer C interface.
 extern "C" {
-void _mlir_ciface_forward_scalar(MemRef<float, 2> *output,
-                                 MemRef<float, 1> *input1,
-                                 MemRef<float, 2> *input2);
-void _mlir_ciface_forward_auto_vectorization(MemRef<float, 2> *output,
-                                             MemRef<float, 1> *input1,
-                                             MemRef<float, 2> *input2);
+void _mlir_ciface_forward_scalar(MemRef<float, 3> *output,
+                                        MemRef<float, 1> *input1,
+                                        MemRef<float, 3> *input2);
+void _mlir_ciface_forward_auto_vectorization(MemRef<float, 3> *output,
+                                                    MemRef<float, 1> *input1,
+                                                    MemRef<float, 3> *input2);
 }
 
 } // namespace
 
-template <typename Func> void DL_LAYER_FFN(benchmark::State &state, Func func) {
+template <typename Func> void DL_LAYER_ATTENTION(benchmark::State &state, Func func) {
 
   // Define the sizes of the input and output tensors.
-  intptr_t sizesInput[2] = {BATCH_SIZE, INPUT_DIM};
-  intptr_t sizesOutput[2] = {BATCH_SIZE, OUTPUT_DIM};
+  intptr_t sizesInput[3] = {BATCH_SIZE, SEQ_LEN, INPUT_DIM};
+  intptr_t sizesOutput[3] = {BATCH_SIZE, SEQ_LEN, OUTPUT_DIM};
   intptr_t sizesParams[1] = {ParamsSize};
 
-  MemRef<float, 2> input1(sizesInput, 2);
-  MemRef<float, 2> output(sizesOutput, 0);
+  MemRef<float, 3> input1(sizesInput, 2);
+  MemRef<float, 3> output(sizesOutput, 0);
   MemRef<float, 1> paramsContainer(sizesParams, 3);
 
   for (auto _ : state) {
@@ -76,9 +76,9 @@ template <typename Func> void DL_LAYER_FFN(benchmark::State &state, Func func) {
   }
 }
 
-BENCHMARK_CAPTURE(DL_LAYER_FFN, Scalar, _mlir_ciface_forward_scalar)
+BENCHMARK_CAPTURE(DL_LAYER_ATTENTION, Scalar, _mlir_ciface_forward_scalar)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_LAYER_FFN, Auto_Vectorization,
+BENCHMARK_CAPTURE(DL_LAYER_ATTENTION, Auto_Vectorization,
                   _mlir_ciface_forward_auto_vectorization)
     ->Unit(benchmark::kMillisecond);
 
@@ -96,12 +96,12 @@ void verification() {
   std::uniform_real_distribution<float> distribution(0.0, 1.0);
 
   // Set the layout sizes of input and output memref container.
-  intptr_t sizesInput[2] = {BATCH_SIZE, INPUT_DIM};
-  intptr_t sizesOutput[2] = {BATCH_SIZE, OUTPUT_DIM};
+  intptr_t sizesInput[3] = {BATCH_SIZE, SEQ_LEN, INPUT_DIM};
+  intptr_t sizesOutput[3] = {BATCH_SIZE, SEQ_LEN, OUTPUT_DIM};
   intptr_t sizesParams[1] = {ParamsSize};
 
   // Generate input memref containers with random numbers.
-  const int inputSize = BATCH_SIZE * INPUT_DIM;
+  const int inputSize = BATCH_SIZE * SEQ_LEN * INPUT_DIM;
   float inputRand1[inputSize];
   float inputRand2[ParamsSize];
 
@@ -112,17 +112,17 @@ void verification() {
     inputRand2[i] = distribution(generator);
   }
 
-  MemRef<float, 2> inputMemRef(inputRand1, sizesInput);
+  MemRef<float, 3> inputMemRef(inputRand1, sizesInput);
   MemRef<float, 1> paramsContainer(inputRand2, sizesParams);
 
   // Generate output memref containers with zero.
-  MemRef<float, 2> outputScalar(sizesOutput);
-  MemRef<float, 2> outputAutoVectorization(sizesOutput);
+  MemRef<float, 3> outputScalar(sizesOutput);
+  MemRef<float, 3> outputAutoVectorization(sizesOutput);
 
-  // Perform all the addf implementations.
+  // Perform all the Self-Attention implementations.
   _mlir_ciface_forward_scalar(&outputScalar, &paramsContainer, &inputMemRef);
   _mlir_ciface_forward_auto_vectorization(&outputAutoVectorization,
-                                          &paramsContainer, &inputMemRef);
+                                                 &paramsContainer, &inputMemRef);
   // Get the result array.
   auto resultScalar = outputScalar.getData();
   auto resultAutoVectorization = outputAutoVectorization.getData();
@@ -132,7 +132,7 @@ void verification() {
             << std::endl;
   std::cout << "Correctness Verification: "
             << (areArraysEqual(resultScalar, resultAutoVectorization,
-                               sizesOutput[0] * sizesOutput[1])
+                               sizesOutput[0] * sizesOutput[1] * sizesOutput[2])
                     ? PASS
                     : FAIL)
             << std::endl;
