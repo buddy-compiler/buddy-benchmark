@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This is the main file of the matmul benchmark.
+// This file implements the benchmark for Matmul on Risc-V vector devices.
 //
 //===----------------------------------------------------------------------===//
 
@@ -52,28 +52,28 @@ void _mlir_ciface_matmul_rvv(MemRef<int, 2> *A, MemRef<int, 2> *B,
                              MemRef<int, 2> *C);
 }
 
-#define DEFINE_MATMUL_BENCHMARK(name, func)                                    \
-  void BM_MATMUL_##name(benchmark::State &state) {                             \
-    intptr_t sizesA[2] = {M, K};                                               \
-    intptr_t sizesB[2] = {K, N};                                               \
-    intptr_t sizesC[2] = {M, N};                                               \
-                                                                               \
-    MemRef<int, 2> A(sizesA, 1.0);                                             \
-    MemRef<int, 2> B(sizesB, 1.0);                                             \
-    MemRef<int, 2> C(sizesC, 0.0);                                             \
-                                                                               \
-    for (auto _ : state) {                                                     \
-      func(&A, &B, &C);                                                        \
-    }                                                                          \
-  }
+template <typename Func>
+void DL_OPS_MATMUL(benchmark::State &state, Func func) {
 
-DEFINE_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_matmul_scalar)
-DEFINE_MATMUL_BENCHMARK(RVV, _mlir_ciface_matmul_rvv)
+  intptr_t sizesA[2] = {M, K};
+  intptr_t sizesB[2] = {K, N};
+  intptr_t sizesC[2] = {M, N};
+
+  MemRef<int, 2> A(sizesA, 1.0);
+  MemRef<int, 2> B(sizesB, 1.0);
+  MemRef<int, 2> C(sizesC, 0.0);
+
+  for (auto _ : state) {
+    func(&A, &B, &C);
+  }
+}
 } // namespace
 
-// Register benchmark cases.
-BENCHMARK(BM_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_MATMUL_RVV)->Unit(benchmark::kMillisecond);
+// Register benchmarking function with different arguments.
+BENCHMARK_CAPTURE(DL_OPS_MATMUL, Scalar, _mlir_ciface_matmul_scalar)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_MATMUL, RvvVectorization, _mlir_ciface_matmul_rvv)
+    ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.

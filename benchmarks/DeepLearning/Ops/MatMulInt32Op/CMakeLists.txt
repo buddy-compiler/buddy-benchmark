@@ -6,7 +6,7 @@ if (CROSS_COMPILE_RVV)
 endif()
 
 add_custom_command(OUTPUT matmul-scalar-rvv.o
-  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulRVVOp/MatMul.mlir |
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulInt32Op/MatMul.mlir |
           sed 's/@matmul/@matmul_scalar/' |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
             -convert-linalg-to-loops
@@ -21,13 +21,13 @@ add_custom_command(OUTPUT matmul-scalar-rvv.o
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MatMulRVVOp/matmul-scalar-rvv.o
+	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MatMulInt32Op/matmul-scalar-rvv.o
 )
 add_library(MatMulScalarRVV STATIC matmul-scalar-rvv.o)
 set_target_properties(MatMulScalarRVV PROPERTIES LINKER_LANGUAGE CXX)
 
 add_custom_command(OUTPUT matmul-rvv.o
-  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulRVVOp/MatMulRVV.mlir |
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulInt32Op/MatMulRVV.mlir |
           sed 's/@matmul/@matmul_rvv/' |
           ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
           -llvm-request-c-wrappers
@@ -43,7 +43,7 @@ add_custom_command(OUTPUT matmul-rvv.o
             ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MatMulRVVOp/matmul-rvv.o
+	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MatMulInt32Op/matmul-rvv.o
 )
 add_library(MatMulRVV STATIC matmul-rvv.o)
 set_target_properties(MatMulRVV PROPERTIES LINKER_LANGUAGE CXX)
