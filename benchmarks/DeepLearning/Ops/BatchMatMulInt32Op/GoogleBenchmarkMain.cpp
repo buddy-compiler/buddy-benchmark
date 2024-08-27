@@ -1,3 +1,23 @@
+//===- GoogleBenchmarkMain.cpp --------------------------------------------===//
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements the benchmark for Batch Matmul on Risc-V vector devices.
+//
+//===----------------------------------------------------------------------===//
+
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <iostream>
@@ -40,35 +60,35 @@ void _mlir_ciface_batch_matmul_vectorization(MemRef<int, 3> *input1,
                                              MemRef<int, 3> *output);
 }
 
-#define DEFINE_BATCH_MATMUL_BENCHMARK(name, func)                              \
-  void BM_BATCH_MATMUL_##name(benchmark::State &state) {                       \
-    intptr_t sizesInput1[3] = {BATCH_SIZE, M, K};                              \
-    intptr_t sizesInput2[3] = {BATCH_SIZE, K, N};                              \
-    intptr_t sizesOutput[3] = {BATCH_SIZE, M, N};                              \
-                                                                               \
-    MemRef<int, 3> input1(sizesInput1, 1.0);                                   \
-    MemRef<int, 3> input2(sizesInput2, 1.0);                                   \
-    MemRef<int, 3> output(sizesOutput, 0.0);                                   \
-                                                                               \
-    for (auto _ : state) {                                                     \
-      func(&input1, &input2, &output);                                         \
-    }                                                                          \
-  }
+template <typename Func>
+void DL_OPS_BATCH_MATMUL(benchmark::State &state, Func func) {
 
-DEFINE_BATCH_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_batch_matmul_scalar)
-DEFINE_BATCH_MATMUL_BENCHMARK(AutoVectorization,
-                              _mlir_ciface_batch_matmul_auto_vectorization)
-DEFINE_BATCH_MATMUL_BENCHMARK(Vectorization,
-                              _mlir_ciface_batch_matmul_vectorization)
-DEFINE_BATCH_MATMUL_BENCHMARK(RvvVectorization,
-                              _mlir_ciface_batch_matmul_rvv_vectorization)
+  intptr_t sizesInput1[3] = {BATCH_SIZE, M, K};
+  intptr_t sizesInput2[3] = {BATCH_SIZE, K, N};
+  intptr_t sizesOutput[3] = {BATCH_SIZE, M, N};
+
+  MemRef<int, 3> input1(sizesInput1, 1.0);
+  MemRef<int, 3> input2(sizesInput2, 1.0);
+  MemRef<int, 3> output(sizesOutput, 0.0);
+
+  for (auto _ : state) {
+    func(&input1, &input2, &output);
+  }
+}
 } // namespace
 
-// Register benchmark cases.
-BENCHMARK(BM_BATCH_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_BATCH_MATMUL_AutoVectorization)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_BATCH_MATMUL_Vectorization)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_BATCH_MATMUL_RvvVectorization)->Unit(benchmark::kMillisecond);
+// Register benchmarking function with different arguments.
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Scalar, _mlir_ciface_batch_matmul_scalar)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, AutoVectorization,
+                  _mlir_ciface_batch_matmul_auto_vectorization)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Vectorization,
+                  _mlir_ciface_batch_matmul_vectorization)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, RvvVectorization,
+                  _mlir_ciface_batch_matmul_rvv_vectorization)
+    ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 void verification() {
