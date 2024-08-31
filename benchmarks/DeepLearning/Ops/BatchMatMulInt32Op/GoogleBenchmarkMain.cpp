@@ -129,6 +129,7 @@ void verification() {
   auto resultScalar = outputScalar.getData();
   auto resultAutoVectorization = outputAutoVectorization.getData();
   auto resultRVVVectorization = outputRVV.getData();
+  auto resultVectorization = outputManual.getData();
 
   std::cout << "-----------------------------------------------------------"
             << std::endl;
