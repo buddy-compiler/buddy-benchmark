@@ -1,6 +1,8 @@
-#map = affine_map<(d0, d1)[s0] -> (-d0 + s0, d1)>
-#map1 = affine_map<(d0, d1) -> (d0 + d1)>
-#map2 = affine_map<(d0) -> (d0)>
+#map = affine_map<(d0) -> (d0 ceildiv 4)>
+#map1 = affine_map<(d0) -> (d0)>
+#map2 = affine_map<(d0, d1)[s0] -> (d0 + d1, s0)>
+#map3 = affine_map<(d0, d1)[s0] -> (-d0 + s0, d1)>
+#map4 = affine_map<(d0, d1) -> (d0 + d1)>
 module {
   func.func @conv_2d_nhwc_fhwc(%arg0: memref<?x?x?x?xf32>, %arg1: memref<?x?x?x?xf32>, %arg2: memref<?x?x?x?xf32>) {
     %c0 = arith.constant 0 : index
@@ -21,36 +23,39 @@ module {
     %dim_8 = memref.dim %arg1, %c1_7 : memref<?x?x?x?xf32>
     %c2_9 = arith.constant 2 : index
     %dim_10 = memref.dim %arg1, %c2_9 : memref<?x?x?x?xf32>
-    scf.for %arg3 = %c0 to %dim step %c1 {
-      scf.for %arg4 = %c0 to %dim_2 step %c1 {
-        scf.for %arg5 = %c0 to %dim_3 step %c1 {
-          scf.for %arg6 = %c0 to %dim_4 step %c1 {
-            %0 = memref.load %arg2[%arg3, %arg4, %arg5, %arg6] : memref<?x?x?x?xf32>
-            %1 = scf.for %arg7 = %c0 to %dim_6 step %c16 iter_args(%arg8 = %0) -> (f32) {
-              %2 = vector.splat %cst : vector<16xf32>
-              %3 = affine.min #map(%arg7, %c16)[%dim_6]
-              %4 = vector.create_mask %3 : vector<16xi1>
-              %5 = scf.for %arg9 = %c0 to %dim_8 step %c1 iter_args(%arg10 = %2) -> (vector<16xf32>) {
-                %8 = affine.apply #map1(%arg4, %arg9)
-                %9 = scf.for %arg11 = %c0 to %dim_10 step %c1 iter_args(%arg12 = %arg10) -> (vector<16xf32>) {
-                  %10 = affine.apply #map1(%arg5, %arg11)
-                  %11 = affine.apply #map2(%arg11)
-                  %12 = vector.load %arg0[%arg3, %8, %10, %arg7] : memref<?x?x?x?xf32>, vector<16xf32>
-                  %13 = vector.load %arg1[%arg6, %arg9, %11, %arg7] : memref<?x?x?x?xf32>, vector<16xf32>
-                  %14 = vector.fma %12, %13, %arg12 : vector<16xf32>
-                  scf.yield %14 : vector<16xf32>
-                }
-                scf.yield %9 : vector<16xf32>
-              }
-              %6 = vector.mask %4 { vector.reduction <add>, %5 : vector<16xf32> into f32 } : vector<16xi1> -> f32
-              %7 = arith.addf %arg8, %6 : f32
-              scf.yield %7 : f32
+    %0 = affine.apply #map(%dim_2)
+    %1 = affine.apply #map(%dim_3)
+    %2 = affine.apply #map1(%dim_4)
+    scf.forall (%arg3, %arg4, %arg5, %arg6) = (%c0, %c0, %c0, %c0) to (%dim, %dim_2, %dim_3, %dim_4) step (%c1, %0, %1, %2) {
+      %3 = affine.min #map2(%arg4, %0)[%dim_2]
+      %4 = affine.min #map2(%arg5, %1)[%dim_3]
+      %5 = affine.min #map2(%arg6, %2)[%dim_4]
+      scf.forall (%arg7, %arg8, %arg9) = (%arg4, %arg5, %arg6) to (%3, %4, %5) step (%c1, %c1, %c1) {
+        %6 = memref.load %arg2[%arg3, %arg7, %arg8, %arg9] : memref<?x?x?x?xf32>
+        %7 = scf.for %arg10 = %c0 to %dim_6 step %c16 iter_args(%arg11 = %6) -> (f32) {
+          %8 = vector.splat %cst : vector<16xf32>
+          %9 = affine.min #map3(%arg10, %c16)[%dim_6]
+          %10 = vector.create_mask %9 : vector<16xi1>
+          %11 = scf.for %arg12 = %c0 to %dim_8 step %c1 iter_args(%arg13 = %8) -> (vector<16xf32>) {
+            %14 = affine.apply #map4(%arg7, %arg12)
+            %15 = scf.for %arg14 = %c0 to %dim_10 step %c1 iter_args(%arg15 = %arg13) -> (vector<16xf32>) {
+              %16 = affine.apply #map4(%arg8, %arg14)
+              %17 = affine.apply #map1(%arg14)
+              %18 = vector.load %arg0[%arg3, %14, %16, %arg10] : memref<?x?x?x?xf32>, vector<16xf32>
+              %19 = vector.load %arg1[%arg9, %arg12, %17, %arg10] : memref<?x?x?x?xf32>, vector<16xf32>
+              %20 = vector.fma %18, %19, %arg15 : vector<16xf32>
+              scf.yield %20 : vector<16xf32>
             }
-            memref.store %1, %arg2[%arg3, %arg4, %arg5, %arg6] : memref<?x?x?x?xf32>
+            scf.yield %15 : vector<16xf32>
           }
+          %12 = vector.mask %10 { vector.reduction <add>, %11 : vector<16xf32> into f32 } : vector<16xi1> -> f32
+          %13 = arith.addf %arg11, %12 : f32
+          scf.yield %13 : f32
         }
+        memref.store %7, %arg2[%arg3, %arg7, %arg8, %arg9] : memref<?x?x?x?xf32>
       }
     }
     return
   }
 }
+

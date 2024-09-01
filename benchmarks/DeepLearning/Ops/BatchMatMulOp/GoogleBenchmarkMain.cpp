@@ -13,9 +13,10 @@ namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
 
-bool areArraysEqual(float array1[], float array2[], int size) {
+bool areArraysEqual(float array1[], float array2[], int size,
+                    float epsilon = 0.0001) {
   for (int i = 0; i < size; ++i) {
-    if (array1[i] != array2[i]) {
+    if (fabs(array1[i] - array2[i]) > epsilon) {
       return false;
     }
   }
@@ -32,30 +33,42 @@ void _mlir_ciface_batch_matmul_scalar(MemRef<float, 3> *input1,
 void _mlir_ciface_batch_matmul_auto_vectorization(MemRef<float, 3> *input1,
                                                   MemRef<float, 3> *input2,
                                                   MemRef<float, 3> *output);
+void _mlir_ciface_batch_matmul_vectorization(MemRef<float, 3> *input1,
+                                             MemRef<float, 3> *input2,
+                                             MemRef<float, 3> *output);
+void _mlir_ciface_batch_matmul_tilling_vectorization(MemRef<float, 3> *input1,
+                                                     MemRef<float, 3> *input2,
+                                                     MemRef<float, 3> *output);
 }
 
-#define DEFINE_BATCH_MATMUL_BENCHMARK(name, func)                             \
-  void BM_BATCH_MATMUL_##name(benchmark::State &state) {                      \
-    intptr_t sizesInput1[3] = {BATCH_SIZE, M, K};                             \
-    intptr_t sizesInput2[3] = {BATCH_SIZE, K, N};                             \
-    intptr_t sizesOutput[3] = {BATCH_SIZE, M, N};                             \
-                                                                              \
-    MemRef<float, 3> input1(sizesInput1, 1.0);                                \
-    MemRef<float, 3> input2(sizesInput2, 1.0);                                \
-    MemRef<float, 3> output(sizesOutput, 0.0);                                \
-                                                                              \
-    for (auto _ : state) {                                                    \
-      func(&input1, &input2, &output);                                        \
-    }                                                                         \
-  }
+template <typename Func>
+void DL_OPS_BATCH_MATMUL(benchmark::State &state, Func func) {
+  intptr_t sizesInput1[3] = {BATCH_SIZE, M, K};
+  intptr_t sizesInput2[3] = {BATCH_SIZE, K, N};
+  intptr_t sizesOutput[3] = {BATCH_SIZE, M, N};
 
-DEFINE_BATCH_MATMUL_BENCHMARK(SCALAR, _mlir_ciface_batch_matmul_scalar)
-DEFINE_BATCH_MATMUL_BENCHMARK(AutoVectorization, _mlir_ciface_batch_matmul_auto_vectorization)
+  MemRef<float, 3> input1(sizesInput1, 1.0);
+  MemRef<float, 3> input2(sizesInput2, 1.0);
+  MemRef<float, 3> output(sizesOutput, 0.0);
+
+  for (auto _ : state) {
+    func(&input1, &input2, &output);
+  }
+}
 } // namespace
 
 // Register benchmark cases.
-BENCHMARK(BM_BATCH_MATMUL_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_BATCH_MATMUL_AutoVectorization)->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Scalar, _mlir_ciface_batch_matmul_scalar)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, AutoVectorization,
+                  _mlir_ciface_batch_matmul_auto_vectorization)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Vectorization,
+                  _mlir_ciface_batch_matmul_vectorization)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, AutoTillingVectorization,
+                  _mlir_ciface_batch_matmul_tilling_vectorization)
+    ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 void verification() {
@@ -84,19 +97,39 @@ void verification() {
   const int outputSize = BATCH_SIZE * M * N;
   MemRef<float, 3> outputScalar(sizesOutput, 0.0);
   MemRef<float, 3> outputAutoVectorization(sizesOutput, 0.0);
+  MemRef<float, 3> outputVectorization(sizesOutput, 0.0);
+  MemRef<float, 3> outputTillingVectorization(sizesOutput, 0.0);
 
   _mlir_ciface_batch_matmul_scalar(&input1MemRef, &input2MemRef, &outputScalar);
   _mlir_ciface_batch_matmul_auto_vectorization(&input1MemRef, &input2MemRef,
                                                &outputAutoVectorization);
+  _mlir_ciface_batch_matmul_vectorization(&input1MemRef, &input2MemRef,
+                                          &outputVectorization);
+  _mlir_ciface_batch_matmul_tilling_vectorization(&input1MemRef, &input2MemRef,
+                                                  &outputTillingVectorization);
 
   auto resultScalar = outputScalar.getData();
   auto resultAutoVectorization = outputAutoVectorization.getData();
+  auto resultVectorization = outputVectorization.getData();
+  auto resultTillingVectorization = outputTillingVectorization.getData();
 
   std::cout << "-----------------------------------------------------------"
             << std::endl;
   std::cout << "Correctness Verification:" << std::endl;
-  std::cout << "Transform case: "
-            << (areArraysEqual(resultScalar, resultAutoVectorization, outputSize)
+  std::cout << "Scalar vs AutoVectorization: "
+            << (areArraysEqual(resultScalar, resultAutoVectorization,
+                               outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Scalar vs Vectorization: "
+            << (areArraysEqual(resultScalar, resultVectorization, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  std::cout << "Scalar vs AutoTillingVectorization: "
+            << (areArraysEqual(resultScalar, resultTillingVectorization,
+                               outputSize)
                     ? PASS
                     : FAIL)
             << std::endl;
