@@ -1,10 +1,3 @@
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
-
 add_custom_command(OUTPUT matmul-scalar-rvv.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulInt32Op/MatMul.mlir |
           sed 's/@matmul/@matmul_scalar/' |
