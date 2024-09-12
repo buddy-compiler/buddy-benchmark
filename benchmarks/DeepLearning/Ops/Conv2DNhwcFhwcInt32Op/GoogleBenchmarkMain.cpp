@@ -14,7 +14,8 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for conv2d(nhwc-fhwc) operation.
+// This file implements the benchmark for conv2d(nhwc-fhwc) operation on Risc-V
+// vector devices.
 //
 //===----------------------------------------------------------------------===//
 
