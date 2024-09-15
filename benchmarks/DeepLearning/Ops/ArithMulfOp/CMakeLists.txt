@@ -1,14 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
-project(ArithMulfBenchmark)
-
-# Define variables for the cross-compilation toolchain and options.
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
-
 # Add custom commands for scalar implementation of arith.mulf
 add_custom_command(OUTPUT mulf_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/ArithMulfOp/ArithMulf.mlir |

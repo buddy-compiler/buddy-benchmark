@@ -1,16 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
-
-project(BatchMatMulBenchmark LANGUAGES CXX C)
-
-set(CMAKE_CXX_STANDARD 14)
-
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
-
 add_custom_command(OUTPUT batch_matmul_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
           sed 's/@batch_matmul/@batch_matmul_scalar/' |
