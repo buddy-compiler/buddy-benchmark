@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the benchmark for FFN layer.
+// This file implements the benchmark for RMSNORM layer.
 //
 //===----------------------------------------------------------------------===//
 
@@ -25,16 +25,14 @@
 
 // Define target layout.
 #define INPUT_DIM 256
-#define HIDDEN_DIM 64
-#define OUTPUT_DIM 64
 #define BATCH_SIZE 1
-constexpr size_t ParamsSize = 20608;
+#define OUTPUT_DIM 256
+constexpr size_t ParamsSize = 256;
 
 // Helper functions and variables.
 namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
-
 
 bool areArraysEqual(float array1[], float array2[], int size,
                     float epsilon = 0.0001) {
@@ -47,7 +45,7 @@ bool areArraysEqual(float array1[], float array2[], int size,
 }
 
 namespace {
-// Declare the FFN layer C interface.
+// Declare the RMSNORM layer C interface.
 extern "C" {
 void _mlir_ciface_forward_scalar(MemRef<float, 2> *output,
                                  MemRef<float, 1> *input1,
@@ -59,7 +57,7 @@ void _mlir_ciface_forward_auto_vectorization(MemRef<float, 2> *output,
 
 } // namespace
 
-template <typename Func> void DL_LAYER_FFN(benchmark::State &state, Func func) {
+template <typename Func> void DL_LAYER_RMSNORM(benchmark::State &state, Func func) {
 
   // Define the sizes of the input and output tensors.
   intptr_t sizesInput[2] = {BATCH_SIZE, INPUT_DIM};
@@ -75,9 +73,9 @@ template <typename Func> void DL_LAYER_FFN(benchmark::State &state, Func func) {
   }
 }
 
-BENCHMARK_CAPTURE(DL_LAYER_FFN, Scalar, _mlir_ciface_forward_scalar)
+BENCHMARK_CAPTURE(DL_LAYER_RMSNORM, Scalar, _mlir_ciface_forward_scalar)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_LAYER_FFN, Auto_Vectorization,
+BENCHMARK_CAPTURE(DL_LAYER_RMSNORM, Auto_Vectorization,
                   _mlir_ciface_forward_auto_vectorization)
     ->Unit(benchmark::kMillisecond);
 
