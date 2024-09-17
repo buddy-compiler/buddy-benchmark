@@ -39,6 +39,7 @@ The table below lists the benchmark cases at the operation level.
 | Reduce Addf | `ninja dl-op-reduce-addf-benchmark` | This benchmark evaluates optimization strategies for the `reduce.addf` operation. The benchmark size can be adjusted in [this file](./Ops/ReduceAddfOp/GoogleBenchmarkMain.cpp). |
 | Reduce Maxf | `ninja dl-op-reduce-maxf-benchmark` | This benchmark evaluates optimization strategies for the `reduce.maxf` operation. The benchmark size can be adjusted in [this file](./Ops/ReduceMaxfOp/GoogleBenchmarkMain.cpp). |
 | Softmax Exp Sum Div | `ninja dl-op-softmax-exp-sum-div-benchmark` | This benchmark evaluates optimization strategies for the `softmax.exp_sum_div` operation. The benchmark size can be adjusted in [this file](./Ops/SoftmaxExpSumDivOp/GoogleBenchmarkMain.cpp). |
+| RFFT | `ninja dl-op-linalg-RFFT-benchmark` | This benchmark evaluates the efficiency of the RFFT operator and verifies its correctness by comparing it with the RFFT function in numpy. The benchmark size can be adjusted in [this file](./Ops/RFFTOp/GoogleBenchmarkMain.cpp). |
 
 ### Enter Python virtual environment
 We recommend you to use anaconda3 to create python virtual environment. You should install python packages as buddy-mlir/requirements.
