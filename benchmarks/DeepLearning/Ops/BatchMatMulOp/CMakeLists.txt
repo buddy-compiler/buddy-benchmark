@@ -42,9 +42,10 @@ set_target_properties(BatchMatMulAutoVectorization PROPERTIES LINKER_LANGUAGE CX
 
 # BatchMatMul Vectorization
 add_custom_command(OUTPUT batch_matmul_vectorization.o
-  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulVec.mlir |
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
           sed 's/@batch_matmul/@batch_matmul_vectorization/' |
           ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -batchmatmul-optimize="vector-size=16"
           -lower-affine 
           -convert-scf-to-cf 
           -convert-math-to-llvm 
