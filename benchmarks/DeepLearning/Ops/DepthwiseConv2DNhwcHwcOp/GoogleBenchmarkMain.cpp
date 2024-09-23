@@ -46,6 +46,7 @@ bool areArraysEqual(float array1[], float array2[], int size,
                     float epsilon = 0.0001) {
   for (int i = 0; i < size; ++i) {
     if (fabs(array1[i] - array2[i]) > epsilon) {
+      printf("array1[%d]:%f array2[%d]:%f\n", i, array1[i], i, array2[i]);
       return false;
     }
   }
@@ -65,36 +66,41 @@ void _mlir_ciface_depthwise_conv_2d_nhwc_hwc_scalar(MemRef<float, 4> *input,
 void _mlir_ciface_depthwise_conv_2d_nhwc_hwc_auto_vectorization(
     MemRef<float, 4> *input, MemRef<float, 3> *filter,
     MemRef<float, 4> *output);
+void _mlir_ciface_depthwise_conv_2d_nhwc_hwc_vectorization(
+    MemRef<float, 4> *input, MemRef<float, 3> *filter,
+    MemRef<float, 4> *output);
 }
 
-#define DEFINE_Depthwise_Conv2DNhwcHwc_BENCHMARK(name, func)                   \
-  void BM_Depthwise_Conv2DNhwcHwc_##name(benchmark::State &state) {            \
-    intptr_t sizesInput[4] = {INPUT_N, INPUT_H, INPUT_W, INPUT_C};             \
-    intptr_t sizesKernel[3] = {KERNEL_H, KERNEL_W, KERNEL_C};                  \
-    intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_H, OUTPUT_W, OUTPUT_C};        \
-                                                                               \
-    MemRef<float, 4> inputMemRef(sizesInput, 2.0);                             \
-    MemRef<float, 3> filterMemRef(sizesKernel, 3.0);                           \
-    MemRef<float, 4> outputMemRef(sizesOutput, 0.0);                           \
-                                                                               \
-    for (auto _ : state) {                                                     \
-      func(&inputMemRef, &filterMemRef, &outputMemRef);                        \
-    }                                                                          \
+template <typename Func>
+void DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC(benchmark::State &state, Func func) {
+
+  intptr_t sizesInput[4] = {INPUT_N, INPUT_H, INPUT_W, INPUT_C};
+  intptr_t sizesKernel[3] = {KERNEL_H, KERNEL_W, KERNEL_C};
+  intptr_t sizesOutput[4] = {OUTPUT_N, OUTPUT_H, OUTPUT_W, OUTPUT_C};
+
+  MemRef<float, 4> inputMemRef(sizesInput, 2.0);
+  MemRef<float, 3> filterMemRef(sizesKernel, 3.0);
+  MemRef<float, 4> outputMemRef(sizesOutput, 0.0);
+
+  for (auto _ : state) {
+    func(&inputMemRef, &filterMemRef, &outputMemRef);
   }
-
-DEFINE_Depthwise_Conv2DNhwcHwc_BENCHMARK(
-    AutoVectorization,
-    _mlir_ciface_depthwise_conv_2d_nhwc_hwc_auto_vectorization)
-
-    DEFINE_Depthwise_Conv2DNhwcHwc_BENCHMARK(
-        SCALAR, _mlir_ciface_depthwise_conv_2d_nhwc_hwc_scalar)
-
+}
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK(BM_Depthwise_Conv2DNhwcHwc_SCALAR)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_Depthwise_Conv2DNhwcHwc_AutoVectorization)
+BENCHMARK_CAPTURE(DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC, Scalar,
+                  _mlir_ciface_depthwise_conv_2d_nhwc_hwc_scalar)
     ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC, AutoVectorization,
+                  _mlir_ciface_depthwise_conv_2d_nhwc_hwc_auto_vectorization)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC, Vectorization,
+                  _mlir_ciface_depthwise_conv_2d_nhwc_hwc_vectorization)
+    ->Unit(benchmark::kMillisecond);
+// BENCHMARK_CAPTURE(DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC, RvvVectorization,
+//                   _mlir_ciface_depthwise_conv_2d_nhwc_hwc_rvv_vectorization)
+//     ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
 /// The verification does not affect the performance.
@@ -116,6 +122,7 @@ void verification() {
 
   // Generate input memref container with random numbers.
   const int inputSize = INPUT_N * INPUT_C * INPUT_H * INPUT_W;
+  const int outputSize = INPUT_N * OUTPUT_C * OUTPUT_H * OUTPUT_W;
   float inputRand[inputSize];
   for (int i = 0; i < inputSize; ++i) {
     inputRand[i] = distribution(generator);
@@ -131,29 +138,47 @@ void verification() {
   MemRef<float, 3> filterMemRef(kernelRand, sizesKernel);
 
   // Generate output memref container with zero.
-  MemRef<float, 4> outputScalarMemRef(sizesOutput, 0.0);
-  MemRef<float, 4> outputVectorizationMemRef(sizesOutput, 0.0);
+  MemRef<float, 4> outputScalar(sizesOutput, 0.0);
+  MemRef<float, 4> outputAutoVectorization(sizesOutput, 0.0);
+  MemRef<float, 4> outputVectorization(sizesOutput, 0.0);
+  // MemRef<int, 4> outputRVVVectorization(sizesOutput, 0.0);
 
   // Perform all the matmul implementation.
   _mlir_ciface_depthwise_conv_2d_nhwc_hwc_scalar(&inputMemRef, &filterMemRef,
-                                                 &outputScalarMemRef);
-  _mlir_ciface_depthwise_conv_2d_nhwc_hwc_scalar(&inputMemRef, &filterMemRef,
-                                                 &outputVectorizationMemRef);
+                                                 &outputScalar);
+  _mlir_ciface_depthwise_conv_2d_nhwc_hwc_auto_vectorization(
+      &inputMemRef, &filterMemRef, &outputAutoVectorization);
+  _mlir_ciface_depthwise_conv_2d_nhwc_hwc_vectorization(
+      &inputMemRef, &filterMemRef, &outputVectorization);
+  // _mlir_ciface_depthwise_conv_2d_nhwc_hwc_rvv_vectorization(
+  //     &inputMemRef, &filterMemRef, &outputRVVVectorization);
 
   // Get the result array.
-  auto resultScalar = outputScalarMemRef.getData();
-  auto resultVectorization = outputVectorizationMemRef.getData();
+  auto resultScalar = outputScalar.getData();
+  auto resultAutoVectorization = outputAutoVectorization.getData();
+  auto resultVectorization = outputVectorization.getData();
+  // auto resultRVVVectorization = outputRVVVectorization.getData();
 
-  // Print the verfication result.
   std::cout << "-----------------------------------------------------------"
             << std::endl;
   std::cout << "Correctness Verification:" << std::endl;
-  std::cout << "Transform case: "
-            << (areArraysEqual(resultScalar, resultVectorization,
-                               OUTPUT_N * OUTPUT_C * OUTPUT_H * OUTPUT_W)
+  std::cout << "Scalar vs AutoVectorization: "
+            << (areArraysEqual(resultScalar, resultAutoVectorization,
+                               outputSize)
                     ? PASS
                     : FAIL)
             << std::endl;
+  std::cout << "Scalar vs Vectorization: "
+            << (areArraysEqual(resultScalar, resultVectorization, outputSize)
+                    ? PASS
+                    : FAIL)
+            << std::endl;
+  // std::cout << "Scalar vs AutoTillingVectorization: "
+  //           << (areArraysEqual(resultScalar, resultRVVVectorization,
+  //           outputSize)
+  //                   ? PASS
+  //                   : FAIL)
+  //           << std::endl;
   std::cout << "-----------------------------------------------------------"
             << std::endl;
 }
