@@ -1,0 +1,261 @@
+pipeline {
+    agent none
+
+    environment {
+
+        //远程克隆可以获取完整分支
+        //本地克隆只能获得本地有的分支，但可以避免出现由于网络导致的克隆失败问题
+        REPO_URL = 'https://github.com/opencv/opencv.git'
+        //REPO_URL = 'file:////home/share/opencv'
+        
+        LLVM_NODES = "llvm-18, llvm-17"
+        RISCV_NODES = "riscv-14 riscv-13"
+
+        //构建命令，将构建过程输出至 .xml 中，并存档
+        LLVM_COMMAND = """
+            cmake -G Ninja ../ \\
+                -DCMAKE_BUILD_TYPE=Release \\
+                -DBUILD_SHARED_LIBS=OFF \\
+                -DBUILD_EXAMPLES=OFF \\
+                -DWITH_PNG=OFF \\
+                -DOPENCV_ENABLE_NONFREE=ON \\
+                -DWITH_OPENCL=OFF \\
+                -DCMAKE_TOOLCHAIN_FILE=../platforms/linux/riscv64-clang.toolchain.cmake \\
+                -DRISCV_CLANG_BUILD_ROOT=/home/share/opt/${BUILD_NODE} \\
+                -DRISCV_GCC_INSTALL_ROOT=/home/share/opt/riscv-13 \\
+                -DCPU_BASELINE=RVV \\
+                -DCPU_BASELINE_REQUIRE=RVV \\
+                -DRISCV_RVV_SCALABLE=ON >> cmake_report.xml 2>&1
+                """
+        RISCV_COMMAND = """
+            cmake -GNinja ../ \\
+                    -DTOOLCHAIN_COMPILER_LOCATION_HINT=/home/share/opt/${BUILD_NODE}/bin \\
+                    -DCMAKE_BUILD_TYPE=Release \\
+                    -DBUILD_SHARED_LIBS=OFF \\
+                    -DWITH_OPENCL=OFF \\
+                    -DCMAKE_TOOLCHAIN_FILE=../platforms/linux/riscv64-gcc.toolchain.cmake \\
+                    -DRISCV_RVV_SCALABLE=ON \\
+                    -DCPU_BASELINE=RVV \\
+                    -DCPU_BASELINE_REQUIRE=RVV >> cmake_report.xml 2>&1
+            """
+        NINJA_COMMAND = ''' ninja >> ninja_report.xml 2>&1'''
+
+    
+    }
+
+    parameters {
+        // 分支参数，用于选择不同分支
+        gitParameter branchFilter: 'origin/(.*)', defaultValue: '4.x', name: 'BRANCH_1', type: 'PT_BRANCH'
+        gitParameter branchFilter: 'origin/(.*)', defaultValue: '5.x', name: 'BRANCH_2', type: 'PT_BRANCH'
+
+        // 构建节点参数，用于选择不同构建工具
+        choice choices: ['llvm-18', 'llvm-17', 'riscv-13', 'riscv-14'], name: 'BUILD_NODE'
+        
+        // 构建文件参数，用于选择测试的文件，多选
+        extendedChoice(
+            name: 'ARCHIVE_FILES',
+            type: 'PT_CHECKBOX',
+            description: 'OpenCV Benchmarks',
+            multiSelectDelimiter: ',',
+            value: 'opencv_perf_core,opencv_perf_imgproc,opencv_perf_dnn,opencv_test_core,opencv_test_imgproc,opencv_test_dnn',
+            defaultValue: 'opencv_perf_core,opencv_test_core'
+        )
+
+        // 运行节点参数，用于选择测试文件的运行节点，多选
+        extendedChoice(
+            name: 'EXECUTION_NODES',
+            type: 'PT_CHECKBOX',
+            description: '',
+            multiSelectDelimiter: ',',
+            value: 'BPI-F3,k235,k236',
+            defaultValue: 'k235'
+        )
+    }
+
+    stages {
+
+        stage('Checkout Branch 1') {
+            //克隆所选分支1
+            agent {
+                node {
+                    label 'x86'
+                }
+            }
+            
+            steps {
+                checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${BRANCH_1}"]],
+                        userRemoteConfigs: [[url: "${REPO_URL}"]]
+                        //可选：浅克隆
+                        //extensions: [ cloneOption(shallow: true) ]
+                    ])
+            }
+        }
+
+        stage('Build 1') {
+            //构建
+            agent {
+                node {
+                    label 'x86'
+                }
+            }
+
+            steps {
+                script {
+                    def buildDir = "build_${BRANCH_1}_${BUILD_NODE}"
+                    sh "rm -rf ${buildDir}"
+                    sh "mkdir ${buildDir}"
+                    dir("${buildDir}"){
+                        if (LLVM_NODES.contains(BUILD_NODE)) {
+                            sh """
+                                ${LLVM_COMMAND}
+                                ${NINJA_COMMAND}
+                            """
+                        } else if (RISCV_NODES.contains(BUILD_NODE)) {
+                            sh """
+                                ${RISCV_COMMAND}
+                                ${NINJA_COMMAND}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Archive and Clean 1'){
+            //存档并清理
+            agent {
+                node {
+                    label 'x86'
+                }
+            }
+            steps {
+                script {
+                    def buildDir = "build_${BRANCH_1}_${BUILD_NODE}"
+                    archiveArtifacts artifacts: "${buildDir}/*.xml"
+                    def files = ARCHIVE_FILES.split(',')
+                    files.each { file ->
+                        archiveArtifacts artifacts: "${buildDir}/bin/${file}"
+                    }
+                    dir("${buildDir}/bin"){
+                        stash name: 'archivedFiles_1', includes: "${ARCHIVE_FILES}"
+                    }
+                    sh "rm -rf ${buildDir}" 
+                }
+            }
+        }
+
+        stage('Deploy and Run Tests 1') {
+            steps {
+                script {
+                    def nodes = params.EXECUTION_NODES.split(',')
+                    nodes.each { nodeLabel ->
+                        node(nodeLabel) {
+                            unstash 'archivedFiles_1'
+                            def files = params.ARCHIVE_FILES.split(',')
+                            files.each { file ->
+                                sh "./${file} > a1_${file}_${nodeLabel}.xml || true"
+                                //sh "./${file} --gtest_filter=\"BinaryOpTest.transposeND*\" --gtest_output=xml:./${file}_${nodeLabel}.xml"
+                            }
+                            archiveArtifacts artifacts: '*.xml'
+                            sh 'rm -rf *'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Checkout Branch 2') {
+            //克隆所选分支2
+            agent {
+                node {
+                    label 'x86'
+                }
+            }
+            
+            steps {
+                checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${BRANCH_1}"]],
+                        userRemoteConfigs: [[url: "${REPO_URL}"]]
+                        //可选：浅克隆
+                        //extensions: [ cloneOption(shallow: true) ]
+                    ])
+            }
+        }
+
+        stage('Build 2') {
+            //构建
+            agent {
+                node {
+                    label 'x86'
+                }
+            }
+
+            steps {
+                script {
+                    def buildDir = "build_${BRANCH_2}_${BUILD_NODE}"
+                    sh "rm -rf ${buildDir}"
+                    sh "mkdir ${buildDir}"
+                    dir("${buildDir}"){
+                        if (LLVM_NODES.contains(BUILD_NODE)) {
+                            sh """
+                                ${LLVM_COMMAND}
+                                ${NINJA_COMMAND}
+                            """
+                        } else if (RISCV_NODES.contains(BUILD_NODE)) {
+                            sh """
+                                ${RISCV_COMMAND}
+                                ${NINJA_COMMAND}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Archive and Clean 2'){
+            //存档并清理
+            agent {
+                node {
+                    label 'x86'
+                }
+            }
+            steps {
+                script {
+                    def buildDir = "build_${BRANCH_2}_${BUILD_NODE}"
+                    archiveArtifacts artifacts: "${buildDir}/*.xml"
+                    def files = ARCHIVE_FILES.split(',')
+                    files.each { file ->
+                        archiveArtifacts artifacts: "${buildDir}/bin/${file}"
+                    }
+                    dir("${buildDir}/bin"){
+                        stash name: 'archivedFiles_2', includes: "${ARCHIVE_FILES}"
+                    }
+                    sh "rm -rf ${buildDir}" 
+                }
+            }
+        }
+
+        stage('Deploy and Run Tests 2') {
+            steps {
+                script {
+                    def nodes = params.EXECUTION_NODES.split(',')
+                    nodes.each { nodeLabel ->
+                        node(nodeLabel) {
+                            unstash 'archivedFiles_2'
+                            def files = params.ARCHIVE_FILES.split(',')
+                            files.each { file ->
+                                sh "./${file} > a2_${file}_${nodeLabel}.xml || true"
+                                //sh "./${file} --gtest_filter=\"BinaryOpTest.transposeND*\" --gtest_output=xml:./${file}_${nodeLabel}.xml"
+                            }
+                            archiveArtifacts artifacts: '*.xml'
+                            sh 'rm -rf *'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

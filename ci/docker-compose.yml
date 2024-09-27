@@ -1,0 +1,107 @@
+version: '3'
+
+services:
+  jenkins:
+    container_name: jenkins
+    build: ./jenkins/
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    restart: on-failure
+
+  llvm-17:
+    container_name: llvm-17
+    build: 
+      context: ./compiler-containers/llvmDockerfile
+      # 指定构建版本
+      args: 
+        LLVM_TAG: llvmorg-17.0.6
+    volumes:
+      - llvm-17:/opt/llvm
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint: ["/bin/sh", "-c", "echo 'LLVM-17 MOUNTED'"]
+    restart: "no"
+    depends_on:
+      - jenkins
+      
+
+  llvm-18:
+    container_name: llvm-18
+    build: 
+      context: ./compiler-containers/llvmDockerfile
+      # 指定构建版本
+      args:
+        LLVM_TAG: llvmorg-18.1.7
+    volumes:
+      - llvm-18:/opt/llvm
+    deploy:
+      restart_policy:
+        condition: none 
+    entrypoint: ["/bin/sh", "-c", "echo 'LLVM-18 MOUNTED'"]
+    restart: "no"
+    depends_on:
+      - jenkins
+      
+
+  riscv-13:
+    container_name: riscv-13
+    build: 
+      context: ./compiler-containers/riscvDockerfile
+      # 指定构建版本
+      args:
+        GCC_TAG: releases/gcc-13.3.0 
+    volumes:
+      - riscv-13:/opt/riscv
+    deploy:
+      restart_policy:
+        condition: none 
+    entrypoint: ["/bin/sh", "-c", "echo 'RISC-V-13 MOUNTED'"]
+    restart: "no"
+    depends_on:
+      - jenkins
+      
+
+  riscv-14:
+    container_name: riscv-14
+    build: 
+      context: ./compiler-containers/riscvDockerfile
+      # 指定构建版本
+      args:
+        GCC_TAG: releases/gcc-14.1.0
+    volumes:
+      - riscv-14:/opt/riscv
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint: ["/bin/sh", "-c", "echo 'RISC-V-14 MOUNTED'"]
+    restart: "no"
+    depends_on:
+      - jenkins
+
+volumes:
+  jenkins_home:
+  llvm-17:
+    driver_opts: 
+      type: ext4   
+      o: bind
+      # 宿主机中保存编译工具的位置
+      device: ./opt/llvm-17 
+  llvm-18:
+    driver_opts: 
+      type: ext4   
+      o: bind
+      device: ./opt/llvm-18
+  riscv-13:
+    driver_opts: 
+      type: ext4   
+      o: bind
+      device: ./opt/riscv-13
+  riscv-14:
+    driver_opts: 
+      type: ext4   
+      o: bind
+      device: ./opt/riscv-14
