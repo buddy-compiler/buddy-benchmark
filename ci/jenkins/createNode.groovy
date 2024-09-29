@@ -59,7 +59,7 @@ nodeNames.each { nodeName ->
     // 创建 Jenkins 节点
     createNode(nodeName, remoteFS, nodeName, launcher)
 
-    println "节点创建成功"
+    println "节点 ${nodeName} 创建成功"
 }
 
 println "所有节点创建成功"

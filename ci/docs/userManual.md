@@ -22,15 +22,16 @@ docker-compose up
 
 ![image-20240925081132364](image/image-20240925081132364.png)
 
-目前配置的从节点设备信息如下：
+## 自动配置从节点设备
+注意，若想使用 `createNode.groovy` 脚本自动配置设备节点，在搭建平台前需要在 `./jenkins/` 下创建 `config.properties`文件，用于保存从设备信息。文件格式如下：
+```
+#  节点名.host=
+#  节点名.port=
+#  节点名.username=
+#  节点名.password=
+#  节点名.remoteFS=       # Jenkins 工作目录，确保该路径在从设备中存在，登录用户具有读写权限
+```
 
-| 名称       | 架构 / 操作系统              | ip             | 备注        |
-| ---------- | ---------------------------- | -------------- | ----------- |
-| x86服务器  | x86 / Ubuntu                 | 192.168.15.160 |             |
-| BPI-F3     | RISC-V RVV / Bianbu (debian) | 192.168.15.164 | k4          |
-| 树莓派4B   | ARM / Ubuntu                 | 192.168.15.4   |             |
-| CanMV-K230 | RISC-V RVV / Linux           | 192.168.15.155 | Ubuntu k235 |
-| CanMV-K230 | RISC-V RVV / Linux           | 192.168.15.156 | Ubuntu k236 |
 
 ------
 
@@ -66,7 +67,7 @@ docker-compose up
   - `Host`：填入SSH主机名
   - `Credentials`：选择上一步配置成功的凭据
 
-![Untitled (3)](image/Untitled (3).png)
+![image-20140929123412341.png](image/image-20140929123412341.png)
 
 - `Host Key Verification Strategy`：配置SSH连接的主机密钥验证策略，这里选择 `Non-verifying Verification Strategy`（不进行验证）
 - `Availability`：控制节点的可用性
@@ -83,17 +84,17 @@ docker-compose up
 
 # 测试用例
 
-测试用例 opencv_test 以 [OpenCV](https://github.com/opencv/opencv) 面向 RISC-V 平台的交叉编译为例，对比使用同一工具链构建下的两个不同分支代码在 RISC-V 开发板上的执行表现。支持用户选择仓库的不同分支、构建工具、测试文件以及负责执行的 RISC-V 设备。下面介绍在 Jenkins 中手动设置测试任务步骤，以及整个任务的测试流程
+测试用例 opencv_test 以 [OpenCV](https://github.com/opencv/opencv) 面向 RISC-V 平台的交叉编译为例，支持用户选择仓库的不同分支、构建工具、测试文件以及负责执行的 RISC-V 设备。下面介绍在 Jenkins 中手动设置测试任务步骤，以及整个任务的测试流程
 
 ## 手动设置测试任务
 
 点击 Jenkins 主页面 New Item，新建一个测试任务，并选择 Pipeline 以创建一个流水线项目
 
-![创建任务1](image/创建任务1.png)
+![image-1](image/image-1.png)
 
 在 Script 处编写测试文件 Jenkinsfile，并勾选 Use Groovy SandBox
 
-![创建任务2](image/创建任务2.png)
+![image-2](image/image-2.png)
 
 保存后点击左侧 Build Now 开始构建。带参数的项目配置完成后需要先构建一次， 第二次构建才会出现参数选择界面
 
@@ -195,9 +196,7 @@ pipeline {
 ```groovy
         stage('Checkout') { // 克隆所选分支
             agent {
-                node {
-                    label 'x86' 
-                }
+                label 'JenkinsNode'
             }
             
             steps {
@@ -240,9 +239,7 @@ parameters {
 ```groovy
 stage('Build') { // 构建阶段
             agent {
-                node { 
-                    label 'x86' 
-                }
+                label 'JenkinsNode'
             }
 
             steps {
@@ -286,15 +283,15 @@ environment {
                 -DOPENCV_ENABLE_NONFREE=ON \\
                 -DWITH_OPENCL=OFF \\
                 -DCMAKE_TOOLCHAIN_FILE=../platforms/linux/riscv64-clang.toolchain.cmake \\
-                -DRISCV_CLANG_BUILD_ROOT=/home/share/opt/${BUILD_NODE} \\
-                -DRISCV_GCC_INSTALL_ROOT=/home/share/opt/riscv \\
+                -DRISCV_CLANG_BUILD_ROOT=/opt/${BUILD_NODE} \\
+                -DRISCV_GCC_INSTALL_ROOT=/opt/riscv_13 \\
                 -DCPU_BASELINE=RVV \\
                 -DCPU_BASELINE_REQUIRE=RVV \\
                 -DRISCV_RVV_SCALABLE=ON >> cmake_report.xml 2>&1
                 """
         RISCV_COMMAND = """
             cmake -GNinja ../ \\
-                    -DTOOLCHAIN_COMPILER_LOCATION_HINT=/hoem/share/opt/${BUILD_NODE}/bin \\
+                    -DTOOLCHAIN_COMPILER_LOCATION_HINT=/opt/${BUILD_NODE}/bin \\
                     -DCMAKE_BUILD_TYPE=Release \\
                     -DBUILD_SHARED_LIBS=OFF \\
                     -DWITH_OPENCL=OFF \\
@@ -332,9 +329,7 @@ parameters {
 ```groovy
 stage('Archive'){ // 存档
             agent {
-                node {
-                    label "${BUILD_NODE}"
-                }
+                label 'JenkinsNode'
             }
             steps {
                 script {

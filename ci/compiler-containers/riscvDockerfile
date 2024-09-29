@@ -1,10 +1,8 @@
 # 使用 ubuntu:22.04 作为基础镜像，用于编译 riscv-gnu-toolchain
 FROM ubuntu:22.04 AS builder
 
-# 设置环境变量，构建镜像过程中所有交互操作都将自动忽略
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 安装构建工具和依赖项
 RUN apt-get update && apt-get install -y \
     autoconf automake autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison\
     flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev git ninja-build cmake libglib2.0-dev libslirp-dev && \
@@ -19,7 +17,6 @@ RUN git clone \
     -b ${COLLAB_TAG} \
     https://github.com/riscv-collab/riscv-gnu-toolchain.git
 
-# 设置工作目录为 lriscv-gnu-toolchain，之后的命令将在该目录下执行
 WORKDIR riscv-gnu-toolchain
 
 # 初始化并更新子模块
@@ -28,7 +25,6 @@ RUN git submodule update --init gcc
 ARG GCC_TAG=releases/gcc-14.1.0
 RUN git -C gcc remote update && git -C gcc fetch origin ${GCC_TAG} && git -C gcc checkout ${GCC_TAG}
 
-# 配置并构建 RISC-V 工具链
 RUN ./configure --prefix=/opt/riscv 
 RUN make linux
 
