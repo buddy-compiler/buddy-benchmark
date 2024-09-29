@@ -35,7 +35,7 @@ def createSSHLauncher(String host, int port, String credentialsId) {
 
 // 创建 Jenkins 节点
 def createNode(String nodeName, String remoteFS, String label, SSHLauncher launcher) {
-    def slave = new DumbSlave(nodeName, '', remoteFS, '1', Node.Mode.NORMAL, label, launcher, new RetentionStrategy.Always())
+    def slave = new DumbSlave(nodeName, '', remoteFS, '1', Node.Mode.EXCLUSIVE, label, launcher, new RetentionStrategy.Always())
     Jenkins.instance.addNode(slave)
 }
 
