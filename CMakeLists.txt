@@ -3,7 +3,6 @@
 ## Configure the buddy-benchmark build.
 ##
 ##===----------------------------------------------------------------------===//
-
 cmake_minimum_required(VERSION 3.10)
 
 #-------------------------------------------------------------------------------
@@ -11,10 +10,9 @@ cmake_minimum_required(VERSION 3.10)
 #-------------------------------------------------------------------------------
 project(buddy-benchmark LANGUAGES CXX C)
 
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
-set(CMAKE_CXX_FLAGS "-no-pie")
-set(CMAKE_C_FLAGS "-no-pie")
 
 #-------------------------------------------------------------------------------
 # BUDDY configuration
@@ -41,8 +39,6 @@ set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(BUDDY_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/bin)
 set(BUDDY_BENCHMARK_DEEP_LEARNING_DIR ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning)
-
-
 
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 set(BUILD_VALIDATION OFF CACHE BOOL "Build validations")
@@ -82,6 +78,7 @@ ExternalProject_Add(project_googlebenchmark
   -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
   -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
   -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+  -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
   UPDATE_COMMAND ""
   TEST_COMMAND "")
 
@@ -101,7 +98,7 @@ target_link_libraries(GoogleBenchmark INTERFACE Threads::Threads)
 # -------------------------------------------------------------------------------
 # Find OpenCV
 # -------------------------------------------------------------------------------
-if(DEFINED IMAGE_PROCESSING_BENCHMARKS OR OP_OPTIMIZATION_BENCHMARKS)
+if(DEFINED IMAGE_PROCESSING_BENCHMARKS)
   find_package(OpenCV REQUIRED CONFIG)
   include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
