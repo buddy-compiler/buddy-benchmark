@@ -66,17 +66,22 @@ $ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
-    -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
-    -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}
-$ ninja <target banchmark>
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR} \
+    -DCMAKE_CXX_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang++ \
+    -DCMAKE_C_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang \
+    -DCMAKE_CXX_FLAGS=-march=native \
+    -DCMAKE_C_FLAGS=-march=native
+$ ninja <target benchmark>
 // For example: 
 $ ninja dl-op-linalg-matmul-benchmark
 ```
 
 3. Run the benchmark on your local platform:
 
-```
+```bash
 // For example:
 $ cd bin
 $ ./dl-op-linalg-matmul-benchmark
@@ -93,11 +98,10 @@ Follow the relevant [documentation](https://github.com/buddy-compiler/buddy-mlir
 ```bash
 $ cd buddy-mlir/build
 $ export BUDDY_MLIR_BUILD_DIR=$PWD
-$ export LLVM_MLIR_BUILD_DIR=$PWD/../llvm/build
-$ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
+$ export LLVM_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}/../llvm/build/
+$ export BUDDY_MLIR_BUILD_CROSS_DIR=${BUDDY_MLIR_BUILD_DIR}/../build-cross-rv
 $ export RISCV_GNU_TOOLCHAIN=${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain
-$ cd ../build-cross-rv
-$ export BUDDY_MLIR_BUILD_CROSS_DIR=$PWD
+$ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
 ```
 
 2. Build the benchmark for the target platform:
@@ -106,16 +110,21 @@ $ export BUDDY_MLIR_BUILD_CROSS_DIR=$PWD
 $ cd buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
-    -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEEP_LEARNING_BENCHMARKS=ON \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DCROSS_COMPILE_RVV=ON \
     -DCMAKE_SYSTEM_NAME=Linux \
     -DCMAKE_SYSTEM_PROCESSOR=riscv \
-    -DCMAKE_C_COMPILER=${RISCV_GNU_TOOLCHAIN}/bin/riscv64-unknown-linux-gnu-gcc \
-    -DCMAKE_CXX_COMPILER=${RISCV_GNU_TOOLCHAIN}/bin/riscv64-unknown-linux-gnu-g++ \
+    -DCMAKE_C_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang \
+    -DRISCV_GNU_TOOLCHAIN=${RISCV_GNU_TOOLCHAIN} \
+    -DCMAKE_CXX_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang++ \
+    -DCMAKE_C_FLAGS="-march=rv64gcv --target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN}/sysroot --gcc-toolchain=${RISCV_GNU_TOOLCHAIN} -fPIC" \
+    -DCMAKE_CXX_FLAGS="-march=rv64gcv --target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN}/sysroot --gcc-toolchain=${RISCV_GNU_TOOLCHAIN} -fPIC" \
     -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR} \
     -DBUDDY_MLIR_BUILD_CROSS_DIR=${BUDDY_MLIR_BUILD_CROSS_DIR}
-$ ninja <target banchmark>
+
+$ ninja <target benchmark>
 // For example: 
 $ ninja dl-op-linalg-matmul-benchmark
 ```
