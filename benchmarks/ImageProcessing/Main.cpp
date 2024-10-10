@@ -36,11 +36,13 @@ void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **, Img<float, 2>);
 void initializeBuddyResize2D(char **, Img<float, 2>);
 void initializeOpenCVResize2D(char **);
+void initializeBuddyResize4D(char **, Img<float, 4>);
 
 void generateResultMLIRConv2D(Img<float, 2>);
 void generateResultBuddyConv2D(Img<float, 2>);
 void generateResultBuddyCorr2D(char **argv, Img<float, 2>);
 void generateResultBuddyResize2D(char **argv, Img<float, 2>);
+void generateResultBuddyResize4D(char **argv, Img<float, 4>);
 void generateResultBuddyErosion2D(char **, Img<float, 2>);
 void generateResultBuddyOpening2D(char **, Img<float, 2>);
 void generateResultBuddyClosing2D(char **, Img<float, 2>);
@@ -67,6 +69,7 @@ void registerBenchmarkBuddyClosing2D();
 void registerBenchmarkBuddyTopHat2D();
 void registerBenchmarkBuddyBottomHat2D();
 void registerBenchmarkBuddyMorphGrad2D();
+void registerBenchmarkBuddyResize4D();
 void registerBenchmarkOpenCVErode2D();
 void registerBenchmarkOpenCVDilate2D();
 void registerBenchmarkOpenCVOpening2D();
@@ -94,6 +97,9 @@ int main(int argc, char **argv) {
   }
 
   Img<float, 2> img = dip::imread<float, 2>(argv[1], dip::IMGRD_GRAYSCALE);
+  Img<float, 3> imgColar = dip::imread<float, 3>(argv[1], dip::IMGRD_COLOR);
+  intptr_t sizes[4] = {1, imgColar.getSizes()[0], imgColar.getSizes()[1], imgColar.getSizes()[2]};
+  Img<float, 4> imgColarBatch(imgColar.getData(), sizes);
 
   initializeMLIRConv2D(argv, img);
   initializeBuddyConv2D(argv, img);
@@ -104,6 +110,7 @@ int main(int argc, char **argv) {
   initializeEigenConvolve2D(argv, img);
   initializeBuddyResize2D(argv, img);
   initializeOpenCVResize2D(argv);
+  initializeBuddyResize4D(argv, imgColarBatch);
 
   registerBenchmarkBuddyCorr2D();
   registerBenchmarkOpenCVFilter2D();
@@ -115,6 +122,7 @@ int main(int argc, char **argv) {
   registerBenchmarkBuddyClosing2D();
   registerBenchmarkBuddyTopHat2D();
   registerBenchmarkBuddyBottomHat2D();
+  registerBenchmarkBuddyResize4D();
   registerBenchmarkOpenCVErode2D();
   registerBenchmarkOpenCVOpening2D();
   registerBenchmarkOpenCVClosing2D();
@@ -139,6 +147,7 @@ int main(int argc, char **argv) {
   generateResultBuddyTopHat2D(argv, img);
   generateResultBuddyBottomHat2D(argv, img);
   generateResultBuddyMorphGrad2D(argv, img);
+  generateResultBuddyResize4D(argv, imgColarBatch);
   generateResultOpenCVTopHat2D();
   generateResultOpenCVBottomHat2D();
   generateResultOpenCVMorphGrad2D();
