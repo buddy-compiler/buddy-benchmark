@@ -41,6 +41,28 @@ add_custom_command(OUTPUT matmul-rvv.o
 add_library(MatMulRVV STATIC matmul-rvv.o)
 set_target_properties(MatMulRVV PROPERTIES LINKER_LANGUAGE CXX)
 
+add_custom_command(OUTPUT matmul-vec.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulInt32Op/MatmulVec.mlir |
+          sed 's/@matmul/@matmul_vec/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+            -llvm-request-c-wrappers
+            -convert-linalg-to-loops 
+            -expand-strided-metadata 
+            -lower-affine 
+            -convert-scf-to-cf 
+            -convert-vector-to-llvm 
+            -finalize-memref-to-llvm 
+            -convert-arith-to-llvm 
+            -convert-func-to-llvm 
+            -reconcile-unrealized-casts |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
+          -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MatMulInt32Op/matmul-vec.o
+)
+add_library(MatMulVec STATIC matmul-vec.o)
+set_target_properties(MatMulVec PROPERTIES LINKER_LANGUAGE CXX)
+
 add_executable(dl-op-linalg-matmul-benchmark-rvv
   GoogleBenchmarkMain.cpp
   )
@@ -55,4 +77,5 @@ target_link_libraries(dl-op-linalg-matmul-benchmark-rvv
   ${BenchmarkTool}
   MatMulScalarRVV
   MatMulRVV
-  )
+  MatMulVec
+)

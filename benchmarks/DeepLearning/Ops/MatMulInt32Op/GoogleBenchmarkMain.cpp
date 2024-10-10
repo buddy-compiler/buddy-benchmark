@@ -24,9 +24,9 @@
 #include <random>
 
 // Define target layout.
-#define M 64
-#define N 3136
-#define K 576
+#define M (128 * 4)
+#define N (128 * 4)
+#define K (128 * 4)
 
 // Helper functions and variables.
 namespace {
@@ -50,6 +50,9 @@ void _mlir_ciface_matmul_scalar(MemRef<int, 2> *A, MemRef<int, 2> *B,
                                 MemRef<int, 2> *C);
 void _mlir_ciface_matmul_rvv(MemRef<int, 2> *A, MemRef<int, 2> *B,
                              MemRef<int, 2> *C);
+void _mlir_ciface_matmul_vec(
+    MemRef<int, 2> *A, MemRef<int, 2> *B,
+    MemRef<int, 2> *C); // Add the interface for matmul_vec
 }
 
 template <typename Func>
@@ -72,7 +75,11 @@ void DL_OPS_MATMUL(benchmark::State &state, Func func) {
 // Register benchmarking function with different arguments.
 BENCHMARK_CAPTURE(DL_OPS_MATMUL, Scalar, _mlir_ciface_matmul_scalar)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_OPS_MATMUL, RvvVectorization, _mlir_ciface_matmul_rvv)
+BENCHMARK_CAPTURE(
+    DL_OPS_MATMUL, VectorBroadcast,
+    _mlir_ciface_matmul_vec) // Register matmul_vec for benchmarking
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_OPS_MATMUL, VectorRVV, _mlir_ciface_matmul_rvv)
     ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
@@ -110,21 +117,29 @@ void verification() {
   const int outputSize = M * N;
   MemRef<int, 2> outputScalar(sizesC, 0);
   MemRef<int, 2> outputRVV(sizesC, 0);
+  MemRef<int, 2> outputVec(sizesC, 0); // Add output for matmul_vec
 
   // Perform all the matmul implementation.
   _mlir_ciface_matmul_scalar(&inputAMemRef, &inputBMemRef, &outputScalar);
   _mlir_ciface_matmul_rvv(&inputAMemRef, &inputBMemRef, &outputRVV);
+  _mlir_ciface_matmul_vec(&inputAMemRef, &inputBMemRef,
+                          &outputVec); // Call matmul_vec
 
   // Get the result array.
   auto resultScalar = outputScalar.getData();
   auto resultRVV = outputRVV.getData();
+  auto resultVec = outputVec.getData(); // Get the result for matmul_vec
 
-  // Print the verfication result.
+  // Print the verification result.
   std::cout << "-----------------------------------------------------------"
             << std::endl;
   std::cout << "Correctness Verification:" << std::endl;
   std::cout << "RVV case: "
             << (areArraysEqual(resultScalar, resultRVV, outputSize) ? PASS
+                                                                    : FAIL)
+            << std::endl;
+  std::cout << "Vec case: "
+            << (areArraysEqual(resultScalar, resultVec, outputSize) ? PASS
                                                                     : FAIL)
             << std::endl;
   std::cout << "-----------------------------------------------------------"

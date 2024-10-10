@@ -22,7 +22,7 @@ module {
     affine.parallel (%arg3) = (0) to (%dim) {
       affine.prefetch %arg0[%arg3, %dim_1, %dim_4], read, locality<3>, data : memref<?x?x?xi32>
       affine.for %arg4 = #map2(%c0) to #map2(%3) {
-        affine.if #set(%arg3)[%dim_2] {
+        affine.if #set(%arg4)[%dim_2] {
           affine.for %arg5 = #map2(%c0) to #map2(%dim_4) {
             %4 = affine.vector_load %arg1[%arg3, %arg5, %arg4 * 8] : memref<?x?x?xi32>, vector<8xi32>
             affine.for %arg6 = #map2(%c0) to #map2(%dim_1) {

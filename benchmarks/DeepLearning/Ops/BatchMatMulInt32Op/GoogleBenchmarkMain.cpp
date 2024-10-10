@@ -83,10 +83,10 @@ BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Scalar, _mlir_ciface_batch_matmul_scalar)
 BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, AutoVectorization,
                   _mlir_ciface_batch_matmul_auto_vectorization)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Vectorization,
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, VectorBroadcast,
                   _mlir_ciface_batch_matmul_vectorization)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, RvvVectorization,
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, VectorRVV,
                   _mlir_ciface_batch_matmul_rvv_vectorization)
     ->Unit(benchmark::kMillisecond);
 

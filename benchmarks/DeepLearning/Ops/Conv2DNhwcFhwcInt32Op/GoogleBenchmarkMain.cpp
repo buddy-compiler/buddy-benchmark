@@ -95,10 +95,10 @@ BENCHMARK_CAPTURE(DL_OPS_CONV_2D_NHWC_FHWC, Scalar,
 BENCHMARK_CAPTURE(DL_OPS_CONV_2D_NHWC_FHWC, AutoVectorization,
                   _mlir_ciface_conv_2d_nhwc_fhwc_auto_vectorization)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_OPS_CONV_2D_NHWC_FHWC, Vectorization,
+BENCHMARK_CAPTURE(DL_OPS_CONV_2D_NHWC_FHWC, VectorBroadcast,
                   _mlir_ciface_conv_2d_nhwc_fhwc_vectorization)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_OPS_CONV_2D_NHWC_FHWC, RvvVectorization,
+BENCHMARK_CAPTURE(DL_OPS_CONV_2D_NHWC_FHWC, VectorRVV,
                   _mlir_ciface_conv_2d_nhwc_fhwc_rvv_vectorization)
     ->Unit(benchmark::kMillisecond);
 
