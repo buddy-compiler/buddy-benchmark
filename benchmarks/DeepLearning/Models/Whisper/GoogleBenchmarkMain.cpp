@@ -34,18 +34,18 @@ namespace {
 // Declare the Whisper C interface.
 extern "C" {
 void _mlir_ciface_forward_auto_vectorization(
-                                             MemRef<float, 3> *output1,
-                                             MemRef<float, 3> *output2,
+                                             MemRef<float, 3> resultContainer[2],
                                              MemRef<float, 1> *params,
-                                             MemRef<long long, 2> *decoder_input,
-                                             MemRef<float, 3> *input);
+                                             MemRef<float, 3> *input,
+                                             MemRef<size_t, 2> *decoder_input
+                                             );
 
 void _mlir_ciface_forward_buddy_vectorization(
-                                              MemRef<float, 3> *output1,
-                                              MemRef<float, 3> *output2,
+                                              MemRef<float, 3> resultContainer[2],
                                               MemRef<float, 1> *params,
-                                              MemRef<long long, 2> *decoder_input,
-                                              MemRef<float, 3> *input);
+                                              MemRef<float, 3> *input,
+                                              MemRef<size_t, 2> *decoder_input
+                                              );
 }
 
 template <typename Func>
@@ -53,12 +53,16 @@ void DL_MODEL_Whisper(benchmark::State &state, Func func) {
   // Create containers for input, output, parameters, and decoder input.
   MemRef<float, 1> paramsContainerf32({ParamsSize}, 5);
   MemRef<float, 3> inputContainer({1, InputChannels, InputTimesteps}, 6);
-  MemRef<long long, 2> decoderInputContainer({1, DecoderInputSize}, 8);  
-  MemRef<float, 3> output1Container({1, Output1Timestep, Output1Features}, 7);
-  MemRef<float, 3> output2Container({1, Output2DecoderSteps, Output2VocabSize}, 9);
+  MemRef<size_t, 2> decoderInputContainer({1, DecoderInputSize}, 8);  
+
+  // Create result container (merged into one array)
+  MemRef<float, 3> resultContainer[2] = {
+      MemRef<float, 3>({1, Output1Timestep, Output1Features}, false, 7),
+      MemRef<float, 3>({1, Output2DecoderSteps, Output2VocabSize}, false, 9)
+  };
 
   for (auto _ : state) {
-    func(&output1Container, &output2Container, &paramsContainerf32, &decoderInputContainer, &inputContainer);  // 调用函数，传递参数
+    func(resultContainer, &paramsContainerf32, &inputContainer, &decoderInputContainer); 
   }
 }
 
@@ -87,37 +91,35 @@ void verification() {
 
   // Create containers for input, output, parameters, and decoder input.
   MemRef<float, 3> inputContainer({1, InputChannels, InputTimesteps}, 6);
-  MemRef<long long, 2> decoderInputContainer({1, DecoderInputSize}, 8);
-  MemRef<float, 3> resultAutoVectorizationOutput1({1, Output1Timestep, Output1Features}, 7);
-  MemRef<float, 3> resultAutoVectorizationOutput2({1, Output2DecoderSteps, Output2VocabSize}, 9);
-  MemRef<float, 3> resultBuddyVectorizationOutput1({1, Output1Timestep, Output1Features}, 7);
-  MemRef<float, 3> resultBuddyVectorizationOutput2({1, Output2DecoderSteps, Output2VocabSize}, 9);
+  MemRef<size_t, 2> decoderInputContainer({1, DecoderInputSize}, 8);
   MemRef<float, 1> paramsContainerf32({ParamsSize}, 5);
 
-  // Populate input with random data
-  for (int i = 0; i < InputChannels * InputTimesteps; ++i) {
-    inputContainer.getData()[i] = distribution(generator);
-  }
+  // Create result containers for auto and buddy vectorization (using array form)
+  MemRef<float, 3> resultAutoVectorization[2] = {
+      MemRef<float, 3>({1, Output1Timestep, Output1Features}, 7),
+      MemRef<float, 3>({1, Output2DecoderSteps, Output2VocabSize}, 9)
+  };
 
-  // Populate the decoder input with some data
-  for (int i = 0; i < DecoderInputSize; ++i) {
-    decoderInputContainer.getData()[i] = rd();
-  }
+  MemRef<float, 3> resultBuddyVectorization[2] = {
+      MemRef<float, 3>({1, Output1Timestep, Output1Features}, 7),
+      MemRef<float, 3>({1, Output2DecoderSteps, Output2VocabSize}, 9)
+  };
+
 
   // Call the forward function of the model.
-  _mlir_ciface_forward_auto_vectorization(&resultAutoVectorizationOutput1, &resultAutoVectorizationOutput2,
-                                          &paramsContainerf32, &decoderInputContainer, &inputContainer);
-  _mlir_ciface_forward_buddy_vectorization(&resultBuddyVectorizationOutput1, &resultBuddyVectorizationOutput2,
-                                           &paramsContainerf32, &decoderInputContainer, &inputContainer);
+  _mlir_ciface_forward_auto_vectorization(resultAutoVectorization,
+                                          &paramsContainerf32, &inputContainer, &decoderInputContainer);
+  _mlir_ciface_forward_buddy_vectorization(resultBuddyVectorization,
+                                           &paramsContainerf32, &inputContainer, &decoderInputContainer);
 
   // Compare results.
-  auto resultAutoVectorization1 = resultAutoVectorizationOutput1.getData();
-  auto resultAutoVectorization2 = resultAutoVectorizationOutput2.getData();
-  auto resultBuddyVectorization1 = resultBuddyVectorizationOutput1.getData();
-  auto resultBuddyVectorization2 = resultBuddyVectorizationOutput2.getData();
+  auto resultAutoVectorization1 = resultAutoVectorization[0].getData();
+  auto resultAutoVectorization2 = resultAutoVectorization[1].getData();
+  auto resultBuddyVectorization1 = resultBuddyVectorization[0].getData();
+  auto resultBuddyVectorization2 = resultBuddyVectorization[1].getData();
 
-  size_t resultSize1 = resultAutoVectorizationOutput1.getSize();
-  size_t resultSize2 = resultAutoVectorizationOutput2.getSize();
+  size_t resultSize1 = resultAutoVectorization[0].getSize();
+  size_t resultSize2 = resultAutoVectorization[1].getSize();
 
   // Print the verification result.
   std::cout << "-----------------------------------------------------------"
