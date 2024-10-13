@@ -1,3 +1,6 @@
 add_subdirectory(TinyLlama)
 add_subdirectory(MobileNet-V3)
 add_subdirectory(LeNet)
+add_subdirectory(Bert)
+add_subdirectory(Resnet18)
+add_subdirectory(Whisper)
