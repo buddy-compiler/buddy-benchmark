@@ -8,7 +8,7 @@
 
 为方便管理和部署，Jenkins 主节点和编译工具使用 Docker 容器安装，从节点的配置整合到 Jenkins 容器中。所有容器使用 docker compose 统一部署
 
-[llvm ](llvm) 和  [riscv ](riscv) 目录下分别保存了镜像制作文件 `Dockerfile`，制作镜像时通过指定参数构建不同版本。容器启动后编译工具以数据卷的形式保存到宿主机上，供 Jenkins 主节点使用。构建参数和数据卷保存路径的具体设置参见 `docker-compose.yml` 文件
+[compiler-containers](compiler-containers) 目录下保存了编译工具的镜像制作文件 `Dockerfile`，制作镜像时通过指定参数构建不同版本。容器启动后编译工具以数据卷的形式保存到宿主机上，供 Jenkins 主节点使用。构建参数和数据卷保存路径的具体设置参见 `docker-compose.yml` 文件
 
 [Jenkins 目录](jenkins) 下包含一个镜像文件 `Dockerfile` 、插件列表 `plugins.txt`、创建节点脚本 `createNode.groovy`、创建测试任务脚本 `createJob.groovy` 以及测试任务用到的 `jenkinsfile`。整个镜像在 [Jenkins 官方镜像](https://github.com/jenkinsci/docker/blob/master/README.md) 的基础上添加了一些插件、从设备节点、以及创建了一个测试任务 opencv_test，测试任务详见 [测试用例](#测试用例) 一节
 

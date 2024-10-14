@@ -9,11 +9,32 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
+      - gcc_14:/opt/gcc_14
       - llvm_17:/opt/llvm_17
       - llvm_18:/opt/llvm_18
       - riscv_13:/opt/riscv_13
       - riscv_14:/opt/riscv_14
     restart: on-failure
+
+
+  gcc-14:
+    container_name: gcc-14
+    build: 
+      context: ./compiler-containers/
+      dockerfile: gccDockerfile
+      # 指定构建版本
+      args: 
+        GCC_TAG: releases/gcc-14.1.0
+    volumes:
+      - gcc_14:/opt/gcc
+    deploy:
+      restart_policy:
+        condition: none
+    entrypoint: ["/bin/sh", "-c", "echo 'GCC-14 MOUNTED'"]
+    restart: "no"
+    depends_on:
+      - jenkins
+
 
   llvm-17:
     container_name: llvm-17
@@ -92,6 +113,7 @@ services:
 
 volumes:
   jenkins_home:
+  gcc_14:
   llvm_17:
   llvm_18:
   riscv_13:

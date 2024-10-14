@@ -15,7 +15,7 @@ COPY --chown=jenkins:jenkins jenkinsfile setMasterLabel.groovy /usr/share/jenkin
 
 RUN apt-get update && \
     apt-get install -y  --no-install-recommends binutils\
-            cmake ninja-build make git  && \
+            cmake ninja-build make git libmpc3 libmpc-dev libc6-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # 在首次启动时跳过默认的安装引导页面
