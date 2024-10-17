@@ -30,17 +30,17 @@
 #define NUM_ITER 5
 
 #define INPUT_N 2
-#define INPUT_H 31
-#define INPUT_W 31
-#define INPUT_C 18
-#define FILTER_H 16
-#define FILTER_W 16
-#define FILTER_C 18
-#define FILTER_F 66
+#define INPUT_H 56
+#define INPUT_W 56
+#define INPUT_C 32
+#define FILTER_H 3
+#define FILTER_W 3
+#define FILTER_C 32
+#define FILTER_F 16
 #define OUTPUT_N 2
-#define OUTPUT_H 16
-#define OUTPUT_W 16
-#define OUTPUT_F 66
+#define OUTPUT_H 54
+#define OUTPUT_W 54
+#define OUTPUT_F 16
 
 // -----------------------------------------------------------------------------
 // Global Variables and Functions. No need to change the code here.
