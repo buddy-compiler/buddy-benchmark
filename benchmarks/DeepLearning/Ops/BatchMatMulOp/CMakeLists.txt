@@ -130,15 +130,3 @@ set_target_properties(batch_matmul_scf PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-op-linalg-batch-matmul-benchmark
   batch_matmul_scf
 )
-
-# Set linker flags
-set_target_properties(dl-op-linalg-batch-matmul-benchmark PROPERTIES
-  LINK_FLAGS "-static"
-)
-
-# Set Google Benchmark tool
-set(BenchmarkTool GoogleBenchmark)
-
-target_link_libraries(dl-op-linalg-batch-matmul-benchmark
-  ${BenchmarkTool}
-)

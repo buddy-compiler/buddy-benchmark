@@ -91,13 +91,3 @@ set_target_properties(matmul_rvv PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-op-linalg-matmul-benchmark-rvv
   matmul_rvv
 )
-
-set_target_properties(dl-op-linalg-matmul-benchmark-rvv PROPERTIES
-  LINK_FLAGS "-static"
-)
-
-set(BenchmarkTool GoogleBenchmark)
-
-target_link_libraries(dl-op-linalg-matmul-benchmark-rvv
-  ${BenchmarkTool}
-)

@@ -89,13 +89,3 @@ set_target_properties(depthwise_conv_2d_nhwc_hwc_vectorization PROPERTIES LINKER
 target_link_libraries(dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark
   depthwise_conv_2d_nhwc_hwc_vectorization
 )
-
-set_target_properties(dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark PROPERTIES
-  LINK_FLAGS "-static"
-)
-
-set(BenchmarkTool GoogleBenchmark)
-
-target_link_libraries(dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark
-  ${BenchmarkTool}
-)

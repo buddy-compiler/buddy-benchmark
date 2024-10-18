@@ -115,13 +115,3 @@ set_target_properties(conv2d_nhwc_fhwc_rvv_vectorization PROPERTIES LINKER_LANGU
 target_link_libraries(dl-op-linalg-conv2d-nhwc-fhwc-benchmark-rvv
   conv2d_nhwc_fhwc_rvv_vectorization
 )
-
-set_target_properties(dl-op-linalg-conv2d-nhwc-fhwc-benchmark-rvv PROPERTIES
-  LINK_FLAGS "-static"
-)
-
-set(BenchmarkTool GoogleBenchmark)
-
-target_link_libraries(dl-op-linalg-conv2d-nhwc-fhwc-benchmark-rvv
-  ${BenchmarkTool}
-)
