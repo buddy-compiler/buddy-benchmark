@@ -6,7 +6,7 @@ The table below lists the benchmark cases at the operation level.
 | Name  | Build Target | Introduction |
 | -------------- | ------------- | ------------- |
 | TinyLlama-1.1B | `ninja dl-model-tinyllama-benchmark` | This benchmark compares multiple optimization strategies targeting the TinyLlama model. |
-| MobileNet-V3 | `ninja dl-model-mobileNetV3-benchmark` | This benchmark compares multiple optimization strategies targeting the MobileNet-V3 model. |
+| MobileNet-V3 | `ninja dl-model-mobilenetv3-benchmark` | This benchmark compares multiple optimization strategies targeting the MobileNet-V3 model. |
 | LeNet | `ninja dl-model-lenet-benchmark` | This benchmark compares multiple optimization strategies targeting the LeNet model. |
 
 ## Layer Level Benchmark

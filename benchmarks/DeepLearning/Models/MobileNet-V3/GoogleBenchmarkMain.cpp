@@ -55,12 +55,12 @@ namespace {
 
 // Declare the mobilenet C interface.
 extern "C" {
-void _mlir_ciface_forward_auto_vectorization(MemRef<float, 2> *output,
+void _mlir_ciface_forward_scalar(MemRef<float, 2> *output,
                                              MemRef<float, 1> *arg0,
                                              MemRef<long long, 1> *arg1,
                                              Img<float, 4> *input);
 
-void _mlir_ciface_forward_vectorization(MemRef<float, 2> *output,
+void _mlir_ciface_forward_conv_opt(MemRef<float, 2> *output,
                                         MemRef<float, 1> *arg0,
                                         MemRef<long long, 1> *arg1,
                                         Img<float, 4> *input);
@@ -92,11 +92,11 @@ void BM_MobileNet_V3(benchmark::State &state, Func func) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK_CAPTURE(BM_MobileNet_V3, BM_MobileNet_V3_Auto_Vectorization,
-                  _mlir_ciface_forward_auto_vectorization)
+BENCHMARK_CAPTURE(BM_MobileNet_V3, BM_MobileNet_V3_scalar,
+                  _mlir_ciface_forward_scalar)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_MobileNet_V3, BM_MobileNet_V3_Vectorization,
-                  _mlir_ciface_forward_vectorization)
+BENCHMARK_CAPTURE(BM_MobileNet_V3, BM_MobileNet_V3_conv_opt,
+                  _mlir_ciface_forward_conv_opt)
     ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
@@ -133,9 +133,9 @@ void verification() {
   MemRef<long long, 1> ParamsContainerInt64({34}, 2.0);
 
   // Call the forward function of the model.
-  _mlir_ciface_forward_auto_vectorization(&outputScalar, &paramsContainerf32,
+  _mlir_ciface_forward_scalar(&outputScalar, &paramsContainerf32,
                                           &ParamsContainerInt64, &input);
-  _mlir_ciface_forward_vectorization(&outputVectorization, &paramsContainerf32,
+  _mlir_ciface_forward_conv_opt(&outputVectorization, &paramsContainerf32,
                                      &ParamsContainerInt64, &input);
 
   auto resultScalar = outputScalar.getData();
