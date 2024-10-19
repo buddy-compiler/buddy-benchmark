@@ -55,7 +55,7 @@ static void BUDDY_RFFT(benchmark::State &state) {
   MemRef<double, 1> inputMemRef0(inputAlign0, inputSizes0);
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
-      dap::whisperPreprocessRFFT(&inputMemRef0);
+      dap::RFFT(&inputMemRef0);
     }
   }
 }
@@ -81,7 +81,7 @@ void verification() {
   intptr_t inputSizes[1] = {testLength};
   MemRef<double, 1> inputMemRef(inputAlign, inputSizes);
 
-  dap::whisperPreprocessRFFT(&inputMemRef);
+  dap::RFFT(&inputMemRef);
 
   // Get the result array.
   auto resultRFFT = inputMemRef.getData();

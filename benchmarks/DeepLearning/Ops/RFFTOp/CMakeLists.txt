@@ -22,8 +22,6 @@ if (CROSS_COMPILE_RVV)
   set(BUDDY_OPT_ATTR +v,+m)
 endif()
 
-set(LLVM_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/bin)
-
 # Add the executable for the benchmark
 add_executable(dl-op-linalg-RFFT-benchmark
   GoogleBenchmarkMain.cpp

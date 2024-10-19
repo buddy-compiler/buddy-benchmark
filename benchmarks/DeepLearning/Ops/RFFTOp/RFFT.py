@@ -29,13 +29,13 @@ def compute_rfft():
         output_lines.append(f"{imag_part:.2f}")
     return output_lines
 
-# 使用 timeit 进行计时
+# set a timer with timeit
 execution_time = timeit.timeit(compute_rfft, number=1) * 1000
 
-# 获取 RFFT 结果
+# get RFFT result
 rfft_result_lines = compute_rfft()
 
-# 将 RFFT 结果和计算时间一起写入文件
+# record the result
 with open(output_file, 'w') as f:
     for line in rfft_result_lines:
         f.write(line + '\n')
