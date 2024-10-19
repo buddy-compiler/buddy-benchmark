@@ -27,21 +27,19 @@ add_executable(dl-op-linalg-RFFT-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-RFFT-benchmark PROPERTIES
-  LINK_FLAGS "-static"
-)
-
 # Define the benchmark tool
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_directories(dl-op-linalg-RFFT-benchmark PRIVATE ${BUDDY_MLIR_BUILD_DIR}/lib)
+target_link_directories(dl-op-linalg-RFFT-benchmark PRIVATE 
+  ${BUDDY_MLIR_LIB_DIR}
+  ${LLVM_MLIR_LIBRARY_DIR}
+)
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-RFFT-benchmark
-  PRIVATE
+target_link_libraries(dl-op-linalg-RFFT-benchmark PRIVATE
   ${BenchmarkTool}
   BuddyLibDAP
-  ${BUDDY_MLIR_BUILD_DIR}/lib/libStaticMLIRCRunnerUtils.a
+  mlir_c_runner_utils
   GoogleBenchmark
 )
 
