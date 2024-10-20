@@ -9,112 +9,24 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - gcc_14:/opt/gcc_14
-      - llvm_17:/opt/llvm_17
-      - llvm_18:/opt/llvm_18
-      - riscv_13:/opt/riscv_13
-      - riscv_14:/opt/riscv_14
+      - buddy_mlir:/opt/buddy_mlir
     restart: on-failure
 
-
-  gcc-14:
-    container_name: gcc-14
-    build: 
+  buddy:
+    container_name: buddy
+    build:
       context: ./compiler-containers/
-      dockerfile: gccDockerfile
-      # 指定构建版本
-      args: 
-        GCC_TAG: releases/gcc-14.1.0
+      dockerfile: Dockerfile
     volumes:
-      - gcc_14:/opt/gcc
+      - buddy_mlir:/opt/build-mlir
     deploy:
       restart_policy:
         condition: none
-    entrypoint: ["/bin/sh", "-c", "echo 'GCC-14 MOUNTED'"]
-    restart: "no"
-    depends_on:
-      - jenkins
-
-
-  llvm-17:
-    container_name: llvm-17
-    build: 
-      context: ./compiler-containers/
-      dockerfile: llvmDockerfile
-      # 指定构建版本
-      args: 
-        LLVM_TAG: llvmorg-17.0.6
-    volumes:
-      - llvm_17:/opt/llvm
-    deploy:
-      restart_policy:
-        condition: none
-    entrypoint: ["/bin/sh", "-c", "echo 'LLVM-17 MOUNTED'"]
-    restart: "no"
-    depends_on:
-      - jenkins
-      
-
-  llvm-18:
-    container_name: llvm-18
-    build: 
-      context: ./compiler-containers/
-      dockerfile: llvmDockerfile
-      # 指定构建版本
-      args:
-        LLVM_TAG: llvmorg-18.1.7
-    volumes:
-      - llvm_18:/opt/llvm
-    deploy:
-      restart_policy:
-        condition: none 
-    entrypoint: ["/bin/sh", "-c", "echo 'LLVM-18 MOUNTED'"]
-    restart: "no"
-    depends_on:
-      - jenkins
-      
-
-  riscv-13:
-    container_name: riscv-13
-    build: 
-      context: ./compiler-containers/
-      dockerfile: riscvDockerfile
-      # 指定构建版本
-      args:
-        GCC_TAG: releases/gcc-13.3.0 
-    volumes:
-      - riscv_13:/opt/riscv
-    deploy:
-      restart_policy:
-        condition: none 
-    entrypoint: ["/bin/sh", "-c", "echo 'RISC-V-13 MOUNTED'"]
-    restart: "no"
-    depends_on:
-      - jenkins
-      
-
-  riscv-14:
-    container_name: riscv-14
-    build: 
-      context: ./compiler-containers/
-      dockerfile: riscvDockerfile
-      # 指定构建版本
-      args:
-        GCC_TAG: releases/gcc-14.1.0
-    volumes:
-      - riscv_14:/opt/riscv
-    deploy:
-      restart_policy:
-        condition: none
-    entrypoint: ["/bin/sh", "-c", "echo 'RISC-V-14 MOUNTED'"]
+    entrypoint: ["/bin/sh", "-c", "echo 'buddy_mlir MOUNTED'"]
     restart: "no"
     depends_on:
       - jenkins
 
 volumes:
   jenkins_home:
-  gcc_14:
-  llvm_17:
-  llvm_18:
-  riscv_13:
-  riscv_14:
+  buddy_mlir:
