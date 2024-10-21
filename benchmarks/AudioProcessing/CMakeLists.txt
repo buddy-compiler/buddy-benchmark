@@ -54,9 +54,6 @@ set_target_properties(MLIRBiquad PROPERTIES LINKER_LANGUAGE CXX)
 # MLIR IIR Operation
 #-------------------------------------------------------------------------------
 
-# TODO:
-# Support only when input audio size is multiple of splitting size.
-# Add a support for all input audio size.
 add_custom_command(OUTPUT mlir-iir.o
         COMMAND ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
         ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/MLIRIIR.mlir
@@ -104,20 +101,23 @@ add_executable(audio-processing-benchmark
   Main.cpp
 )
 
-target_link_directories(audio-processing-benchmark
-  PRIVATE 
+target_link_directories(audio-processing-benchmark PRIVATE 
   ${KFR_DIR}/build/
   ${BUDDY_MLIR_LIB_DIR}
 )
 
-target_link_libraries(audio-processing-benchmark
-  PRIVATE
+target_link_libraries(audio-processing-benchmark PRIVATE
+  # Third-party library
   kfr_io
   kfr_dft
+  # MLIR hand-written benchmark
   MLIRBiquad
   MLIRIIR
   MLIRIIRVectorization
+  # Buddy DAP library
   BuddyLibDAP
-  BuddyLibDAPVectorization
+  # LLVM/MLIR library
+  StaticMLIRCRunnerUtils
+  # Benchmark library
   GoogleBenchmark
 )
