@@ -18,7 +18,7 @@ services:
       context: ./compiler-containers/
       dockerfile: Dockerfile
     volumes:
-      - buddy_mlir:/opt/build-mlir
+      - buddy_mlir:/buddy-mlir
     deploy:
       restart_policy:
         condition: none

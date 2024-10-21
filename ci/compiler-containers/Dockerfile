@@ -13,11 +13,9 @@ RUN apt-get update && \
 
     
 # 0. Prepare buddy-mlir and Submodules
-# RUN git clone https://github.com/buddy-compiler/buddy-mlir.git && \
-#     cd buddy-mlir && \
-#     git submodule update --init
-COPY buddy-mlir /opt/buddy-mlir
-ENV BUILD_ROOT=/opt
+RUN git clone https://github.com/buddy-compiler/buddy-mlir.git && \
+    cd buddy-mlir && \
+    git submodule update --init
 
 # 1. Build Local LLVM/MLIR
 RUN mkdir ${BUILD_ROOT}/buddy-mlir/llvm/build
@@ -44,8 +42,7 @@ RUN cmake -G Ninja .. \
      -DBUDDY_MLIR_ENABLE_RISCV_GNU_TOOLCHAIN=ON \
      -DBUDDY_MLIR_ENABLE_PYTHON_PACKAGES=ON \
      -DPython3_EXECUTABLE=$(which python3)       
-RUN ninja -j1
-RUN ninja check-buddy
+RUN ninja
 ENV BUILD_RISCV_GNU_TOOLCHAIN_DIR=${BUILD_ROOT}/buddy-mlir/build/thirdparty/riscv-gnu-toolchain/
 ENV RISCV_GNU_TOOLCHAIN_SYSROOT_DIR=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}/sysroot/
 
@@ -70,8 +67,8 @@ RUN cmake -G Ninja ../llvm \
 RUN ninja clang lli
 
 # 4. Build Cross-Compiled MLIR
-RUN mkdir llvm/build-cross-mlir-rv
-RUN ${BUILD_ROOT}/buddy-mlir/llvm/build-cross-mlir-rv
+RUN mkdir ${BUILD_ROOT}/buddy-mlir/llvm/build-cross-mlir-rv
+WORKDIR ${BUILD_ROOT}/buddy-mlir/llvm/build-cross-mlir-rv
 RUN cmake -G Ninja ../../llvm/llvm \
      -DLLVM_ENABLE_PROJECTS="mlir" \
      -DLLVM_BUILD_EXAMPLES=OFF \
