@@ -1,4 +1,4 @@
-# 使用 ubuntu:22.04 作为基础镜像，用于编译 riscv-gnu-toolchain
+# Use ubuntu:22.04 as a base image for compiling riscv-gnu-toolchain
 FROM ubuntu:22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y \
     flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev git ninja-build cmake libglib2.0-dev libslirp-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# Define the build parameter GCC_TAG, which is used to clone the gcc project with the specified version
+# default releases/gcc-14.1.0
 ARG GCC_TAG=releases/gcc-14.1.0
 
 RUN git clone \

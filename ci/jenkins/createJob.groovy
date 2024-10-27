@@ -3,17 +3,24 @@ import hudson.model.*
 import org.jenkinsci.plugins.workflow.job.*
 import org.jenkinsci.plugins.workflow.cps.*
 
-// 获取 Jenkins 实例
 def jenkins = Jenkins.instance
+jenkins.setLabelString("JenkinsNode")
 
-def job = jenkins.createProject(WorkflowJob, 'opencv_test')
+// List of job names and corresponding Jenkinsfile paths
+def jobDetails = [
+    ['buddy_DeepLearningBenchmark', '/usr/share/jenkins/ref/init.groovy.d/jenkinsfileBuddy'],
+    //['opencv_test', '/usr/share/jenkins/ref/init.groovy.d/jenkinsfileOpencv']
+]
 
-// 设置流水线定义为读取 Jenkinsfile 文件
-def pipelineScript = new File("/usr/share/jenkins/ref/init.groovy.d/jenkinsfile").text
-def flowDefinition = new CpsFlowDefinition(pipelineScript, true)
-job.setDefinition(flowDefinition)
+jobDetails.each { jobName, jenkinsfilePath ->
+    def job = jenkins.createProject(WorkflowJob, jobName)
+    def pipelineScript = new File(jenkinsfilePath).text
 
-// 保存任务
-job.save()
+    def flowDefinition = new CpsFlowDefinition(pipelineScript, true)
+    job.setDefinition(flowDefinition)
 
-println("Pipeline job 'opencv_test' created successfully.")
+    job.save()
+
+    println("Pipeline job '${jobName}' created successfully.")
+}
+

@@ -1,25 +1,26 @@
-# 使用 Jenkins 官方基础镜像
 FROM jenkins/jenkins:2.462.1-jdk17
 
-# 使用 root 权限来安装插件
 USER root
 
-# 安装指定的插件
+# Install the plugins used in Jenkins
 COPY --chown=jenkins:jenkins plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
 
-# 拷贝创建节点脚本和创建测试任务脚本，Jenkins 初始运行自动执行
-COPY --chown=jenkins:jenkins createNode.groovy config.properties /usr/share/jenkins/ref/init.groovy.d/
-COPY --chown=jenkins:jenkins jenkinsfile createJob.groovy /usr/share/jenkins/ref/init.groovy.d/
-COPY --chown=jenkins:jenkins jenkinsfile setMasterLabel.groovy /usr/share/jenkins/ref/init.groovy.d/
+# Copy the node creation script and the test job creation script, which are automatically executed by the initial run of Jenkins
+COPY --chown=jenkins:jenkins createNode.groovy config.properties* /usr/share/jenkins/ref/init.groovy.d/
+COPY --chown=jenkins:jenkins jenkinsfileBuddy jenkinsfileOpencv createJob.groovy /usr/share/jenkins/ref/init.groovy.d/
 
+# Install dependencies for test tasks
+COPY requirementsPy.txt  requirementsApt.txt /app/
 RUN apt-get update && \
-    apt-get install -y  --no-install-recommends binutils\
-            cmake ninja-build make git libmpc3 libmpc-dev libc6-dev && \
-    rm -rf /var/lib/apt/lists/*
+    xargs -a /app/requirementsApt.txt apt-get install -y --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* 
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install -r /app/requirementsPy.txt
+ENV PATH="/opt/venv/bin:$PATH"
 
-# 在首次启动时跳过默认的安装引导页面
+# Skip the default installation boot page on first startup
 ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
-# 切换回 Jenkins 用户
 USER jenkins
