@@ -13,24 +13,28 @@ The table below lists the benchmark cases at the operation level.
 
 ### Local Hardware Platform.
 
-1. Set KFR library path:
+1. Set KFR library:
 
-The audio processing benchmark currently includes the following frameworks and libraries:
-
-- KFR ([link](https://github.com/kfrlib/kfr))
+```bash
+$ cd buddy-benchmark
+$ git submodule update --init ./thirdparty/kfr
+```
 
 
 2. Build benchmark for local platform:
 
 ```bash
-$ cd buddy-benchmark
+$ cd ../buddy-mlir/build
+$ export BUDDY_MLIR_BUILD_DIR=$PWD
+$ export LLVM_MLIR_BUILD_DIR=$PWD/../llvm/build
+$ cd ../../buddy-benchmark
 $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DAUDIO_PROCESSING_BENCHMARKS=ON \
-    -DCMAKE_CXX_COMPILER=clang++ \
-    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
-    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+    -DCMAKE_CXX_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang++ \
+    -DKFR_DIR=$PWD/../thirdparty/kfr \
+    -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}
 $ ninja <target benchmark>
 // For example: 
 $ ninja dap-op-iir-benchmark
