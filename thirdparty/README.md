@@ -6,6 +6,7 @@ Version of third-party performance comparison items:
 | -------------- | ------------- | ------------- |
 | OpenCV  | 4.9.0 | [Homepage](https://opencv.org/), [Code](https://github.com/opencv/opencv/tree/4.9.0) |
 | Eigen  | 3.4.0 | [Homepage](https://eigen.tuxfamily.org/index.php?title=Main_Page), [Code](https://gitlab.com/libeigen/eigen/-/tree/master) |
+| KFR  | 4.0.0 | [Homepage](https://www.kfrlib.com/), [Code](https://github.com/kfrlib/kfr/tree/4.0.0) |
 
 ## TVM
 
