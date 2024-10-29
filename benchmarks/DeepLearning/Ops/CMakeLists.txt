@@ -15,7 +15,6 @@ add_subdirectory(MathExpOp)
 add_subdirectory(ReduceAddfOp)
 add_subdirectory(ReduceMaxfOp)
 add_subdirectory(SoftmaxExpSumDivOp)
-add_subdirectory(RFFTOp)
 add_subdirectory(Conv2DNhwcFhwcOp)
 
 if (CROSS_COMPILE_RVV)
