@@ -24,35 +24,26 @@
 #include <iostream>
 #include <random>
 
-#define testLength 20
+#define testLength 840
 
 // Helper functions and variables.
 namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
 
-bool areArraysEqual(float array1[], float array2[], int size) {
-  for (int i = 0; i < size; ++i) {
-    if (array1[i] != array2[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-double *inputAlign0 = new double[testLength];
-intptr_t inputSizes0[1] = {testLength};
+double *inputData = new double[testLength];
+intptr_t inputSize[1] = {testLength};
 
-void initializeInputAlign0() {
-
+void initializeBuddyRFFT() {
   for (int i = 0; i < testLength; ++i) {
-    inputAlign0[i] = static_cast<double>(i);
+    inputData[i] = static_cast<double>(i);
   }
 }
 
+MemRef<double, 1> inputMemRef0(inputData, inputSize);
 } // namespace
 
 static void BUDDY_RFFT(benchmark::State &state) {
-  MemRef<double, 1> inputMemRef0(inputAlign0, inputSizes0);
   for (auto _ : state) {
     for (int i = 0; i < state.range(0); ++i) {
       dap::RFFT(&inputMemRef0);
@@ -63,10 +54,9 @@ static void BUDDY_RFFT(benchmark::State &state) {
 BENCHMARK(BUDDY_RFFT)->Arg(1)->Unit(benchmark::kMillisecond);
 
 void verification() {
-
   std::vector<double> fileData;
   std::ifstream inputFile(
-      "../../benchmarks/DeepLearning/Ops/RFFTOp/result.txt");
+      "../../benchmarks/AudioProcessing/Operations/RFFTOp/result.txt");
 
   double value;
   while (inputFile >> value) {
@@ -108,7 +98,7 @@ void verification() {
 
 int main(int argc, char **argv) {
   // Run benchmark.
-  initializeInputAlign0();
+  initializeBuddyRFFT();
 
   ::benchmark::Initialize(&argc, argv);
 

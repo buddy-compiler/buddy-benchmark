@@ -14,33 +14,25 @@ add_custom_target(generate_result_txt ALL
   COMMENT "Ensure result.txt is generated"
 )
 
-# Define variables for the cross-compilation toolchain and options.
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
-
 # Add the executable for the benchmark
-add_executable(dap-op-RFFT-benchmark
+add_executable(dap-op-rfft-benchmark
   GoogleBenchmarkMain.cpp
 )
 
 # Define the benchmark tool
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_directories(dap-op-RFFT-benchmark PRIVATE 
+target_link_directories(dap-op-rfft-benchmark PRIVATE 
   ${BUDDY_MLIR_LIB_DIR}
   ${LLVM_MLIR_LIBRARY_DIR}
 )
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dap-op-RFFT-benchmark PRIVATE
+target_link_libraries(dap-op-rfft-benchmark PRIVATE
   ${BenchmarkTool}
   BuddyLibDAP
   mlir_c_runner_utils
   GoogleBenchmark
 )
 
-add_dependencies(dap-op-RFFT-benchmark generate_result_txt)
+add_dependencies(dap-op-rfft-benchmark generate_result_txt)

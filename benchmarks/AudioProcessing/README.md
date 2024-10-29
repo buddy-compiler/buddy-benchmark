@@ -10,8 +10,7 @@ The table below lists the benchmark cases at the operation level.
 | FFT Op | `ninja dap-op-fft-benchmark`  | Task in TODO list. Check the benchmark in [this file](./Operations/FFTOp/Main.cpp). |
 | FIR Op | `ninja dap-op-fir-benchmark`  | Task in TODO list. Check the benchmark in [this file](./Operations/FIROp/Main.cpp). |
 | IIR Op | `ninja dap-op-iir-benchmark`  | This benchmark compares scalar and vectorized version `dap.iir` operation with KFR library. Check the benchmark in [this file](./Operations/IIROp/Main.cpp). |
-| RFFT | `ninja dap-op-RFFT-benchmark` | This benchmark evaluates the efficiency of the RFFT operator and verifies its correctness by comparing it with the RFFT function in numpy. The benchmark size can be adjusted in [this file](./Operations/RFFTOp/GoogleBenchmarkMain.cpp). And you can compare the time consumption with Numpy library in the `time_result.txt`.|
-
+| RFFT Op | `ninja dap-op-rfft-benchmark` | This benchmark evaluates the efficiency of the RFFT operator and verifies its correctness by comparing it with the RFFT function in numpy. The benchmark size can be adjusted in [this file](./Operations/RFFTOp/GoogleBenchmarkMain.cpp). And you can compare the time consumption with Numpy library in the `numpyTimeResult.txt`.|
 
 ### Local Hardware Platform.
 
