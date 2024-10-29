@@ -23,24 +23,24 @@ if (CROSS_COMPILE_RVV)
 endif()
 
 # Add the executable for the benchmark
-add_executable(dl-op-linalg-RFFT-benchmark
+add_executable(dap-op-RFFT-benchmark
   GoogleBenchmarkMain.cpp
 )
 
 # Define the benchmark tool
 set(BenchmarkTool GoogleBenchmark)
 
-target_link_directories(dl-op-linalg-RFFT-benchmark PRIVATE 
+target_link_directories(dap-op-RFFT-benchmark PRIVATE 
   ${BUDDY_MLIR_LIB_DIR}
   ${LLVM_MLIR_LIBRARY_DIR}
 )
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-RFFT-benchmark PRIVATE
+target_link_libraries(dap-op-RFFT-benchmark PRIVATE
   ${BenchmarkTool}
   BuddyLibDAP
   mlir_c_runner_utils
   GoogleBenchmark
 )
 
-add_dependencies(dl-op-linalg-RFFT-benchmark generate_result_txt)
+add_dependencies(dap-op-RFFT-benchmark generate_result_txt)
