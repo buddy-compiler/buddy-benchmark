@@ -76,8 +76,6 @@ void verification() {
   // Get the result array.
   auto resultRFFT = inputMemRef.getData();
 
-  std::cout << "Length : " << fileData.size() << std::endl;
-
   bool isEqual = true;
   double tolerance = 1e-2;
   size_t minSize = fileData.size();
@@ -87,13 +85,11 @@ void verification() {
     }
   }
 
-  std::cout << "-----------------------------------------------------------"
+  std::cout << "\033[34m---------- Verification ----------\033[0m" << std::endl;
+  std::cout << "Test Length : \033[32m" << fileData.size() << "\033[0m"
             << std::endl;
   std::cout << "Correctness Verification: " << (isEqual ? PASS : FAIL)
             << std::endl;
-  std::cout << "-----------------------------------------------------------"
-            << std::endl;
-
 }
 
 int main(int argc, char **argv) {
