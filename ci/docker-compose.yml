@@ -1,0 +1,77 @@
+# The comments section builds images for different compilers as well as containers
+# And removing the comments gives a more generalized platform. 
+# See the ./docs/userManual.md for a detailed explanation
+
+version: '3'
+
+services:
+  jenkins:
+    container_name: jenkins
+    build: ./jenkins/
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      # - gcc_14:/opt/gcc_14
+      # - llvm_18:/opt/llvm_18
+      # - riscv_14:/opt/riscv_14
+    restart: on-failure
+
+  # gcc-14:
+  #   container_name: gcc-14
+  #   build: 
+  #     context: ./compiler-containers/
+  #     dockerfile: gccDockerfile
+  #     # Specify the tag of the repository to build a different version of gcc.
+  #     args: 
+  #       GCC_TAG: releases/gcc-14.1.0
+  #   volumes:
+  #     - gcc_14:/opt/gcc
+  #   deploy:
+  #     restart_policy:
+  #       condition: none
+  #   entrypoint: ["/bin/sh", "-c", "echo 'GCC-14 MOUNTED'"]
+  #   restart: "no"
+  #   depends_on:
+  #     - jenkins
+
+  # llvm-18:
+  #   container_name: llvm-18
+  #   build: 
+  #     context: ./compiler-containers/
+  #     dockerfile: llvmDockerfile
+  #     args:
+  #       LLVM_TAG: llvmorg-18.1.7
+  #   volumes:
+  #     - llvm_18:/opt/llvm
+  #   deploy:
+  #     restart_policy:
+  #       condition: none 
+  #   entrypoint: ["/bin/sh", "-c", "echo 'LLVM-18 MOUNTED'"]
+  #   restart: "no"
+  #   depends_on:
+  #     - jenkins
+
+  # riscv-14:
+  #   container_name: riscv-14
+  #   build: 
+  #     context: ./compiler-containers/
+  #     dockerfile: riscvDockerfile
+  #     args:
+  #       GCC_TAG: releases/gcc-14.1.0
+  #   volumes:
+  #     - riscv_14:/opt/riscv
+  #   deploy:
+  #     restart_policy:
+  #       condition: none
+  #   entrypoint: ["/bin/sh", "-c", "echo 'RISC-V-14 MOUNTED'"]
+  #   restart: "no"
+  #   depends_on:
+  #     - jenkins
+
+volumes:
+  jenkins_home:
+  # gcc_14:
+  # llvm_18:
+  # riscv_14:

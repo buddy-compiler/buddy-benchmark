@@ -3,3 +3,6 @@
 
 # vscode configurations
 /.vscode
+
+# jenkins node configuration information
+/ci/jenkins/config.properties

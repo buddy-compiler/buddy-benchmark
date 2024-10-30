@@ -1,0 +1,39 @@
+FROM ubuntu:22.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive 
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates gnupg ninja-build \
+           build-essential cmake make python3 zlib1g wget subversion unzip git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Define the build parameter LLVM_TAG, which is used to clone the LLVM project with the specified version
+# default llvmorg-18.1.7
+ARG LLVM_TAG=llvmorg-18.1.7
+
+RUN git clone \
+    -b ${LLVM_TAG} \
+    --depth=1 \
+    --recurse-submodules \
+    --shallow-submodules \
+    https://github.com/llvm/llvm-project
+
+WORKDIR llvm-project
+
+RUN cmake -G Ninja \
+    -S llvm \
+    -B build \
+    -DCMAKE_INSTALL_PREFIX=/opt/llvm \
+    -DLLVM_ENABLE_PROJECTS="clang" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLLVM_TARGETS_TO_BUILD="X86;ARM;RISCV"
+RUN cmake --build build --target install -- -j2
+
+
+FROM ubuntu:22.04
+
+ENV LLVM=/opt/llvm 
+ENV PATH=${LLVM}/bin:$PATH
+
+COPY --from=builder /opt/llvm ${LLVM}
+

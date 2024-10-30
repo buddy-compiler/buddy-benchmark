@@ -1,0 +1,156 @@
+pipeline {
+    agent none
+
+    environment {
+
+        REPO_URL = 'https://github.com/opencv/opencv.git'
+        
+        LLVM_NODES = "llvm_18, llvm_17"
+        RISCV_NODES = "riscv_14 riscv_13"
+
+        LLVM_COMMAND = """
+            cmake -G Ninja ../ \\
+                -DCMAKE_BUILD_TYPE=Release \\
+                -DBUILD_SHARED_LIBS=OFF \\
+                -DBUILD_EXAMPLES=OFF \\
+                -DWITH_PNG=OFF \\
+                -DOPENCV_ENABLE_NONFREE=ON \\
+                -DWITH_OPENCL=OFF \\
+                -DCMAKE_TOOLCHAIN_FILE=../platforms/linux/riscv64-clang.toolchain.cmake \\
+                -DRISCV_CLANG_BUILD_ROOT=/opt/${BUILD_NODE} \\
+                -DRISCV_GCC_INSTALL_ROOT=/opt/riscv-13 \\
+                -DCPU_BASELINE=RVV \\
+                -DCPU_BASELINE_REQUIRE=RVV \\
+                -DRISCV_RVV_SCALABLE=ON >> cmake_report.xml 2>&1
+                """
+        RISCV_COMMAND = """
+            cmake -GNinja ../ \\
+                    -DTOOLCHAIN_COMPILER_LOCATION_HINT=/opt/${BUILD_NODE}/bin \\
+                    -DCMAKE_BUILD_TYPE=Release \\
+                    -DBUILD_SHARED_LIBS=OFF \\
+                    -DWITH_OPENCL=OFF \\
+                    -DCMAKE_TOOLCHAIN_FILE=../platforms/linux/riscv64-gcc.toolchain.cmake \\
+                    -DRISCV_RVV_SCALABLE=ON \\
+                    -DCPU_BASELINE=RVV \\
+                    -DCPU_BASELINE_REQUIRE=RVV >> cmake_report.xml 2>&1
+            """
+        NINJA_COMMAND = ''' ninja >> ninja_report.xml 2>&1'''
+    
+    }
+
+    parameters {
+        // Branching parameters for selecting different branches
+        gitParameter branchFilter: 'origin/(.*)', defaultValue: '4.x', name: 'BRANCH_1', type: 'PT_BRANCH'
+        //gitParameter branchFilter: 'origin/(.*)', defaultValue: '5.x', name: 'BRANCH_2', type: 'PT_BRANCH'
+
+        // Build node parameters for selecting different build tools
+        choice choices: ['llvm_18', 'riscv_14'], name: 'BUILD_NODE'
+        
+        // Build file parameter, used to select the file for testing
+        extendedChoice(
+            name: 'ARCHIVE_FILES',
+            type: 'PT_CHECKBOX',
+            description: 'OpenCV Benchmarks',
+            multiSelectDelimiter: ',',
+            value: 'opencv_perf_core,opencv_perf_imgproc,opencv_perf_dnn,opencv_test_core,opencv_test_imgproc,opencv_test_dnn',
+            defaultValue: 'opencv_perf_core,opencv_test_core'
+        )
+
+        // node parameter to select the run node for the test file
+        extendedChoice(
+            name: 'EXECUTION_NODES',
+            type: 'PT_CHECKBOX',
+            description: '',
+            multiSelectDelimiter: ',',
+            value: 'bpi,k235,k236',
+            defaultValue: 'bpi'
+
+        )
+    }
+
+    stages {
+
+        stage('Checkout Branch 1') {
+            agent {
+                label 'JenkinsNode'
+            }
+            
+            steps {
+                checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${BRANCH_1}"]],
+                        userRemoteConfigs: [[url: "${REPO_URL}"]]
+                    ])
+            }
+        }
+
+        stage('Build 1') { //This stage builds the opencv
+            agent {
+                label 'JenkinsNode'
+            }
+
+            steps {
+                script {
+                    def buildDir = "build_${BRANCH_1}_${BUILD_NODE}"
+                    sh "rm -rf ${buildDir}"
+                    sh "mkdir ${buildDir}"
+                    dir("${buildDir}"){
+                        if (LLVM_NODES.contains(BUILD_NODE)) {
+                            sh """
+                                ${LLVM_COMMAND}
+                                ${NINJA_COMMAND}
+                            """
+                        } else if (RISCV_NODES.contains(BUILD_NODE)) {
+                            sh """
+                                ${RISCV_COMMAND}
+                                ${NINJA_COMMAND}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Archive and Clean 1'){
+            // This stage archives products that are built and need to be tested.
+            // also clean up any excess builds
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                script {
+                    def buildDir = "build_${BRANCH_1}_${BUILD_NODE}"
+                    archiveArtifacts artifacts: "${buildDir}/*.xml"
+                    def files = ARCHIVE_FILES.split(',')
+                    files.each { file ->
+                        archiveArtifacts artifacts: "${buildDir}/bin/${file}"
+                    }
+                    dir("${buildDir}/bin"){
+                        stash name: 'archivedFiles_1', includes: "${ARCHIVE_FILES}"
+                    }
+                    sh "rm -rf ${buildDir}" 
+                }
+            }
+        }
+
+        stage('Deploy and Run Tests 1') {
+            // This stage sends the build product to each node for execution and archives the build results
+            steps {
+                script {
+                    def nodes = params.EXECUTION_NODES.split(',')
+                    nodes.each { nodeLabel ->
+                        node(nodeLabel) {
+                            unstash 'archivedFiles_1'
+                            def files = params.ARCHIVE_FILES.split(',')
+                            files.each { file ->
+                                sh "./${file} --gtest_filter=\"BinaryOpTest.transposeND*\" --gtest_output=xml:./${file}_${nodeLabel}.xml"
+                            }
+                            archiveArtifacts artifacts: '*.xml'
+                            sh 'rm -rf *'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

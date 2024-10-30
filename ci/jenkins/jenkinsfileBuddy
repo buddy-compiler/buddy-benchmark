@@ -1,0 +1,394 @@
+pipeline {
+    agent none
+
+    environment {
+        //Initialize the environment variables needed for the compile command
+        BUILD_LOCAL_LLVM_DIR= ""
+        BUILD_RISCV_GNU_TOOLCHAIN_DIR=""
+        RISCV_GNU_TOOLCHAIN_SYSROOT_DIR=""
+        BUILD_CROSS_MLIR_DIR=""
+
+
+        BUDDY_MLIR_BUILD_DIR= ""
+        LLVM_MLIR_BUILD_DIR= ""
+        BUDDY_MLIR_BUILD_CROSS_DIR= ""
+        RISCV_GNU_TOOLCHAIN= ""
+        PYTHONPATH= ""
+    }
+
+    parameters {
+        // Branch parameters for selecting different branches
+        gitParameter branchFilter: 'origin/(.*)', defaultValue: 'main', name: 'BRANCH_MLIR', type: 'PT_BRANCH', useRepository: '.*buddy-mlir.git'
+        gitParameter branchFilter: 'origin/(.*)', defaultValue: 'main', name: 'BRANCH_BENCHMARK', type: 'PT_BRANCH', useRepository: '.*buddy-benchmark.git'
+        
+        // Build file parameter, used to select the file for testing, multiple choices
+        extendedChoice(
+            name: 'TEST_FILES',
+            type: 'PT_CHECKBOX',
+            description: 'Deep Learning Benchmark',
+            multiSelectDelimiter: ',',
+            value: 'dl-op-linalg-conv2d-nhwc-hwcf-benchmark,dl-op-linalg-conv2d-nchw-fchw-benchmark,dl-op-linalg-matmul-benchmark,dl-op-linalg-conv2d-nhwc-fhwc-benchmark',
+            defaultValue: 'dl-op-linalg-matmul-benchmark,dl-op-linalg-conv2d-nhwc-hwcf-benchmark'
+        )
+
+        // Parameter for selecting execution nodes, allowing multiple selections
+        extendedChoice(
+            name: 'EXECUTION_NODES',
+            type: 'PT_CHECKBOX',
+            description: '',
+            multiSelectDelimiter: ',',
+// ------------------------------ you need to modify the next two lines!!!  ----------------------------------------------
+            value: 'bpi,k235,k236',  // Replace with your actual node labels
+            defaultValue: 'bpi' // Replace with your default node label
+        )
+    }
+
+// the stages block groups multiple stage steps to define the sequence of tasks within the pipeline
+    stages {
+        
+        // Stage to clone the buddy-mlir repository
+        stage('clone mlir') {
+
+            // Specifies the node  where this stage of the pipeline should execute
+            agent {
+                //'JenkinsNode' refers to the Jenkins master node.
+                label 'JenkinsNode' 
+            }
+            steps {
+                // The Jenkins git plugin clones the contents of the repository directly into the working directory
+                sh "mkdir -p buddy-mlir"
+                dir("buddy-mlir") { // Changing the working directory
+                    retry(3) {  // Retry the block up to 3 times in case of failure
+                        git branch: "${BRANCH_MLIR}", url: 'https://github.com/buddy-compiler/buddy-mlir.git'
+                        sh 'git submodule update --init'
+                    }
+                }
+            }
+        }
+
+
+        stage('clone benchmark') {
+            // Stage to clone the buddy-benchmark repository
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                sh "mkdir -p buddy-benchmark"
+                dir("buddy-benchmark") {
+                    retry(3) { 
+                        git branch: "${BRANCH_BENCHMARK}", url: 'https://github.com/buddy-compiler/buddy-benchmark.git'
+                    }
+                }
+            }
+        }
+
+
+        stage('Build Local LLVM/MLIR') {
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                sh "mkdir -p buddy-mlir/llvm/build"
+                dir("buddy-mlir/llvm/build"){
+                    sh '''cmake -G Ninja ../llvm \
+                            -DLLVM_ENABLE_PROJECTS="mlir;clang;openmp" \
+                            -DLLVM_TARGETS_TO_BUILD="host;RISCV" \
+                            -DLLVM_ENABLE_ASSERTIONS=ON \
+                            -DOPENMP_ENABLE_LIBOMPTARGET=OFF \
+                            -DCMAKE_BUILD_TYPE=RELEASE \
+                            -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+                            -DPython3_EXECUTABLE=$(which python3)
+                         ninja check-clang check-mlir omp    
+                    '''
+                    script {
+                        BUILD_LOCAL_LLVM_DIR = "${WORKSPACE}/buddy-mlir/llvm/build"
+                    }
+                }
+            }
+        }
+
+        stage('Build Local buddy-mlir') {
+            agent {
+                label 'JenkinsNode'
+            }
+
+            steps {
+                sh "mkdir -p buddy-mlir/build"
+                dir("buddy-mlir/build"){
+                    sh '''cmake -G Ninja .. \
+                            -DMLIR_DIR=$PWD/../llvm/build/lib/cmake/mlir \
+                            -DLLVM_DIR=$PWD/../llvm/build/lib/cmake/llvm \
+                            -DLLVM_ENABLE_ASSERTIONS=ON \
+                            -DCMAKE_BUILD_TYPE=RELEASE \
+                            -DBUDDY_MLIR_ENABLE_RISCV_GNU_TOOLCHAIN=ON \
+                            -DBUDDY_MLIR_ENABLE_PYTHON_PACKAGES=ON \
+                            -DPython3_EXECUTABLE=$(which python3)
+                         ninja 
+                         ninja check-buddy  
+                        '''
+                    script {
+                        BUILD_RISCV_GNU_TOOLCHAIN_DIR="${WORKSPACE}/buddy-mlir/build/thirdparty/riscv-gnu-toolchain/"
+                        RISCV_GNU_TOOLCHAIN_SYSROOT_DIR="${BUILD_RISCV_GNU_TOOLCHAIN_DIR}/sysroot/"
+                    }
+                }
+            }
+        }
+
+
+        stage('Build Cross-Compiled Clang') {
+            agent {
+                label 'JenkinsNode'
+            }
+
+            steps {
+                sh "mkdir -p buddy-mlir/llvm/build-cross-clang-rv"
+                dir("buddy-mlir/llvm/build-cross-clang-rv"){
+                    sh """cmake -G Ninja ../llvm \
+                        -DLLVM_ENABLE_PROJECTS="clang" \
+                        -DLLVM_TARGETS_TO_BUILD="RISCV" \
+                        -DCMAKE_SYSTEM_NAME=Linux \
+                        -DCMAKE_C_COMPILER=${BUILD_LOCAL_LLVM_DIR}/bin/clang \
+                        -DCMAKE_CXX_COMPILER=${BUILD_LOCAL_LLVM_DIR}/bin/clang++ \
+                        -DCMAKE_C_FLAGS="--target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN_SYSROOT_DIR} --gcc-toolchain=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}" \
+                        -DCMAKE_CXX_FLAGS="--target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN_SYSROOT_DIR} --gcc-toolchain=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}" \
+                        -DLLVM_TABLEGEN=${BUILD_LOCAL_LLVM_DIR}/bin/llvm-tblgen \
+                        -DCLANG_TABLEGEN=${BUILD_LOCAL_LLVM_DIR}/bin/clang-tblgen \
+                        -DLLVM_DEFAULT_TARGET_TRIPLE=riscv64-unknown-linux-gnu \
+                        -DLLVM_TARGET_ARCH=RISCV64 \
+                        -DCMAKE_BUILD_TYPE=Release \
+                        -DLLVM_ENABLE_ZSTD=Off
+                        ninja clang lli   
+                        """
+                }
+            }
+        }
+
+
+        stage('Build Cross-Compiled MLIR') {
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                sh "mkdir -p buddy-mlir/llvm/build-cross-mlir-rv"
+                dir("buddy-mlir/llvm/build-cross-mlir-rv"){
+                    sh """
+                        cmake -G Ninja ../../llvm/llvm \
+                            -DLLVM_ENABLE_PROJECTS="mlir" \
+                            -DLLVM_BUILD_EXAMPLES=OFF \
+                            -DCMAKE_CROSSCOMPILING=True \
+                            -DLLVM_TARGET_ARCH=RISCV64 \
+                            -DLLVM_TARGETS_TO_BUILD=RISCV \
+                            -DCMAKE_BUILD_TYPE=Release \
+                            -DLLVM_ENABLE_ASSERTIONS=ON \
+                            -DLLVM_NATIVE_ARCH=RISCV \
+                            -DLLVM_HOST_TRIPLE=riscv64-unknown-linux-gnu \
+                            -DLLVM_DEFAULT_TARGET_TRIPLE=riscv64-unknown-linux-gnu \
+                            -DCMAKE_C_COMPILER=${BUILD_LOCAL_LLVM_DIR}/bin/clang \
+                            -DCMAKE_CXX_COMPILER=${BUILD_LOCAL_LLVM_DIR}/bin/clang++ \
+                            -DCMAKE_C_FLAGS="--target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN_SYSROOT_DIR} --gcc-toolchain=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}" \
+                            -DCMAKE_CXX_FLAGS="--target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN_SYSROOT_DIR} --gcc-toolchain=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}" \
+                            -DMLIR_TABLEGEN=${BUILD_LOCAL_LLVM_DIR}/bin/mlir-tblgen \
+                            -DLLVM_TABLEGEN=${BUILD_LOCAL_LLVM_DIR}/bin/llvm-tblgen \
+                            -DMLIR_LINALG_ODS_YAML_GEN=${BUILD_LOCAL_LLVM_DIR}/bin/mlir-linalg-ods-yaml-gen \
+                            -DMLIR_PDLL_TABLEGEN=${BUILD_LOCAL_LLVM_DIR}/bin/mlir-pdll \
+                            -DLLVM_ENABLE_ZSTD=Off
+                            ninja
+                    """
+                    script {
+                        BUILD_CROSS_MLIR_DIR="${WORKSPACE}/buddy-mlir/llvm/build-cross-mlir-rv"
+                    }
+                }
+            }
+        }
+
+
+        stage('Build Cross-Compiled buddy-mlir') {
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                sh "mkdir -p buddy-mlir/build-cross-rv"
+                dir("buddy-mlir/build-cross-rv"){
+                    sh """
+                        cmake -G Ninja .. \
+                            -DCMAKE_SYSTEM_NAME=Linux \
+                            -DMLIR_DIR=${BUILD_CROSS_MLIR_DIR}/lib/cmake/mlir \
+                            -DLLVM_DIR=${BUILD_CROSS_MLIR_DIR}/lib/cmake/llvm \
+                            -DCMAKE_CROSSCOMPILING=True \
+                            -DLLVM_TARGETS_TO_BUILD=RISCV \
+                            -DCMAKE_BUILD_TYPE=Release \
+                            -DLLVM_ENABLE_ASSERTIONS=ON \
+                            -DLLVM_NATIVE_ARCH=RISCV \
+                            -DLLVM_HOST_TRIPLE=riscv64-unknown-linux-gnu \
+                            -DCMAKE_C_COMPILER=${BUILD_LOCAL_LLVM_DIR}/bin/clang \
+                            -DCMAKE_CXX_COMPILER=${BUILD_LOCAL_LLVM_DIR}/bin/clang++ \
+                            -DCMAKE_C_FLAGS="--target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN_SYSROOT_DIR} --gcc-toolchain=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}" \
+                            -DCMAKE_CXX_FLAGS="--target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN_SYSROOT_DIR} --gcc-toolchain=${BUILD_RISCV_GNU_TOOLCHAIN_DIR}" \
+                            -DLLVM_ENABLE_ZSTD=Off
+                        ninja StaticMLIRCRunnerUtils StaticMLIRRunnerUtils
+                    """
+                }
+            }
+        }
+
+
+        stage('Testing RVV Environment') { 
+            // Expected Output:
+            // Unranked Memref base@ = 0x55555729aaa0 rank = 1 offset = 0 sizes = [20] strides = [1] data = 
+            // [0,  12,  26,  42,  60,  80,  102,  126,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                dir("buddy-mlir/examples/RVVDialect/"){
+                    sh '''
+                      make rvv-mul-add-run
+                    '''
+                }
+            }
+        }
+
+        stage('Build the benchmark') { 
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                script {
+                    BUDDY_MLIR_BUILD_DIR="${WORKSPACE}/buddy-mlir/build"
+                    LLVM_MLIR_BUILD_DIR="${BUDDY_MLIR_BUILD_DIR}/../llvm/build/"
+                    BUDDY_MLIR_BUILD_CROSS_DIR="${BUDDY_MLIR_BUILD_DIR}/../build-cross-rv"
+                    RISCV_GNU_TOOLCHAIN="${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain"
+                    PYTHONPATH="${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages"
+                }
+
+                sh "mkdir -p buddy-benchmark/build"
+                dir("buddy-benchmark/build"){
+                    sh """
+                        cmake -G Ninja .. \\
+                            -DDEEP_LEARNING_BENCHMARKS=ON \\
+                            -DCMAKE_BUILD_TYPE=RELEASE \\
+                            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \\
+                            -DCROSS_COMPILE_RVV=ON \\
+                            -DCMAKE_SYSTEM_NAME=Linux \\
+                            -DCMAKE_SYSTEM_PROCESSOR=riscv \\
+                            -DCMAKE_C_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang \\
+                            -DRISCV_GNU_TOOLCHAIN=${RISCV_GNU_TOOLCHAIN} \\
+                            -DCMAKE_CXX_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang++ \\
+                            -DCMAKE_C_FLAGS="-march=rv64gcv --target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN}/sysroot --gcc-toolchain=${RISCV_GNU_TOOLCHAIN} -fPIC" \\
+                            -DCMAKE_CXX_FLAGS="-march=rv64gcv --target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN}/sysroot --gcc-toolchain=${RISCV_GNU_TOOLCHAIN} -fPIC" \\
+                            -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR} \\
+                            -DBUDDY_MLIR_BUILD_CROSS_DIR=${BUDDY_MLIR_BUILD_CROSS_DIR}
+                        """
+                script{
+                    def files = TEST_FILES.split(',')
+                    files.each { file ->
+                        // Execute the 'ninja' build command for each specified test file，e.g. ninja dl-op-linalg-matmul-benchmark
+                        sh "ninja ${file}"
+                    }
+                }
+                }
+                // Stash (temporarily save) the generated files
+                // Subsequent distribution to different nodes for execution
+                dir("buddy-benchmark/build/bin"){
+                    stash name: 'archivedFiles', includes: "${TEST_FILES}"
+                }
+                
+            }
+
+        }
+
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    def nodes = params.EXECUTION_NODES.split(',')
+                    // Allocate the current node for the following tasks
+                    nodes.each { nodeLabel ->
+                        node(nodeLabel) {
+                            // Retrieve the previously stashed files ('archivedFiles') for use in this node
+                            // e.g. dl-op-linalg-matmul-benchmark
+                            unstash 'archivedFiles'
+                            def files = TEST_FILES.split(',')
+                            files.each { file ->
+                                // Execute the test file with the benchmark option in CSV format and save the output to a CSV file named with the node label
+                                sh "./${file} --benchmark_format=csv > ${file}_${nodeLabel}.csv"
+                            }
+                            // Stash the generated CSV files
+                            stash includes: '*.csv', name: "csv-files-${nodeLabel}"
+                            sh 'rm -rf *'
+                        }
+                    }
+                }
+            }
+        }
+
+
+        //collect stashed CSV files and create HTML
+        stage('Generate CSV HTML Report') {
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                script {
+                    // Unstash all csv files from different nodes
+                    sh 'mkdir -p res'
+                    dir('res'){
+                        def nodes = params.EXECUTION_NODES.split(',')
+                            nodes.each { nodeLabel ->
+                            unstash "csv-files-${nodeLabel}"
+                        }
+                        def csvFiles = sh(script: "ls *.csv", returnStdout: true).trim().split('\n')
+                        //convert them into HTML reports
+                        def htmlContent = """
+                            <html>
+                            <head><title>CSV Reports</title></head>
+                            <body>
+                            <h1>CSV Report</h1>
+                        """
+                        csvFiles.each { csvFile ->
+                            htmlContent += "<h2>${csvFile}</h2>"
+                            htmlContent += "<table border='1' cellpadding='5' cellspacing='0'>"
+
+                            def csvContent = readFile(file: csvFile)
+                            csvContent.split('\n').each { line ->
+                                def columns = line.split(',')
+                                htmlContent += '<tr>'
+                                columns.each { column ->
+                                    htmlContent += "<td>${column}</td>"
+                                }
+                                htmlContent += '</tr>'
+                            }
+
+                            htmlContent += "</table><br/>"
+                        }
+
+                        htmlContent += "</body></html>"
+
+                        writeFile file: 'output.html', text: htmlContent
+                    }                    
+                }
+            }
+        }
+
+        // Stage to publish HTML report
+        stage('Publish CSV Report') {
+            agent {
+                label 'JenkinsNode'
+            }
+            steps {
+                    publishHTML(target: [
+                    reportName: 'Report',
+                    reportDir: 'res',
+                    reportFiles: 'output.html',
+                    alwaysLinkToLastBuild: false,
+                    allowMissing: false,
+                    keepAll: true
+                ])
+                // Clean up
+                sh 'rm -rf buddy-mlir'
+            }
+        }
+
+
+    }
+}
