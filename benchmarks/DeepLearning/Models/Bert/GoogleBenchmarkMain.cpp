@@ -50,19 +50,25 @@ namespace {
 
 // Declare the BERT C interface.
 extern "C" {
-void _mlir_ciface_forward_auto_vectorization(MemRef<float, 2> *output,
-                                             MemRef<float, 1> *input0,
-                                             MemRef<size_t, 1> *input1,
-                                             MemRef<size_t, 2> *input2,
-                                             MemRef<size_t, 2> *input3,
-                                             MemRef<size_t, 2> *input4);
+void _mlir_ciface_forward_scalar(MemRef<float, 2> *output,
+                                 MemRef<float, 1> *input0,
+                                 MemRef<size_t, 1> *input1,
+                                 MemRef<size_t, 2> *input2,
+                                 MemRef<size_t, 2> *input3,
+                                 MemRef<size_t, 2> *input4);
 
-void _mlir_ciface_forward_buddy_vectorization(MemRef<float, 2> *output,
-                                              MemRef<float, 1> *input0,
-                                              MemRef<size_t, 1> *input1,
-                                              MemRef<size_t, 2> *input2,
-                                              MemRef<size_t, 2> *input3,
-                                              MemRef<size_t, 2> *input4);
+void _mlir_ciface_forward_opt(MemRef<float, 2> *output,
+                              MemRef<float, 1> *input0,
+                              MemRef<size_t, 1> *input1,
+                              MemRef<size_t, 2> *input2,
+                              MemRef<size_t, 2> *input3,
+                              MemRef<size_t, 2> *input4);
+void _mlir_ciface_forward_opt_omp(MemRef<float, 2> *output,
+                                  MemRef<float, 1> *input0,
+                                  MemRef<size_t, 1> *input1,
+                                  MemRef<size_t, 2> *input2,
+                                  MemRef<size_t, 2> *input3,
+                                  MemRef<size_t, 2> *input4);
 }
 
 template <typename Func>
@@ -82,11 +88,11 @@ void DL_MODEL_BERT(benchmark::State &state, Func func) {
 } // namespace
 
 // Register benchmarking function with different arguments.
-BENCHMARK_CAPTURE(DL_MODEL_BERT, Auto_Vectorization,
-                  _mlir_ciface_forward_auto_vectorization)
+BENCHMARK_CAPTURE(DL_MODEL_BERT, scalar, _mlir_ciface_forward_scalar)
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(DL_MODEL_BERT, Buddy_Vectorization,
-                  _mlir_ciface_forward_buddy_vectorization)
+BENCHMARK_CAPTURE(DL_MODEL_BERT, opt, _mlir_ciface_forward_opt)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_MODEL_BERT, opt_omp, _mlir_ciface_forward_opt_omp)
     ->Unit(benchmark::kMillisecond);
 
 /// Correctness Verification
@@ -102,8 +108,10 @@ void verification() {
   MemRef<size_t, 2> input4({1, MaxTokenLength}, 6);
 
   // Call the forward functions of the model.
-  _mlir_ciface_forward_auto_vectorization(&outputAutoVectorization, &input0, &input1, &input2, &input3, &input4);
-  _mlir_ciface_forward_buddy_vectorization(&outputBuddyVectorization, &input0, &input1, &input2, &input3, &input4);
+  _mlir_ciface_forward_scalar(&outputAutoVectorization, &input0, &input1,
+                              &input2, &input3, &input4);
+  _mlir_ciface_forward_opt(&outputBuddyVectorization, &input0, &input1, &input2,
+                           &input3, &input4);
 
   auto resultAutoVectorization = outputAutoVectorization.getData();
   auto resultBuddyVectorization = outputBuddyVectorization.getData();

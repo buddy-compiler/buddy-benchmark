@@ -26,11 +26,11 @@
 // Benchmark Configuration. You can change the number here as needed.
 // -----------------------------------------------------------------------------
 
-#define BATCH_SIZE 3
-#define _SIZE_M 128
-#define _SIZE_N 128
-#define _SIZE_K 128
-#define _NUM_ITER 5
+#define BATCH_SIZE 128
+#define _SIZE_M 256
+#define _SIZE_N 256
+#define _SIZE_K 256
+#define _NUM_ITER 10
 
 // -----------------------------------------------------------------------------
 // Global Variables and Functions. No need to change the code here.
@@ -83,6 +83,12 @@ void _mlir_ciface_batch_matmul_tile(MemRef<float, 3> *A, MemRef<float, 3> *B,
                                     MemRef<float, 3> *C);
 void _mlir_ciface_batch_matmul_scf(MemRef<float, 3> *A, MemRef<float, 3> *B,
                                    MemRef<float, 3> *C);
+void _mlir_ciface_batch_matmul_broadcast(MemRef<float, 3> *A,
+                                         MemRef<float, 3> *B,
+                                         MemRef<float, 3> *C);
+void _mlir_ciface_batch_matmul_broadcast_omp(MemRef<float, 3> *A,
+                                             MemRef<float, 3> *B,
+                                             MemRef<float, 3> *C);
 /// [Step 1] Add function of your new method.
 }
 
@@ -101,6 +107,14 @@ BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, Tile, _mlir_ciface_batch_matmul_tile)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, SCF, _mlir_ciface_batch_matmul_scf)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, BROADCAST,
+                  _mlir_ciface_batch_matmul_broadcast)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DL_OPS_BATCH_MATMUL, BROADCAST_OMP,
+                  _mlir_ciface_batch_matmul_broadcast_omp)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 /// [Step 2] Call GoogleBenchmark function to run your new method.
@@ -129,6 +143,10 @@ int main(int argc, char **argv) {
 
   MLIRVerification(outputExpected, _mlir_ciface_batch_matmul_tile, "Tile");
   MLIRVerification(outputExpected, _mlir_ciface_batch_matmul_scf, "SCF");
+  MLIRVerification(outputExpected, _mlir_ciface_batch_matmul_broadcast,
+                   "BROADCAST");
+  MLIRVerification(outputExpected, _mlir_ciface_batch_matmul_broadcast_omp,
+                   "BROADCAST_OMP");
   /// [Step 3] Add your new method for verification.
 
   delete[] input1;

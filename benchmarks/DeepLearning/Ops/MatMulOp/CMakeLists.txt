@@ -77,4 +77,29 @@ target_link_libraries(dl-op-linalg-matmul-benchmark
   matmul_tile
 )
 
+add_custom_command(OUTPUT matmul_tile_omp.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/MatMulOp/matmul.mlir |
+          sed 's/@matmul/@matmul_tile_omp/' |
+          ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+            -matmul-optimize="vec-size=16;kernel-m=2;kernel-n=4"
+            -convert-linalg-to-loops
+            -expand-strided-metadata
+            -lower-affine
+            -convert-scf-to-cf
+            -convert-vector-to-llvm
+            -finalize-memref-to-llvm
+            -convert-arith-to-llvm
+            -llvm-request-c-wrappers
+            -convert-func-to-llvm
+            -reconcile-unrealized-casts | 
+            ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o matmul_tile_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} matmul_tile_omp.ll
+          -fopenmp -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/matmul_tile_omp.o
+)
+add_library(matmul_tile_omp STATIC matmul_tile_omp.o)
+set_target_properties(matmul_tile_omp PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-matmul-benchmark
+  matmul_tile_omp
+)
+
 # Build the target for your new method here.

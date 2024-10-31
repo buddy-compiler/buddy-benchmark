@@ -7,161 +7,239 @@ add_custom_command(
   COMMENT "Generating forward.mlir, subgraph0.mlir"
 )
 
-add_custom_command(
-  OUTPUT forward_auto_vectorization.o
-  COMMAND
-    cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
-    sed -e {s/@forward/@forward_auto_vectorization/}
-        -e {s/@subgraph0/@subgraph0_auto_vectorization/} |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
-    -pass-pipeline
-    "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
-              empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, arith-bufferize, \
-              func.func(linalg-bufferize, tensor-bufferize), func-bufferize)" |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-    -pass-pipeline
-    "builtin.module(func.func(buffer-deallocation-simplification, convert-linalg-to-loops), \
-              eliminate-empty-tensors, func.func(llvm-request-c-wrappers), \
-              convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
-              convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
-              convert-func-to-llvm, reconcile-unrealized-casts)" |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/forward_auto_vectorization.o
-  DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
-  COMMENT "Building forward_auto_vectorization.o"
-  VERBATIM)
-
-add_custom_command(
-  OUTPUT subgraph0_auto_vectorization.o
-  COMMAND
-    cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
-    sed -e {s/@subgraph0/@subgraph0_auto_vectorization/} |
-    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt 
-      -pass-pipeline "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, func-bufferize-dynamic-offset, arith-bufferize, func.func(linalg-bufferize, tensor-bufferize))" |
-    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-      -convert-elementwise-to-linalg
-      -func-bufferize-dynamic-offset
-      -arith-bufferize
-      -func-bufferize
-      -tensor-bufferize
-      -linalg-bufferize
-      -finalizing-bufferize
-      -convert-linalg-to-loops
-      -lower-affine
-      -convert-scf-to-cf
-      -llvm-request-c-wrappers
-      -convert-math-to-llvm
-      -convert-math-to-libm
-      -convert-arith-to-llvm
-      -convert-func-to-llvm
-      -expand-strided-metadata
-      -finalize-memref-to-llvm
-      -reconcile-unrealized-casts |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_auto_vectorization.o
-  DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
-    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-  COMMENT "Building subgraph0_auto_vectorization.o"
-  VERBATIM)
-
-  add_custom_command(
-    OUTPUT forward_buddy_vectorization.o
-    COMMAND 
-      cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
-      sed -e {s/@forward/@forward_buddy_vectorization/}
-          -e {s/@subgraph0/@subgraph0_buddy_vectorization/} |
-          ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
-          -pass-pipeline
-          "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
-                    empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, arith-bufferize, \
-                    func.func(linalg-bufferize, tensor-bufferize), func-bufferize)" |
-          ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-          -pass-pipeline
-          "builtin.module(func.func(buffer-deallocation-simplification, convert-linalg-to-loops), \
-                    eliminate-empty-tensors, func.func(llvm-request-c-wrappers), \
-                    convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
-                    convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
-                    convert-func-to-llvm, reconcile-unrealized-casts)" |
-      ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-      ${LLVM_MLIR_BINARY_DIR}/llc -O3
-        -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-        -o ${CMAKE_CURRENT_BINARY_DIR}/forward_buddy_vectorization.o
-    DEPENDS
-      ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
-    COMMENT "Building forward_buddy_vectorization.o"
-    VERBATIM)
-
-add_custom_command(
-  OUTPUT subgraph0_buddy_vectorization.o
-  COMMAND
-    cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
-    sed -e {s/@subgraph0/@subgraph0_buddy_vectorization/} |
-    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-      -pass-pipeline "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, func-bufferize-dynamic-offset, arith-bufferize, func.func(linalg-bufferize, tensor-bufferize))" |
-    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-      -convert-elementwise-to-linalg
-      -func-bufferize-dynamic-offset
-      -arith-bufferize
-      -func-bufferize
-      -tensor-bufferize
-      -linalg-bufferize
-      -finalizing-bufferize
-      -batchmatmul-optimize
-      -convert-linalg-to-affine-loops
-      -lower-affine
-      -convert-vector-to-scf
-      -convert-scf-to-cf
-      -llvm-request-c-wrappers
-      -convert-vector-to-llvm
-      -convert-math-to-llvm
-      -convert-math-to-libm
-      -convert-arith-to-llvm
-      -convert-func-to-llvm
-      -expand-strided-metadata
-      -finalize-memref-to-llvm
-      -reconcile-unrealized-casts |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_buddy_vectorization.o
-  DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
-    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-  COMMENT "Building subgraph0_buddy_vectorization.o"
-  VERBATIM)
-
-
-add_library(BERT_AUTO_VECTORIZATION subgraph0_auto_vectorization.o forward_auto_vectorization.o)
-set_target_properties(BERT_AUTO_VECTORIZATION PROPERTIES LINKER_LANGUAGE CXX)
-
-add_library(BERT_BUDDY_VECTORIZATION STATIC subgraph0_buddy_vectorization.o forward_buddy_vectorization.o)
-set_target_properties(BERT_BUDDY_VECTORIZATION PROPERTIES LINKER_LANGUAGE CXX)
-
 add_executable(dl-model-bert-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-model-bert-benchmark PROPERTIES
-  LINK_FLAGS "-static"
+target_link_libraries(dl-model-bert-benchmark
+  GoogleBenchmark
 )
 
-set(BenchmarkTool GoogleBenchmark)
+# CMAKE_C_FLAGS is set when configuring cmake.
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
-if(CROSS_COMPILE_RVV)
-  set(BUDDY_LIB_DIR ${BUDDY_MLIR_CROSS_LIB_DIR})
-else()
-  set(BUDDY_LIB_DIR ${BUDDY_MLIR_LIB_DIR})
-endif()
+################################################################################
+#
+# Build scalar target.
+#
+################################################################################
+add_custom_command(
+  OUTPUT forward_scalar.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
+    sed -e {s/@forward/@forward_scalar/} |
+    sed -e {s/@subgraph0/@subgraph0_scalar/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -expand-strided-metadata
+    -finalize-memref-to-llvm
+    -llvm-request-c-wrappers
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_scalar.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_scalar.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
+  COMMENT "Building forward_scalar.o"
+  VERBATIM)
 
+add_custom_command(
+  OUTPUT subgraph0_scalar.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
+    sed -e {s/@subgraph0/@subgraph0_scalar/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -pass-pipeline 
+    "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
+  ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+    -arith-expand
+    -eliminate-empty-tensors
+    -convert-elementwise-to-linalg
+    -empty-tensor-to-alloc-tensor
+    -one-shot-bufferize
+    -convert-linalg-to-affine-loops
+    -affine-loop-fusion
+    -affine-parallelize
+    -lower-affine
+    -func-bufferize-dynamic-offset
+    -tensor-bufferize
+    -convert-linalg-to-loops
+    -finalizing-bufferize
+    -convert-vector-to-scf
+    -expand-strided-metadata
+    -cse
+    -convert-vector-to-llvm
+    -memref-expand
+    -convert-arith-to-llvm
+    -finalize-memref-to-llvm
+    -convert-scf-to-cf
+    -llvm-request-c-wrappers
+    -convert-arith-to-llvm
+    -convert-math-to-llvm
+    -convert-math-to-libm
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_scalar.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_scalar.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
+  COMMENT "Building subgraph0_scalar.o"
+  VERBATIM)
+add_library(bert_scalar STATIC subgraph0_scalar.o forward_scalar.o)
+set_target_properties(bert_scalar PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-model-bert-benchmark
-  ${BenchmarkTool}
-  BERT_AUTO_VECTORIZATION
-  BERT_BUDDY_VECTORIZATION
+  bert_scalar
+  ${BUDDY_LIB_DIR}/libStaticMLIRCRunnerUtils.a
+)
+
+################################################################################
+#
+# Build matmul/batch_matmul optimization target.
+#
+################################################################################
+add_custom_command(
+  OUTPUT forward_opt.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
+    sed -e {s/@forward/@forward_opt/} |
+    sed -e {s/@subgraph0/@subgraph0_opt/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -expand-strided-metadata
+    -finalize-memref-to-llvm
+    -llvm-request-c-wrappers
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_opt.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_opt.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_opt.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
+  COMMENT "Building forward_opt.o"
+  VERBATIM)
+
+add_custom_command(
+  OUTPUT subgraph0_opt.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
+    sed -e {s/@subgraph0/@subgraph0_opt/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -pass-pipeline 
+    "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
+  ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+    -arith-expand
+    -eliminate-empty-tensors
+    -convert-elementwise-to-linalg
+    -empty-tensor-to-alloc-tensor
+    -one-shot-bufferize
+    -matmul-parallel-vectorization-optimize # matmul optimization
+    -batchmatmul-optimize # batchmatmul optimization
+    -convert-linalg-to-affine-loops
+    -affine-loop-fusion
+    -affine-parallelize
+    -lower-affine
+    -func-bufferize-dynamic-offset
+    -tensor-bufferize
+    -convert-linalg-to-loops
+    -finalizing-bufferize
+    -convert-vector-to-scf
+    -expand-strided-metadata
+    -cse
+    -convert-vector-to-llvm
+    -memref-expand
+    -convert-arith-to-llvm
+    -finalize-memref-to-llvm
+    -convert-scf-to-cf
+    -llvm-request-c-wrappers
+    -convert-arith-to-llvm
+    -convert-math-to-llvm
+    -convert-math-to-libm
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_opt.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_opt.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_opt.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
+  COMMENT "Building subgraph0_opt.o"
+  VERBATIM)
+add_library(bert_opt STATIC subgraph0_opt.o forward_opt.o)
+set_target_properties(bert_opt PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-model-bert-benchmark
+  bert_opt
+  ${BUDDY_LIB_DIR}/libStaticMLIRCRunnerUtils.a
+)
+
+################################################################################
+#
+# Build matmul/batch_matmul optimization target with openmp.
+#
+################################################################################
+add_custom_command(
+  OUTPUT forward_opt_omp.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
+    sed -e {s/@forward/@forward_opt_omp/} |
+    sed -e {s/@subgraph0/@subgraph0_opt_omp/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -expand-strided-metadata
+    -finalize-memref-to-llvm
+    -llvm-request-c-wrappers
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_opt_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_opt_omp.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_opt_omp.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
+  COMMENT "Building forward_opt_omp.o"
+  VERBATIM)
+
+add_custom_command(
+  OUTPUT subgraph0_opt_omp.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
+    sed -e {s/@subgraph0/@subgraph0_opt_omp/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -pass-pipeline 
+    "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
+  ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+    -arith-expand
+    -eliminate-empty-tensors
+    -convert-elementwise-to-linalg
+    -empty-tensor-to-alloc-tensor
+    -one-shot-bufferize
+    -matmul-parallel-vectorization-optimize # matmul optimization
+    -batchmatmul-optimize # batchmatmul optimization
+    -convert-linalg-to-affine-loops
+    -affine-loop-fusion
+    -affine-parallelize
+    -lower-affine
+    -convert-scf-to-openmp # openmp support
+    -func-bufferize-dynamic-offset
+    -tensor-bufferize
+    -convert-linalg-to-loops
+    -finalizing-bufferize
+    -convert-vector-to-scf
+    -expand-strided-metadata
+    -cse
+    -convert-vector-to-llvm
+    -memref-expand
+    -convert-arith-to-llvm
+    -finalize-memref-to-llvm
+    -convert-scf-to-cf
+    -llvm-request-c-wrappers
+    -convert-openmp-to-llvm # openmp support
+    -convert-arith-to-llvm
+    -convert-math-to-llvm
+    -convert-math-to-libm
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_opt_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_opt_omp.ll
+    -fopenmp -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_opt_omp.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
+  COMMENT "Building subgraph0_opt_omp.o"
+  VERBATIM)
+add_library(bert_opt_omp subgraph0_opt_omp.o forward_opt_omp.o)
+set_target_properties(bert_opt_omp PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-model-bert-benchmark
+  ${OMP_SHARED_DIR}
+  bert_opt_omp
   ${BUDDY_LIB_DIR}/libStaticMLIRCRunnerUtils.a
 )
