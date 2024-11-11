@@ -18,8 +18,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @conv1d_linalg(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>) -> () {
+func.func @mlir_linalg_conv1d(%in : memref<?xf32>, %filter : memref<?xf32>, %out : memref<?xf32>) -> () {
   linalg.conv_1d ins(%in, %filter : memref<?xf32>, memref<?xf32>)
-                outs(%out : memref<?xf32>)
+                 outs(%out : memref<?xf32>)
   return
 }
