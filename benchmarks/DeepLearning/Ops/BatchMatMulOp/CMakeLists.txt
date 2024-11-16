@@ -22,14 +22,14 @@ add_custom_command(OUTPUT batch_matmul_auto_vectorization.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
           sed 's/@batch_matmul/@batch_matmul_auto_vectorization/' |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-            -convert-linalg-to-loops
-            -convert-scf-to-cf
-            -lower-affine
-            -finalize-memref-to-llvm
-            -llvm-request-c-wrappers
-            -convert-func-to-llvm
-            -convert-math-to-llvm
-            -reconcile-unrealized-casts | 
+          -convert-linalg-to-loops
+          -convert-scf-to-cf
+          -lower-affine
+          -finalize-memref-to-llvm
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm
+          -convert-math-to-llvm
+          -reconcile-unrealized-casts | 
           ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
           ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
             -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
@@ -37,6 +37,30 @@ add_custom_command(OUTPUT batch_matmul_auto_vectorization.o
 )
 add_library(BatchMatMulAutoVectorization STATIC batch_matmul_auto_vectorization.o)
 set_target_properties(BatchMatMulAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
+
+add_custom_command(OUTPUT batch_matmul_vectorization.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
+          sed 's/@batch_matmul/@batch_matmul_vectorization/' |
+          ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+            -batchmatmul-optimize
+            -convert-linalg-to-loops 
+            -convert-vector-to-scf
+            -lower-affine 
+            -arith-bufferize 
+            -convert-scf-to-cf 
+            -convert-vector-to-llvm 
+            -convert-arith-to-llvm 
+            -finalize-memref-to-llvm 
+            --llvm-request-c-wrappers
+            -convert-func-to-llvm 
+            -reconcile-unrealized-casts | 
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
+          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
+            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
+	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/BatchMatMulOp/batch_matmul_vectorization.o
+)
+add_library(BatchMatMulVectorization STATIC batch_matmul_vectorization.o)
+set_target_properties(BatchMatMulVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(dl-op-linalg-batch-matmul-benchmark
   GoogleBenchmarkMain.cpp
@@ -52,4 +76,5 @@ target_link_libraries(dl-op-linalg-batch-matmul-benchmark
   ${BenchmarkTool}
   BatchMatMulScalar
   BatchMatMulAutoVectorization
+  BatchMatMulVectorization
 )
