@@ -7,10 +7,7 @@ add_custom_command(
   COMMAND 
     ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt 
       ${BUDDY_SOURCE_DIR}/benchmarks/AudioProcessing/Operations/FIROp/MLIRFIR.mlir
-      -convert-linalg-to-affine-loops
-      -lower-affine
       -convert-scf-to-cf
-      -convert-vector-to-llvm 
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -finalize-memref-to-llvm

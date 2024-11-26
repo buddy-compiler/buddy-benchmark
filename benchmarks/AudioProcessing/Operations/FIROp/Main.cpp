@@ -80,7 +80,7 @@ void Verification(const univector<float, _IN_OUT_SIZE> &outputExpected,
 // Register Benchmark.
 // -----------------------------------------------------------------------------
 
-BENCHMARK_CAPTURE(DAP_OPS_FIR, linalg_conv1d, _mlir_ciface_mlir_linalg_conv1d)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_fir, _mlir_ciface_mlir_fir)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_fir, dap::FIR<float, 1>)
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
   // Verify the correctness of all methods.
   Verification(firOutput, dap::FIR<float, 1>, "Buddy");
-  Verification(firOutput, _mlir_ciface_mlir_linalg_conv1d, "MLIR");
+  Verification(firOutput, _mlir_ciface_mlir_fir, "MLIR");
 
   return 0;
 }

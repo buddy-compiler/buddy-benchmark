@@ -37,9 +37,9 @@ using namespace kfr;
 // -----------------------------------------------------------------------------
 
 extern "C" {
-void _mlir_ciface_mlir_linalg_conv1d(MemRef<float, 1> *inputMLIRConv1D,
-                                     MemRef<float, 1> *kernelMLIRConv1D,
-                                     MemRef<float, 1> *outputMLIRConv1D);
+void _mlir_ciface_mlir_fir(MemRef<float, 1> *inputMLIRFIR,
+                           MemRef<float, 1> *kernelMLIRFIR,
+                           MemRef<float, 1> *outputMLIRFIR);
 }
 
 // -----------------------------------------------------------------------------
