@@ -56,7 +56,8 @@ void initializeKFRFIR(univector<T, N1> &input, univector<T, N2> &kernel) {
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
   reader.read(input.data(), input.size());
   // Generate kernel data.
-  expression_handle<T> kaiser = to_handle(window_kaiser<T>(kernel.size(), 3.0));
+  expression_pointer<T> kaiser =
+      to_pointer(window_kaiser<T>(kernel.size(), 3.0));
   fir_lowpass(kernel, 0.2, kaiser, true);
 }
 
