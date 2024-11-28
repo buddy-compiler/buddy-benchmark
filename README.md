@@ -140,12 +140,41 @@ $ mkdir build && cd build
 $ cmake -G Ninja .. \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DOP_OPTIMIZATION_BENCHMARKS=ON \
+    -DCMAKE_CXX_COMPILER=clang++ \
     -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
 $ ninja <your target operation benchmark>
 
 // Operation benchamrk supported include:
 //   - conv2d-nchw-fchw-benchmark
 //   - matmul-benchmark
+```
+### matmul-benchmark
+`OpenMP` and `lld` LTO is required in matmul-benchmark. To ensure version compatibility with the project, it's recommended to use the LLVM toolchains built within the `buddy-benchmark`. Follow the steps below:
+- build llvm toolchains with `lld` and `OpenMP`.
+```
+$ cd buddy-mlir/llvm/build
+$ cmake -G Ninja ../llvm \
+    -DLLVM_ENABLE_PROJECTS="mlir;clang;lld;openmp" \
+    -DLLVM_TARGETS_TO_BUILD="host;RISCV" \
+    -DLLVM_ENABLE_ASSERTIONS=ON \
+    -DLLVM_ENABLE_RUNTIMES=all \
+    -DOPENMP_ENABLE_LIBOMPTARGET=OFF \
+    -DCMAKE_BUILD_TYPE=RELEASE
+```
+- use the `clang++` in `buddy-mlir/llvm/build/bin`.
+```
+$ mkdir build && cd build
+$ cmake -G Ninja .. \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DOP_OPTIMIZATION_BENCHMARKS=ON \
+    -DCMAKE_CXX_COMPILER=/PATH/TO/BUDDY-MLIR/BUILD/bin/clang++ \
+    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
+$ ninja matmul-benchmark
+```
+- `matmul-benchmark` need to load the `libomp.so` in `buddy-mlir/llvm/build/lib` to execute, here's a temporary way without root. 
+
+```
+$ export LD_LIBRARY_PATH=/PATH/TO/BUDDY-MLIR/BUILD/lib/:$LD_LIBRARY_PATH
 ```
 
 Run TVM operation optimization benchmark cases.
