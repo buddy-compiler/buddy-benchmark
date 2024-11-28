@@ -1,8 +1,8 @@
 # Correctness Checking Framework
 
-## Python based correctness checking
+## [DAP] Python based correctness checking for audio processing
 
-## Environment Setup
+### Environment Setup
 
 Please build the "AudioValidationLib" target in CMake.
 It would generate a dynamic library for CFFI to use.
@@ -37,3 +37,21 @@ There is no strict rule for adding a test case.
 The test case should be a python file with a class inherited from AudioTest.
 You would need to modify CWrapper.cpp to add new function wrappers for the new test case.
 The class should have a method named "run" which will be invoked by the main.py.
+
+## [DIP] Python based correctness checking for image processing
+
+### Environment Setup
+```
+$ cd ImageProcessing
+$ python -m venv Img.venv
+$ source Img.venv/bin/activate
+$ pip install -r requirements.txt
+$ deactivate
+```
+
+### Execution
+```
+$ source Img.venv/bin/activate
+$ python compareImg.py <PATH/TO/Image1> <PATH/TO/Image2>
+$ deactivate
+```
