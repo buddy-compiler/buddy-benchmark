@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @mlir_iir_vectorization(%in : memref<?xf32>, %filter : memref<?x?xf32>, %out : memref<?xf32>){
+func.func @iir_vectorization(%in : memref<?xf32>, %filter : memref<?x?xf32>, %out : memref<?xf32>){
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
   %N = memref.dim %in, %c0 : memref<?xf32>

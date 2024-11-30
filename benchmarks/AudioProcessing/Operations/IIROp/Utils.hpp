@@ -37,13 +37,13 @@ using namespace kfr;
 // -----------------------------------------------------------------------------
 
 extern "C" {
-void _mlir_ciface_mlir_iir(MemRef<float, 1> *inputMLIRIIR,
-                           MemRef<float, 2> *kernelMLIRIIR,
-                           MemRef<float, 1> *outputMLIRIIR);
+void _mlir_ciface_iir_scalar(MemRef<float, 1> *inputMLIRIIR,
+                             MemRef<float, 2> *kernelMLIRIIR,
+                             MemRef<float, 1> *outputMLIRIIR);
 
-void _mlir_ciface_mlir_iir_vectorization(MemRef<float, 1> *inputMLIRIIR,
-                                         MemRef<float, 2> *kernelMLIRIIR,
-                                         MemRef<float, 1> *outputMLIRIIR);
+void _mlir_ciface_iir_vectorization(MemRef<float, 1> *inputMLIRIIR,
+                                    MemRef<float, 2> *kernelMLIRIIR,
+                                    MemRef<float, 1> *outputMLIRIIR);
 }
 
 // -----------------------------------------------------------------------------
@@ -54,7 +54,9 @@ namespace iirOp {
 
 // Initialize input and kernel data.
 template <typename T, size_t N>
-void initializeKFRIIR(univector<T, N> &input, std::vector<biquad_params<T>> &bqs, univector<T> &kernel) {
+void initializeKFRIIR(univector<T, N> &input,
+                      std::vector<biquad_params<T>> &bqs,
+                      univector<T> &kernel) {
   // Decode audio data.
   audio_reader_wav<T> reader(open_file_for_reading(
       "../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav"));
@@ -62,9 +64,8 @@ void initializeKFRIIR(univector<T, N> &input, std::vector<biquad_params<T>> &bqs
   // Generate kernel data.
   zpk<T> filt = iir_lowpass(bessel<T>(24), 1000, 48000);
   bqs = to_sos(filt);
-  // Store kernel data in vector container. 
-  for (int i = 0; i < bqs.size(); ++i) {  // TODO : for (auto bq : bqs)
-    auto bq = bqs[i];
+  // Store kernel data in vector container.
+  for (auto bq : bqs) {
     kernel.push_back(bq.b0);
     kernel.push_back(bq.b1);
     kernel.push_back(bq.b2);

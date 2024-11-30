@@ -52,7 +52,7 @@ using MLIRFunctionType = void (*)(MemRef<float, 1> *, MemRef<float, 2> *,
                                   MemRef<float, 1> *);
 
 using BuddyFunctionType = void (*)(MemRef<float, 1> *, MemRef<float, 2> *,
-                                  MemRef<float, 1> *, bool isVectorization);
+                                   MemRef<float, 1> *, bool);
 
 // Benchmarking function for MLIR based IIR method.
 void DAP_OPS_IIR(benchmark::State &state, MLIRFunctionType func) {
@@ -63,7 +63,8 @@ void DAP_OPS_IIR(benchmark::State &state, MLIRFunctionType func) {
   benchmark::DoNotOptimize(resRef);
 }
 
-void DAP_OPS_IIR(benchmark::State &state, BuddyFunctionType func, bool isVectorization) {
+void DAP_OPS_IIR(benchmark::State &state, BuddyFunctionType func,
+                 bool isVectorization) {
   MemRef<float, 1> resRef(sizeofAud, 0.0);
   for (auto _ : state) {
     func(&audRef, &kernelRef, &resRef, isVectorization);
@@ -89,7 +90,8 @@ void Verification(const univector<float, _IN_OUT_SIZE> &outputExpected,
 }
 
 void Verification(const univector<float, _IN_OUT_SIZE> &outputExpected,
-                  BuddyFunctionType BuddyFunc, bool isVectorization, const std::string &name) {
+                  BuddyFunctionType BuddyFunc, bool isVectorization,
+                  const std::string &name) {
   // Initialize MemRef with all zeros.
   MemRef<float, 1> outputGenerated(sizeofAud, 0.0);
   BuddyFunc(&audRef, &kernelRef, &outputGenerated, isVectorization);
@@ -101,13 +103,13 @@ void Verification(const univector<float, _IN_OUT_SIZE> &outputExpected,
 // Register Benchmark.
 // -----------------------------------------------------------------------------
 
-BENCHMARK_CAPTURE(DAP_OPS_IIR, mlir_scalar, _mlir_ciface_mlir_iir)
+BENCHMARK_CAPTURE(DAP_OPS_IIR, mlir_scalar, _mlir_ciface_iir_scalar)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 BENCHMARK_CAPTURE(DAP_OPS_IIR, buddy_scalar, dap::IIR<float, 1>, false)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
-BENCHMARK_CAPTURE(DAP_OPS_IIR, mlir_vectorize, _mlir_ciface_mlir_iir_vectorization)
+BENCHMARK_CAPTURE(DAP_OPS_IIR, mlir_vectorize, _mlir_ciface_iir_vectorization)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 BENCHMARK_CAPTURE(DAP_OPS_IIR, buddy_vectorize, dap::IIR<float, 1>, true)
@@ -137,10 +139,12 @@ int main(int argc, char **argv) {
   iirOp::printUnivector(iirOutput, /*doPrint=*/_PRINT);
 
   // Verify the correctness of all methods.
-  Verification(iirOutput, _mlir_ciface_mlir_iir, "MLIRScalar");
-  Verification(iirOutput, dap::IIR<float, 1>, /*isVectorization=*/false, "BuddyScalar");
-  Verification(iirOutput, _mlir_ciface_mlir_iir_vectorization, "MLIRVectorize");
-  Verification(iirOutput, dap::IIR<float, 1>, /*isVectorization=*/true, "BuddyVectorize");
+  Verification(iirOutput, _mlir_ciface_iir_scalar, "MLIRScalar");
+  Verification(iirOutput, dap::IIR<float, 1>, /*isVectorization=*/false,
+               "BuddyScalar");
+  Verification(iirOutput, _mlir_ciface_iir_vectorization, "MLIRVectorize");
+  Verification(iirOutput, dap::IIR<float, 1>, /*isVectorization=*/true,
+               "BuddyVectorize");
 
   return 0;
 }
