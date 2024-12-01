@@ -6,7 +6,8 @@ The table below lists the benchmark cases at the operation level.
 
 | Name  | Build Target | Introduction |
 | -------------- | ------------- | ------------- |
-| Biquad Op  | `ninja dap-op-biquad-benchmark`  | This benchmark compares Buddy's `dap.biquad` operation with KFR library. Check the benchmark in [this file](./Operations/BiquadOp/Main.cpp). |
+| Biquad Op  | `ninja dap-op-biquad-benchmark`  | This benchmark evaluates the efficiency of scalar implementation of the Biquad operator and verifies their accuracy against KFR's biquad function. The benchmark options can be configured in [this file](./Operations/BiquadOp/Main.cpp).
+Note: The vectorized implementation of the biquad filter is the same as the IIR operator. Please refer to the 'IIR Op' for details. |
 | FFT Op | `ninja dap-op-fft-benchmark`  | Task in TODO list. Check the benchmark in [this file](./Operations/FFTOp/Main.cpp). |
 | FIR Op | `ninja dap-op-fir-benchmark`  | Task in TODO list. Check the benchmark in [this file](./Operations/FIROp/Main.cpp). |
 | IIR Op | `ninja dap-op-iir-benchmark`  | This benchmark compares scalar and vectorized version `dap.iir` operation with KFR library. Check the benchmark in [this file](./Operations/IIROp/Main.cpp). |
