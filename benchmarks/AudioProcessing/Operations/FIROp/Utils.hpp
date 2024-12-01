@@ -25,6 +25,7 @@
 #include <buddy/Core/Container.h>
 #include <buddy/DAP/DAP.h>
 #include <fstream>
+#include <iomanip>
 #include <kfr/base.hpp>
 #include <kfr/dft.hpp>
 #include <kfr/dsp.hpp>
@@ -99,7 +100,7 @@ void printMemRef(const MemRef<T, N> &result, const std::string &name = "",
   }
 }
 
-// Verify correctness between KFR and MLIR based result.
+// Verify correctness of KFR vs. MLIR results using relative error.
 template <typename T, size_t N>
 void verify(const univector<T, N> &A, const MemRef<float, 1> &B, size_t size,
             const std::string &name) {
@@ -112,8 +113,9 @@ void verify(const univector<T, N> &A, const MemRef<float, 1> &B, size_t size,
   // Print verification result.
   std::cout << name << " ";
   for (int i = 0; i < size; ++i) {
-    if (std::fabs(A[i] - B[i]) > epsilon) {
+    if (std::fabs((A[i] - B[i]) / A[i]) > epsilon) {
       std::cout << FAIL << std::endl;
+      std::cout << std::setprecision(15);
       std::cout << "i=" << i << ":\tA[" << i << "]=" << A[i] << "\tB[" << i
                 << "]=" << B[i] << std::endl;
       isPass = false;
