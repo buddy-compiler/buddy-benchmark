@@ -9,7 +9,7 @@ The table below lists the benchmark cases at the operation level.
 | Biquad Op  | `ninja dap-op-biquad-benchmark`  | This benchmark compares Buddy's `dap.biquad` operation with KFR library. Check the benchmark in [this file](./Operations/BiquadOp/Main.cpp). |
 | FFT Op | `ninja dap-op-fft-benchmark`  | Task in TODO list. Check the benchmark in [this file](./Operations/FFTOp/Main.cpp). |
 | FIR Op | `ninja dap-op-fir-benchmark`  | This benchmark evaluates the efficiency of scalar implementation of the FIR operator and verifies accuracy against KFR's FIR function. The benchmark options can be configured in [this file](./Operations/FIROp/Main.cpp). |
-| IIR Op | `ninja dap-op-iir-benchmark`  | This benchmark compares scalar and vectorized version `dap.iir` operation with KFR library. Check the benchmark in [this file](./Operations/IIROp/Main.cpp). |
+| IIR Op | `ninja dap-op-iir-benchmark`  | This benchmark evaluates the efficiency of both scalar and vectorized implementations of the IIR operator and verifies their accuracy against KFR's IIR function. The benchmark options can be configured in [this file](./Operations/IIROp/Main.cpp).|
 | RFFT Op | `ninja dap-op-rfft-benchmark` | This benchmark evaluates the efficiency of the RFFT operator and verifies its correctness by comparing it with the RFFT function in numpy. The benchmark size can be adjusted in [this file](./Operations/RFFTOp/GoogleBenchmarkMain.cpp). And you can compare the time consumption with Numpy library in the `numpyTimeResult.txt`.|
 
 ### Local Hardware Platform.
@@ -20,7 +20,6 @@ The table below lists the benchmark cases at the operation level.
 $ cd buddy-benchmark
 $ git submodule update --init ./thirdparty/kfr
 ```
-
 
 2. Build benchmark for local platform:
 
@@ -53,15 +52,15 @@ $ ./dap-op-iir-benchmark
 
 1. Install required packages:
 
-To help visualize the results of audio processing, we provide a tool for figure plotting. To use this tool, ensure that you are running `Python3` and have the necessary packages installed: `numpy`, `matplotlib` and `scipy`. You can install them using the following command:
+To help visualize the results of audio processing, we provide a tool for figure plotting. To use this tool, ensure that you are running `Python3` and have the necessary packages installed: `NumPy`, `Matplotlib` and `SciPy`. You can install them using the following command:
 
 ```bash
-$ pip install matplotlib scipy
+$ pip install numpy matplotlib scipy
 ```
 
 2. Build benchmark for local platform:
 
-You can customize the `python3` path during the build process by 
+You can customize the `Python3` path during the build process by 
 adding the option `-DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN` as follows:
 
 ```bash
