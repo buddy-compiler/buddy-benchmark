@@ -50,11 +50,23 @@ MemRef<float, 1> kernelRef(sizeofKernel);
 using MLIRFunctionType = void (*)(MemRef<float, 1> *, MemRef<float, 1> *,
                                   MemRef<float, 1> *);
 
+using BuddyFunctionType = void (*)(MemRef<float, 1> *, MemRef<float, 1> *,
+                                   MemRef<float, 1> *, bool);
+
 // Benchmarking function for MLIR based FIR method.
 void DAP_OPS_FIR(benchmark::State &state, MLIRFunctionType func) {
   MemRef<float, 1> resRef(sizeofAud, 0.0);
   for (auto _ : state) {
     func(&audRef, &kernelRef, &resRef);
+  }
+  benchmark::DoNotOptimize(resRef);
+}
+
+void DAP_OPS_FIR(benchmark::State &state, BuddyFunctionType func,
+                 bool isVectorization) {
+  MemRef<float, 1> resRef(sizeofAud, 0.0);
+  for (auto _ : state) {
+    func(&audRef, &kernelRef, &resRef, isVectorization);
   }
   benchmark::DoNotOptimize(resRef);
 }
@@ -76,14 +88,34 @@ void Verification(const univector<float, _IN_OUT_SIZE> &outputExpected,
   firOp::verify(outputExpected, outputGenerated, _IN_OUT_SIZE, name);
 }
 
+void Verification(const univector<float, _IN_OUT_SIZE> &outputExpected,
+                  BuddyFunctionType BuddyFunc, bool isVectorization,
+                  const std::string &name) {
+  // Initialize MemRef with all zeros.
+  MemRef<float, 1> outputGenerated(sizeofAud, 0.0);
+  BuddyFunc(&audRef, &kernelRef, &outputGenerated, isVectorization);
+  firOp::printMemRef(outputGenerated, name, /*doPrint=*/_PRINT);
+  firOp::verify(outputExpected, outputGenerated, _IN_OUT_SIZE, name);
+}
+
 // -----------------------------------------------------------------------------
 // Register Benchmark.
 // -----------------------------------------------------------------------------
 
-BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_fir, _mlir_ciface_mlir_fir)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_scalar, _mlir_ciface_fir_scalar)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_fir, dap::FIR<float, 1>)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_scalar, dap::FIR<float, 1>, false)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_vectorize, _mlir_ciface_fir_vectorization)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_tiled_vectorize,
+                  _mlir_ciface_fir_tiled_vectorization)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_tiled_vectorize, dap::FIR<float, 1>, true)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 BENCHMARK(KFR_FIR)->Unit(benchmark::kMillisecond)->Iterations(_NUM_ITER);
@@ -109,8 +141,14 @@ int main(int argc, char **argv) {
   firOp::printUnivector(firOutput, /*doPrint=*/_PRINT);
 
   // Verify the correctness of all methods.
-  Verification(firOutput, dap::FIR<float, 1>, "Buddy");
-  Verification(firOutput, _mlir_ciface_mlir_fir, "MLIR");
+  Verification(firOutput, _mlir_ciface_fir_scalar, "MLIRScalar");
+  Verification(firOutput, dap::FIR<float, 1>, /*isVectorization=*/false,
+               "BuddyScalar");
+  Verification(firOutput, _mlir_ciface_fir_vectorization, "MLIRVectorize");
+  Verification(firOutput, _mlir_ciface_fir_tiled_vectorization,
+               "MLIRTiledVectorize");
+  Verification(firOutput, dap::FIR<float, 1>, /*isVectorization=*/true,
+               "BuddyTiledVectorize");
 
   return 0;
 }
