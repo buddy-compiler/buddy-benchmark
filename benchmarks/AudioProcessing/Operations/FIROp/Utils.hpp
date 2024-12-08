@@ -38,9 +38,15 @@ using namespace kfr;
 // -----------------------------------------------------------------------------
 
 extern "C" {
-void _mlir_ciface_mlir_fir(MemRef<float, 1> *inputMLIRFIR,
-                           MemRef<float, 1> *kernelMLIRFIR,
-                           MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_fir_scalar(MemRef<float, 1> *inputMLIRFIR,
+                             MemRef<float, 1> *kernelMLIRFIR,
+                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_fir_vectorization(MemRef<float, 1> *inputMLIRFIR,
+                                    MemRef<float, 1> *kernelMLIRFIR,
+                                    MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_fir_tiled_vectorization(MemRef<float, 1> *inputMLIRFIR,
+                                          MemRef<float, 1> *kernelMLIRFIR,
+                                          MemRef<float, 1> *outputMLIRFIR);
 }
 
 // -----------------------------------------------------------------------------
@@ -100,7 +106,7 @@ void printMemRef(const MemRef<T, N> &result, const std::string &name = "",
   }
 }
 
-// Verify correctness of KFR vs. MLIR results using relative error.
+// Verify correctness of KFR vs. MLIR results using direct error.
 template <typename T, size_t N>
 void verify(const univector<T, N> &A, const MemRef<float, 1> &B, size_t size,
             const std::string &name) {
@@ -113,7 +119,7 @@ void verify(const univector<T, N> &A, const MemRef<float, 1> &B, size_t size,
   // Print verification result.
   std::cout << name << " ";
   for (int i = 0; i < size; ++i) {
-    if (std::fabs((A[i] - B[i]) / A[i]) > epsilon) {
+    if (std::fabs(A[i] - B[i]) > epsilon) {
       std::cout << FAIL << std::endl;
       std::cout << std::setprecision(15);
       std::cout << "i=" << i << ":\tA[" << i << "]=" << A[i] << "\tB[" << i

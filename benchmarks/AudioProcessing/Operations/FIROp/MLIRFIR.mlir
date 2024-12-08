@@ -18,7 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @mlir_fir(%input : memref<?xf32>, %kernel : memref<?xf32>, 
+func.func @fir_scalar(%input : memref<?xf32>, %kernel : memref<?xf32>, 
                     %output : memref<?xf32>) -> () {
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
