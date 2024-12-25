@@ -115,7 +115,7 @@ Before building the benchmark target, please see the following table and ensure 
 | Cases | Hardware Configuration |
 | -------------- | ------------- |
 | Gemmini-ResNet-101  | defaultFpConfig ([link](./docs/GemminiConfig.md#using-default-float-point-configuration)) |
-
+| Gemmini-MiniLM-L6   | defaultFpConfig
 We assume you have already built all the components in the Gemmini README file. Now, let's build and run the cases. 
 
 ```
@@ -129,6 +129,7 @@ $ cmake -G Ninja .. \
 $ ninja
 $ cd bin
 $ spike --extension=gemmini pk Gemmini-ResNet-101
+$ spike --extension=gemmini pk Gemmini-MiniLM-L6
 ```
 
 ## Operation Optimization Benchmark
