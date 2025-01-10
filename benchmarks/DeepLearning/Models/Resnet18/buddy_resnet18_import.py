@@ -22,6 +22,7 @@ import os
 import torch
 import torchvision
 from torch._inductor.decomposition import decompositions as inductor_decomp
+from torch._decomp import remove_decompositions
 from buddy.compiler.frontend import DynamoCompiler
 from buddy.compiler.ops import tosa
 from buddy.compiler.graph import GraphDriver
@@ -29,6 +30,17 @@ from buddy.compiler.graph.transform import simply_fuse
 
 model = torchvision.models.resnet18()
 resnet_model = model.eval()
+
+for layer in resnet_model.modules():
+    if isinstance(layer, torch.nn.BatchNorm2d):
+        if hasattr(layer, "num_batches_tracked"):
+            del layer.num_batches_tracked
+
+DEFAULT_DECOMPOSITIONS = [
+    torch.ops.aten.max_pool2d_with_indices.default,
+]
+
+remove_decompositions(inductor_decomp, DEFAULT_DECOMPOSITIONS)
 
 # Initialize Dynamo Compiler with specific configurations as an importer.
 dynamo_compiler = DynamoCompiler(

@@ -37,6 +37,11 @@ model = models.mobilenet_v3_small(
 )
 model = model.eval()
 
+for layer in model.modules():
+    if isinstance(layer, torch.nn.BatchNorm2d):
+        if hasattr(layer, "num_batches_tracked"):
+            del layer.num_batches_tracked
+
 # Initialize Dynamo Compiler with specific configurations as an importer.
 dynamo_compiler = DynamoCompiler(
     primary_registry=tosa.ops_registry,

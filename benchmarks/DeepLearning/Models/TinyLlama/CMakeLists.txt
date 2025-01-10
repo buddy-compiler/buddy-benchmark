@@ -54,6 +54,7 @@ add_custom_command(
   ${LLVM_MLIR_BINARY_DIR}/mlir-opt
     -eliminate-empty-tensors
     -empty-tensor-to-alloc-tensor
+    -convert-elementwise-to-linalg
     -one-shot-bufferize
     -convert-linalg-to-affine-loops
     -lower-affine
@@ -121,6 +122,7 @@ add_custom_command(
   ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
     -eliminate-empty-tensors
     -empty-tensor-to-alloc-tensor
+    -convert-elementwise-to-linalg
     -one-shot-bufferize
     -matmul-parallel-vectorization-optimize # new added
     -batchmatmul-optimize # new added
