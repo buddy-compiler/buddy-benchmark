@@ -27,60 +27,66 @@ separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 ################################################################################
 add_custom_command(
   OUTPUT forward_scalar.o
-  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
+  COMMAND 
+    cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
     sed -e {s/@forward/@forward_scalar/} |
     sed -e {s/@subgraph0/@subgraph0_scalar/} |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-    -expand-strided-metadata
-    -finalize-memref-to-llvm
-    -llvm-request-c-wrappers
-    -convert-func-to-llvm
-    -reconcile-unrealized-casts |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_scalar.ll
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_scalar.ll
-    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_scalar.o
-  DEPENDS
+    ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+      -expand-strided-metadata
+      -finalize-memref-to-llvm
+      -llvm-request-c-wrappers
+      -convert-func-to-llvm
+      -reconcile-unrealized-casts |
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_scalar.ll
+  COMMAND 
+    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_scalar.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_scalar.o
+  DEPENDS 
     ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
   COMMENT "Building forward_scalar.o"
-  VERBATIM)
+  VERBATIM
+)
 
 add_custom_command(
   OUTPUT subgraph0_scalar.o
-  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
+  COMMAND 
+    cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
     sed -e {s/@subgraph0/@subgraph0_scalar/} |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-    -pass-pipeline 
-    "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-    -eliminate-empty-tensors
-    -empty-tensor-to-alloc-tensor
-    -convert-elementwise-to-linalg
-    -one-shot-bufferize
-    -convert-linalg-to-affine-loops
-    -lower-affine
-    -func-bufferize
-    -tensor-bufferize
-    -arith-bufferize
-    -buffer-deallocation
-    -finalizing-bufferize
-    -convert-vector-to-scf
-    -expand-strided-metadata
-    -convert-vector-to-llvm
-    -finalize-memref-to-llvm
-    -convert-scf-to-cf
-    -llvm-request-c-wrappers
-    -convert-arith-to-llvm
-    -convert-math-to-llvm
-    -convert-math-to-libm 
-    -convert-func-to-llvm
-    -reconcile-unrealized-casts |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_scalar.ll
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_scalar.ll
-    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_scalar.o
-  DEPENDS
+    ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+      -pass-pipeline 
+      "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
+    ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+      -eliminate-empty-tensors
+      -empty-tensor-to-alloc-tensor
+      -convert-elementwise-to-linalg
+      -one-shot-bufferize
+      -convert-linalg-to-affine-loops
+      -lower-affine
+      -func-bufferize
+      -tensor-bufferize
+      -arith-bufferize
+      -buffer-deallocation
+      -finalizing-bufferize
+      -convert-vector-to-scf
+      -expand-strided-metadata
+      -convert-vector-to-llvm
+      -finalize-memref-to-llvm
+      -convert-scf-to-cf
+      -llvm-request-c-wrappers
+      -convert-arith-to-llvm
+      -convert-math-to-llvm
+      -convert-math-to-libm 
+      -convert-func-to-llvm
+      -reconcile-unrealized-casts |
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_scalar.ll
+  COMMAND 
+    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_scalar.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_scalar.o
+  DEPENDS 
     ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
   COMMENT "Building subgraph0_scalar.o"
-  VERBATIM)
+  VERBATIM
+)
 add_library(tinyllama_scalar STATIC subgraph0_scalar.o forward_scalar.o)
 set_target_properties(tinyllama_scalar PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-model-tinyllama-benchmark
@@ -95,62 +101,69 @@ target_link_libraries(dl-model-tinyllama-benchmark
 ################################################################################
 add_custom_command(
   OUTPUT forward_matmul_opt.o
-  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
+  COMMAND 
+    cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
     sed -e {s/@forward/@forward_matmul_opt/} |
     sed -e {s/@subgraph0/@subgraph0_matmul_opt/} |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-    -expand-strided-metadata
-    -finalize-memref-to-llvm
-    -llvm-request-c-wrappers
-    -convert-func-to-llvm
-    -reconcile-unrealized-casts |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_matmul_opt.ll
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_matmul_opt.ll
-    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_matmul_opt.o
-  DEPENDS
+    ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+      -expand-strided-metadata
+      -finalize-memref-to-llvm
+      -llvm-request-c-wrappers
+      -convert-func-to-llvm
+      -reconcile-unrealized-casts |
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_matmul_opt.ll
+  COMMAND 
+    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_matmul_opt.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_matmul_opt.o
+  DEPENDS 
     ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
   COMMENT "Building forward_matmul_opt.o"
-  VERBATIM)
+  VERBATIM
+)
 
 add_custom_command(
   OUTPUT subgraph0_matmul_opt.o
-  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
+  COMMAND 
+    cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
     sed -e {s/@subgraph0/@subgraph0_matmul_opt/} |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-    -pass-pipeline 
-    "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
-  ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-    -eliminate-empty-tensors
-    -empty-tensor-to-alloc-tensor
-    -convert-elementwise-to-linalg
-    -one-shot-bufferize
-    -matmul-parallel-vectorization-optimize # new added
-    -batchmatmul-optimize # new added
-    -convert-linalg-to-affine-loops
-    -lower-affine
-    -func-bufferize
-    -tensor-bufferize
-    -arith-bufferize
-    -buffer-deallocation
-    -finalizing-bufferize
-    -convert-vector-to-scf
-    -expand-strided-metadata
-    -convert-vector-to-llvm
-    -finalize-memref-to-llvm
-    -convert-scf-to-cf
-    -llvm-request-c-wrappers
-    -convert-arith-to-llvm
-    -convert-math-to-llvm
-    -convert-math-to-libm 
-    -convert-func-to-llvm
-    -reconcile-unrealized-casts |
-  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_matmul_opt.ll
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_matmul_opt.ll
-    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_matmul_opt.o
-  DEPENDS
+    ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+      -pass-pipeline 
+      "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
+    ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+      -eliminate-empty-tensors
+      -empty-tensor-to-alloc-tensor
+      -convert-elementwise-to-linalg
+      -one-shot-bufferize
+      -matmul-parallel-vectorization-optimize # new added
+      -batchmatmul-optimize # new added
+      -convert-linalg-to-affine-loops
+      -lower-affine
+      -func-bufferize
+      -tensor-bufferize
+      -arith-bufferize
+      -buffer-deallocation
+      -finalizing-bufferize
+      -convert-vector-to-scf
+      -expand-strided-metadata
+      -convert-vector-to-llvm
+      -finalize-memref-to-llvm
+      -convert-scf-to-cf
+      -llvm-request-c-wrappers
+      -convert-arith-to-llvm
+      -convert-math-to-llvm
+      -convert-math-to-libm 
+      -convert-func-to-llvm
+      -reconcile-unrealized-casts |
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_matmul_opt.ll
+  COMMAND 
+    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_matmul_opt.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_matmul_opt.o
+  DEPENDS 
     ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
   COMMENT "Building subgraph0_matmul_opt.o"
-  VERBATIM)
+  VERBATIM
+)
+
 add_library(tinyllama_matmul_opt STATIC subgraph0_matmul_opt.o forward_matmul_opt.o)
 set_target_properties(tinyllama_matmul_opt PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-model-tinyllama-benchmark

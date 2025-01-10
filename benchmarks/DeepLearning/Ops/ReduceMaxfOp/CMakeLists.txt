@@ -1,3 +1,5 @@
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
+
 # Add custom commands for scalar implementation of reduce.maxf
 add_custom_command(OUTPUT maxf_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/ReduceMaxfOp/ReduceMaxf.mlir |
@@ -11,10 +13,9 @@ add_custom_command(OUTPUT maxf_scalar.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/ReduceMaxfOp/maxf_scalar.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o maxf_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} maxf_scalar.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/maxf_scalar.o
 )
 add_library(ReduceMaxfScalar STATIC maxf_scalar.o)
 set_target_properties(ReduceMaxfScalar PROPERTIES LINKER_LANGUAGE CXX)
@@ -32,10 +33,9 @@ add_custom_command(OUTPUT maxf_auto_vectorization.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/ReduceMaxfOp/maxf_auto_vectorization.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o maxf_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} maxf_auto_vectorization.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/maxf_auto_vectorization.o
 )
 add_library(ReduceMaxfAutoVectorization STATIC maxf_auto_vectorization.o)
 set_target_properties(ReduceMaxfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
