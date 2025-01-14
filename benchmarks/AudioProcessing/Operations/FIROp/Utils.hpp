@@ -44,6 +44,48 @@ void _mlir_ciface_fir_vector_f32(MemRef<float, 1> *inputMLIRFIR,
 void _mlir_ciface_fir_vector_f64(MemRef<double, 1> *inputMLIRFIR,
                                  MemRef<double, 1> *kernelMLIRFIR,
                                  MemRef<double, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_8_ts_256_f64(MemRef<double, 1> *inputMLIRFIR,
+                                             MemRef<double, 1> *kernelMLIRFIR,
+                                             MemRef<double, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_8_ts_128_f64(MemRef<double, 1> *inputMLIRFIR,
+                                             MemRef<double, 1> *kernelMLIRFIR,
+                                             MemRef<double, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_8_ts_512_f64(MemRef<double, 1> *inputMLIRFIR,
+                                             MemRef<double, 1> *kernelMLIRFIR,
+                                             MemRef<double, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_8_ts_1024_f64(MemRef<double, 1> *inputMLIRFIR,
+                                             MemRef<double, 1> *kernelMLIRFIR,
+                                             MemRef<double, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_64_f32(MemRef<float, 1> *inputMLIRFIR,
+                                             MemRef<float, 1> *kernelMLIRFIR,
+                                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_128_f32(MemRef<float, 1> *inputMLIRFIR,
+                                             MemRef<float, 1> *kernelMLIRFIR,
+                                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_240_f32(MemRef<float, 1> *inputMLIRFIR,
+                                             MemRef<float, 1> *kernelMLIRFIR,
+                                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_256_f32(MemRef<float, 1> *inputMLIRFIR,
+                                             MemRef<float, 1> *kernelMLIRFIR,
+                                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_8_ts_256_f32(MemRef<float, 1> *inputMLIRFIR,
+                                             MemRef<float, 1> *kernelMLIRFIR,
+                                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_512_f32(MemRef<float, 1> *inputMLIRFIR,
+                                             MemRef<float, 1> *kernelMLIRFIR,
+                                             MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_1024_f32(MemRef<float, 1> *inputMLIRFIR,
+                                              MemRef<float, 1> *kernelMLIRFIR,
+                                              MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_2048_f32(MemRef<float, 1> *inputMLIRFIR,
+                                              MemRef<float, 1> *kernelMLIRFIR,
+                                              MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_4096_f32(MemRef<float, 1> *inputMLIRFIR,
+                                              MemRef<float, 1> *kernelMLIRFIR,
+                                              MemRef<float, 1> *outputMLIRFIR);
+void _mlir_ciface_buddy_fir_vs_16_ts_8192_f32(MemRef<float, 1> *inputMLIRFIR,
+                                              MemRef<float, 1> *kernelMLIRFIR,
+                                              MemRef<float, 1> *outputMLIRFIR);
 }
 
 // -----------------------------------------------------------------------------
