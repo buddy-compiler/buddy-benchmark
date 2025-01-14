@@ -55,8 +55,11 @@ static void printArray(int n, double *x1, double *x2) {
   printf("\nend   dump: x2\n");
 }
 
-void registerMLIRPolybenchMvt() {
+void registerMLIRPolybenchMvt(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "mvt-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

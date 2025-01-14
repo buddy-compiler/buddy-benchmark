@@ -10,9 +10,8 @@ void _mlir_ciface_seidel_2d_init_array(int, MemRef<double, 2> *);
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
     {"mini", {20, 40}},           {"small", {40, 120}},
-    {"medium", {100, 400}},       
-    // {"large", {500, 2000}},
-    // {"extralarge", {1000, 4000}},
+    {"medium", {100, 400}},       {"large", {500, 2000}},
+    {"extralarge", {1000, 4000}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -42,8 +41,11 @@ static void printArray(int n, double *A) {
   printf("\n");
 }
 
-void registerMLIRPolybenchSeidel2D() {
+void registerMLIRPolybenchSeidel2D(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "seidel-2d-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

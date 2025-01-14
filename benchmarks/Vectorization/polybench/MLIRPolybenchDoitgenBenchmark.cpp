@@ -10,9 +10,9 @@ void _mlir_ciface_doitgen_init_array(int, int, int, MemRef<double, 3> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {8, 10, 12}}, {"small", {20, 25, 30}}, {"medium", {40, 50, 60}},
-    // {"large", {140, 150, 160}},
-    // {"extralarge", {220, 250, 270}},
+    {"mini", {8, 10, 12}},           {"small", {20, 25, 30}},
+    {"medium", {40, 50, 60}},        {"large", {140, 150, 160}},
+    {"extralarge", {220, 250, 270}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -48,8 +48,11 @@ static void printArray(int nr, int nq, int np, double *A) {
   printf("\n");
 }
 
-void registerMLIRPolybenchDoitgen() {
+void registerMLIRPolybenchDoitgen(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "doitgen-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

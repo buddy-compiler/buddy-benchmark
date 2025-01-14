@@ -8,9 +8,8 @@ void _mlir_ciface_floyd_warshall_init_array(int, MemRef<int, 2> *);
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {60}}, {"small", {180}}, {"medium", {500}},
-    // {"large", {2800}},
-    // {"extralarge", {5600}},
+    {"mini", {60}},    {"small", {180}},       {"medium", {500}},
+    {"large", {2800}}, {"extralarge", {5600}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -40,8 +39,12 @@ static void printArray(int n, int *path) {
   printf("\n");
 }
 
-void registerMLIRPolybenchFloydWarshall() {
+void registerMLIRPolybenchFloydWarshall(
+    const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "floyd-warshall-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

@@ -42,8 +42,11 @@ static void printArray(int n, int *table) {
   printf("\n");
 }
 
-void registerMLIRPolybenchNussinov() {
+void registerMLIRPolybenchNussinov(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "nussinov-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

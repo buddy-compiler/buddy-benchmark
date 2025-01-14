@@ -10,9 +10,9 @@ void _mlir_ciface_atax_init_array(int, int, MemRef<double, 2> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {38, 42}}, {"small", {116, 124}}, {"medium", {390, 410}},
-    // {"large", {1900, 2100}},
-    // {"extralarge", {1800, 2200}},
+    {"mini", {38, 42}},           {"small", {116, 124}},
+    {"medium", {390, 410}},       {"large", {1900, 2100}},
+    {"extralarge", {1800, 2200}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -43,8 +43,11 @@ static void printArray(int n, double *y) {
   printf("\n");
 }
 
-void registerMLIRPolybenchAtax() {
+void registerMLIRPolybenchAtax(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "atax-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

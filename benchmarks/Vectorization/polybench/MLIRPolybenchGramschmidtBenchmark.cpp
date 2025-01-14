@@ -12,9 +12,9 @@ void _mlir_ciface_gramschmidt_init_array(int, int, MemRef<double, 2> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 30}}, {"small", {60, 80}}, {"medium", {200, 240}},
-    // {"large", {1000, 1200}},
-    // {"extralarge", {2000, 2600}},
+    {"mini", {20, 30}},           {"small", {60, 80}},
+    {"medium", {200, 240}},       {"large", {1000, 1200}},
+    {"extralarge", {2000, 2600}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -58,8 +58,12 @@ static void printArray(int m, int n, double *A, double *R, double *Q) {
   printf("\nend   dump: Q\n");
 }
 
-void registerMLIRPolybenchGramschmidt() {
+void registerMLIRPolybenchGramschmidt(
+    const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "gramschmidt-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

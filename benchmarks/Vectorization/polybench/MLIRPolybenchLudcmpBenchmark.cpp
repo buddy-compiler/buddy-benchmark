@@ -11,8 +11,8 @@ void _mlir_ciface_ludcmp_init_array(int, MemRef<double, 2> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {40}}, {"small", {120}}, {"medium", {400}},
-    // {"large", {2000}}, {"extralarge", {4000}},
+    {"mini", {40}},    {"small", {120}},       {"medium", {400}},
+    {"large", {2000}}, {"extralarge", {4000}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -43,8 +43,11 @@ static void printArray(int n, double *x) {
   printf("\n");
 }
 
-void registerMLIRPolybenchLudcmp() {
+void registerMLIRPolybenchLudcmp(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "ludcmp-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

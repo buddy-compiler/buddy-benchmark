@@ -11,9 +11,9 @@ void _mlir_ciface_bicg_init_array(int, int, MemRef<double, 2> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {38, 42}}, {"small", {116, 124}}, {"medium", {390, 410}},
-    // {"large", {1900, 2100}},
-    // {"extralarge", {1800, 2200}},
+    {"mini", {38, 42}},           {"small", {116, 124}},
+    {"medium", {390, 410}},       {"large", {1900, 2100}},
+    {"extralarge", {1800, 2200}},
 };
 
 static void printArray(int m, int n, double *s, double *q) {
@@ -55,8 +55,11 @@ static void runPolybench(benchmark::State &state,
   }
 }
 
-void registerMLIRPolybenchBicg() {
+void registerMLIRPolybenchBicg(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "bicg-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

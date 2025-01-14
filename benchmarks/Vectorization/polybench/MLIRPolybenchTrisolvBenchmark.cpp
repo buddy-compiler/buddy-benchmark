@@ -5,9 +5,9 @@
 
 extern "C" {
 void _mlir_ciface_trisolv(int, MemRef<double, 2> *, MemRef<double, 1> *,
-                         MemRef<double, 1> *);
+                          MemRef<double, 1> *);
 void _mlir_ciface_trisolv_init_array(int, MemRef<double, 2> *,
-                                    MemRef<double, 1> *, MemRef<double, 1> *);
+                                     MemRef<double, 1> *, MemRef<double, 1> *);
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
@@ -42,8 +42,11 @@ static void printArray(int n, double *x) {
   printf("\n");
 }
 
-void registerMLIRPolybenchTrisolv() {
+void registerMLIRPolybenchTrisolv(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "trisolv-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

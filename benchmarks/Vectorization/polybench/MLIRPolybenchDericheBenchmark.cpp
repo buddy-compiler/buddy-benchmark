@@ -11,9 +11,9 @@ void _mlir_ciface_deriche_init_array(int, int, MemRef<float, 1> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {64, 64}}, {"small", {192, 128}}, {"medium", {720, 480}},
-    // {"large", {4096, 2160}},
-    // {"extralarge", {7680, 4320}},
+    {"mini", {64, 64}},           {"small", {192, 128}},
+    {"medium", {720, 480}},       {"large", {4096, 2160}},
+    {"extralarge", {7680, 4320}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -48,8 +48,11 @@ static void printArray(int w, int h, float *imgOut) {
   printf("\n");
 }
 
-void registerMLIRPolybenchDeriche() {
+void registerMLIRPolybenchDeriche(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "deriche-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

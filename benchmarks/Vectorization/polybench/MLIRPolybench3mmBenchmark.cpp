@@ -14,12 +14,12 @@ void _mlir_ciface_kernel_3mm_init_array(int, int, int, int, int,
                                         MemRef<double, 2> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
+const std::vector<std::pair<std::string, std::vector<size_t>>> DATASET_SIZES = {
     {"mini", {16, 18, 20, 22, 24}},
     {"small", {40, 50, 60, 70, 80}},
     {"medium", {180, 190, 200, 210, 220}},
-    // {"large", {800, 900, 1000, 1100, 1200}},
-    // {"extralarge", {1600, 1800, 2000, 2200, 2400}},
+    {"large", {800, 900, 1000, 1100, 1200}},
+    {"extralarge", {1600, 1800, 2000, 2200, 2400}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -61,8 +61,11 @@ static void printArray(int ni, int nl, double *G) {
   printf("\n");
 }
 
-void registerMLIRPolybench3mm() {
-  for (const auto &sizePair : sizes) {
+void registerMLIRPolybench3mm(const std::set<std::string> &disabledSizes) {
+  for (const auto &sizePair : DATASET_SIZES) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "3mm-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {
@@ -73,8 +76,8 @@ void registerMLIRPolybench3mm() {
 }
 
 void generateResultMLIRPolybench3mm(size_t size_id) {
-  const std::string benchmarkName = "3mm-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
+  const std::string benchmarkName = "3mm-" + DATASET_SIZES[size_id].first;
+  const std::vector<size_t> &size = DATASET_SIZES[size_id].second;
 
   const size_t NI = size[0];
   const size_t NJ = size[1];

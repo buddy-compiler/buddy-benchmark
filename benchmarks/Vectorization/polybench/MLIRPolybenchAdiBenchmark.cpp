@@ -9,9 +9,9 @@ void _mlir_ciface_adi_init_array(int, MemRef<double, 2> *);
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 20}}, {"small", {40, 60}}, {"medium", {100, 200}},
-    // {"large", {500, 1000}},
-    // {"extralarge", {1000, 2000}},
+    {"mini", {20, 20}},           {"small", {40, 60}},
+    {"medium", {100, 200}},       {"large", {500, 1000}},
+    {"extralarge", {1000, 2000}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -45,8 +45,11 @@ static void printArray(int n, double *u) {
   printf("\n");
 }
 
-void registerMLIRPolybenchAdi() {
+void registerMLIRPolybenchAdi(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "adi-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

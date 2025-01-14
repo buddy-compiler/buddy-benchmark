@@ -11,9 +11,9 @@ void _mlir_ciface_correlation_init_array(int, int, MemRef<double, 1> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {28, 32}}, {"small", {80, 100}}, {"medium", {240, 260}},
-    // {"large", {1200, 1400}},
-    // {"extralarge", {2600, 3000}},
+    {"mini", {28, 32}},           {"small", {80, 100}},
+    {"medium", {240, 260}},       {"large", {1200, 1400}},
+    {"extralarge", {2600, 3000}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -48,8 +48,12 @@ static void printArray(int m, double *corr) {
   printf("\n");
 }
 
-void registerMLIRPolybenchCorrelation() {
+void registerMLIRPolybenchCorrelation(
+    const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "correlation-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

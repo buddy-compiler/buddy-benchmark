@@ -20,8 +20,8 @@ const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
     {"mini", {16, 18, 22, 24}},
     {"small", {40, 50, 70, 80}},
     {"medium", {180, 190, 210, 220}},
-    // {"large", {800, 900, 1100, 1200}},
-    // {"extralarge", {1600, 1800, 2200, 2400}},
+    {"large", {800, 900, 1100, 1200}},
+    {"extralarge", {1600, 1800, 2200, 2400}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -63,8 +63,11 @@ static void printArray(int ni, int nl, double *D) {
   printf("\n");
 }
 
-void registerMLIRPolybench2mm() {
+void registerMLIRPolybench2mm(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "2mm-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

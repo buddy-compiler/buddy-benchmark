@@ -45,8 +45,11 @@ static void printArray(int m, int n, double *b) {
   printf("\n");
 }
 
-void registerMLIRPolybenchTrmm() {
+void registerMLIRPolybenchTrmm(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "trmm-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

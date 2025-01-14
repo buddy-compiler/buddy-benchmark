@@ -14,8 +14,8 @@ const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
     {"mini", {20, 25, 30}},
     {"small", {60, 70, 80}},
     {"medium", {200, 220, 240}},
-    // {"large", {1000, 1100, 1200}},
-    // {"extralarge", {2000, 2300, 2600}},
+    {"large", {1000, 1100, 1200}},
+    {"extralarge", {2000, 2300, 2600}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -54,8 +54,11 @@ static void printArray(int ni, int nj, double *c) {
   printf("\n");
 }
 
-void registerMLIRPolybenchGemm() {
+void registerMLIRPolybenchGemm(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "gemm-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

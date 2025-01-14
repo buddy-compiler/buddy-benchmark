@@ -10,8 +10,8 @@ void _mlir_ciface_heat_3d_init_array(int, MemRef<double, 3> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 10}}, {"small", {40, 20}}, {"medium", {100, 40}},
-    // {"large", {500, 120}}, {"extralarge", {1000, 200}},
+    {"mini", {20, 10}},    {"small", {40, 20}},         {"medium", {100, 40}},
+    {"large", {500, 120}}, {"extralarge", {1000, 200}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -44,8 +44,11 @@ static void printArray(int n, double *A) {
   printf("\n");
 }
 
-void registerMLIRPolybenchHeat3D() {
+void registerMLIRPolybenchHeat3D(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "heat-3d-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

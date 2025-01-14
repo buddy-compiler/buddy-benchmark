@@ -16,8 +16,8 @@ const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
     {"mini", {20, 20, 30}},
     {"small", {40, 60, 80}},
     {"medium", {100, 200, 240}},
-    // {"large", {500,1000,1200}},
-    // {"extralarge", {1000,2000,2600}},
+    {"large", {500, 1000, 1200}},
+    {"extralarge", {1000, 2000, 2600}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -76,8 +76,11 @@ static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
   printf("\nend   dump: hz\n");
 }
 
-void registerMLIRPolybenchFdtd2D() {
+void registerMLIRPolybenchFdtd2D(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "fdtd-2d-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

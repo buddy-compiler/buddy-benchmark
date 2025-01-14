@@ -10,9 +10,9 @@ void _mlir_ciface_jacobi_2d_init_array(int, MemRef<double, 2> *,
 }
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 30}}, {"small", {40, 90}}, {"medium", {100, 250}},
-    // {"large", {500, 1300}},
-    // {"extralarge", {1000, 2800}},
+    {"mini", {20, 30}},           {"small", {40, 90}},
+    {"medium", {100, 250}},       {"large", {500, 1300}},
+    {"extralarge", {1000, 2800}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -43,8 +43,11 @@ static void printArray(int n, double *A) {
   printf("\n");
 }
 
-void registerMLIRPolybenchJacobi2D() {
+void registerMLIRPolybenchJacobi2D(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "jacobi-2d-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {

@@ -13,9 +13,8 @@ void _mlir_ciface_symm_init_array(int, int, MemRef<double, 1> *,
 
 const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
     {"mini", {20, 30}},           {"small", {60, 80}},
-    {"medium", {200, 240}},       
-    // {"large", {1000, 1200}},
-    // {"extralarge", {2000, 2600}},
+    {"medium", {200, 240}},       {"large", {1000, 1200}},
+    {"extralarge", {2000, 2600}},
 };
 
 static void runPolybench(benchmark::State &state,
@@ -52,8 +51,11 @@ static void printArray(int m, int n, double *C) {
   printf("\n");
 }
 
-void registerMLIRPolybenchSymm() {
+void registerMLIRPolybenchSymm(const std::set<std::string> &disabledSizes) {
   for (const auto &sizePair : sizes) {
+    if (disabledSizes.count(sizePair.first)) {
+      continue;
+    }
     std::string benchmarkName = "symm-" + sizePair.first;
     benchmark::RegisterBenchmark(benchmarkName.c_str(),
                                  [sizePair](benchmark::State &state) {
