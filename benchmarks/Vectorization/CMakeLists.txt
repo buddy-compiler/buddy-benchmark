@@ -1,6 +1,7 @@
 
 add_subdirectory(gccloops)
 add_subdirectory(linpackc)
+add_subdirectory(polybench)
 
 #-------------------------------------------------------------------------------
 # MLIR Linalg Dialect MatMal Operation + Upstream Lowering Passes

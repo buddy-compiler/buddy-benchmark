@@ -1,0 +1,58 @@
+#map = affine_map<()[s0] -> (s0 - 1)>
+
+func.func @seidel_2d_init_array(%arg0: i32, %arg1: memref<?x?xf64>) {
+  %c0 = arith.constant 0 : index
+  %c1 = arith.constant 1 : index
+  %cst = arith.constant 2.000000e+00 : f64
+  %c2_i32 = arith.constant 2 : i32
+  %0 = arith.index_cast %arg0 : i32 to index
+  scf.for %arg2 = %c0 to %0 step %c1 {
+    %1 = arith.index_cast %arg2 : index to i32
+    %2 = arith.index_cast %arg0 : i32 to index
+    scf.for %arg3 = %c0 to %2 step %c1 {
+      %3 = arith.index_cast %arg3 : index to i32
+      %4 = arith.sitofp %1 : i32 to f64
+      %5 = arith.addi %3, %c2_i32 : i32
+      %6 = arith.sitofp %5 : i32 to f64
+      %7 = arith.mulf %4, %6 : f64
+      %8 = arith.addf %7, %cst : f64
+      %9 = arith.sitofp %arg0 : i32 to f64
+      %10 = arith.divf %8, %9 : f64
+      memref.store %10, %arg1[%arg2, %arg3] : memref<?x?xf64>
+    }
+  }
+  return
+}
+
+func.func @seidel_2d(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>) {
+  %cst = arith.constant 9.000000e+00 : f64
+  %0 = arith.index_cast %arg0 : i32 to index
+  %1 = arith.index_cast %arg1 : i32 to index
+  %2 = arith.index_cast %arg1 : i32 to index
+  affine.for %arg3 = 0 to %0 {
+    affine.for %arg4 = 1 to #map()[%1] {
+      affine.for %arg5 = 1 to #map()[%2] {
+        %3 = affine.load %arg2[%arg4 - 1, %arg5 - 1] : memref<?x?xf64>
+        %4 = affine.load %arg2[%arg4 - 1, %arg5] : memref<?x?xf64>
+        %5 = arith.addf %3, %4 : f64
+        %6 = affine.load %arg2[%arg4 - 1, %arg5 + 1] : memref<?x?xf64>
+        %7 = arith.addf %5, %6 : f64
+        %8 = affine.load %arg2[%arg4, %arg5 - 1] : memref<?x?xf64>
+        %9 = arith.addf %7, %8 : f64
+        %10 = affine.load %arg2[%arg4, %arg5] : memref<?x?xf64>
+        %11 = arith.addf %9, %10 : f64
+        %12 = affine.load %arg2[%arg4, %arg5 + 1] : memref<?x?xf64>
+        %13 = arith.addf %11, %12 : f64
+        %14 = affine.load %arg2[%arg4 + 1, %arg5 - 1] : memref<?x?xf64>
+        %15 = arith.addf %13, %14 : f64
+        %16 = affine.load %arg2[%arg4 + 1, %arg5] : memref<?x?xf64>
+        %17 = arith.addf %15, %16 : f64
+        %18 = affine.load %arg2[%arg4 + 1, %arg5 + 1] : memref<?x?xf64>
+        %19 = arith.addf %17, %18 : f64
+        %20 = arith.divf %19, %cst : f64
+        affine.store %20, %arg2[%arg4, %arg5] : memref<?x?xf64>
+      }
+    }
+  }
+  return
+}
