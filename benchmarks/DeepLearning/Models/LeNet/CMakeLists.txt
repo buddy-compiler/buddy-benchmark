@@ -7,6 +7,8 @@ add_custom_command(
   COMMENT "Generating forward.mlir, subgraph0.mlir"
 )
 
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
+
 add_custom_command(
   OUTPUT forward_auto_vectorization.o
   COMMAND 
@@ -25,15 +27,16 @@ add_custom_command(
                                 convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
                                 convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
                                 convert-func-to-llvm, reconcile-unrealized-casts)" |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/forward_auto_vectorization.o
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_auto_vectorization.ll
+  COMMAND
+    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_auto_vectorization.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_auto_vectorization.o
   DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
   COMMENT "Building forward_auto_vectorization.o"
-  VERBATIM)
+  VERBATIM
+)
 
 add_custom_command(
   OUTPUT subgraph0_auto_vectorization.o
@@ -62,15 +65,16 @@ add_custom_command(
       -expand-strided-metadata
       -finalize-memref-to-llvm
       -reconcile-unrealized-casts |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_auto_vectorization.o
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_auto_vectorization.ll
+  COMMAND
+    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_auto_vectorization.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_auto_vectorization.o
   DEPENDS 
     ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
   COMMENT "Building subgraph0_auto_vectorization.o"
-  VERBATIM)
+  VERBATIM
+)
 
 add_custom_command(
   OUTPUT forward_buddy_vectorization.o
@@ -90,15 +94,15 @@ add_custom_command(
                                 convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
                                 convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
                                 convert-func-to-llvm, reconcile-unrealized-casts)" |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/forward_buddy_vectorization.o
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_buddy_vectorization.ll
+    COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_buddy_vectorization.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_buddy_vectorization.o
   DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
   COMMENT "Building forward_buddy_vectorization.o"
-  VERBATIM)
+  VERBATIM
+)
 
 add_custom_command(
   OUTPUT subgraph0_buddy_vectorization.o
@@ -130,15 +134,15 @@ add_custom_command(
       -expand-strided-metadata
       -finalize-memref-to-llvm
       -reconcile-unrealized-casts |
-    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir |
-    ${LLVM_MLIR_BINARY_DIR}/llc -O3
-      -mtriple=${BUDDY_OPT_TRIPLE} -mattr=${BUDDY_OPT_ATTR} -filetype=obj
-      -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_buddy_vectorization.o
+    ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_buddy_vectorization.ll
+    COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_buddy_vectorization.ll
+      -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_buddy_vectorization.o
   DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
   COMMENT "Building subgraph0_vectorization.o"
-  VERBATIM)
+  VERBATIM
+)
 
 add_library(LENET_AUTO_VECTORIZATION STATIC subgraph0_auto_vectorization.o forward_auto_vectorization.o)
 set_target_properties(LENET_AUTO_VECTORIZATION PROPERTIES LINKER_LANGUAGE CXX)
