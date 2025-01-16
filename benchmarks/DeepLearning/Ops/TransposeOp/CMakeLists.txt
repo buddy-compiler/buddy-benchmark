@@ -96,7 +96,7 @@ add_custom_command(OUTPUT transpose_scalar_O3.o
               -convert-func-to-llvm
               -reconcile-unrealized-casts | 
             ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o transpose_scalar_O3.ll
-  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} transpose_scalar_O3.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} transpose_scalar_O3.ll
           -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/transpose_scalar_O3.o
   VERBATIM)
 
