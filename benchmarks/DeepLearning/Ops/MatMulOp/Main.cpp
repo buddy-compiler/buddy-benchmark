@@ -27,9 +27,9 @@
 // -----------------------------------------------------------------------------
 
 #define _NUM_ITER 5
-#define _SIZE_M 16
-#define _SIZE_N 3136
-#define _SIZE_K 576
+#define _SIZE_M 40
+#define _SIZE_N 4096
+#define _SIZE_K 4096
 
 // -----------------------------------------------------------------------------
 // Global Variables and Functions. No need to change the code here.
@@ -76,6 +76,10 @@ void _mlir_ciface_matmul_scalar_O3(MemRef<float, 2> *A, MemRef<float, 2> *B,
                                    MemRef<float, 2> *C);
 void _mlir_ciface_matmul_tile(MemRef<float, 2> *A, MemRef<float, 2> *B,
                               MemRef<float, 2> *C);
+void _mlir_ciface_matmul_vec(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                             MemRef<float, 2> *C);
+void _mlir_ciface_matmul_vec_omp(MemRef<float, 2> *A, MemRef<float, 2> *B,
+                                 MemRef<float, 2> *C);
 /// [Step 1] Add function of your new method.
 }
 BENCHMARK_CAPTURE(DL_OPS_MATMUL, scalar_O0, _mlir_ciface_matmul_scalar_O0)
@@ -85,6 +89,12 @@ BENCHMARK_CAPTURE(DL_OPS_MATMUL, scalar_O3, _mlir_ciface_matmul_scalar_O3)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 BENCHMARK_CAPTURE(DL_OPS_MATMUL, tile, _mlir_ciface_matmul_tile)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DL_OPS_MATMUL, vec, _mlir_ciface_matmul_vec)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(_NUM_ITER);
+BENCHMARK_CAPTURE(DL_OPS_MATMUL, vec_omp, _mlir_ciface_matmul_vec_omp)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(_NUM_ITER);
 /// [Step 2] Call GoogleBenchmark function to run your new method.
@@ -112,6 +122,8 @@ int main(int argc, char **argv) {
   float *outputExpected = outputMemrefScalar.getData();
 
   MLIRVerification(outputExpected, _mlir_ciface_matmul_tile, "tile");
+  MLIRVerification(outputExpected, _mlir_ciface_matmul_vec, "vec");
+  MLIRVerification(outputExpected, _mlir_ciface_matmul_vec_omp, "vec_omp");
   /// [Step 3] Add your new method for verification.
 
   delete[] inputA;
