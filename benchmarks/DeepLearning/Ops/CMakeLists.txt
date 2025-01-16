@@ -17,6 +17,7 @@ add_subdirectory(ReduceMaxfOp)
 add_subdirectory(SoftmaxExpSumDivOp)
 add_subdirectory(Conv2DNhwcFhwcOp)
 add_subdirectory(TransposeOp)
+add_subdirectory(MatMulTransposeBOp)
 
 if (CROSS_COMPILE_RVV)
 add_subdirectory(Conv2DNhwcFhwcInt32Op)
