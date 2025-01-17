@@ -87,57 +87,7 @@ $ cd bin && ./image-processing-benchmark <image path> <kernel name> <kernelmorph
 
 ## Audio Processing Benchmark
 
-Currently, the audio processing benchmark includes the following frameworks or optimizers:
-
-- KFR ([link](https://github.com/kfrlib/kfr))
-
-*Note: Please replace the `/PATH/TO/*` with your local path.*
-
-```
-$ cd buddy-benchmark
-$ mkdir build && cd build
-$ cmake -G Ninja .. \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DAUDIO_PROCESSING_BENCHMARKS=ON \
-    -DCMAKE_CXX_COMPILER=clang++ \
-    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
-    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD/
-$ ninja audio-processing-benchmark
-$ cd bin
-$ ./audio-processing-benchmark
-```
-
-### audio-plot tool
-
-To better demonstrate the result after processing, we provide a tool for figure plotting. To use this tool, you have to make sure that you are using `python3` and that the `numpy`, `matplotlib` and `scipy` packages have been installed properly. Use the following command to install the required packages:
-
-```
-$ pip install matplotlib scipy
-```
-
-You can customize the `python3` path by adding the option `-DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN` while building:
-
-*Note: Please replace the `/PATH/TO/*` with your local path.*
-
-```
-$ cd build
-$ cmake -G Ninja .. \
-    -DAUDIO_PROCESSING_BENCHMARKS=ON \
-    -DCMAKE_CXX_COMPILER=clang++ \
-    -DKFR_DIR=/PATH/TO/KFR/SOURCE/CODE \
-    -DBUDDY_MLIR_BUILD_DIR=/PATH/TO/BUDDY-MLIR/BUILD \
-    -DPYTHON_BINARY_DIR=/PATH/TO/PYTHON/BIN/
-$ ninja audio-plot
-```
-
-Once the processing is done, you can use this tool to plot a comparision figure:
-
-```
-$ cd bin
-$ ./audio-plot ../../benchmarks/AudioProcessing/Audios/NASA_Mars.wav ResultKFRIir.wav
-```
-
-The result is saved in `bin/res.png`. For more usage, use `audio-plot -h` for detailed information.
+Please check the audio processing benchmark document [here](./benchmarks/AudioProcessing/README.md).
 
 ## Vectorization Benchmark
 

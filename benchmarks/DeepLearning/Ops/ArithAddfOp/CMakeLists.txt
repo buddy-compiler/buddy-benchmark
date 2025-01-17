@@ -1,3 +1,5 @@
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
+
 # Add custom commands for scalar implementation of arith.addf
 add_custom_command(OUTPUT addf_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/ArithAddfOp/ArithAddf.mlir |
@@ -11,10 +13,9 @@ add_custom_command(OUTPUT addf_scalar.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/ArithAddfOp/addf_scalar.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o addf_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} addf_scalar.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/addf_scalar.o
 )
 add_library(ArithAddfScalar STATIC addf_scalar.o)
 set_target_properties(ArithAddfScalar PROPERTIES LINKER_LANGUAGE CXX)
@@ -32,10 +33,9 @@ add_custom_command(OUTPUT addf_auto_vectorization.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/ArithAddfOp/addf_auto_vectorization.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o addf_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} addf_auto_vectorization.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/addf_auto_vectorization.o
 )
 add_library(ArithAddfAutoVectorization STATIC addf_auto_vectorization.o)
 set_target_properties(ArithAddfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)

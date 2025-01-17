@@ -45,7 +45,6 @@ def main():
     # Initialize Dynamo Compiler with specific configurations as an importer.
     dynamo_compiler = DynamoCompiler(
         primary_registry=tosa.ops_registry,
-        aot_autograd_decomposition=inductor_decomp,
     )
 
     data = torch.randn([1, 1, 28, 28])

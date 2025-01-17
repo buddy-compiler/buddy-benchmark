@@ -1,3 +1,5 @@
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
+
 # Add custom commands for scalar implementation of arith.divf
 add_custom_command(OUTPUT divf_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/ArithDivfOp/ArithDivf.mlir |
@@ -11,10 +13,9 @@ add_custom_command(OUTPUT divf_scalar.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/ArithDivfOp/divf_scalar.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o divf_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} divf_scalar.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/divf_scalar.o
 )
 add_library(ArithDivfScalar STATIC divf_scalar.o)
 set_target_properties(ArithDivfScalar PROPERTIES LINKER_LANGUAGE CXX)
@@ -32,10 +33,9 @@ add_custom_command(OUTPUT divf_auto_vectorization.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/ArithDivfOp/divf_auto_vectorization.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o divf_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} divf_auto_vectorization.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/divf_auto_vectorization.o
 )
 add_library(ArithDivfAutoVectorization STATIC divf_auto_vectorization.o)
 set_target_properties(ArithDivfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)

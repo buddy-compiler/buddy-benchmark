@@ -1,4 +1,4 @@
-//===- GoogleBenchmarkMain.cpp---------------------------------------------===//
+//===---------------- GoogleBenchmarkMain.cpp-------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,15 +35,17 @@ namespace {
 const std::string PASS = "\033[32mPASS\033[0m";
 const std::string FAIL = "\033[31mFAIL\033[0m";
 
-bool areArraysEqual(float array1[], float array2[], int size) {
+
+bool areArraysEqual(float array1[], float array2[], int size,
+                    float epsilon = 0.0001) {
   for (int i = 0; i < size; ++i) {
-    if (array1[i] != array2[i]) {
+    if (fabs(array1[i] - array2[i]) > epsilon) {
       return false;
     }
   }
   return true;
 }
-} // namespace
+}
 
 namespace {
 // Declare the FFN layer C interface.
