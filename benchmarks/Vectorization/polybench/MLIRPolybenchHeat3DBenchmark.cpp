@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <cstdio>
@@ -51,6 +52,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int n, double *A) {
+  polybench::startDump();
+  polybench::beginDump("A");
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       for (int k = 0; k < n; k++) {
@@ -61,7 +64,8 @@ static void printArray(int n, double *A) {
       }
     }
   }
-  printf("\n");
+  polybench::endDump("A");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchHeat3D(const std::set<std::string> &disabledSizes) {

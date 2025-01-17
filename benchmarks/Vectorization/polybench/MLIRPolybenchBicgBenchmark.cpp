@@ -1,4 +1,4 @@
-//===- MLIRPolybenchBicgBenchmark.cpp --------------------------------------===//
+//===- MLIRPolybenchBicgBenchmark.cpp -------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the bicg Polybench benchmark. 
+// This file implements the bicg Polybench benchmark.
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -37,23 +38,25 @@ const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
 };
 
 static void printArray(int m, int n, double *s, double *q) {
-  printf("begin dump: s");
+  polybench::startDump();
+  polybench::beginDump("s");
   for (int i = 0; i < m; i++) {
     if (i % 20 == 0) {
       printf("\n");
     }
     printf("%0.2lf ", s[i]);
   }
-  printf("\nend   dump: s\n");
+  polybench::endDump("s");
 
-  printf("begin dump: q");
+  polybench::beginDump("q");
   for (int i = 0; i < n; i++) {
     if (i % 20 == 0) {
       printf("\n");
     }
     printf("%0.2lf ", q[i]);
   }
-  printf("\nend   dump: q\n");
+  polybench::endDump("q");
+  polybench::finishDump();
 }
 
 static void runPolybench(benchmark::State &state,

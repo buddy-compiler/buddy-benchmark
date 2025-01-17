@@ -105,6 +105,40 @@ port.
 Note that the output can be very large, so it is recommended to redirect the
 output to a file and compare it with the original Polybench output later.
 
+## Verifying the Benchmark Results
+
+`polybench_mlir_gen.py` is provided to generate the output of the original
+Polybench suite for the specified dataset size. Run the following command to
+generate the output for the mini dataset size:
+
+```bash
+python benchmarks/Vectorization/polybench/polybench_mlir_gen.py \
+    --output-dir output \
+    --polygeist-build-dir ${POLYGEIST_BUILD_DIR} \
+    --polybench-dir ${POLYBENCH_SRC_DIR} \
+    --generate-mlir \
+    --generate-binary \
+    --binary-compiler=cgeist \
+    --generate-std-output \
+    --std-output-file "polybench-mini.txt" \
+    --std-output--dataset-size mini
+```
+
+This will generate `output/polybench-mini.txt` which contains the output of the
+original Polybench suite for the mini dataset size. Then, run the following
+command to generate the output of the ported Polybench suite:
+
+```bash
+<path_to_build>/bin/vectorization-polybench-benchmark run-validation mini > ported-mini.txt
+```
+
+The `output/polybench-mini.txt` and `ported-mini.txt` can be compared using diff
+to verify the correctness of the port.
+
+Note that the python script generates the output with `-O0` and it is recommended
+to use cgeist as the binary compiler to generate the output (an alternative is
+to use `--binary-compiler=clang`, which might lead to floating-point differences).
+
 ## About this Benchmark
 
 Most of the Polybench cases uses parametric loop bounds and sizes, which makes

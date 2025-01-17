@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -57,6 +58,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int m, double *corr) {
+  polybench::startDump();
+  polybench::beginDump("corr");
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < m; j++) {
       if ((i * m + j) % 20 == 0) {
@@ -65,7 +68,8 @@ static void printArray(int m, double *corr) {
       printf("%0.2lf ", corr[i * m + j]);
     }
   }
-  printf("\n");
+  polybench::endDump("corr");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchCorrelation(

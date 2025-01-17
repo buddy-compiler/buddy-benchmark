@@ -1,4 +1,4 @@
-//===- MLIRPolybenchAtaxBenchmark.cpp --------------------------------------===//
+//===- MLIRPolybenchAtaxBenchmark.cpp -------------------------------------===//
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -54,13 +55,16 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int n, double *y) {
+  polybench::startDump();
+  polybench::beginDump("y");
   for (int i = 0; i < n; i++) {
     if (i % 20 == 0) {
       printf("\n");
     }
     printf("%0.2lf ", y[i]);
   }
-  printf("\n");
+  polybench::endDump("y");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchAtax(const std::set<std::string> &disabledSizes) {

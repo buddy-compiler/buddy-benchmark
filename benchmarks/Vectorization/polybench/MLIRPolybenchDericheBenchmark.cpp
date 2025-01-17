@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -57,6 +58,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int w, int h, float *imgOut) {
+  polybench::startDump();
+  polybench::beginDump("imgOut");
   for (int i = 0; i < w; i++) {
     for (int j = 0; j < h; j++) {
       if ((i * h + j) % 20 == 0) {
@@ -65,7 +68,8 @@ static void printArray(int w, int h, float *imgOut) {
       printf("%0.2f ", imgOut[i * h + j]);
     }
   }
-  printf("\n");
+  polybench::endDump("imgOut");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchDeriche(const std::set<std::string> &disabledSizes) {

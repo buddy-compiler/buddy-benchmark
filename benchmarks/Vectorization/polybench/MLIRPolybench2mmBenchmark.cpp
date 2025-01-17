@@ -14,10 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the 2mm Polybench benchmark. 
+// This file implements the 2mm Polybench benchmark.
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <cstdio>
@@ -72,6 +73,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int ni, int nl, double *D) {
+  polybench::startDump();
+  polybench::beginDump("D");
   for (int i = 0; i < ni; i++) {
     for (int j = 0; j < nl; j++) {
       if ((i * ni + j) % 20 == 0) {
@@ -80,7 +83,8 @@ static void printArray(int ni, int nl, double *D) {
       printf("%0.2lf ", D[i * nl + j]);
     }
   }
-  printf("\n");
+  polybench::endDump("D");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybench2mm(const std::set<std::string> &disabledSizes) {

@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <cstddef>
@@ -50,6 +51,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int n, double *A) {
+  polybench::startDump();
+  polybench::beginDump("A");
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       if ((i * n + j) % 20 == 0) {
@@ -58,7 +61,8 @@ static void printArray(int n, double *A) {
       printf("%0.2lf ", A[i * n + j]);
     }
   }
-  printf("\n");
+  polybench::endDump("A");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchSeidel2D(const std::set<std::string> &disabledSizes) {

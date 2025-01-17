@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -72,13 +73,16 @@ static void runPolybench(benchmark::State &state,
 
 static void printArray(int n, double *w) {
   int i;
+  polybench::startDump();
+  polybench::beginDump("w");
   for (i = 0; i < n; i++) {
     if (i % 20 == 0) {
       printf("\n");
     }
     printf("%0.2lf ", w[i]);
   }
-  printf("\n");
+  polybench::endDump("w");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchGemver(const std::set<std::string> &disabledSizes) {

@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -50,6 +51,9 @@ static void runPolybench(benchmark::State &state,
 static void printArray(int n, int *table) {
   int i, j;
   int t = 0;
+
+  polybench::startDump();
+  polybench::beginDump("table");
   for (i = 0; i < n; i++) {
     for (j = i; j < n; j++) {
       if (t % 20 == 0) {
@@ -59,7 +63,8 @@ static void printArray(int n, int *table) {
       t++;
     }
   }
-  printf("\n");
+  polybench::endDump("table");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchNussinov(const std::set<std::string> &disabledSizes) {

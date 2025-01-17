@@ -26,7 +26,7 @@ function(add_polybench_benchmark bench_name)
         -reconcile-unrealized-casts |
       ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o ${ll_file}
     COMMAND
-      ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} ${ll_file}
+      ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} ${ll_file}
         -c -save-temps -o ${obj_file}
     DEPENDS ${mlir_file}
   )

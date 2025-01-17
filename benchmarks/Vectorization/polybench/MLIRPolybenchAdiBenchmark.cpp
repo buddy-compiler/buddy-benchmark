@@ -14,10 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the adi Polybench benchmark. 
+// This file implements the adi Polybench benchmark.
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <vector>
@@ -54,6 +55,8 @@ static void runPolybench(benchmark::State &state,
 
 static void printArray(int n, double *u) {
   int i, j;
+  polybench::startDump();
+  polybench::beginDump("u");
   for (i = 0; i < n; i++) {
     for (j = 0; j < n; j++) {
       if ((i * n + j) % 20 == 0) {
@@ -62,7 +65,8 @@ static void printArray(int n, double *u) {
       printf("%0.2lf ", u[i * n + j]);
     }
   }
-  printf("\n");
+  polybench::endDump("u");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchAdi(const std::set<std::string> &disabledSizes) {

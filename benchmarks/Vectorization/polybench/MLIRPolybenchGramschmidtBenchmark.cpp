@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <cstdio>
@@ -55,7 +56,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int m, int n, double *A, double *R, double *Q) {
-  printf("begin dump: R");
+  polybench::startDump();
+  polybench::beginDump("R");
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       if ((i * n + j) % 20 == 0) {
@@ -64,9 +66,9 @@ static void printArray(int m, int n, double *A, double *R, double *Q) {
       printf("%0.2lf ", R[i * n + j]);
     }
   }
-  printf("\nend   dump: R\n");
+  polybench::endDump("R");
 
-  printf("begin dump: Q");
+  polybench::beginDump("Q");
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < n; j++) {
       if ((i * n + j) % 20 == 0) {
@@ -75,7 +77,8 @@ static void printArray(int m, int n, double *A, double *R, double *Q) {
       printf("%0.2lf ", Q[i * n + j]);
     }
   }
-  printf("\nend   dump: Q\n");
+  polybench::endDump("Q");
+  polybench::finishDump();
 }
 
 void registerMLIRPolybenchGramschmidt(

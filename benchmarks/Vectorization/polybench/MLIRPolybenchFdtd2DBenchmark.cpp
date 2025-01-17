@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Utils.hpp"
 #include <benchmark/benchmark.h>
 #include <buddy/Core/Container.h>
 #include <cstdio>
@@ -62,7 +63,8 @@ static void runPolybench(benchmark::State &state,
 }
 
 static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
-  printf("begin dump: ex");
+  polybench::startDump();
+  polybench::beginDump("ex");
   for (int i = 0; i < nx; i++) {
     for (int j = 0; j < ny; j++) {
       if ((i * nx + j) % 20 == 0) {
@@ -71,9 +73,10 @@ static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
       printf("%0.2lf ", ex[i * ny + j]);
     }
   }
-  printf("\nend   dump: ex\n");
+  polybench::endDump("ex");
+  polybench::finishDump();
 
-  printf("begin dump: ey");
+  polybench::beginDump("ey");
   for (int i = 0; i < nx; i++) {
     for (int j = 0; j < ny; j++) {
       if ((i * nx + j) % 20 == 0) {
@@ -82,9 +85,9 @@ static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
       printf("%0.2lf ", ey[i * ny + j]);
     }
   }
-  printf("\nend   dump: ey\n");
+  polybench::endDump("ey");
 
-  printf("begin dump: hz");
+  polybench::beginDump("hz");
   for (int i = 0; i < nx; i++) {
     for (int j = 0; j < ny; j++) {
       if ((i * nx + j) % 20 == 0) {
@@ -93,7 +96,7 @@ static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
       printf("%0.2lf ", hz[i * ny + j]);
     }
   }
-  printf("\nend   dump: hz\n");
+  polybench::endDump("hz");
 }
 
 void registerMLIRPolybenchFdtd2D(const std::set<std::string> &disabledSizes) {
