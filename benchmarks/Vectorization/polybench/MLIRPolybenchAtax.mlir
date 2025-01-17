@@ -1,3 +1,24 @@
+//===- MLIRPolybenchAtax.mlir ---------------------------------------------===//
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//===----------------------------------------------------------------------===//
+//
+// This file provides initialization and kernel functions for the atax Polybench
+// benchmark. The MLIR code is generated with Polygeist and modified manually to
+// run on different dataset sizes.
+//
+//===----------------------------------------------------------------------===//
 
 func.func @atax_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3: memref<?xf64>) {
   %c0 = arith.constant 0 : index
@@ -30,6 +51,7 @@ func.func @atax_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3
   }
   return
 }
+
 func.func @atax(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3: memref<?xf64>, %arg4: memref<?xf64>, %arg5: memref<?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %0 = arith.index_cast %arg1 : i32 to index
