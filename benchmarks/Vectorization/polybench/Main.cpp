@@ -14,11 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <benchmark/benchmark.h>
+#include "Utils.hpp"
+#include "benchmark/benchmark.h"
+
+#include <cstring>
 #include <iostream>
-#include <map>
-#include <set>
-#include <sstream>
 #include <string>
 
 void generateResultMLIRPolybench2mm(size_t);
@@ -52,108 +52,46 @@ void generateResultMLIRPolybenchSyrk(size_t);
 void generateResultMLIRPolybenchTrisolv(size_t);
 void generateResultMLIRPolybenchTrmm(size_t);
 
-void registerMLIRPolybench2mm(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybench3mm(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchAdi(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchAtax(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchBicg(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchCholesky(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchCorrelation(
-    const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchCovariance(
-    const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchDeriche(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchDoitgen(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchDurbin(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchFdtd2D(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchFloydWarshall(
-    const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchGemm(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchGemver(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchGesummv(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchGramschmidt(
-    const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchHeat3D(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchJacobi1D(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchJacobi2D(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchLu(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchLudcmp(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchMvt(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchNussinov(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchSeidel2D(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchSymm(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchSyr2k(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchSyrk(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchTrisolv(const std::set<std::string> &disabledSizes);
-void registerMLIRPolybenchTrmm(const std::set<std::string> &disabledSizes);
-
-const std::map<std::string, size_t> SIZE_IDS = {
-    {"mini", 0}, {"small", 1}, {"medium", 2}, {"large", 3}, {"extralarge", 4}};
-
-std::set<std::string> parseDisabledSizes(const std::string &arg) {
-  std::set<std::string> disabledSizes;
-  std::stringstream ss(arg);
-  std::string size;
-  while (std::getline(ss, size, ',')) {
-    disabledSizes.insert(size);
-  }
-  return disabledSizes;
-}
+void verifyResultMLIRPolybench2mm(size_t);
+void verifyResultMLIRPolybench3mm(size_t);
+void verifyResultMLIRPolybenchAdi(size_t);
+void verifyResultMLIRPolybenchAtax(size_t);
+void verifyResultMLIRPolybenchBicg(size_t);
+void verifyResultMLIRPolybenchCholesky(size_t);
+void verifyResultMLIRPolybenchCorrelation(size_t);
+void verifyResultMLIRPolybenchCovariance(size_t);
+void verifyResultMLIRPolybenchDeriche(size_t);
+void verifyResultMLIRPolybenchDoitgen(size_t);
+void verifyResultMLIRPolybenchDurbin(size_t);
+void verifyResultMLIRPolybenchFdtd2D(size_t);
+void verifyResultMLIRPolybenchFloydWarshall(size_t);
+void verifyResultMLIRPolybenchGemm(size_t);
+void verifyResultMLIRPolybenchGemver(size_t);
+void verifyResultMLIRPolybenchGesummv(size_t);
+void verifyResultMLIRPolybenchGramschmidt(size_t);
+void verifyResultMLIRPolybenchHeat3D(size_t);
+void verifyResultMLIRPolybenchJacobi1D(size_t);
+void verifyResultMLIRPolybenchJacobi2D(size_t);
+void verifyResultMLIRPolybenchLu(size_t);
+void verifyResultMLIRPolybenchLudcmp(size_t);
+void verifyResultMLIRPolybenchMvt(size_t);
+void verifyResultMLIRPolybenchNussinov(size_t);
+void verifyResultMLIRPolybenchSeidel2D(size_t);
+void verifyResultMLIRPolybenchSymm(size_t);
+void verifyResultMLIRPolybenchSyr2k(size_t);
+void verifyResultMLIRPolybenchSyrk(size_t);
+void verifyResultMLIRPolybenchTrisolv(size_t);
+void verifyResultMLIRPolybenchTrmm(size_t);
 
 int main(int argc, char **argv) {
-  std::string arg = (argc > 1) ? argv[1] : "run-benchmark";
-  std::set<std::string> disabledSizes;
-
-  for (int i = 2; i < argc; ++i) {
-    std::string argStr = argv[i];
-    if (argStr.find("--disable-sizes=") == 0) {
-      disabledSizes = parseDisabledSizes(argStr.substr(16));
+  if (argc > 1 && std::string(argv[1]).find("--generate-output=") == 0) {
+    std::string sizeStr =
+        std::string(argv[1]).substr(strlen("--generate-output="));
+    int size_id = polybench::getPolybenchDatasetSizeID(sizeStr);
+    if (size_id == -1) {
+      std::cerr << "Invalid dataset size: " << sizeStr << std::endl;
+      return 1;
     }
-  }
-
-  if (arg == "run-benchmark") {
-    std::cout << "Disabled dataset sizes: [ ";
-    for (const auto &size : disabledSizes) {
-      std::cout << size << " ";
-    }
-    std::cout << "]" << std::endl;
-
-    registerMLIRPolybench2mm(disabledSizes);
-    registerMLIRPolybench3mm(disabledSizes);
-    registerMLIRPolybenchAdi(disabledSizes);
-    registerMLIRPolybenchAtax(disabledSizes);
-    registerMLIRPolybenchBicg(disabledSizes);
-    registerMLIRPolybenchCholesky(disabledSizes);
-    registerMLIRPolybenchCorrelation(disabledSizes);
-    registerMLIRPolybenchCovariance(disabledSizes);
-    registerMLIRPolybenchDeriche(disabledSizes);
-    registerMLIRPolybenchDoitgen(disabledSizes);
-    registerMLIRPolybenchDurbin(disabledSizes);
-    registerMLIRPolybenchFdtd2D(disabledSizes);
-    registerMLIRPolybenchFloydWarshall(disabledSizes);
-    registerMLIRPolybenchGemm(disabledSizes);
-    registerMLIRPolybenchGemver(disabledSizes);
-    registerMLIRPolybenchGesummv(disabledSizes);
-    registerMLIRPolybenchGramschmidt(disabledSizes);
-    registerMLIRPolybenchHeat3D(disabledSizes);
-    registerMLIRPolybenchJacobi1D(disabledSizes);
-    registerMLIRPolybenchJacobi2D(disabledSizes);
-    registerMLIRPolybenchLu(disabledSizes);
-    registerMLIRPolybenchLudcmp(disabledSizes);
-    registerMLIRPolybenchMvt(disabledSizes);
-    registerMLIRPolybenchNussinov(disabledSizes);
-    registerMLIRPolybenchSeidel2D(disabledSizes);
-    registerMLIRPolybenchSymm(disabledSizes);
-    registerMLIRPolybenchSyr2k(disabledSizes);
-    registerMLIRPolybenchSyrk(disabledSizes);
-    registerMLIRPolybenchTrisolv(disabledSizes);
-    registerMLIRPolybenchTrmm(disabledSizes);
-
-    ::benchmark::Initialize(&argc, argv);
-    ::benchmark::RunSpecifiedBenchmarks();
-
-  } else if (arg.rfind("run-validation", 0) == 0) {
-    size_t size_id = SIZE_IDS.at(argv[2]);
 
     generateResultMLIRPolybench2mm(size_id);
     generateResultMLIRPolybench3mm(size_id);
@@ -185,19 +123,58 @@ int main(int argc, char **argv) {
     generateResultMLIRPolybenchSyrk(size_id);
     generateResultMLIRPolybenchTrisolv(size_id);
     generateResultMLIRPolybenchTrmm(size_id);
-
   } else {
-    std::cout
-        << "Usage: " << argv[0] << std::endl
-        << "  run-benchmark [--disable-sizes=<sizes-to-disable>]" << std::endl
-        << "  run-validation <size-id>" << std::endl
-        << "By default, run-benchmark will be executed with all dataset sizes "
-           "enabled."
-        << std::endl;
-    return 1;
-  }
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
 
-  return 0;
+    for (int i = 1; i < argc; ++i) {
+      if (std::string(argv[i]).find("--verification-dataset-size=") == 0) {
+        std::string sizeStr = std::string(argv[i]).substr(
+            std::strlen("--verification-dataset-size="));
+        int size_id = polybench::getPolybenchDatasetSizeID(sizeStr);
+        if (size_id == -1) {
+          std::cerr << "Invalid dataset size: " << sizeStr << std::endl;
+          return 1;
+        }
+
+        std::cout << "------------------------------------------------"
+                  << std::endl;
+        verifyResultMLIRPolybench2mm(size_id);
+        verifyResultMLIRPolybench3mm(size_id);
+        verifyResultMLIRPolybenchAdi(size_id);
+        verifyResultMLIRPolybenchAtax(size_id);
+        verifyResultMLIRPolybenchBicg(size_id);
+        verifyResultMLIRPolybenchCholesky(size_id);
+        verifyResultMLIRPolybenchCorrelation(size_id);
+        verifyResultMLIRPolybenchCovariance(size_id);
+        verifyResultMLIRPolybenchDeriche(size_id);
+        verifyResultMLIRPolybenchDoitgen(size_id);
+        verifyResultMLIRPolybenchDurbin(size_id);
+        verifyResultMLIRPolybenchFdtd2D(size_id);
+        verifyResultMLIRPolybenchFloydWarshall(size_id);
+        verifyResultMLIRPolybenchGemm(size_id);
+        verifyResultMLIRPolybenchGemver(size_id);
+        verifyResultMLIRPolybenchGesummv(size_id);
+        verifyResultMLIRPolybenchGramschmidt(size_id);
+        verifyResultMLIRPolybenchHeat3D(size_id);
+        verifyResultMLIRPolybenchJacobi1D(size_id);
+        verifyResultMLIRPolybenchJacobi2D(size_id);
+        verifyResultMLIRPolybenchLu(size_id);
+        verifyResultMLIRPolybenchLudcmp(size_id);
+        verifyResultMLIRPolybenchMvt(size_id);
+        verifyResultMLIRPolybenchNussinov(size_id);
+        verifyResultMLIRPolybenchSeidel2D(size_id);
+        verifyResultMLIRPolybenchSymm(size_id);
+        verifyResultMLIRPolybenchSyr2k(size_id);
+        verifyResultMLIRPolybenchSyrk(size_id);
+        verifyResultMLIRPolybenchTrisolv(size_id);
+        verifyResultMLIRPolybenchTrmm(size_id);
+        std::cout << "------------------------------------------------"
+                  << std::endl;
+        break;
+      }
+    }
+  }
 }
 
 namespace polybench {
@@ -210,6 +187,39 @@ void beginDump(const std::string &name) { std::cout << "begin dump: " << name; }
 
 void endDump(const std::string &name) {
   std::cout << std::endl << "end   dump: " << name << std::endl;
+}
+
+std::string getPolybenchDatasetSizeName(int size_id) {
+  switch (size_id) {
+  case 0:
+    return "mini";
+  case 1:
+    return "small";
+  case 2:
+    return "medium";
+  case 3:
+    return "large";
+  case 4:
+    return "extralarge";
+  default:
+    return "unknown";
+  }
+}
+
+int getPolybenchDatasetSizeID(const std::string &name) {
+  if (name == "mini") {
+    return 0;
+  } else if (name == "small") {
+    return 1;
+  } else if (name == "medium") {
+    return 2;
+  } else if (name == "large") {
+    return 3;
+  } else if (name == "extralarge") {
+    return 4;
+  } else {
+    return -1;
+  }
 }
 
 } // namespace polybench

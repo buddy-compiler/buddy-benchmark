@@ -34,7 +34,7 @@ ninja vectorization-polybench-benchmark
 3. Run the benchmark:
 
 ```bash
-./bin/vectorization-polybench-benchmark run-benchmark --disable-sizes=mini,large,extralarge
+./bin/vectorization-polybench-benchmark --benchmark_filter=.*/.*/[12]
 ```
 
 ### Cross Compile to Target Platform
@@ -82,24 +82,30 @@ ninja vectorization-polybench-benchmark
 
 ## Running the Benchmark
 
-The binary `vectorization-polybench-benchmark` provides two options, `run-benchmark` and `run-validation`.
-
-`run-benchmark` runs the benchmark with the specified sizes and prints the
-execution time of each benchmark. To disable certain dataset sizes, use the
-`--disable-sizes` option. For example, to disable the mini, large, and
-extralarge dataset sizes, use the following command:
+The binary `vectorization-polybench-benchmark` inherits the command-line options
+from google benchmark. The following command runs the benchmark for all cases
+on `small` and `medium` dataset sizes (indices 1 and 2).
 
 ```bash
-./bin/vectorization-polybench-benchmark run-benchmark --disable-sizes=mini,large,extralarge
+./bin/vectorization-polybench-benchmark --benchmark_filter=.*/.*/[12]
 ```
 
-`run-validation` runs the benchmark with the specified dataset size and output
-the result to stdout. The format of output data is the same as the original
-Polybench suite. So this output can be used to validate the correctness of this
-port.
+Also, to verify the correctness of different methods, use
+`--verification-dataset-size` option. The command below runs all benchmark cases
+on `small` and `medium` dataset sizes, and verifies the results using the `mini`
+dataset size for optimized methods.
 
 ```bash
-./bin/vectorization-polybench-benchmark run-validation mini
+./bin/vectorization-polybench-benchmark --benchmark_filter=.*/.*/[12] --verification-dataset-size=mini
+```
+
+Additionally, `--generate-output` runs the benchmark with the specified dataset 
+size and output the result to stdout. The format of output data is the same as
+the original Polybench suite. So this output can be used to validate the 
+correctness of this port.
+
+```bash
+./bin/vectorization-polybench-benchmark --generate-output=mini
 ```
 
 Note that the output can be very large, so it is recommended to redirect the
@@ -121,7 +127,7 @@ python benchmarks/Vectorization/polybench/polybench_mlir_gen.py \
     --binary-compiler=cgeist \
     --generate-std-output \
     --std-output-file "polybench-mini.txt" \
-    --std-output--dataset-size mini
+    --std-output-dataset-size mini
 ```
 
 This will generate `output/polybench-mini.txt` which contains the output of the
@@ -129,7 +135,7 @@ original Polybench suite for the mini dataset size. Then, run the following
 command to generate the output of the ported Polybench suite:
 
 ```bash
-<path_to_build>/bin/vectorization-polybench-benchmark run-validation mini > ported-mini.txt
+<path_to_build>/bin/vectorization-polybench-benchmark --generate-output=mini > output/ported-mini.txt
 ```
 
 The `output/polybench-mini.txt` and `ported-mini.txt` can be compared using diff

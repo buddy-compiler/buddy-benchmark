@@ -47,7 +47,7 @@ func.func @deriche_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?xf32>, %arg
   return
 }
 
-func.func @deriche(%arg0: i32, %arg1: i32, %arg2: f32, %arg3: memref<?x?xf32>, %arg4: memref<?x?xf32>, %arg5: memref<?x?xf32>, %arg6: memref<?x?xf32>) {
+func.func @deriche_kernel(%arg0: i32, %arg1: i32, %arg2: f32, %arg3: memref<?x?xf32>, %arg4: memref<?x?xf32>, %arg5: memref<?x?xf32>, %arg6: memref<?x?xf32>) {
   %cst = arith.constant 1.000000e+00 : f32
   %cst_0 = arith.constant 2.000000e+00 : f32
   %cst_1 = arith.constant -2.000000e+00 : f32

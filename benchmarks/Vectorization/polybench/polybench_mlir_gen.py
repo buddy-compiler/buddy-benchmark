@@ -216,7 +216,7 @@ def main():
             command = os.path.join(output_dir, f"{benchmark_id}-{dataset_size}")
 
             with open(output_file_path, "a") as f:
-                print(f"{'-' * 56}", file=f)
+                print(f"{'-' * 48}", file=f)
                 print(f"Result for {benchmark_id}-{dataset_size}:", file=f)
 
             command = f"cd {output_dir} && {command} 2>> {args.std_output_file}"
@@ -228,7 +228,7 @@ def main():
                 break
 
             with open(output_file_path, "a") as f:
-                print(f"{'-' * 56}", file=f)
+                print(f"{'-' * 48}", file=f)
 
     print("Done")
 

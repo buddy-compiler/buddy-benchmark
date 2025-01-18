@@ -67,7 +67,7 @@ func.func @gemver_init_array(%arg0: i32, %arg1: memref<?xf64>, %arg2: memref<?xf
   }
   return
 }
-func.func @gemver(%arg0: i32, %arg1: f64, %arg2: f64, %arg3: memref<?x?xf64>, %arg4: memref<?xf64>, %arg5: memref<?xf64>, %arg6: memref<?xf64>, %arg7: memref<?xf64>, %arg8: memref<?xf64>, %arg9: memref<?xf64>, %arg10: memref<?xf64>, %arg11: memref<?xf64>) {
+func.func @gemver_kernel(%arg0: i32, %arg1: f64, %arg2: f64, %arg3: memref<?x?xf64>, %arg4: memref<?xf64>, %arg5: memref<?xf64>, %arg6: memref<?xf64>, %arg7: memref<?xf64>, %arg8: memref<?xf64>, %arg9: memref<?xf64>, %arg10: memref<?xf64>, %arg11: memref<?xf64>) {
   %0 = arith.index_cast %arg0 : i32 to index
   affine.for %arg12 = 0 to %0 {
     affine.for %arg13 = 0 to %0 {

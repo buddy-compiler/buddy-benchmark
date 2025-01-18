@@ -92,7 +92,7 @@ func.func @lu_init_array(%arg0: i32, %arg1: memref<?x?xf64>) {
   return
 }
 
-func.func @lu(%arg0: i32, %arg1: memref<?x?xf64>) {
+func.func @lu_kernel(%arg0: i32, %arg1: memref<?x?xf64>) {
   %0 = arith.index_cast %arg0 : i32 to index
   affine.for %arg2 = 0 to %0 {
     affine.for %arg3 = 0 to #map(%arg2) {

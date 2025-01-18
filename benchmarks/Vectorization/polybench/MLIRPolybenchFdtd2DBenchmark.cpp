@@ -19,49 +19,73 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
-#include <cstdio>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_fdtd_2d(int, int, int, MemRef<double, 2> *,
-                          MemRef<double, 2> *, MemRef<double, 2> *,
-                          MemRef<double, 1> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_fdtd_2d_init_array(int, int, int, MemRef<double, 2> *,
                                      MemRef<double, 2> *, MemRef<double, 2> *,
                                      MemRef<double, 1> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 20, 30}},
-    {"small", {40, 60, 80}},
-    {"medium", {100, 200, 240}},
-    {"large", {500, 1000, 1200}},
-    {"extralarge", {1000, 2000, 2600}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, int, int, MemRef<double, 2> *,
+                            MemRef<double, 2> *, MemRef<double, 2> *,
+                            MemRef<double, 1> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {20, 20, 30},      {40, 60, 80},       {100, 200, 240},
+    {500, 1000, 1200}, {1000, 2000, 2600},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t TMAX = size[0];
-  const size_t NX = size[1];
-  const size_t NY = size[2];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto tmax = size[0];
+  auto nx = size[1];
+  auto ny = size[2];
 
-  MemRef<double, 2> inputEx({NX, NY}, 0);
-  MemRef<double, 2> inputEy({NX, NY}, 0);
-  MemRef<double, 2> inputHz({NX, NY}, 0);
-  MemRef<double, 1> inputFict({TMAX}, 0);
+  MemRef<double, 2> ex({nx, ny}, 0);
+  MemRef<double, 2> ey({nx, ny}, 0);
+  MemRef<double, 2> hz({nx, ny}, 0);
+  MemRef<double, 1> fict({tmax}, 0);
 
+  _mlir_ciface_fdtd_2d_init_array(tmax, nx, ny, &ex, &ey, &hz, &fict);
+
+  return std::make_tuple(tmax, nx, ny, std::move(ex), std::move(ey),
+                         std::move(hz), std::move(fict));
+}
+
+// Runs the provided kernel for the fdtd-2d benchmark.
+static void MLIRPolybenchFdtd2D(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_fdtd_2d_init_array(TMAX, NX, NY, &inputEx, &inputEy, &inputHz,
-                                    &inputFict);
+    // Skip the initialization time from the measurement.
+    auto [tmax, nx, ny, ex, ey, hz, fict] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_fdtd_2d(TMAX, NX, NY, &inputEx, &inputEy, &inputHz,
-                         &inputFict);
+    kernel(tmax, nx, ny, &ex, &ey, &hz, &fict);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static auto runMLIRPolybenchFdtd2D(KernelFunc kernel, size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [tmax, nx, ny, ex, ey, hz, fict] = initializeMemRefs(size);
+  kernel(tmax, nx, ny, &ex, &ey, &hz, &fict);
+  return std::make_tuple(std::move(ex), std::move(ey), std::move(hz));
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
   polybench::startDump();
   polybench::beginDump("ex");
@@ -99,42 +123,66 @@ static void printArray(int nx, int ny, double *ex, double *ey, double *hz) {
   polybench::endDump("hz");
 }
 
-void registerMLIRPolybenchFdtd2D(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "fdtd-2d-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_fdtd_2d_kernel_scalar(int, int, int, MemRef<double, 2> *,
+                                        MemRef<double, 2> *,
+                                        MemRef<double, 2> *,
+                                        MemRef<double, 1> *);
+
+void _mlir_ciface_fdtd_2d_kernel_autovec(int, int, int, MemRef<double, 2> *,
+                                         MemRef<double, 2> *,
+                                         MemRef<double, 2> *,
+                                         MemRef<double, 1> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchFdtd2D, scalar,
+                  _mlir_ciface_fdtd_2d_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchFdtd2D, autovec,
+                  _mlir_ciface_fdtd_2d_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchFdtd2D(size_t size_id) {
+  const std::string benchmarkName =
+      "fdtd-2d-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto [refEx, refEy, refHz] =
+      runMLIRPolybenchFdtd2D(_mlir_ciface_fdtd_2d_kernel_scalar, size_id);
+
+  auto [vecEx, vecEy, vecHz] =
+      runMLIRPolybenchFdtd2D(_mlir_ciface_fdtd_2d_kernel_autovec, size_id);
+  polybench::verify(refEx.getData(), vecEx.getData(), refEx.getSize(),
+                    "autovec " + benchmarkName + " (ex)");
+  polybench::verify(refEy.getData(), vecEy.getData(), refEy.getSize(),
+                    "autovec " + benchmarkName + " (ey)");
+  polybench::verify(refHz.getData(), vecHz.getData(), refHz.getSize(),
+                    "autovec " + benchmarkName + " (hz)");
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchFdtd2D(size_t size_id) {
-  const std::string benchmarkName = "fdtd-2d-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t TMAX = size[0];
-  const size_t NX = size[1];
-  const size_t NY = size[2];
-
-  MemRef<double, 2> inputEx({NX, NY}, 0);
-  MemRef<double, 2> inputEy({NX, NY}, 0);
-  MemRef<double, 2> inputHz({NX, NY}, 0);
-  MemRef<double, 1> inputFict({TMAX}, 0);
-
-  _mlir_ciface_fdtd_2d_init_array(TMAX, NX, NY, &inputEx, &inputEy, &inputHz,
-                                  &inputFict);
-
-  _mlir_ciface_fdtd_2d(TMAX, NX, NY, &inputEx, &inputEy, &inputHz, &inputFict);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(NX, NY, inputEx.getData(), inputEy.getData(), inputHz.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "fdtd-2d-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto [ex, ey, hz] =
+      runMLIRPolybenchFdtd2D(_mlir_ciface_fdtd_2d_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(ex.getSizes()[0], ex.getSizes()[1], ex.getData(), ey.getData(),
+             hz.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

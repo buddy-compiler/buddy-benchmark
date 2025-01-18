@@ -7,14 +7,14 @@ separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 function(add_polybench_benchmark bench_name)
   set(mlir_file ${BUDDY_SOURCE_DIR}/benchmarks/Vectorization/polybench/${bench_name}.mlir)
 
-  set(ll_file ${CMAKE_CURRENT_BINARY_DIR}/${bench_name}.ll)
-  set(obj_file ${CMAKE_CURRENT_BINARY_DIR}/${bench_name}.o)
-
+  set(scalar_ll_file ${CMAKE_CURRENT_BINARY_DIR}/${bench_name}_scalar.ll)
+  set(scalar_obj_file ${CMAKE_CURRENT_BINARY_DIR}/${bench_name}_scalar.o)
   add_custom_command(
-    OUTPUT ${obj_file}
+    OUTPUT ${scalar_obj_file}
     COMMAND
+      cat ${mlir_file} |
+      sed "s/_kernel(/_kernel_scalar(/" |
       ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-      ${mlir_file}
         -lower-affine
         -convert-scf-to-cf
         -expand-strided-metadata
@@ -24,14 +24,44 @@ function(add_polybench_benchmark bench_name)
         -finalize-memref-to-llvm
         -convert-func-to-llvm
         -reconcile-unrealized-casts |
-      ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o ${ll_file}
+      ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o ${scalar_ll_file}
     COMMAND
-      ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} ${ll_file}
-        -c -save-temps -o ${obj_file}
+      ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} ${scalar_ll_file}
+        -c -save-temps -o ${scalar_obj_file}
     DEPENDS ${mlir_file}
+    VERBATIM
   )
 
-  add_library(${bench_name} STATIC ${obj_file})
+  # Auto-vectorization version of the benchmark
+  # Also replace the init_array function name to avoid conflicts
+  set(autovec_ll_file ${CMAKE_CURRENT_BINARY_DIR}/${bench_name}_autovec.ll)
+  set(autovec_obj_file ${CMAKE_CURRENT_BINARY_DIR}/${bench_name}_autovec.o)
+  add_custom_command(
+    OUTPUT ${autovec_obj_file}
+    COMMAND
+      cat ${mlir_file} |
+      sed "s/_kernel(/_kernel_autovec(/;s/_init_array(/_init_array_autovec(/" |
+      ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+        -lower-affine
+        -convert-scf-to-cf
+        -expand-strided-metadata
+        -convert-math-to-llvm
+        -convert-arith-to-llvm
+        -llvm-request-c-wrappers
+        -finalize-memref-to-llvm
+        -convert-func-to-llvm
+        -reconcile-unrealized-casts |
+      ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o ${autovec_ll_file}
+    COMMAND
+      ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} ${autovec_ll_file}
+        -c -save-temps -o ${autovec_obj_file}
+    DEPENDS ${mlir_file}
+    VERBATIM
+  )
+
+  # [Step 4] Add more compilation pipeline steps here if needed
+
+  add_library(${bench_name} STATIC ${scalar_obj_file} ${autovec_obj_file})
   set_target_properties(${bench_name} PROPERTIES LINKER_LANGUAGE CXX)
 
   target_sources(vectorization-polybench-benchmark PRIVATE ${bench_name}Benchmark.cpp)

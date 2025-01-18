@@ -42,7 +42,7 @@ func.func @jacobi_1d_init_array(%arg0: i32, %arg1: memref<?xf64>, %arg2: memref<
   return
 }
 
-func.func @jacobi_1d(%arg0: i32, %arg1: i32, %arg2: memref<?xf64>, %arg3: memref<?xf64>) {
+func.func @jacobi_1d_kernel(%arg0: i32, %arg1: i32, %arg2: memref<?xf64>, %arg3: memref<?xf64>) {
   %cst = arith.constant 3.333300e-01 : f64
   %0 = arith.index_cast %arg1 : i32 to index
   %1 = arith.index_cast %arg1 : i32 to index

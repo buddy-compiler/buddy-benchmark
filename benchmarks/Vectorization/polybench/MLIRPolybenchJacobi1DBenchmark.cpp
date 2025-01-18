@@ -19,39 +19,66 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
-#include <cstdio>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_jacobi_1d(int, int, MemRef<double, 1> *, MemRef<double, 1> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_jacobi_1d_init_array(int, MemRef<double, 1> *,
                                        MemRef<double, 1> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 30}},           {"small", {40, 120}},
-    {"medium", {100, 400}},       {"large", {500, 2000}},
-    {"extralarge", {1000, 4000}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, int, MemRef<double, 1> *, MemRef<double, 1> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {20, 30}, {40, 120}, {100, 400}, {500, 2000}, {1000, 4000},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t TSTEPS = size[0];
-  const size_t N = size[1];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto tsteps = size[0];
+  auto n = size[1];
 
-  MemRef<double, 1> inputA({N}, 0);
-  MemRef<double, 1> inputB({N}, 0);
+  MemRef<double, 1> A({n}, 0);
+  MemRef<double, 1> B({n}, 0);
 
+  _mlir_ciface_jacobi_1d_init_array(n, &A, &B);
+
+  return std::make_tuple(tsteps, n, std::move(A), std::move(B));
+}
+
+// Runs the provided kernel for the jacobi-1d benchmark.
+static void MLIRPolybenchJacobi1D(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_jacobi_1d_init_array(N, &inputA, &inputB);
+    // Skip the initialization time from the measurement.
+    auto [tsteps, n, A, B] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_jacobi_1d(TSTEPS, N, &inputA, &inputB);
+    kernel(tsteps, n, &A, &B);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<double, 1> runMLIRPolybenchJacobi1D(KernelFunc kernel,
+                                                  size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [tsteps, n, A, B] = initializeMemRefs(size);
+  kernel(tsteps, n, &A, &B);
+  return A;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int n, double *A) {
   polybench::startDump();
   polybench::beginDump("A");
@@ -65,37 +92,57 @@ static void printArray(int n, double *A) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchJacobi1D(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "jacobi-1d-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_jacobi_1d_kernel_scalar(int, int, MemRef<double, 1> *,
+                                          MemRef<double, 1> *);
+
+void _mlir_ciface_jacobi_1d_kernel_autovec(int, int, MemRef<double, 1> *,
+                                           MemRef<double, 1> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchJacobi1D, scalar,
+                  _mlir_ciface_jacobi_1d_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchJacobi1D, autovec,
+                  _mlir_ciface_jacobi_1d_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchJacobi1D(size_t size_id) {
+  const std::string benchmarkName =
+      "jacobi-1d-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refA =
+      runMLIRPolybenchJacobi1D(_mlir_ciface_jacobi_1d_kernel_scalar, size_id);
+
+  auto vecA =
+      runMLIRPolybenchJacobi1D(_mlir_ciface_jacobi_1d_kernel_autovec, size_id);
+  polybench::verify(refA.getData(), vecA.getData(), refA.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchJacobi1D(size_t size_id) {
-  const std::string benchmarkName = "jacobi-1d-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t TSTEPS = size[0];
-  const size_t N = size[1];
-
-  MemRef<double, 1> inputA({N}, 0);
-  MemRef<double, 1> inputB({N}, 0);
-
-  _mlir_ciface_jacobi_1d_init_array(N, &inputA, &inputB);
-  _mlir_ciface_jacobi_1d(TSTEPS, N, &inputA, &inputB);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputA.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "jacobi-1d-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto A =
+      runMLIRPolybenchJacobi1D(_mlir_ciface_jacobi_1d_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(A.getSize(), A.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

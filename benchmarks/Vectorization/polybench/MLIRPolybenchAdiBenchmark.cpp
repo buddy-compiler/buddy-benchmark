@@ -19,46 +19,74 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
+#include <utility>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_adi(int, int, MemRef<double, 2> *, MemRef<double, 2> *,
-                      MemRef<double, 2> *, MemRef<double, 2> *);
 void _mlir_ciface_adi_init_array(int, MemRef<double, 2> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 20}},           {"small", {40, 60}},
-    {"medium", {100, 200}},       {"large", {500, 1000}},
-    {"extralarge", {1000, 2000}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, int, MemRef<double, 2> *, MemRef<double, 2> *,
+                            MemRef<double, 2> *, MemRef<double, 2> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {20, 20}, {40, 60}, {100, 200}, {500, 1000}, {1000, 2000},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t TSTEPS = size[0];
-  const size_t N = size[1];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto tsteps = size[0];
+  auto n = size[1];
 
-  MemRef<double, 2> inputU({N, N}, 0);
-  MemRef<double, 2> inputV({N, N}, 0);
-  MemRef<double, 2> inputP({N, N}, 0);
-  MemRef<double, 2> inputQ({N, N}, 0);
+  MemRef<double, 2> u({n, n}, 0);
+  MemRef<double, 2> v({n, n}, 0);
+  MemRef<double, 2> p({n, n}, 0);
+  MemRef<double, 2> q({n, n}, 0);
 
+  _mlir_ciface_adi_init_array(n, &u);
+
+  return std::make_tuple(tsteps, n, std::move(u), std::move(v), std::move(p),
+                         std::move(q));
+}
+
+// Runs the provided kernel for the adi benchmark.
+static void MLIRPolybenchAdi(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_adi_init_array(N, &inputU);
+    // Skip the initialization time from the measurement.
+    auto [tsteps, n, u, v, p, q] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_adi(TSTEPS, N, &inputU, &inputV, &inputP, &inputQ);
+    kernel(tsteps, n, &u, &v, &p, &q);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<double, 2> runMLIRPolybenchAdi(KernelFunc kernel,
+                                             size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [tsteps, n, u, v, p, q] = initializeMemRefs(size);
+  kernel(tsteps, n, &u, &v, &p, &q);
+  return u;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int n, double *u) {
-  int i, j;
   polybench::startDump();
   polybench::beginDump("u");
-  for (i = 0; i < n; i++) {
-    for (j = 0; j < n; j++) {
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
       if ((i * n + j) % 20 == 0) {
         printf("\n");
       }
@@ -69,40 +97,53 @@ static void printArray(int n, double *u) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchAdi(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "adi-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_adi_kernel_scalar(int, int, MemRef<double, 2> *,
+                                    MemRef<double, 2> *, MemRef<double, 2> *,
+                                    MemRef<double, 2> *);
+void _mlir_ciface_adi_kernel_autovec(int, int, MemRef<double, 2> *,
+                                     MemRef<double, 2> *, MemRef<double, 2> *,
+                                     MemRef<double, 2> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchAdi, scalar, _mlir_ciface_adi_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchAdi, autovec, _mlir_ciface_adi_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchAdi(size_t size_id) {
+  const std::string benchmarkName =
+      "adi-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refU = runMLIRPolybenchAdi(_mlir_ciface_adi_kernel_scalar, size_id);
+
+  auto vecU = runMLIRPolybenchAdi(_mlir_ciface_adi_kernel_autovec, size_id);
+  polybench::verify(refU.getData(), vecU.getData(), refU.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchAdi(size_t size_id) {
-  const std::string benchmarkName = "adi-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t TSTEPS = size[0];
-  const size_t N = size[1];
-
-  MemRef<double, 2> inputU({N, N}, 0);
-  MemRef<double, 2> inputV({N, N}, 0);
-  MemRef<double, 2> inputP({N, N}, 0);
-  MemRef<double, 2> inputQ({N, N}, 0);
-
-  _mlir_ciface_adi_init_array(N, &inputU);
-
-  _mlir_ciface_adi(TSTEPS, N, &inputU, &inputV, &inputP, &inputQ);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputU.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "adi-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto u = runMLIRPolybenchAdi(_mlir_ciface_adi_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(u.getSizes()[0], u.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

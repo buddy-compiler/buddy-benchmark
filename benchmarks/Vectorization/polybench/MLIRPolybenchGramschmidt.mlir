@@ -55,7 +55,7 @@ func.func @gramschmidt_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>
   return
 }
 
-func.func @gramschmidt(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>) {
+func.func @gramschmidt_kernel(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %0 = arith.index_cast %arg0 : i32 to index
   %alloca = memref.alloca() : memref<f64>

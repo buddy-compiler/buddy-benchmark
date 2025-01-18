@@ -19,44 +19,71 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
-#include <cstddef>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_trisolv(int, MemRef<double, 2> *, MemRef<double, 1> *,
-                          MemRef<double, 1> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_trisolv_init_array(int, MemRef<double, 2> *,
                                      MemRef<double, 1> *, MemRef<double, 1> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {40}},    {"small", {120}},       {"medium", {400}},
-    {"large", {2000}}, {"extralarge", {4000}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, MemRef<double, 2> *, MemRef<double, 1> *,
+                            MemRef<double, 1> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {40}, {120}, {400}, {2000}, {4000},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t N = size[0];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto n = size[0];
 
-  MemRef<double, 2> inputL({N, N}, 0);
-  MemRef<double, 1> inputX({N}, 0);
-  MemRef<double, 1> inputB({N}, 0);
+  MemRef<double, 2> L({n, n}, 0);
+  MemRef<double, 1> x({n}, 0);
+  MemRef<double, 1> b({n}, 0);
 
+  _mlir_ciface_trisolv_init_array(n, &L, &x, &b);
+
+  return std::make_tuple(n, std::move(L), std::move(x), std::move(b));
+}
+
+// Runs the provided kernel for the trisolv benchmark.
+static void MLIRPolybenchTrisolv(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_trisolv_init_array(N, &inputL, &inputX, &inputB);
+    // Skip the initialization time from the measurement.
+    auto [n, L, x, b] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_trisolv(N, &inputL, &inputX, &inputB);
+    kernel(n, &L, &x, &b);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<double, 1> runMLIRPolybenchTrisolv(KernelFunc kernel,
+                                                 size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [n, L, x, b] = initializeMemRefs(size);
+  kernel(n, &L, &x, &b);
+  return x;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int n, double *x) {
-  int i;
   polybench::startDump();
   polybench::beginDump("x");
-  for (i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     printf("%0.2lf ", x[i]);
     if (i % 20 == 0) {
       printf("\n");
@@ -66,38 +93,58 @@ static void printArray(int n, double *x) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchTrisolv(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "trisolv-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_trisolv_kernel_scalar(int, MemRef<double, 2> *,
+                                        MemRef<double, 1> *,
+                                        MemRef<double, 1> *);
+
+void _mlir_ciface_trisolv_kernel_autovec(int, MemRef<double, 2> *,
+                                         MemRef<double, 1> *,
+                                         MemRef<double, 1> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchTrisolv, scalar,
+                  _mlir_ciface_trisolv_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchTrisolv, autovec,
+                  _mlir_ciface_trisolv_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchTrisolv(size_t size_id) {
+  const std::string benchmarkName =
+      "trisolv-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refX =
+      runMLIRPolybenchTrisolv(_mlir_ciface_trisolv_kernel_scalar, size_id);
+
+  auto vecX =
+      runMLIRPolybenchTrisolv(_mlir_ciface_trisolv_kernel_autovec, size_id);
+  polybench::verify(refX.getData(), vecX.getData(), refX.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchTrisolv(size_t size_id) {
-  const std::string benchmarkName = "trisolv-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t N = size[0];
-
-  MemRef<double, 2> inputL({N, N}, 0);
-  MemRef<double, 1> inputX({N}, 0);
-  MemRef<double, 1> inputB({N}, 0);
-
-  _mlir_ciface_trisolv_init_array(N, &inputL, &inputX, &inputB);
-
-  _mlir_ciface_trisolv(N, &inputL, &inputX, &inputB);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputX.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "trisolv-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto x = runMLIRPolybenchTrisolv(_mlir_ciface_trisolv_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(x.getSize(), x.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

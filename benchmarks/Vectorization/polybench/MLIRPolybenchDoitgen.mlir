@@ -20,7 +20,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @doitgen(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: memref<?x?x?xf64>, %arg4: memref<?x?xf64>, %arg5: memref<?xf64>) {
+func.func @doitgen_kernel(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: memref<?x?x?xf64>, %arg4: memref<?x?xf64>, %arg5: memref<?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %0 = arith.index_cast %arg1 : i32 to index
   %1 = arith.index_cast %arg2 : i32 to index

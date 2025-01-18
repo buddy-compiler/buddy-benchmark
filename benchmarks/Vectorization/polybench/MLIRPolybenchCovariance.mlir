@@ -46,7 +46,7 @@ func.func @covariance_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?xf64>, %
   return
 }
 
-func.func @covariance(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>, %arg5: memref<?xf64>) {
+func.func @covariance_kernel(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>, %arg5: memref<?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %cst_0 = arith.constant 1.000000e+00 : f64
   %0 = arith.index_cast %arg1 : i32 to index

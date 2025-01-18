@@ -19,16 +19,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_gemver(int, double, double, MemRef<double, 2> *,
-                         MemRef<double, 1> *, MemRef<double, 1> *,
-                         MemRef<double, 1> *, MemRef<double, 1> *,
-                         MemRef<double, 1> *, MemRef<double, 1> *,
-                         MemRef<double, 1> *, MemRef<double, 1> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_gemver_init_array(int, MemRef<double, 1> *,
                                     MemRef<double, 1> *, MemRef<double, 2> *,
                                     MemRef<double, 1> *, MemRef<double, 1> *,
@@ -37,45 +39,75 @@ void _mlir_ciface_gemver_init_array(int, MemRef<double, 1> *,
                                     MemRef<double, 1> *, MemRef<double, 1> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {40}},    {"small", {120}},       {"medium", {400}},
-    {"large", {2000}}, {"extralarge", {4000}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, double, double, MemRef<double, 2> *,
+                            MemRef<double, 1> *, MemRef<double, 1> *,
+                            MemRef<double, 1> *, MemRef<double, 1> *,
+                            MemRef<double, 1> *, MemRef<double, 1> *,
+                            MemRef<double, 1> *, MemRef<double, 1> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {40}, {120}, {400}, {2000}, {4000},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t N = size[0];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto n = size[0];
 
   MemRef<double, 1> alpha({1}, 0);
   MemRef<double, 1> beta({1}, 0);
 
-  MemRef<double, 2> inputA({N, N}, 0);
-  MemRef<double, 1> inputU1({N}, 0);
-  MemRef<double, 1> inputV1({N}, 0);
-  MemRef<double, 1> inputU2({N}, 0);
-  MemRef<double, 1> inputV2({N}, 0);
-  MemRef<double, 1> inputW({N}, 0);
-  MemRef<double, 1> inputX({N}, 0);
-  MemRef<double, 1> inputY({N}, 0);
-  MemRef<double, 1> inputZ({N}, 0);
+  MemRef<double, 2> A({n, n}, 0);
+  MemRef<double, 1> u1({n}, 0);
+  MemRef<double, 1> v1({n}, 0);
+  MemRef<double, 1> u2({n}, 0);
+  MemRef<double, 1> v2({n}, 0);
+  MemRef<double, 1> w({n}, 0);
+  MemRef<double, 1> x({n}, 0);
+  MemRef<double, 1> y({n}, 0);
+  MemRef<double, 1> z({n}, 0);
 
+  _mlir_ciface_gemver_init_array(n, &alpha, &beta, &A, &u1, &v1, &u2, &v2, &w,
+                                 &x, &y, &z);
+
+  return std::make_tuple(n, std::move(alpha), std::move(beta), std::move(A),
+                         std::move(u1), std::move(v1), std::move(u2),
+                         std::move(v2), std::move(w), std::move(x),
+                         std::move(y), std::move(z));
+}
+
+// Runs the provided kernel for the gemver benchmark.
+static void MLIRPolybenchGemver(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_gemver_init_array(N, &alpha, &beta, &inputA, &inputU1,
-                                   &inputV1, &inputU2, &inputV2, &inputW,
-                                   &inputX, &inputY, &inputZ);
+    // Skip the initialization time from the measurement.
+    auto [n, alpha, beta, A, u1, v1, u2, v2, w, x, y, z] =
+        initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_gemver(N, alpha.getData()[0], beta.getData()[0], &inputA,
-                        &inputU1, &inputV1, &inputU2, &inputV2, &inputW,
-                        &inputX, &inputY, &inputZ);
+    kernel(n, alpha.getData()[0], beta.getData()[0], &A, &u1, &v1, &u2, &v2, &w,
+           &x, &y, &z);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<double, 1> runMLIRPolybenchGemver(KernelFunc kernel,
+                                                size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [n, alpha, beta, A, u1, v1, u2, v2, w, x, y, z] =
+      initializeMemRefs(size);
+  kernel(n, alpha.getData()[0], beta.getData()[0], &A, &u1, &v1, &u2, &v2, &w,
+         &x, &y, &z);
+  return w;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int n, double *w) {
-  int i;
   polybench::startDump();
   polybench::beginDump("w");
-  for (i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     if (i % 20 == 0) {
       printf("\n");
     }
@@ -85,50 +117,64 @@ static void printArray(int n, double *w) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchGemver(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "gemver-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_gemver_kernel_scalar(int, double, double, MemRef<double, 2> *,
+                                       MemRef<double, 1> *, MemRef<double, 1> *,
+                                       MemRef<double, 1> *, MemRef<double, 1> *,
+                                       MemRef<double, 1> *, MemRef<double, 1> *,
+                                       MemRef<double, 1> *,
+                                       MemRef<double, 1> *);
+
+void _mlir_ciface_gemver_kernel_autovec(
+    int, double, double, MemRef<double, 2> *, MemRef<double, 1> *,
+    MemRef<double, 1> *, MemRef<double, 1> *, MemRef<double, 1> *,
+    MemRef<double, 1> *, MemRef<double, 1> *, MemRef<double, 1> *,
+    MemRef<double, 1> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchGemver, scalar,
+                  _mlir_ciface_gemver_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchGemver, autovec,
+                  _mlir_ciface_gemver_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchGemver(size_t size_id) {
+  const std::string benchmarkName =
+      "gemver-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refW =
+      runMLIRPolybenchGemver(_mlir_ciface_gemver_kernel_scalar, size_id);
+
+  auto vecW =
+      runMLIRPolybenchGemver(_mlir_ciface_gemver_kernel_autovec, size_id);
+  polybench::verify(refW.getData(), vecW.getData(), refW.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchGemver(size_t size_id) {
-  const std::string benchmarkName = "gemver-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-  const size_t N = size[0];
+  const std::string benchmarkName =
+      "gemver-" + polybench::getPolybenchDatasetSizeName(size_id);
 
-  MemRef<double, 1> alpha({1}, 0);
-  MemRef<double, 1> beta({1}, 0);
-
-  MemRef<double, 2> inputA({N, N}, 0);
-  MemRef<double, 1> inputU1({N}, 0);
-  MemRef<double, 1> inputV1({N}, 0);
-  MemRef<double, 1> inputU2({N}, 0);
-  MemRef<double, 1> inputV2({N}, 0);
-  MemRef<double, 1> inputW({N}, 0);
-  MemRef<double, 1> inputX({N}, 0);
-  MemRef<double, 1> inputY({N}, 0);
-  MemRef<double, 1> inputZ({N}, 0);
-
-  _mlir_ciface_gemver_init_array(N, &alpha, &beta, &inputA, &inputU1, &inputV1,
-                                 &inputU2, &inputV2, &inputW, &inputX, &inputY,
-                                 &inputZ);
-
-  _mlir_ciface_gemver(N, alpha.getData()[0], beta.getData()[0], &inputA,
-                      &inputU1, &inputV1, &inputU2, &inputV2, &inputW, &inputX,
-                      &inputY, &inputZ);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputW.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  auto w = runMLIRPolybenchGemver(_mlir_ciface_gemver_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(w.getSize(), w.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

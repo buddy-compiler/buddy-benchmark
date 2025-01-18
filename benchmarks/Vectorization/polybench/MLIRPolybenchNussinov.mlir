@@ -50,7 +50,7 @@ func.func @nussinov_init_array(%arg0: i32, %arg1: memref<?xi8>, %arg2: memref<?x
   return
 }
 
-func.func @nussinov(%arg0: i32, %arg1: memref<?xi8>, %arg2: memref<?x?xi32>) {
+func.func @nussinov_kernel(%arg0: i32, %arg1: memref<?xi8>, %arg2: memref<?x?xi32>) {
   %c3_i32 = arith.constant 3 : i32
   %0 = arith.index_cast %arg0 : i32 to index
   %1 = arith.index_cast %arg0 : i32 to index

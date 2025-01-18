@@ -19,43 +19,70 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_nussinov(int, MemRef<char, 1> *, MemRef<int, 2> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_nussinov_init_array(int, MemRef<char, 1> *, MemRef<int, 2> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {60}},    {"small", {180}},       {"medium", {500}},
-    {"large", {2500}}, {"extralarge", {5500}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, MemRef<char, 1> *, MemRef<int, 2> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {60}, {180}, {500}, {2500}, {5500},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t N = size[0];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto n = size[0];
 
-  MemRef<char, 1> inputSeq({N}, 0);
-  MemRef<int, 2> inputTable({N, N}, 0);
+  MemRef<char, 1> seq({n}, 0);
+  MemRef<int, 2> table({n, n}, 0);
 
+  _mlir_ciface_nussinov_init_array(n, &seq, &table);
+
+  return std::make_tuple(n, std::move(seq), std::move(table));
+}
+
+// Runs the provided kernel for the nussinov benchmark.
+static void MLIRPolybenchNussinov(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_nussinov_init_array(N, &inputSeq, &inputTable);
+    // Skip the initialization time from the measurement.
+    auto [n, seq, table] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_nussinov(N, &inputSeq, &inputTable);
+    kernel(n, &seq, &table);
   }
 }
 
-static void printArray(int n, int *table) {
-  int i, j;
-  int t = 0;
+// Run the kernel and return the memref instance for verification.
+static MemRef<int, 2> runMLIRPolybenchNussinov(KernelFunc kernel,
+                                               size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [n, seq, table] = initializeMemRefs(size);
+  kernel(n, &seq, &table);
+  return table;
+}
 
+// Mimic the output format of the original Polybench implementation.
+static void printArray(int n, int *table) {
+  int t = 0;
   polybench::startDump();
   polybench::beginDump("table");
-  for (i = 0; i < n; i++) {
-    for (j = i; j < n; j++) {
+  for (int i = 0; i < n; i++) {
+    for (int j = i; j < n; j++) {
       if (t % 20 == 0) {
         printf("\n");
       }
@@ -67,36 +94,57 @@ static void printArray(int n, int *table) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchNussinov(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "nussinov-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_nussinov_kernel_scalar(int, MemRef<char, 1> *,
+                                         MemRef<int, 2> *);
+
+void _mlir_ciface_nussinov_kernel_autovec(int, MemRef<char, 1> *,
+                                          MemRef<int, 2> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchNussinov, scalar,
+                  _mlir_ciface_nussinov_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchNussinov, autovec,
+                  _mlir_ciface_nussinov_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchNussinov(size_t size_id) {
+  const std::string benchmarkName =
+      "nussinov-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refTable =
+      runMLIRPolybenchNussinov(_mlir_ciface_nussinov_kernel_scalar, size_id);
+
+  auto vecTable =
+      runMLIRPolybenchNussinov(_mlir_ciface_nussinov_kernel_autovec, size_id);
+  polybench::verify(refTable.getData(), vecTable.getData(), refTable.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchNussinov(size_t size_id) {
-  const std::string benchmarkName = "nussinov-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t N = size[0];
-
-  MemRef<char, 1> inputSeq({N}, 0);
-  MemRef<int, 2> inputTable({N, N}, 0);
-
-  _mlir_ciface_nussinov_init_array(N, &inputSeq, &inputTable);
-  _mlir_ciface_nussinov(N, &inputSeq, &inputTable);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputTable.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "nussinov-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto table =
+      runMLIRPolybenchNussinov(_mlir_ciface_nussinov_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(table.getSizes()[0], table.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

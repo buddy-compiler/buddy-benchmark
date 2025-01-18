@@ -65,7 +65,7 @@ func.func @floyd_warshall_init_array(%arg0: i32, %arg1: memref<?x?xi32>) {
   return
 }
 
-func.func @floyd_warshall(%arg0: i32, %arg1: memref<?x?xi32>) {
+func.func @floyd_warshall_kernel(%arg0: i32, %arg1: memref<?x?xi32>) {
   %0 = arith.index_cast %arg0 : i32 to index
   affine.for %arg2 = 0 to %0 {
     affine.for %arg3 = 0 to %0 {

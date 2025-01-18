@@ -54,7 +54,7 @@ func.func @bicg_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3
   }
   return
 }
-func.func @bicg(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3: memref<?xf64>, %arg4: memref<?xf64>, %arg5: memref<?xf64>, %arg6: memref<?xf64>) {
+func.func @bicg_kernel(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>, %arg3: memref<?xf64>, %arg4: memref<?xf64>, %arg5: memref<?xf64>, %arg6: memref<?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %0 = arith.index_cast %arg0 : i32 to index
   affine.for %arg7 = 0 to %0 {

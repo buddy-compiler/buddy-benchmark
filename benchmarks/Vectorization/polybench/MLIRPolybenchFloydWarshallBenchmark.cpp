@@ -19,40 +19,66 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_floyd_warshall(int, MemRef<int, 2> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_floyd_warshall_init_array(int, MemRef<int, 2> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {60}},    {"small", {180}},       {"medium", {500}},
-    {"large", {2800}}, {"extralarge", {5600}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, MemRef<int, 2> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {60}, {180}, {500}, {2800}, {5600},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t N = size[0];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto n = size[0];
+  MemRef<int, 2> path({n, n}, 0);
+  _mlir_ciface_floyd_warshall_init_array(n, &path);
+  return std::make_tuple(n, std::move(path));
+}
 
-  MemRef<int, 2> inputPath({N, N}, 0);
-
+// Runs the provided kernel for the floyd-warshall benchmark.
+static void MLIRPolybenchFloydWarshall(benchmark::State &state,
+                                       KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_floyd_warshall_init_array(N, &inputPath);
+    // Skip the initialization time from the measurement.
+    auto [n, path] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_floyd_warshall(N, &inputPath);
+    kernel(n, &path);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<int, 2> runMLIRPolybenchFloydWarshall(KernelFunc kernel,
+                                                    size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [n, path] = initializeMemRefs(size);
+  kernel(n, &path);
+  return path;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int n, int *path) {
-  int i, j;
   polybench::startDump();
   polybench::beginDump("path");
-  for (i = 0; i < n; i++) {
-    for (j = 0; j < n; j++) {
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
       if ((i * n + j) % 20 == 0) {
         printf("\n");
       }
@@ -63,36 +89,54 @@ static void printArray(int n, int *path) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchFloydWarshall(
-    const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "floyd-warshall-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_floyd_warshall_kernel_scalar(int, MemRef<int, 2> *);
+void _mlir_ciface_floyd_warshall_kernel_autovec(int, MemRef<int, 2> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchFloydWarshall, scalar,
+                  _mlir_ciface_floyd_warshall_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchFloydWarshall, autovec,
+                  _mlir_ciface_floyd_warshall_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchFloydWarshall(size_t size_id) {
+  const std::string benchmarkName =
+      "floyd-warshall-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refPath = runMLIRPolybenchFloydWarshall(
+      _mlir_ciface_floyd_warshall_kernel_scalar, size_id);
+
+  auto vecPath = runMLIRPolybenchFloydWarshall(
+      _mlir_ciface_floyd_warshall_kernel_autovec, size_id);
+  polybench::verify(refPath.getData(), vecPath.getData(), refPath.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchFloydWarshall(size_t size_id) {
-  const std::string benchmarkName = "floyd-warshall-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t N = size[0];
-
-  MemRef<int, 2> inputPath({N, N}, 0);
-
-  _mlir_ciface_floyd_warshall_init_array(N, &inputPath);
-  _mlir_ciface_floyd_warshall(N, &inputPath);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputPath.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "floyd-warshall-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto path = runMLIRPolybenchFloydWarshall(
+      _mlir_ciface_floyd_warshall_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(path.getSizes()[0], path.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

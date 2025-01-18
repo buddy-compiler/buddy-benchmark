@@ -46,7 +46,7 @@ func.func @seidel_2d_init_array(%arg0: i32, %arg1: memref<?x?xf64>) {
   return
 }
 
-func.func @seidel_2d(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>) {
+func.func @seidel_2d_kernel(%arg0: i32, %arg1: i32, %arg2: memref<?x?xf64>) {
   %cst = arith.constant 9.000000e+00 : f64
   %0 = arith.index_cast %arg0 : i32 to index
   %1 = arith.index_cast %arg1 : i32 to index

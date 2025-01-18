@@ -19,38 +19,66 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
-#include <cstdio>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_heat_3d(int, int, MemRef<double, 3> *, MemRef<double, 3> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_heat_3d_init_array(int, MemRef<double, 3> *,
                                      MemRef<double, 3> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {20, 10}},    {"small", {40, 20}},         {"medium", {100, 40}},
-    {"large", {500, 120}}, {"extralarge", {1000, 200}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, int, MemRef<double, 3> *, MemRef<double, 3> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {20, 10}, {40, 20}, {100, 40}, {500, 120}, {1000, 200},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t TSTEPS = size[0];
-  const size_t N = size[1];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto tsteps = size[0];
+  auto n = size[1];
 
-  MemRef<double, 3> inputA({N, N, N}, 0);
-  MemRef<double, 3> inputB({N, N, N}, 0);
+  MemRef<double, 3> A({n, n, n}, 0);
+  MemRef<double, 3> B({n, n, n}, 0);
 
+  _mlir_ciface_heat_3d_init_array(n, &A, &B);
+
+  return std::make_tuple(tsteps, n, std::move(A), std::move(B));
+}
+
+// Runs the provided kernel for the heat-3d benchmark.
+static void MLIRPolybenchHeat3D(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_heat_3d_init_array(N, &inputA, &inputB);
+    // Skip the initialization time from the measurement.
+    auto [tsteps, n, A, B] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_heat_3d(TSTEPS, N, &inputA, &inputB);
+    kernel(tsteps, n, &A, &B);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<double, 3> runMLIRPolybenchHeat3D(KernelFunc kernel,
+                                                size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [tsteps, n, A, B] = initializeMemRefs(size);
+  kernel(tsteps, n, &A, &B);
+  return A;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int n, double *A) {
   polybench::startDump();
   polybench::beginDump("A");
@@ -68,37 +96,56 @@ static void printArray(int n, double *A) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchHeat3D(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "heat-3d-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_heat_3d_kernel_scalar(int, int, MemRef<double, 3> *,
+                                        MemRef<double, 3> *);
+
+void _mlir_ciface_heat_3d_kernel_autovec(int, int, MemRef<double, 3> *,
+                                         MemRef<double, 3> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchHeat3D, scalar,
+                  _mlir_ciface_heat_3d_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchHeat3D, autovec,
+                  _mlir_ciface_heat_3d_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchHeat3D(size_t size_id) {
+  const std::string benchmarkName =
+      "heat-3d-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refA =
+      runMLIRPolybenchHeat3D(_mlir_ciface_heat_3d_kernel_scalar, size_id);
+
+  auto vecA =
+      runMLIRPolybenchHeat3D(_mlir_ciface_heat_3d_kernel_autovec, size_id);
+  polybench::verify(refA.getData(), vecA.getData(), refA.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchHeat3D(size_t size_id) {
-  const std::string benchmarkName = "heat-3d-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t TSTEPS = size[0];
-  const size_t N = size[1];
-
-  MemRef<double, 3> inputA({N, N, N}, 0);
-  MemRef<double, 3> inputB({N, N, N}, 0);
-
-  _mlir_ciface_heat_3d_init_array(N, &inputA, &inputB);
-  _mlir_ciface_heat_3d(TSTEPS, N, &inputA, &inputB);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(N, inputA.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "heat-3d-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto A = runMLIRPolybenchHeat3D(_mlir_ciface_heat_3d_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(A.getSizes()[0], A.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

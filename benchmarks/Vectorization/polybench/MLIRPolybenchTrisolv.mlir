@@ -51,7 +51,7 @@ func.func @trisolv_init_array(%arg0: i32, %arg1: memref<?x?xf64>, %arg2: memref<
   return
 }
 
-func.func @trisolv(%arg0: i32, %arg1: memref<?x?xf64>, %arg2: memref<?xf64>, %arg3: memref<?xf64>) {
+func.func @trisolv_kernel(%arg0: i32, %arg1: memref<?x?xf64>, %arg2: memref<?xf64>, %arg3: memref<?xf64>) {
   %0 = arith.index_cast %arg0 : i32 to index
   affine.for %arg4 = 0 to %0 {
     %1 = affine.load %arg3[%arg4] : memref<?xf64>

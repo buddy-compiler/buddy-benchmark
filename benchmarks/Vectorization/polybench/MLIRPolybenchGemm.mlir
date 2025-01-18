@@ -77,7 +77,7 @@ func.func @gemm_init_array(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: memref<?xf
   return
 }
 
-func.func @gemm(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: f64, %arg4: f64, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>, %arg7: memref<?x?xf64>) {
+func.func @gemm_kernel(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: f64, %arg4: f64, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>, %arg7: memref<?x?xf64>) {
   %0 = arith.index_cast %arg1 : i32 to index
   %1 = arith.index_cast %arg2 : i32 to index
   %2 = arith.index_cast %arg0 : i32 to index

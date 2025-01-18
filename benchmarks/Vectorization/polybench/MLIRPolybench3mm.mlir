@@ -20,7 +20,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-func.func @kernel_3mm_init_array(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: i32, %arg4: i32, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>, %arg7: memref<?x?xf64>, %arg8: memref<?x?xf64>) {
+func.func @polybench_3mm_init_array(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: i32, %arg4: i32, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>, %arg7: memref<?x?xf64>, %arg8: memref<?x?xf64>) {
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
   %c3_i32 = arith.constant 3 : i32
@@ -96,7 +96,7 @@ func.func @kernel_3mm_init_array(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: i32,
   return
 }
 
-func.func @kernel_3mm(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: i32, %arg4: i32, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>, %arg7: memref<?x?xf64>, %arg8: memref<?x?xf64>, %arg9: memref<?x?xf64>, %arg10: memref<?x?xf64>, %arg11: memref<?x?xf64>) {
+func.func @polybench_3mm_kernel(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: i32, %arg4: i32, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>, %arg7: memref<?x?xf64>, %arg8: memref<?x?xf64>, %arg9: memref<?x?xf64>, %arg10: memref<?x?xf64>, %arg11: memref<?x?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %0 = arith.index_cast %arg1 : i32 to index
   %1 = arith.index_cast %arg2 : i32 to index

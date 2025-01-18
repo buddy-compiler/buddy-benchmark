@@ -23,7 +23,7 @@
 #map = affine_map<()[s0] -> (s0 - 1)>
 #map_0 = affine_map<()[s0] -> (s0 + 1)>
 
-func.func private @heat_3d_init_array(%arg0: i32, %arg1: memref<?x?x?xf64>, %arg2: memref<?x?x?xf64>) attributes {llvm.linkage = #llvm.linkage<internal>} {
+func.func @heat_3d_init_array(%arg0: i32, %arg1: memref<?x?x?xf64>, %arg2: memref<?x?x?xf64>) {
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
   %cst = arith.constant 1.000000e+01 : f64
@@ -52,7 +52,7 @@ func.func private @heat_3d_init_array(%arg0: i32, %arg1: memref<?x?x?xf64>, %arg
   return
 }
 
-func.func private @heat_3d(%arg0: i32, %arg1: i32, %arg2: memref<?x?x?xf64>, %arg3: memref<?x?x?xf64>) attributes {llvm.linkage = #llvm.linkage<internal>} {
+func.func @heat_3d_kernel(%arg0: i32, %arg1: i32, %arg2: memref<?x?x?xf64>, %arg3: memref<?x?x?xf64>) {
   %cst = arith.constant 1.250000e-01 : f64
   %cst_0 = arith.constant 2.000000e+00 : f64
   %0 = arith.index_cast %arg1 : i32 to index

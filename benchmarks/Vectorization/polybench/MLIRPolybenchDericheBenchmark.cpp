@@ -19,44 +19,72 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_deriche(int, int, float, MemRef<float, 2> *,
-                          MemRef<float, 2> *, MemRef<float, 2> *,
-                          MemRef<float, 2> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_deriche_init_array(int, int, MemRef<float, 1> *,
                                      MemRef<float, 2> *, MemRef<float, 2> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {64, 64}},           {"small", {192, 128}},
-    {"medium", {720, 480}},       {"large", {4096, 2160}},
-    {"extralarge", {7680, 4320}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, int, float, MemRef<float, 2> *,
+                            MemRef<float, 2> *, MemRef<float, 2> *,
+                            MemRef<float, 2> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {64, 64}, {192, 128}, {720, 480}, {4096, 2160}, {7680, 4320},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t W = size[0];
-  const size_t H = size[1];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto w = size[0];
+  auto h = size[1];
 
   MemRef<float, 1> alpha({1}, 0);
-  MemRef<float, 2> inputImgIn({W, H}, 0);
-  MemRef<float, 2> inputImgOut({W, H}, 0);
-  MemRef<float, 2> inputY1({W, H}, 0);
-  MemRef<float, 2> inputY2({W, H}, 0);
+  MemRef<float, 2> imgIn({w, h}, 0);
+  MemRef<float, 2> imgOut({w, h}, 0);
+  MemRef<float, 2> y1({w, h}, 0);
+  MemRef<float, 2> y2({w, h}, 0);
 
+  _mlir_ciface_deriche_init_array(w, h, &alpha, &imgIn, &imgOut);
+
+  return std::make_tuple(w, h, std::move(alpha), std::move(imgIn),
+                         std::move(imgOut), std::move(y1), std::move(y2));
+}
+
+// Runs the provided kernel for the deriche benchmark.
+static void MLIRPolybenchDeriche(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_deriche_init_array(W, H, &alpha, &inputImgIn, &inputImgOut);
+    // Skip the initialization time from the measurement.
+    auto [w, h, alpha, imgIn, imgOut, y1, y2] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_deriche(W, H, alpha.getData()[0], &inputImgIn, &inputImgOut,
-                         &inputY1, &inputY2);
+    kernel(w, h, alpha.getData()[0], &imgIn, &imgOut, &y1, &y2);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<float, 2> runMLIRPolybenchDeriche(KernelFunc kernel,
+                                                size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [w, h, alpha, imgIn, imgOut, y1, y2] = initializeMemRefs(size);
+  kernel(w, h, alpha.getData()[0], &imgIn, &imgOut, &y1, &y2);
+  return imgOut;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int w, int h, float *imgOut) {
   polybench::startDump();
   polybench::beginDump("imgOut");
@@ -72,42 +100,59 @@ static void printArray(int w, int h, float *imgOut) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchDeriche(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "deriche-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_deriche_kernel_scalar(int, int, float, MemRef<float, 2> *,
+                                        MemRef<float, 2> *, MemRef<float, 2> *,
+                                        MemRef<float, 2> *);
+
+void _mlir_ciface_deriche_kernel_autovec(int, int, float, MemRef<float, 2> *,
+                                         MemRef<float, 2> *, MemRef<float, 2> *,
+                                         MemRef<float, 2> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchDeriche, scalar,
+                  _mlir_ciface_deriche_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchDeriche, autovec,
+                  _mlir_ciface_deriche_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchDeriche(size_t size_id) {
+  const std::string benchmarkName =
+      "deriche-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refImgOut =
+      runMLIRPolybenchDeriche(_mlir_ciface_deriche_kernel_scalar, size_id);
+
+  auto vecImgOut =
+      runMLIRPolybenchDeriche(_mlir_ciface_deriche_kernel_autovec, size_id);
+  polybench::verify(refImgOut.getData(), vecImgOut.getData(),
+                    refImgOut.getSize(), "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchDeriche(size_t size_id) {
-  const std::string benchmarkName = "deriche-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t W = size[0];
-  const size_t H = size[1];
-
-  MemRef<float, 1> alpha({1}, 0);
-  MemRef<float, 2> inputImgIn({W, H}, 0);
-  MemRef<float, 2> inputImgOut({W, H}, 0);
-  MemRef<float, 2> inputY1({W, H}, 0);
-  MemRef<float, 2> inputY2({W, H}, 0);
-
-  _mlir_ciface_deriche_init_array(W, H, &alpha, &inputImgIn, &inputImgOut);
-
-  _mlir_ciface_deriche(W, H, alpha.getData()[0], &inputImgIn, &inputImgOut,
-                       &inputY1, &inputY2);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(W, H, inputImgOut.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "deriche-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto imgOut =
+      runMLIRPolybenchDeriche(_mlir_ciface_deriche_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(imgOut.getSizes()[0], imgOut.getSizes()[1], imgOut.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

@@ -19,48 +19,76 @@
 //===----------------------------------------------------------------------===//
 
 #include "Utils.hpp"
-#include <benchmark/benchmark.h>
-#include <buddy/Core/Container.h>
+#include "benchmark/benchmark.h"
+#include "buddy/Core/Container.h"
+
+#include <tuple>
 #include <vector>
 
+// -----------------------------------------------------------------------------
+// Global Variables and Functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
 extern "C" {
-void _mlir_ciface_doitgen(int, int, int, MemRef<double, 3> *,
-                          MemRef<double, 2> *, MemRef<double, 1> *);
+// Initialization kernel for the benchmark. Not counted in execution time.
 void _mlir_ciface_doitgen_init_array(int, int, int, MemRef<double, 3> *,
                                      MemRef<double, 2> *);
 }
 
-const std::vector<std::pair<std::string, std::vector<size_t>>> sizes = {
-    {"mini", {8, 10, 12}},           {"small", {20, 25, 30}},
-    {"medium", {40, 50, 60}},        {"large", {140, 150, 160}},
-    {"extralarge", {220, 250, 270}},
+// Kernel function signature for the benchmark.
+using KernelFunc = void (*)(int, int, int, MemRef<double, 3> *,
+                            MemRef<double, 2> *, MemRef<double, 1> *);
+
+// Dataset sizes for the benchmark.
+static const std::vector<std::vector<size_t>> DATASET_SIZES{
+    {8, 10, 12}, {20, 25, 30}, {40, 50, 60}, {140, 150, 160}, {220, 250, 270},
 };
 
-static void runPolybench(benchmark::State &state,
-                         const std::vector<size_t> &size) {
-  const size_t NQ = size[0];
-  const size_t NR = size[1];
-  const size_t NP = size[2];
+// Initializes the memrefs for the benchmark.
+static auto initializeMemRefs(const std::vector<size_t> &size) {
+  auto nq = size[0];
+  auto nr = size[1];
+  auto np = size[2];
 
-  MemRef<double, 3> inputA({NR, NQ, NP}, 0);
-  MemRef<double, 2> inputC4({NP, NP}, 0);
-  MemRef<double, 1> inputSum({NP}, 0);
+  MemRef<double, 3> A({nr, nq, np}, 0);
+  MemRef<double, 2> C4({np, np}, 0);
+  MemRef<double, 1> sum({np}, 0);
 
+  _mlir_ciface_doitgen_init_array(nr, nq, np, &A, &C4);
+
+  return std::make_tuple(nr, nq, np, std::move(A), std::move(C4),
+                         std::move(sum));
+}
+
+// Runs the provided kernel for the doitgen benchmark.
+static void MLIRPolybenchDoitgen(benchmark::State &state, KernelFunc kernel) {
+  // The dataset size is determined by the argument passed by google benchmark.
+  const auto &size = DATASET_SIZES[state.range(0)];
   for (auto _ : state) {
     state.PauseTiming();
-    _mlir_ciface_doitgen_init_array(NR, NQ, NP, &inputA, &inputC4);
+    // Skip the initialization time from the measurement.
+    auto [nr, nq, np, A, C4, sum] = initializeMemRefs(size);
     state.ResumeTiming();
-    _mlir_ciface_doitgen(NR, NQ, NP, &inputA, &inputC4, &inputSum);
+    kernel(nr, nq, np, &A, &C4, &sum);
   }
 }
 
+// Run the kernel and return the memref instance for verification.
+static MemRef<double, 3> runMLIRPolybenchDoitgen(KernelFunc kernel,
+                                                 size_t size_id) {
+  const auto &size = DATASET_SIZES[size_id];
+  auto [nr, nq, np, A, C4, sum] = initializeMemRefs(size);
+  kernel(nr, nq, np, &A, &C4, &sum);
+  return A;
+}
+
+// Mimic the output format of the original Polybench implementation.
 static void printArray(int nr, int nq, int np, double *A) {
-  int i, j, k;
   polybench::startDump();
   polybench::beginDump("A");
-  for (i = 0; i < nr; i++) {
-    for (j = 0; j < nq; j++) {
-      for (k = 0; k < np; k++) {
+  for (int i = 0; i < nr; i++) {
+    for (int j = 0; j < nq; j++) {
+      for (int k = 0; k < np; k++) {
         if ((i * nq * np + j * np + k) % 20 == 0) {
           printf("\n");
         }
@@ -72,40 +100,58 @@ static void printArray(int nr, int nq, int np, double *A) {
   polybench::finishDump();
 }
 
-void registerMLIRPolybenchDoitgen(const std::set<std::string> &disabledSizes) {
-  for (const auto &sizePair : sizes) {
-    if (disabledSizes.count(sizePair.first)) {
-      continue;
-    }
-    std::string benchmarkName = "doitgen-" + sizePair.first;
-    benchmark::RegisterBenchmark(benchmarkName.c_str(),
-                                 [sizePair](benchmark::State &state) {
-                                   runPolybench(state, sizePair.second);
-                                 })
-        ->Unit(benchmark::kMillisecond);
-  }
+// -----------------------------------------------------------------------------
+// MLIR Benchmark. New methods can be added here.
+// -----------------------------------------------------------------------------
+
+extern "C" {
+void _mlir_ciface_doitgen_kernel_scalar(int, int, int, MemRef<double, 3> *,
+                                        MemRef<double, 2> *,
+                                        MemRef<double, 1> *);
+
+void _mlir_ciface_doitgen_kernel_autovec(int, int, int, MemRef<double, 3> *,
+                                         MemRef<double, 2> *,
+                                         MemRef<double, 1> *);
+/// [Step 1] Add function of new methods here.
 }
 
+BENCHMARK_CAPTURE(MLIRPolybenchDoitgen, scalar,
+                  _mlir_ciface_doitgen_kernel_scalar)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(MLIRPolybenchDoitgen, autovec,
+                  _mlir_ciface_doitgen_kernel_autovec)
+    ->DenseRange(0, DATASET_SIZES.size() - 1)
+    ->Unit(benchmark::kMillisecond);
+/// [Step 2] Register new benchmarks here.
+
+void verifyResultMLIRPolybenchDoitgen(size_t size_id) {
+  const std::string benchmarkName =
+      "doitgen-" + polybench::getPolybenchDatasetSizeName(size_id);
+
+  auto refA =
+      runMLIRPolybenchDoitgen(_mlir_ciface_doitgen_kernel_scalar, size_id);
+
+  auto vecA =
+      runMLIRPolybenchDoitgen(_mlir_ciface_doitgen_kernel_autovec, size_id);
+  polybench::verify(refA.getData(), vecA.getData(), refA.getSize(),
+                    "autovec " + benchmarkName);
+  // [Step 3] Add verification code here.
+}
+
+// -----------------------------------------------------------------------------
+// Additional utility functions. No need to change the code here.
+// -----------------------------------------------------------------------------
+
+// Generate the baseline result for the benchmark to verify the correctness of
+// the ported code.
 void generateResultMLIRPolybenchDoitgen(size_t size_id) {
-  const std::string benchmarkName = "doitgen-" + sizes[size_id].first;
-  const std::vector<size_t> &size = sizes[size_id].second;
-
-  const size_t NQ = size[0];
-  const size_t NR = size[1];
-  const size_t NP = size[2];
-
-  MemRef<double, 3> inputA({NR, NQ, NP}, 0);
-  MemRef<double, 2> inputC4({NP, NP}, 0);
-  MemRef<double, 1> inputSum({NP}, 0);
-
-  _mlir_ciface_doitgen_init_array(NR, NQ, NP, &inputA, &inputC4);
-
-  _mlir_ciface_doitgen(NR, NQ, NP, &inputA, &inputC4, &inputSum);
-
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
-  std::cout << "Result for " << benchmarkName << ":\n";
-  printArray(NR, NQ, NP, inputA.getData());
-  std::cout << "--------------------------------------------------------"
-            << std::endl;
+  const std::string benchmarkName =
+      "doitgen-" + polybench::getPolybenchDatasetSizeName(size_id);
+  auto A = runMLIRPolybenchDoitgen(_mlir_ciface_doitgen_kernel_scalar, size_id);
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "Result for " << benchmarkName << ":" << std::endl;
+  printArray(A.getSizes()[0], A.getSizes()[1], A.getSizes()[2], A.getData());
+  std::cout << "------------------------------------------------" << std::endl;
 }

@@ -79,7 +79,7 @@ func.func @symm_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?xf64>, %arg3: 
   return
 }
 
-func.func @symm(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: f64, %arg4: memref<?x?xf64>, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>) {
+func.func @symm_kernel(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: f64, %arg4: memref<?x?xf64>, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %0 = arith.index_cast %arg1 : i32 to index
   %alloca = memref.alloca() : memref<f64>

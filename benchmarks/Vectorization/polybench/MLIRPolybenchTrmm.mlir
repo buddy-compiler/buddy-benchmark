@@ -56,7 +56,7 @@ func.func @trmm_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?xf64>, %arg3: 
   return
 }
 
-func.func @trmm(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>) {
+func.func @trmm_kernel(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>) {
   %0 = arith.index_cast %arg1 : i32 to index
   %1 = arith.index_cast %arg0 : i32 to index
   affine.for %arg5 = 0 to %1 {

@@ -71,7 +71,7 @@ func.func @syr2k_init_array(%arg0: i32, %arg1: i32, %arg2: memref<?xf64>, %arg3:
   return
 }
 
-func.func @syr2k(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: f64, %arg4: memref<?x?xf64>, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>) {
+func.func @syr2k_kernel(%arg0: i32, %arg1: i32, %arg2: f64, %arg3: f64, %arg4: memref<?x?xf64>, %arg5: memref<?x?xf64>, %arg6: memref<?x?xf64>) {
   %0 = arith.index_cast %arg1 : i32 to index
   %1 = arith.index_cast %arg0 : i32 to index
   affine.for %arg7 = 0 to %1 {

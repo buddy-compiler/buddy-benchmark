@@ -37,7 +37,7 @@ func.func @durbin_init_array(%arg0: i32, %arg1: memref<?xf64>) {
   return
 }
 
-func.func @durbin(%arg0: i32, %arg1: memref<?xf64>, %arg2: memref<?xf64>) {
+func.func @durbin_kernel(%arg0: i32, %arg1: memref<?xf64>, %arg2: memref<?xf64>) {
   %cst = arith.constant 0.000000e+00 : f64
   %cst_0 = arith.constant 1.000000e+00 : f64
   %alloca = memref.alloca() : memref<f64>

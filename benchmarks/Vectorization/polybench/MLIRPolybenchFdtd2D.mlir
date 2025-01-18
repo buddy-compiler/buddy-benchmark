@@ -63,7 +63,7 @@ func.func @fdtd_2d_init_array(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: memref<
   return
 }
 
-func.func @fdtd_2d(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>, %arg5: memref<?x?xf64>, %arg6: memref<?xf64>) {
+func.func @fdtd_2d_kernel(%arg0: i32, %arg1: i32, %arg2: i32, %arg3: memref<?x?xf64>, %arg4: memref<?x?xf64>, %arg5: memref<?x?xf64>, %arg6: memref<?xf64>) {
   %cst = arith.constant 5.000000e-01 : f64
   %cst_0 = arith.constant 0.69999999999999996 : f64
   %0 = arith.index_cast %arg1 : i32 to index
