@@ -20,20 +20,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(BuddyMLIR_DIR ${BUDDY_MLIR_BUILD_DIR}/cmake)
 find_package(BuddyMLIR REQUIRED CONFIG)
 
-if(CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_ATTR +v,+m CACHE STRING "Target Architecture.")
-  set(BUDDY_OPT_TRIPLE riscv64 CACHE STRING "Target Triple.")
-  set(BUDDY_LIB_DIR ${BUDDY_MLIR_BUILD_CROSS_DIR}/lib)
-else()
-  set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
-  set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
-  set(BUDDY_LIB_DIR ${BUDDY_MLIR_BUILD_DIR}/lib)
-endif()
-message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
-message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
-
 # BUDDY project.
 set(BUDDY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BUDDY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
@@ -45,14 +31,30 @@ set(BUILD_VALIDATION OFF CACHE BOOL "Build validations")
 set(BUILD_CORRECTNESS OFF CACHE BOOL "Build correctness checking")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUDDY_BINARY_DIR})
 
+# MLIR binary directory.
+set(LLVM_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/bin)
+set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/lib)
+
+if(CROSS_COMPILE_RVV)
+  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
+  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
+  set(BUDDY_OPT_ATTR +v,+m CACHE STRING "Target Architecture.")
+  set(BUDDY_OPT_TRIPLE riscv64 CACHE STRING "Target Triple.")
+  set(BUDDY_LIB_DIR ${BUDDY_MLIR_BUILD_CROSS_DIR}/lib)
+  set(OMP_SHARED_DIR ${RISCV_OMP_SHARED})
+else()
+  set(BUDDY_OPT_ATTR avx512f CACHE STRING "Target Architecture.")
+  set(BUDDY_OPT_TRIPLE x86_64-unknown-linux-gnu CACHE STRING "Target Triple.")
+  set(BUDDY_LIB_DIR ${BUDDY_MLIR_BUILD_DIR}/lib)
+  set(OMP_SHARED_DIR ${LLVM_MLIR_LIBRARY_DIR}/libomp.so)
+endif()
+message(STATUS "Configuring Target Architecture: ${BUDDY_OPT_ATTR}")
+message(STATUS "Configuring Target Triple: ${BUDDY_OPT_TRIPLE}")
+
 # Add BUDDY files to the include path
 include_directories(${BUDDY_MAIN_INCLUDE_DIR})
 include_directories(${BUDDY_MLIR_INTERFACE_DIR})
 include_directories(${BUDDY_THIRDPARTY_INCLUDE_DIR})
-
-# MLIR binary directory.
-set(LLVM_MLIR_BINARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/bin)
-set(LLVM_MLIR_LIBRARY_DIR ${BUDDY_MLIR_BUILD_DIR}/../llvm/build/lib)
 
 # Helper functions.
 include(${BUDDY_SOURCE_DIR}/cmake/buddy-benchmark.cmake)
