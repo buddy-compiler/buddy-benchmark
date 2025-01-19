@@ -74,12 +74,18 @@ void _mlir_ciface_forward_scalar(MemRef<float, 3> *a, MemRef<float, 1> *b,
                                  MemRef<size_t, 2> *c);
 void _mlir_ciface_forward_matmul_opt(MemRef<float, 3> *a, MemRef<float, 1> *b,
                                      MemRef<size_t, 2> *c);
+void _mlir_ciface_forward_matmul_opt_omp(MemRef<float, 3> *a,
+                                         MemRef<float, 1> *b,
+                                         MemRef<size_t, 2> *c);
 /// [Step 1] Add function of your new method.
 }
 BENCHMARK_CAPTURE(DL_MODEL_TINYLLAMA, scalar, _mlir_ciface_forward_scalar)
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(DL_MODEL_TINYLLAMA, matmul_opt,
                   _mlir_ciface_forward_matmul_opt)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(DL_MODEL_TINYLLAMA, matmul_opt_omp,
+                  _mlir_ciface_forward_matmul_opt_omp)
     ->Unit(benchmark::kMillisecond);
 /// [Step 2] Call GoogleBenchmark function to run your new method.
 
@@ -103,6 +109,8 @@ int main(int argc, char **argv) {
 
   MLIRVerification(outputExpected, _mlir_ciface_forward_matmul_opt,
                    "matmul_opt");
-  /// [Step 3] Add your new method for verification.
-  return 0;
+  MLIRVerification(outputExpected, _mlir_ciface_forward_matmul_opt_omp,
+                   "matmul_opt_omp");
+  // /// [Step 3] Add your new method for verification.
+  // return 0;
 }

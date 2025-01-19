@@ -1,6 +1,7 @@
 # Deep Learning Benchmark
 
-## Model Level Benchmark
+## Benchmark Lists
+### Model Level Benchmark
 The table below lists the benchmark cases at the operation level.
 
 | Name  | Build Target | Introduction |
@@ -12,7 +13,7 @@ The table below lists the benchmark cases at the operation level.
 | Whisper | `ninja dl-model-whisper-benchmark` | This benchmark compares multiple optimization strategies targeting the Whisper model. |
 | ResNet-18 | `ninja dl-model-resnet18-benchmark` | This benchmark compares multiple optimization strategies targeting the ResNet-18 model. |
 
-## Layer Level Benchmark
+### Layer Level Benchmark
 The table below lists the benchmark cases at the layer level.
 
 | Name  | Build Target | Introduction |
@@ -21,7 +22,7 @@ The table below lists the benchmark cases at the layer level.
 | Self Attention | `ninja dl-layer-selfattention-benchmark` | This benchmark compares multiple optimization strategies targeting the self attention layer. |
 | RMSNorm | `ninja dl-layer-rmsnorm-benchmark` | This benchmark compares multiple optimization strategies targeting the RMSNorm layer. |
 
-## Operation Level Benchmark
+### Operation Level Benchmark
 
 The table below lists the benchmark cases at the operation level.
 
@@ -51,6 +52,8 @@ The table below lists the benchmark cases at the operation level.
 | TOSA Transpose | `ninja dl-op-tosa-transpose-benchmark` | This benchmark evaluates optimization strategies for the `tosa.transpose` operation. The benchmark size can be adjusted in [this file](./Ops/TransposeOp/Main.cpp). |
 | MatMul Transpose B | `ninja dl-op-matmul-transpose-b-benchmark` | This benchmark evaluates optimization strategies for the `linalg.matmul_transpose_b` operation. The benchmark size can be adjusted in [main file](./Ops/MatMulTransposeBOp/Main.cpp) and [MLIR file](./Ops/MatMulTransposeBOp/MatMulTransposeB.mlir). |
 
+## How to Build
+
 ### Enter Python virtual environment
 We recommend you to use anaconda3 to create python virtual environment. You should install python packages as buddy-mlir/requirements.
 ```bash
@@ -59,7 +62,7 @@ $ cd buddy-benchmark
 $ pip install -r requirements.txt
 ```
 
-### Local Hardware Platform.
+### Build on Local Hardware Platform
 
 1. Set the `buddy-mlir` toolchain and PYTHONPATH environment variable:
 Make sure that the PYTHONPATH variable includes the directory of LLVM/MLIR python bindings and the directory of Buddy MLIR python packages.
@@ -67,7 +70,7 @@ Make sure that the PYTHONPATH variable includes the directory of LLVM/MLIR pytho
 ```bash
 $ cd buddy-mlir/build
 $ export BUDDY_MLIR_BUILD_DIR=$PWD
-$ export LLVM_MLIR_BUILD_DIR=$PWD/../llvm/build
+$ export LLVM_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}/../llvm/build/
 $ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
 ```
 
@@ -102,7 +105,7 @@ $ ./dl-op-linalg-matmul-benchmark
 
 **RISC-V Vector Extension**
 
-Follow the relevant [documentation](https://github.com/buddy-compiler/buddy-mlir/blob/main/docs/RVVEnviroment.md) to prepare the RVV environment.
+Follow the [Environment Setup Guide for MLIR and RVV Testing and Experiments](https://github.com/buddy-compiler/buddy-mlir/blob/main/docs/RVVEnvironment.md) to prepare the RVV environment. Furthermore, To enable the openmp feature on RISC-V, you also need to refer to [Prepare RISC-V OpenMP ToolChain](../../docs/PrepareRVOpenMP.md).
 
 1. Set variables for the toolchain:
 
@@ -110,9 +113,11 @@ Follow the relevant [documentation](https://github.com/buddy-compiler/buddy-mlir
 $ cd buddy-mlir/build
 $ export BUDDY_MLIR_BUILD_DIR=$PWD
 $ export LLVM_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR}/../llvm/build/
+$ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
 $ export BUDDY_MLIR_BUILD_CROSS_DIR=${BUDDY_MLIR_BUILD_DIR}/../build-cross-rv
 $ export RISCV_GNU_TOOLCHAIN=${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain
-$ export PYTHONPATH=${LLVM_MLIR_BUILD_DIR}/tools/mlir/python_packages/mlir_core:${BUDDY_MLIR_BUILD_DIR}/python_packages:${PYTHONPATH}
+$ export RISCV_OMP_SHARED=${LLVM_MLIR_BUILD_DIR}/../build-omp-shared-rv/libomp.so
+
 ```
 
 2. Build the benchmark for the target platform:
@@ -132,6 +137,7 @@ $ cmake -G Ninja .. \
     -DCMAKE_CXX_COMPILER=${LLVM_MLIR_BUILD_DIR}/bin/clang++ \
     -DCMAKE_C_FLAGS="-march=rv64gcv --target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN}/sysroot --gcc-toolchain=${RISCV_GNU_TOOLCHAIN} -fPIC" \
     -DCMAKE_CXX_FLAGS="-march=rv64gcv --target=riscv64-unknown-linux-gnu --sysroot=${RISCV_GNU_TOOLCHAIN}/sysroot --gcc-toolchain=${RISCV_GNU_TOOLCHAIN} -fPIC" \
+    -DRISCV_OMP_SHARED=${RISCV_OMP_SHARED} \
     -DBUDDY_MLIR_BUILD_DIR=${BUDDY_MLIR_BUILD_DIR} \
     -DBUDDY_MLIR_BUILD_CROSS_DIR=${BUDDY_MLIR_BUILD_CROSS_DIR} \
     -DBUDDY_MLIR_CROSS_LIB_DIR=${BUDDY_MLIR_BUILD_CROSS_DIR}/lib

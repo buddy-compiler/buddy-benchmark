@@ -130,3 +130,54 @@ set_target_properties(batch_matmul_scf PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-op-linalg-batch-matmul-benchmark
   batch_matmul_scf
 )
+
+# BatchMatMul Broadcast
+add_custom_command(OUTPUT batch_matmul_broadcast.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulBroadcast.mlir |
+          sed 's/@batch_matmul/@batch_matmul_broadcast/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -expand-strided-metadata
+          -affine-super-vectorize
+          -lower-affine
+          -convert-vector-to-llvm
+          -finalize-memref-to-llvm
+          -convert-scf-to-cf          
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm
+          -reconcile-unrealized-casts | 
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_broadcast.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_broadcast.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_broadcast.o
+)
+add_library(batch_matmul_broadcast STATIC batch_matmul_broadcast.o)
+set_target_properties(batch_matmul_broadcast PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  batch_matmul_broadcast
+)
+
+# BatchMatMul Broadcast Openmp
+add_custom_command(OUTPUT batch_matmul_broadcast_omp.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulBroadcast.mlir |
+          sed 's/@batch_matmul/@batch_matmul_broadcast_omp/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -expand-strided-metadata
+          -affine-super-vectorize
+          -lower-affine
+          -convert-scf-to-openmp
+          -convert-vector-to-llvm
+          -finalize-memref-to-llvm
+          -convert-scf-to-cf
+          -llvm-request-c-wrappers
+          -convert-openmp-to-llvm
+          -convert-func-to-llvm
+          -reconcile-unrealized-casts |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_broadcast_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_broadcast_omp.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_broadcast_omp.o
+)
+add_library(batch_matmul_broadcast_omp STATIC batch_matmul_broadcast_omp.o)
+set_target_properties(batch_matmul_broadcast_omp PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  ${OMP_SHARED_DIR}
+  batch_matmul_broadcast_omp
+)
