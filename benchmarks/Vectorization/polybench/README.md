@@ -31,11 +31,8 @@ cmake -G Ninja .. \
 ninja vectorization-polybench-benchmark
 ```
 
-3. Run the benchmark:
-
-```bash
-./bin/vectorization-polybench-benchmark --benchmark_filter=.*/.*/[12]
-```
+1. Run the benchmark, check the [Running the Benchmark](#running-the-benchmark)
+   section for more details.
 
 ### Cross Compile to Target Platform
 
@@ -83,11 +80,23 @@ ninja vectorization-polybench-benchmark
 ## Running the Benchmark
 
 The binary `vectorization-polybench-benchmark` inherits the command-line options
-from google benchmark. The following command runs the benchmark for all cases
-on `small` and `medium` dataset sizes (indices 1 and 2).
+from google benchmark including the benchmark filtering feature (see
+[here](https://github.com/google/benchmark/blob/main/docs/user_guide.md#running-a-subset-of-benchmarks)
+for more details). The benchmark cases are organized as
+`MLIRPolybenchCase/methods/<dataset_size_id>`, so the following command can be used
+to run the benchmark for all cases on `small` and `medium` dataset sizes
+(indices 1 and 2).
 
 ```bash
-./bin/vectorization-polybench-benchmark --benchmark_filter=.*/.*/[12]
+./bin/vectorization-polybench-benchmark --benchmark_filter=".*/.*/[12]"
+```
+
+And to run the benchmark for a specific case (e.g., `2mm`) on a specific dataset
+sizes (e.g., `mini`, `small` and `medium`) with all methods, use the following
+command:
+
+```bash
+./bin/vectorization-polybench-benchmark --benchmark_filter="MLIRPolybench2mm/.*/[012]"
 ```
 
 Also, to verify the correctness of different methods, use
@@ -96,7 +105,7 @@ on `small` and `medium` dataset sizes, and verifies the results using the `mini`
 dataset size for optimized methods.
 
 ```bash
-./bin/vectorization-polybench-benchmark --benchmark_filter=.*/.*/[12] --verification-dataset-size=mini
+./bin/vectorization-polybench-benchmark --benchmark_filter=".*/.*/[12]" --verification-dataset-size=mini
 ```
 
 Additionally, `--generate-output` runs the benchmark with the specified dataset 

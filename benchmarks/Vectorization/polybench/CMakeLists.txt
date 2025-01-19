@@ -59,8 +59,6 @@ function(add_polybench_benchmark bench_name)
     VERBATIM
   )
 
-  # [Step 4] Add more compilation pipeline steps here if needed
-
   add_library(${bench_name} STATIC ${scalar_obj_file} ${autovec_obj_file})
   set_target_properties(${bench_name} PROPERTIES LINKER_LANGUAGE CXX)
 
