@@ -29,7 +29,7 @@ using namespace std;
 // -----------------------------------------------------------------------------
 
 #define _NUM_ITER 10
-#define _IN_OUT_SIZE 2000000
+#define _IN_OUT_SIZE 20000000
 #define _FILTER_SIZE 127
 #define _PRINT false
 
@@ -150,71 +150,92 @@ void Verification(const univector<T, _IN_OUT_SIZE> &outputExpected,
 // -----------------------------------------------------------------------------
 
 // Benchmarks with f32/float type.
-BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_scalar_f32, dap::FIR<float, 1>, false)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_vector_f32, _mlir_ciface_fir_vector_f32)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_scalar_f32, dap::FIR<float, 1>, false)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(_NUM_ITER);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_vector_f32, _mlir_ciface_fir_vector_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(_NUM_ITER);
 BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_tiled_vector_f32, dap::FIR<float, 1>, true)
     ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
-BENCHMARK(KFR_FIR_f32)->Unit(benchmark::kMillisecond)->Iterations(_NUM_ITER);
-// Benchmarks with f64/double type.
-BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_scalar_f64, dap::FIR<double, 1>, false)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_vector_f64, _mlir_ciface_fir_vector_f64)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_tiled_vector_f64, dap::FIR<double, 1>,
-                  true)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
-BENCHMARK(KFR_FIR_f64)->Unit(benchmark::kMillisecond)->Iterations(_NUM_ITER);
-// Benchmarks for vector size and tile size.
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts64_f32, _mlir_ciface_buddy_fir_vs_16_ts_64_f32)
+    ->Iterations(20);
+// BENCHMARK(KFR_FIR_f32)->Unit(benchmark::kMillisecond)->Iterations(_NUM_ITER);
+// // Benchmarks with f64/double type.
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_scalar_f64, dap::FIR<double, 1>, false)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(_NUM_ITER);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, mlir_vector_f64, _mlir_ciface_fir_vector_f64)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(_NUM_ITER);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_tiled_vector_f64, dap::FIR<double, 1>,
+//                   true)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(_NUM_ITER);
+// BENCHMARK(KFR_FIR_f64)->Unit(benchmark::kMillisecond)->Iterations(_NUM_ITER);
+// // Benchmarks for vector size and tile size.
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts64_f32, _mlir_ciface_buddy_fir_vs_16_ts_64_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts128_f32, _mlir_ciface_buddy_fir_vs_16_ts_128_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(_NUM_ITER);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts256_f32, _mlir_ciface_buddy_fir_vs_8_ts_256_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts216_f32, _mlir_ciface_buddy_fir_vs_16_ts_240_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts240_f32, _mlir_ciface_buddy_fir_vs_16_ts_240_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts256_f32, _mlir_ciface_buddy_fir_vs_16_ts_256_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+BENCHMARK_CAPTURE(DAP_OPS_FIR, vec16_tile512_uf1_f32, _mlir_ciface_buddy_fir_vs_16_ts_512_uf_1_f32)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts128_f32, _mlir_ciface_buddy_fir_vs_16_ts_128_f32)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(_NUM_ITER);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts256_f32, _mlir_ciface_buddy_fir_vs_8_ts_256_f32)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, vec16_tile512_uf2_f32, _mlir_ciface_buddy_fir_vs_16_ts_512_uf_2_f32)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts240_f32, _mlir_ciface_buddy_fir_vs_16_ts_240_f32)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, vec16_tile512_uf4_f32, _mlir_ciface_buddy_fir_vs_16_ts_512_uf_4_f32)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts256_f32, _mlir_ciface_buddy_fir_vs_16_ts_256_f32)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, vec16_tile512_uf8_f32, _mlir_ciface_buddy_fir_vs_16_ts_512_uf_8_f32)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts512_f32, _mlir_ciface_buddy_fir_vs_16_ts_512_f32)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, vec16_tile512_uf16_f32, _mlir_ciface_buddy_fir_vs_16_ts_512_uf_16_f32)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts1024_f32, _mlir_ciface_buddy_fir_vs_16_ts_1024_f32)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, buddy_tiled_vector_f32, dap::FIR<float, 1>, true)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts2048_f32, _mlir_ciface_buddy_fir_vs_16_ts_2048_f32)
+BENCHMARK_CAPTURE(DAP_OPS_FIR, vec16_tile1024_uf1_f32, _mlir_ciface_buddy_fir_vs_16_ts_1024_uf_1_f32)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts4096_f32, _mlir_ciface_buddy_fir_vs_16_ts_4096_f32)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts8192_f32, _mlir_ciface_buddy_fir_vs_16_ts_8192_f32)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts256_f64, _mlir_ciface_buddy_fir_vs_8_ts_256_f64)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts128_f64, _mlir_ciface_buddy_fir_vs_8_ts_128_f64)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts512_f64, _mlir_ciface_buddy_fir_vs_8_ts_512_f64)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(20);
-BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts1024_f64, _mlir_ciface_buddy_fir_vs_8_ts_1024_f64)
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts2048_f32, _mlir_ciface_buddy_fir_vs_16_ts_2048_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts4096_f32, _mlir_ciface_buddy_fir_vs_16_ts_4096_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts8192_f32, _mlir_ciface_buddy_fir_vs_16_ts_8192_uf_1_f32)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts256_f64, _mlir_ciface_buddy_fir_vs_8_ts_256_uf_1_f64)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts128_f64, _mlir_ciface_buddy_fir_vs_8_ts_128_uf_1_f64)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts512_f64, _mlir_ciface_buddy_fir_vs_8_ts_512_uf_1_f64)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs8_ts1024_f64, _mlir_ciface_buddy_fir_vs_8_ts_1024_uf_1_f64)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
+// BENCHMARK_CAPTURE(DAP_OPS_FIR, vs16_ts512_f64, _mlir_ciface_buddy_fir_vs_16_ts_512_uf_1_f64)
+//     ->Unit(benchmark::kMillisecond)
+//     ->Iterations(20);
 
 // -----------------------------------------------------------------------------
 // Main Function.
