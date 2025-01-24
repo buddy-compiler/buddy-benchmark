@@ -1,68 +1,183 @@
-cmake_minimum_required(VERSION 3.10)
+add_executable(dl-op-linalg-batch-matmul-benchmark
+  Main.cpp
+)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark GoogleBenchmark)
 
-project(BatchMatMulBenchmark LANGUAGES CXX C)
+# CMAKE_C_FLAGS is set when configuring CMake
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
-set(CMAKE_CXX_STANDARD 14)
-
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
-
+# Batch MatMul Scalar
 add_custom_command(OUTPUT batch_matmul_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
           sed 's/@batch_matmul/@batch_matmul_scalar/' |
-          ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-            -convert-linalg-to-loops
-            -convert-scf-to-cf
-            -lower-affine
-            -finalize-memref-to-llvm
-            -llvm-request-c-wrappers
-            -convert-func-to-llvm
-            -convert-math-to-llvm
-            -reconcile-unrealized-casts |
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/BatchMatMulOp/batch_matmul_scalar.o
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -convert-linalg-to-loops
+          -expand-strided-metadata
+          -lower-affine 
+          -convert-scf-to-cf 
+          -convert-math-to-llvm 
+          -convert-vector-to-llvm 
+          -finalize-memref-to-llvm 
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm 
+          -reconcile-unrealized-casts|
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} batch_matmul_scalar.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_scalar.o
 )
-add_library(BatchMatMulScalar STATIC batch_matmul_scalar.o)
-set_target_properties(BatchMatMulScalar PROPERTIES LINKER_LANGUAGE CXX)
+add_library(batch_matmul_scalar STATIC batch_matmul_scalar.o)
+set_target_properties(batch_matmul_scalar PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  batch_matmul_scalar
+)
 
+# Batch MatMul Auto Vectorization
 add_custom_command(OUTPUT batch_matmul_auto_vectorization.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMul.mlir |
           sed 's/@batch_matmul/@batch_matmul_auto_vectorization/' |
-          ${LLVM_MLIR_BINARY_DIR}/mlir-opt
-            -convert-linalg-to-loops
-            -convert-scf-to-cf
-            -lower-affine
-            -finalize-memref-to-llvm
-            -llvm-request-c-wrappers
-            -convert-func-to-llvm
-            -convert-math-to-llvm
-            -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/BatchMatMulOp/batch_matmul_auto_vectorization.o
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -convert-linalg-to-loops
+          -expand-strided-metadata
+          -lower-affine 
+          -convert-scf-to-cf 
+          -convert-math-to-llvm 
+          -convert-vector-to-llvm 
+          -finalize-memref-to-llvm 
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm 
+          -reconcile-unrealized-casts|
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_auto_vectorization.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_auto_vectorization.o
 )
-add_library(BatchMatMulAutoVectorization STATIC batch_matmul_auto_vectorization.o)
-set_target_properties(BatchMatMulAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(dl-op-linalg-batch-matmul-benchmark
-  GoogleBenchmarkMain.cpp
-)
-
-set_target_properties(dl-op-linalg-batch-matmul-benchmark PROPERTIES
-  LINK_FLAGS "-static"
-)
-
-set(BenchmarkTool GoogleBenchmark)
-
+add_library(batch_matmul_auto_vectorization STATIC batch_matmul_auto_vectorization.o)
+set_target_properties(batch_matmul_auto_vectorization PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-op-linalg-batch-matmul-benchmark
-  ${BenchmarkTool}
-  BatchMatMulScalar
-  BatchMatMulAutoVectorization
+  batch_matmul_auto_vectorization
+)
+
+# BatchMatMul Vectorization
+add_custom_command(OUTPUT batch_matmul_vectorization.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulVec.mlir |
+          sed 's/@batch_matmul/@batch_matmul_vectorization/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -convert-linalg-to-loops
+          -expand-strided-metadata
+          -lower-affine 
+          -convert-scf-to-cf 
+          -convert-math-to-llvm 
+          -convert-vector-to-llvm 
+          -finalize-memref-to-llvm 
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm 
+          -reconcile-unrealized-casts|
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_vectorization.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_vectorization.o
+)
+add_library(batch_matmul_vectorization STATIC batch_matmul_vectorization.o)
+set_target_properties(batch_matmul_vectorization PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  batch_matmul_vectorization
+)
+
+# BatchMatMul Tiling Vectorization
+add_custom_command(OUTPUT batch_matmul_tilling_vectorization.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulVecTile.mlir |
+          sed 's/@batch_matmul/@batch_matmul_tile/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -convert-linalg-to-loops
+          -expand-strided-metadata
+          -lower-affine 
+          -convert-scf-to-cf 
+          -convert-math-to-llvm 
+          -convert-vector-to-llvm 
+          -finalize-memref-to-llvm 
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm 
+          -reconcile-unrealized-casts|
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_tilling_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_tilling_vectorization.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_tilling_vectorization.o
+)
+add_library(batch_matmul_tilling_vectorization STATIC batch_matmul_tilling_vectorization.o)
+set_target_properties(batch_matmul_tilling_vectorization PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  batch_matmul_tilling_vectorization
+)
+
+# BatchMatMul SCF
+add_custom_command(OUTPUT batch_matmul_scf.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulSCF.mlir |
+          sed 's/@batch_matmul/@batch_matmul_scf/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -convert-linalg-to-loops
+          -expand-strided-metadata
+          -lower-affine 
+          -convert-scf-to-cf 
+          -convert-math-to-llvm 
+          -convert-vector-to-llvm 
+          -finalize-memref-to-llvm 
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm 
+          -reconcile-unrealized-casts|
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_scf.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_scf.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_scf.o
+)
+add_library(batch_matmul_scf STATIC batch_matmul_scf.o)
+set_target_properties(batch_matmul_scf PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  batch_matmul_scf
+)
+
+# BatchMatMul Broadcast
+add_custom_command(OUTPUT batch_matmul_broadcast.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulBroadcast.mlir |
+          sed 's/@batch_matmul/@batch_matmul_broadcast/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -expand-strided-metadata
+          -affine-super-vectorize
+          -lower-affine
+          -convert-vector-to-llvm
+          -finalize-memref-to-llvm
+          -convert-scf-to-cf          
+          -llvm-request-c-wrappers
+          -convert-func-to-llvm
+          -reconcile-unrealized-casts | 
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_broadcast.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_broadcast.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_broadcast.o
+)
+add_library(batch_matmul_broadcast STATIC batch_matmul_broadcast.o)
+set_target_properties(batch_matmul_broadcast PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  batch_matmul_broadcast
+)
+
+# BatchMatMul Broadcast Openmp
+add_custom_command(OUTPUT batch_matmul_broadcast_omp.o
+  COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/BatchMatMulOp/BatchMatMulBroadcast.mlir |
+          sed 's/@batch_matmul/@batch_matmul_broadcast_omp/' |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-opt
+          -expand-strided-metadata
+          -affine-super-vectorize
+          -lower-affine
+          -convert-scf-to-openmp
+          -convert-vector-to-llvm
+          -finalize-memref-to-llvm
+          -convert-scf-to-cf
+          -llvm-request-c-wrappers
+          -convert-openmp-to-llvm
+          -convert-func-to-llvm
+          -reconcile-unrealized-casts |
+          ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-translate --buddy-to-llvmir -o batch_matmul_broadcast_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} batch_matmul_broadcast_omp.ll
+          -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/batch_matmul_broadcast_omp.o
+)
+add_library(batch_matmul_broadcast_omp STATIC batch_matmul_broadcast_omp.o)
+set_target_properties(batch_matmul_broadcast_omp PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(dl-op-linalg-batch-matmul-benchmark
+  ${OMP_SHARED_DIR}
+  batch_matmul_broadcast_omp
 )

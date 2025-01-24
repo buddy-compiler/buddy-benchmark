@@ -1,9 +1,4 @@
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
 add_custom_command(OUTPUT pooling_nhwc_sum_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/PoolingNhwcSumOp/PoolingNhwcSum.mlir |
@@ -16,10 +11,9 @@ add_custom_command(OUTPUT pooling_nhwc_sum_scalar.o
             -llvm-request-c-wrappers
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/PoolingNhwcSumOp/pooling_nhwc_sum_scalar.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o pooling_nhwc_sum_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} pooling_nhwc_sum_scalar.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/pooling_nhwc_sum_scalar.o
 )
 add_library(PoolingNhwcSumScalar STATIC pooling_nhwc_sum_scalar.o)
 set_target_properties(PoolingNhwcSumScalar PROPERTIES LINKER_LANGUAGE CXX)
@@ -35,17 +29,16 @@ add_custom_command(OUTPUT pooling_nhwc_sum_auto_vectorization.o
             -llvm-request-c-wrappers
             -convert-func-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-	          -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/PoolingNhwcSumOp/pooling_nhwc_sum_auto_vectorization.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o pooling_nhwc_sum_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} pooling_nhwc_sum_auto_vectorization.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/pooling_nhwc_sum_auto_vectorization.o
 )
 add_library(PoolingNhwcSumAutoVectorization STATIC pooling_nhwc_sum_auto_vectorization.o)
 set_target_properties(PoolingNhwcSumAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(dl-op-linalg-pooling-nhwc-sum-benchmark
   GoogleBenchmarkMain.cpp
-  )
+)
 
 set_target_properties(dl-op-linalg-pooling-nhwc-sum-benchmark PROPERTIES
   LINK_FLAGS "-static"
@@ -57,4 +50,4 @@ target_link_libraries(dl-op-linalg-pooling-nhwc-sum-benchmark
   ${BenchmarkTool}
   PoolingNhwcSumScalar
   PoolingNhwcSumAutoVectorization
-  )
+)

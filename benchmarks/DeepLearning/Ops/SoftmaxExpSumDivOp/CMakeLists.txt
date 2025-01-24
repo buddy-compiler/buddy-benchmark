@@ -1,9 +1,4 @@
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
 add_custom_command(OUTPUT softmaxexpsumdiv_scalar.o
   COMMAND cat ${BUDDY_SOURCE_DIR}/benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/SoftmaxExpSumDiv.mlir |
@@ -17,10 +12,9 @@ add_custom_command(OUTPUT softmaxexpsumdiv_scalar.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/softmaxexpsumdiv_scalar.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o softmaxexpsumdiv_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} softmaxexpsumdiv_scalar.ll
+            -c -save-temps -o softmaxexpsumdiv_scalar.o
 )
 add_library(SoftmaxExpSumDivScalar STATIC softmaxexpsumdiv_scalar.o)
 set_target_properties(SoftmaxExpSumDivScalar PROPERTIES LINKER_LANGUAGE CXX)
@@ -37,10 +31,9 @@ add_custom_command(OUTPUT softmaxexpsumdiv_auto_vectorization.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/SoftmaxExpSumDivOp/softmaxexpsumdiv_auto_vectorization.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o softmaxexpsumdiv_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} softmaxexpsumdiv_auto_vectorization.ll
+            -c -save-temps -o softmaxexpsumdiv_auto_vectorization.o
 )
 add_library(SoftmaxExpSumDivAutoVectorization STATIC softmaxexpsumdiv_auto_vectorization.o)
 set_target_properties(SoftmaxExpSumDivAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)

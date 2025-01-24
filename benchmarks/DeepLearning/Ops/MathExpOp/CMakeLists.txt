@@ -1,13 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
-project(MathExpBenchmark)
-
-# Define variables for the cross-compilation toolchain and options.
-if (CROSS_COMPILE_RVV)
-  set(RISCV_GNU_TOOLCHAIN ${BUDDY_MLIR_BUILD_DIR}/thirdparty/riscv-gnu-toolchain)
-  set(RISCV_GNU_TOOLCHAIN_SYSROOT ${RISCV_GNU_TOOLCHAIN}/sysroot)
-  set(BUDDY_OPT_TRIPLE riscv64)
-  set(BUDDY_OPT_ATTR +v,+m)
-endif()
+separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
 # Add custom commands for scalar implementation of math.exp
 add_custom_command(OUTPUT exp_scalar.o
@@ -22,10 +13,9 @@ add_custom_command(OUTPUT exp_scalar.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O0 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MathExpOp/exp_scalar.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o exp_scalar.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O0 ${CLANG_FLAGS_LIST} exp_scalar.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/exp_scalar.o
 )
 add_library(MathExpScalar STATIC exp_scalar.o)
 set_target_properties(MathExpScalar PROPERTIES LINKER_LANGUAGE CXX)
@@ -43,10 +33,9 @@ add_custom_command(OUTPUT exp_auto_vectorization.o
             -convert-func-to-llvm
             -convert-math-to-llvm
             -reconcile-unrealized-casts | 
-          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir |
-          ${LLVM_MLIR_BINARY_DIR}/llc -O3 -mtriple=${BUDDY_OPT_TRIPLE} 
-            -mattr=${BUDDY_OPT_ATTR} --filetype=obj 
-            -o ${BUDDY_BINARY_DIR}/../benchmarks/DeepLearning/Ops/MathExpOp/exp_auto_vectorization.o
+          ${LLVM_MLIR_BINARY_DIR}/mlir-translate --mlir-to-llvmir -o exp_auto_vectorization.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} exp_auto_vectorization.ll
+            -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/exp_auto_vectorization.o
 )
 add_library(MathExpAutoVectorization STATIC exp_auto_vectorization.o)
 set_target_properties(MathExpAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
