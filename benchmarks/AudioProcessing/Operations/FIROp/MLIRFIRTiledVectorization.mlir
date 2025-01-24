@@ -14,7 +14,9 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file provides the vectorized MLIR FIR function with tiling.
+// This file implements the vectorized FIR function using a tiling technique. 
+// following the same algorithm as Buddy's vectorize DAP pass:
+//    `--vectorize-dap="fir-vec-size=16 fir-tile-size=2048"`
 //
 //===----------------------------------------------------------------------===//
 
@@ -110,7 +112,7 @@ func.func @fir_tiled_vectorization(%input : memref<?xf32>, %kernel : memref<?xf3
       scf.for %i = %address to %upbound step %vl_step {
         %in_vec = vector.load %input[%i] : memref<?xf32>, vector<16xf32>
         %out_index = arith.addi %i, %n : index
-        %out_vec = vector.load %output[%out_index] : memref<?xf32>, vector<16xf32>  // 需要计算output的偏移量
+        %out_vec = vector.load %output[%out_index] : memref<?xf32>, vector<16xf32>
         %fma_vec = vector.fma %k_vec, %in_vec, %out_vec : vector<16xf32>
         vector.store %fma_vec, %output[%out_index] : memref<?xf32>, vector<16xf32>
       }

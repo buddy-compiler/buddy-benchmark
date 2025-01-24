@@ -14,7 +14,8 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file provides the MLIR Fir function.
+// This file implements the scalar version of the Fir function, following the 
+// same algorithm as Buddy's scalar version DAP pass: `--lower-dap`.
 //
 //===----------------------------------------------------------------------===//
 
