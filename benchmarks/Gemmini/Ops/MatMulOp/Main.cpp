@@ -18,6 +18,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "gemmini.h"
 #include "Utils.hpp"
 #include <buddy/Core/Container.h>
 
@@ -34,44 +35,63 @@
 // Global Variables and Functions. No need to change the code here.
 // -----------------------------------------------------------------------------
 
-static uint64_t readCycles() {
-  uint64_t cycles;
-  asm volatile("rdcycle %0" : "=r"(cycles));
-  return cycles;
-}
-
 intptr_t sizesA[2] = {_SIZE_M, _SIZE_K};
 intptr_t sizesB[2] = {_SIZE_K, _SIZE_N};
 intptr_t sizesC[2] = {_SIZE_M, _SIZE_N};
 intptr_t sizesD[2] = {_SIZE_M, _SIZE_N};
 int8_t *inputA = nullptr;
 int8_t *inputB = nullptr;
+int32_t *inputD = nullptr;
 MemRef<int8_t, 2> inputAMemRef(sizesA);
 MemRef<int8_t, 2> inputBMemRef(sizesB);
+MemRef<int32_t, 2> inputDMemRef(sizesD);
 
-// Runs the provided MatMul function for benchmarking.
-// template <typename Func>
-// void DL_OPS_MATMUL(benchmark::State &state, Func func) {
-//   MemRef<float, 2> outputMemRef(sizesC, 0.0);
-//   for (auto _ : state) {
-//     func(&inputAMemRef, &inputBMemRef, &outputMemRef);
-//   }
-//   benchmark::DoNotOptimize(outputMemRef);
-// }
+// By inserting assembly code to obtain clock cycles
+static uint64_t readCycles() {
+  uint64_t cycles;
+  asm volatile("rdcycle %0" : "=r"(cycles));
+  return cycles;
+}
 
-// using MLIRFunctionType = void (*)(MemRef<int8_t, 2> *,
-//                                   MemRef<int8_t, 2> *, 
-//                                   MemRef<int8_t, 2> *,
-//                                   MemRef<int32_t, 2> *);
-// //  Verifies the result of an MLIR-based function against expected output.
-// void MLIRVerification(float *outputExpected, MLIRFunctionType MLIRFunc,
-//                       const std::string &name) {
-//   MemRef<float, 2> outputMemRef(sizesC, 0);
-//   MLIRFunc(&inputAMemRef, &inputBMemRef, &outputMemRef);
-//   float *outputOptimized = outputMemRef.getData();
-//   matmul::verify<float>(outputExpected, outputOptimized, _SIZE_M, _SIZE_N,
-//                         name);
-// }
+// Gemmini native matmul function
+void gemminiMatmul(
+  int8_t *inputA, int8_t *inputB, 
+  int8_t *outputC, int32_t *inputD){
+
+  uint64_t start = readCycles();
+  tiled_matmul_auto(
+    _SIZE_M, _SIZE_N, _SIZE_K,
+    inputA, inputB, inputD, outputC,
+    _SIZE_K, _SIZE_N, _SIZE_N, _SIZE_N,
+    MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
+    NO_ACTIVATION, ACC_SCALE_IDENTITY, 0,
+    false,
+    false, false,
+    false, false,
+    0,
+    WS
+  );
+  uint64_t end = readCycles();
+  std::cout << "Gemmini native matmul cycles: " << end - start << std::endl;
+
+}
+
+using MLIRFunctionType = void (*)(MemRef<int8_t, 2> *,
+                                  MemRef<int8_t, 2> *, 
+                                  MemRef<int8_t, 2> *,
+                                  MemRef<int32_t, 2> *);
+//  Verifies the result of an MLIR-based function against expected output.
+void MLIRVerification(int8_t *outputExpected, MLIRFunctionType MLIRFunc,
+                      const std::string &name) {
+  MemRef<int8_t, 2> outputMemRef(sizesC, 0);
+  uint64_t start = readCycles();
+  MLIRFunc(&inputAMemRef, &inputBMemRef, &outputMemRef, &inputDMemRef);
+  uint64_t end = readCycles();
+  std::cout << name << " cycles: " << end - start << std::endl;
+  int8_t *outputOptimized = outputMemRef.getData();
+  matmul::verify<int8_t>(outputExpected, outputOptimized, _SIZE_M, _SIZE_N,
+                        name);
+}
 
 // -----------------------------------------------------------------------------
 // MLIR Benchmark. You can compare your new method with other methods here.
@@ -80,14 +100,10 @@ MemRef<int8_t, 2> inputBMemRef(sizesB);
 extern "C" {
 void _mlir_ciface_gemmini_matmul1(MemRef<int8_t, 2>  *input0,
                                   MemRef<int8_t, 2>  *input1,
-                                  MemRef<int8_t, 2>  *bias,
-                                  MemRef<int32_t, 2> *output);
+                                  MemRef<int8_t, 2>  *output,
+                                  MemRef<int32_t, 2> *bias);
 /// [Step 1] Add function of your new method.
 }
-// BENCHMARK_CAPTURE(DL_OPS_MATMUL, scalar_O0, _mlir_ciface_gemmini_matmul1)
-//     ->Unit(benchmark::kMillisecond)
-//     ->Iterations(_NUM_ITER);
-/// [Step 2] Call GoogleBenchmark function to run your new method.
 
 // -----------------------------------------------------------------------------
 // Main Function. You can verify the correctness of your new method here.
@@ -97,28 +113,18 @@ int main(int argc, char **argv) {
   // Initialize input data.
   inputA = matmul::allocArray<int8_t>(_SIZE_M, _SIZE_K);
   inputB = matmul::allocArray<int8_t>(_SIZE_K, _SIZE_N);
+  inputD = matmul::allocArray<int32_t>(_SIZE_M, _SIZE_N);
   inputAMemRef = MemRef<int8_t, 2>(inputA, sizesA);
   inputBMemRef = MemRef<int8_t, 2>(inputB, sizesB);
-  MemRef<int8_t, 2> inputDMemRef(sizesD, 0);
-
-  // for (int i = 0; i < _SIZE_M; i++) {
-  //   for (int j = 0; j < _SIZE_N; j++) {
-  //     std::cout << static_cast<int>(inputA[i * _SIZE_N + j]) << " ";
-  //   }
-  //   std::cout << std::endl;
-  // }
-
-  // Run benchmark.
-  // ::benchmark::Initialize(&argc, argv);
-  // ::benchmark::RunSpecifiedBenchmarks();
+  inputDMemRef = MemRef<int32_t, 2>(inputD, sizesD);
 
   std::cout << "\033[34m---------- Verification ----------\033[0m" << std::endl;
-  // Attain scalar output results as expected output results in verification.
-  MemRef<int32_t, 2> outputMemrefScalar(sizesC, 0);
-  _mlir_ciface_gemmini_matmul1(&inputAMemRef, &inputBMemRef, &inputDMemRef, &outputMemrefScalar);
-  int32_t *outputExpected = outputMemrefScalar.getData();
+  // Attain Gemmini native matmul output results as expected output results in verification.
+  int8_t* outputExpected = new int8_t[_SIZE_M * _SIZE_N];
+  gemminiMatmul(inputA, inputB, outputExpected, inputD);
 
   /// [Step 3] Add your new method for verification.
+  MLIRVerification(outputExpected, _mlir_ciface_gemmini_matmul1, "Buddy Gemmini MatMul");
 
   delete[] inputA;
   delete[] inputB;

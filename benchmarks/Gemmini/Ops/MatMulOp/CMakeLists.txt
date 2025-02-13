@@ -35,6 +35,8 @@ add_executable(dl-op-gemmini-matmul-benchmark Main.cpp)
 
 target_include_directories(dl-op-gemmini-matmul-benchmark
   PRIVATE
+  ${GEMMINI_INCLUDE_DIR}
+  ${GEMMINI_INCLUDE_DIR}/../
   ${INTERFACES}
 )
 
