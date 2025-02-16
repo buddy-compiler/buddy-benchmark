@@ -5,7 +5,14 @@ set(BUDDY_LLC ${BUDDY_MLIR_BUILD_DIR}/bin/buddy-llc)
 set(INTERFACES /home/xychen/buddy-mlir/frontend/Interfaces)
 
 set(CMAKE_CXX_COMPILER riscv64-unknown-linux-gnu-g++)
+set(CMAKE_C_COMPILER riscv64-unknown-linux-gnu-gcc)
 
+include_directories(
+  ${BENCHMARKS_DIR}
+  ${GEMMINI_INCLUDE_DIR}
+  ${GEMMINI_INCLUDE_DIR}/../
+  ${INTERFACES}
+)
 
 if (NOT DEFINED ENV{RISCV})
   message(FATAL_ERROR "Can't find RISCV environment variable(missing: RISCV_TOOLCHAIN)")
@@ -14,7 +21,7 @@ endif()
 # CMAKE_C_FLAGS is set when configuring cmake.
 separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
-add_custom_command(OUTPUT matmul.o
+add_custom_command(OUTPUT buddy_matmul.o
   COMMAND ${BUDDY_OPT} ${CMAKE_CURRENT_SOURCE_DIR}/matmul.mlir 
             -llvm-request-c-wrappers 
             -convert-linalg-to-gemmini 
@@ -23,28 +30,17 @@ add_custom_command(OUTPUT matmul.o
             ${BUDDY_TRANSLATE} -buddy-to-llvmir | 
             ${BUDDY_LLC} -filetype=obj -mtriple=riscv64 
               -mattr=+buddyext,+D -float-abi=hard 
-              -o matmul.o 
+              -o buddy_matmul.o 
 )
-add_library(GemminiMatMul STATIC matmul.o)
-set_target_properties(GemminiMatMul PROPERTIES LINKER_LANGUAGE CXX)
+add_library(BuddyMatMul STATIC buddy_matmul.o)
+set_target_properties(BuddyMatMul PROPERTIES LINKER_LANGUAGE C)
 
-add_library(Utils STATIC Utils.hpp)
-set_target_properties(Utils PROPERTIES LINKER_LANGUAGE CXX)
+add_library(ExoMatMul STATIC ExoMatmul.c)
+set_target_properties(ExoMatMul PROPERTIES LINKER_LANGUAGE C)
 
 add_executable(dl-op-gemmini-matmul-benchmark Main.cpp)
-
-target_include_directories(dl-op-gemmini-matmul-benchmark
-  PRIVATE
-  ${GEMMINI_INCLUDE_DIR}
-  ${GEMMINI_INCLUDE_DIR}/../
-  ${INTERFACES}
-)
-
 target_link_libraries(dl-op-gemmini-matmul-benchmark
   -static
-  GemminiMatMul
-  Utils
+  ExoMatMul
+  BuddyMatMul
 )
-
-
-# Build the target for your new method here.
