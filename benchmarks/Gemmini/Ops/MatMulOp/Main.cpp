@@ -57,9 +57,9 @@ void _exo_matmul_4(const float *scale, bool act, const int8_t *A,
 // Global Variables.
 // -----------------------------------------------------------------------------
 
-static int8_t inputA[_SIZE_M * _SIZE_K];
-static int8_t inputB[_SIZE_K * _SIZE_N];
-static int32_t inputBias[_SIZE_M * _SIZE_N];
+static int8_t inputA[_SIZE_M * _SIZE_K] row_align(1);
+static int8_t inputB[_SIZE_K * _SIZE_N] row_align(1);
+static int32_t inputBias[_SIZE_M * _SIZE_N] row_align(1);
 intptr_t sizesA[2] = {_SIZE_M, _SIZE_K};
 intptr_t sizesB[2] = {_SIZE_K, _SIZE_N};
 intptr_t sizesOutput[2] = {_SIZE_M, _SIZE_N};
@@ -93,8 +93,11 @@ using MLIRFunctionType = void (*)(MemRef<int8_t, 2> *, MemRef<int8_t, 2> *,
                                   MemRef<int8_t, 2> *, MemRef<int32_t, 2> *);
 void buddyMatmul(int8_t *outputExpected, MLIRFunctionType MLIRFunc,
                  const std::string &name) {
+  int8_t output[_SIZE_M * _SIZE_N] row_align(1) = {0} ;
   MemRef<int8_t, 2> outputMemRef(sizesOutput, 0);
+  outputMemRef = MemRef<int8_t, 2>(output, sizesOutput);
   MemRef<int32_t, 2> inputBiasMemRef(sizesBias, _BIAS);
+  inputBiasMemRef = MemRef<int32_t, 2>(inputBias, sizesBias);
   uint64_t start = gemmini::readCycles();
   MLIRFunc(&inputAMemRef, &inputBMemRef, &outputMemRef, &inputBiasMemRef);
   uint64_t end = gemmini::readCycles();
@@ -107,7 +110,10 @@ void buddyMatmul(int8_t *outputExpected, MLIRFunctionType MLIRFunc,
 
 // Exo-lang matmul benchmark function.
 void exoMatmul(int8_t *outputExpected) {
-  static int8_t outputExoMatmul[_SIZE_M * _SIZE_N] = {0};
+  static int8_t outputExoMatmul[_SIZE_M * _SIZE_N] row_align(1);
+  for (int i = 0; i < _SIZE_M * _SIZE_N; i++) {
+    outputExoMatmul[i] = 0;
+  }
   uint64_t start = gemmini::readCycles();
   _exo_matmul_4(c_scale, false, inputA, inputB, outputExoMatmul);
   uint64_t end = gemmini::readCycles();
@@ -148,7 +154,7 @@ int main() {
 
   std::cout << "\033[34m---------- Verification ----------\033[0m" << std::endl;
 
-  int8_t outputExpected[_SIZE_M * _SIZE_N] = {0};
+  int8_t outputExpected[_SIZE_M * _SIZE_N] row_align(1) = {0} ;
 
   nativeMatmul(inputA, inputB, outputExpected, inputBias);
 
