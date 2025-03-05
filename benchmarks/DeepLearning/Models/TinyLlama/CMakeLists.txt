@@ -10,9 +10,7 @@ add_custom_command(
 add_executable(dl-model-tinyllama-benchmark
   Main.cpp
 )
-set_target_properties(dl-model-tinyllama-benchmark PROPERTIES
-  LINK_FLAGS "-static"
-)
+
 target_link_libraries(dl-model-tinyllama-benchmark
   GoogleBenchmark
 )
@@ -134,8 +132,8 @@ add_custom_command(
       -empty-tensor-to-alloc-tensor
       -convert-elementwise-to-linalg
       -one-shot-bufferize
-      -matmul-parallel-vectorization-optimize # new added
-      -batchmatmul-optimize # new added
+      -matmul-parallel-vectorization-optimize # matmul optimization
+      -batchmatmul-optimize # batchmatmul optimization
       -convert-linalg-to-affine-loops
       -lower-affine
       -func-bufferize
@@ -155,10 +153,9 @@ add_custom_command(
       -convert-func-to-llvm
       -reconcile-unrealized-casts |
     ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_matmul_opt.ll
-  COMMAND 
-    ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_matmul_opt.ll
+    COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_matmul_opt.ll
       -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_matmul_opt.o
-  DEPENDS 
+    DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
   COMMENT "Building subgraph0_matmul_opt.o"
   VERBATIM
@@ -168,5 +165,79 @@ add_library(tinyllama_matmul_opt STATIC subgraph0_matmul_opt.o forward_matmul_op
 set_target_properties(tinyllama_matmul_opt PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(dl-model-tinyllama-benchmark
   tinyllama_matmul_opt
+  ${BUDDY_LIB_DIR}/libStaticMLIRCRunnerUtils.a
+)
+
+################################################################################
+#
+# Build matmul/batch_matmul optimization target with openmp.
+#
+################################################################################
+add_custom_command(
+  OUTPUT forward_matmul_opt_omp.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir |
+    sed -e {s/@forward/@forward_matmul_opt_omp/} |
+    sed -e {s/@subgraph0/@subgraph0_matmul_opt_omp/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -expand-strided-metadata
+    -finalize-memref-to-llvm
+    -llvm-request-c-wrappers
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_matmul_opt_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} forward_matmul_opt_omp.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/forward_matmul_opt_omp.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/forward.mlir
+  COMMENT "Building forward_matmul_opt_omp.o"
+  VERBATIM)
+
+add_custom_command(
+  OUTPUT subgraph0_matmul_opt_omp.o
+  COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
+    sed -e {s/@subgraph0/@subgraph0_matmul_opt_omp/} |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-opt
+    -pass-pipeline 
+    "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |
+  ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
+    -eliminate-empty-tensors
+    -empty-tensor-to-alloc-tensor
+    -convert-elementwise-to-linalg
+    -one-shot-bufferize
+    -matmul-parallel-vectorization-optimize #  # matmul optimization
+    -batchmatmul-optimize #  # batchmatmul optimization
+    -convert-linalg-to-affine-loops
+    -lower-affine
+    -convert-scf-to-openmp # openmp support
+    -func-bufferize
+    -tensor-bufferize
+    -arith-bufferize
+    -buffer-deallocation
+    -finalizing-bufferize
+    -convert-vector-to-scf
+    -expand-strided-metadata
+    -convert-vector-to-llvm
+    -finalize-memref-to-llvm
+    -convert-scf-to-cf
+    -llvm-request-c-wrappers
+    -convert-openmp-to-llvm # openmp support
+    -convert-arith-to-llvm
+    -convert-math-to-llvm
+    -convert-math-to-libm 
+    -convert-func-to-llvm
+    -reconcile-unrealized-casts |
+  ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_matmul_opt_omp.ll
+  COMMAND ${LLVM_MLIR_BINARY_DIR}/clang -O3 ${CLANG_FLAGS_LIST} subgraph0_matmul_opt_omp.ll
+    -c -save-temps -o ${CMAKE_CURRENT_BINARY_DIR}/subgraph0_matmul_opt_omp.o
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir
+  COMMENT "Building subgraph0_matmul_opt_omp.o"
+  VERBATIM)
+add_library(tinyllama_matmul_opt_omp subgraph0_matmul_opt_omp.o forward_matmul_opt_omp.o)
+set_target_properties(tinyllama_matmul_opt_omp PROPERTIES LINKER_LANGUAGE CXX)
+
+target_link_libraries(dl-model-tinyllama-benchmark
+  ${OMP_SHARED_DIR}
+  tinyllama_matmul_opt_omp
   ${BUDDY_LIB_DIR}/libStaticMLIRCRunnerUtils.a
 )

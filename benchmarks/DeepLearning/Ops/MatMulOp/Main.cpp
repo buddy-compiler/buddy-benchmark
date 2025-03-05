@@ -26,7 +26,7 @@
 // Benchmark Configuration. You can change the number here as needed.
 // -----------------------------------------------------------------------------
 
-#define _NUM_ITER 5
+#define _NUM_ITER 1
 #define _SIZE_M 40
 #define _SIZE_N 4096
 #define _SIZE_K 4096

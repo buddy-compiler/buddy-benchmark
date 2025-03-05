@@ -128,7 +128,7 @@ set_target_properties(matmul_vec_omp PROPERTIES LINKER_LANGUAGE CXX)
 target_link_directories(dl-op-linalg-matmul-benchmark PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
 target_link_libraries(dl-op-linalg-matmul-benchmark
   matmul_vec_omp
-  omp
+  ${OMP_SHARED_DIR}
 )
 
 # Build the target for your new method here.

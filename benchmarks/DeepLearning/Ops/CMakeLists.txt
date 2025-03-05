@@ -23,6 +23,4 @@ add_subdirectory(MatMulTransposeBOp)
 
 if (CROSS_COMPILE_RVV)
 add_subdirectory(Conv2DNhwcFhwcInt32Op)
-add_subdirectory(BatchMatMulInt32Op)
-add_subdirectory(MatMulInt32Op)
 endif()

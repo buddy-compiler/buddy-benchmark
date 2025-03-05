@@ -1,3 +1,5 @@
+set(BENCHMARKS_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 if(IMAGE_PROCESSING_BENCHMARKS)
   add_subdirectory(ImageProcessing)
 endif()
