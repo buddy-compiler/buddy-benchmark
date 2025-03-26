@@ -35,12 +35,17 @@ void initializeOpenCVMorph2D(char **);
 void initializeOpenCVFilter2D(char **);
 void initializeEigenConvolve2D(char **, Img<float, 2>);
 void initializeBuddyResize2D(char **, Img<float, 2>);
+void initializeBuddyRotate2D(char **, Img<float, 2>);
+void initializeBuddyRotate4D(char **);
 void initializeOpenCVResize2D(char **);
+void initializeOpenCVRotate2D(char **);
 
 void generateResultMLIRConv2D(Img<float, 2>);
 void generateResultBuddyConv2D(Img<float, 2>);
 void generateResultBuddyCorr2D(char **argv, Img<float, 2>);
 void generateResultBuddyResize2D(char **argv, Img<float, 2>);
+void generateResultBuddyRotate2D(char **argv, Img<float, 2>);
+void generateResultBuddyRotate4D(char **);
 void generateResultBuddyErosion2D(char **, Img<float, 2>);
 void generateResultBuddyOpening2D(char **, Img<float, 2>);
 void generateResultBuddyClosing2D(char **, Img<float, 2>);
@@ -57,6 +62,7 @@ void generateResultOpenCVTopHat2D();
 void generateResultOpenCVBottomHat2D();
 void generateResultOpenCVMorphGrad2D();
 void generateResultOpenCVResize2D();
+void generateResultOpenCVRotate2D();
 void generateResultEigenConvolve2D();
 
 void registerBenchmarkBuddyCorr2D();
@@ -76,7 +82,10 @@ void registerBenchmarkOpenCVBottomHat2D();
 void registerBenchmarkOpenCVMorphGrad2D();
 void registerBenchmarkOpenCVFilter2D();
 void registerBenchmarkBuddyResize2D();
+void registerBenchmarkBuddyRotate2D();
+void registerBenchmarkBuddyRotate4D();
 void registerBenchmarkOpenCVResize2D();
+void registerBenchmarkOpenCVRotate2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
@@ -103,12 +112,18 @@ int main(int argc, char **argv) {
   initializeOpenCVFilter2D(argv);
   initializeEigenConvolve2D(argv, img);
   initializeBuddyResize2D(argv, img);
+  initializeBuddyRotate2D(argv, img);
+  initializeBuddyRotate4D(argv);
   initializeOpenCVResize2D(argv);
+  initializeOpenCVRotate2D(argv);
 
   registerBenchmarkBuddyCorr2D();
   registerBenchmarkOpenCVFilter2D();
   registerBenchmarkBuddyResize2D();
+  registerBenchmarkBuddyRotate2D();
+  registerBenchmarkBuddyRotate4D();
   registerBenchmarkOpenCVResize2D();
+  registerBenchmarkOpenCVRotate2D();
   registerBenchmarkBuddyErosion2D();
   registerBenchmarkBuddyDilation2D();
   registerBenchmarkBuddyOpening2D();
@@ -131,6 +146,8 @@ int main(int argc, char **argv) {
   generateResultOpenCVFilter2D();
   generateResultBuddyConv2D(img);
   generateResultBuddyCorr2D(argv, img);
+  generateResultBuddyRotate2D(argv, img);
+  generateResultBuddyRotate4D(argv);
   generateResultBuddyResize2D(argv, img);
   generateResultBuddyErosion2D(argv, img);
   generateResultBuddyDilation2D(argv, img);
@@ -147,6 +164,7 @@ int main(int argc, char **argv) {
   generateResultOpenCVOpening2D();
   generateResultOpenCVClosing2D();
   generateResultOpenCVResize2D();
+  generateResultOpenCVRotate2D();
   generateResultEigenConvolve2D();
 
   return 0;
