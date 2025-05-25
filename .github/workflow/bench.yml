@@ -2,7 +2,7 @@ name: Buddy-Benchmark CI
 
 on:
   push:
-    branches: [main]        # or whatever branch should trigger the run
+    branches: ['**']       # or whatever branch should trigger the run
   pull_request:
 
 jobs:
