@@ -1,0 +1,6 @@
+Vectorization Benchmark - Sun May 25 19:22:50 UTC 2025
+[Info] Running CMake configuration...
+CMake Error: The source directory "/home/buddy-complier-workspace/buddy-benchmark/test" does not appear to contain CMakeLists.txt.
+Specify --help for usage, or press the help button on the CMake GUI.
+[Info] Building vectorization-matrix-benchmark...
+ninja: error: loading 'build.ninja': No such file or directory

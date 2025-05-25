@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-apt update
-apt install -y libc6-riscv64-cross
-apt install -y \
-     libc6-riscv64-cross       \
-     libstdc++6-riscv64-cross  \
-     libgcc-s1-riscv64-cross 
+# apt update
+# apt install -y libc6-riscv64-cross
+# apt install -y \
+#      libc6-riscv64-cross       \
+#      libstdc++6-riscv64-cross  \
+#      libgcc-s1-riscv64-cross 
 ################################################################################
 # 1. Script Setup
 ################################################################################
@@ -30,6 +30,9 @@ echo "Vectorization Benchmark - $(date)" > "${LOG_FILE}"
 ################################################################################
 # 2. Build Benchmark
 ################################################################################
+cd /home/buddy-complier-workspace/buddy-benchmark
+echo "[Info] Starting vectorization-matrix-benchmark build..." | tee -a "${LOG_FILE}"
+rm -rf build
 mkdir -p build && cd build
 echo "[Info] Running CMake configuration..." | tee -a "${LOG_FILE}"
 cmake -G Ninja .. \
