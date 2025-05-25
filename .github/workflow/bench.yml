@@ -1,0 +1,70 @@
+name: Buddy-Benchmark CI
+
+on:
+  push:
+    branches: [main]        # or whatever branch should trigger the run
+  pull_request:
+
+jobs:
+  bench:
+    runs-on: self-hosted    # your own actions-runner machine
+    permissions:
+      contents: read
+      pages: write
+      id-token: write       # required by Pages deploy
+
+    steps:
+    # ------------------------------------------------------------
+    # 1) check out the two source trees side-by-side
+    # ------------------------------------------------------------
+    - uses: actions/checkout@v4
+      with: {path: buddy-benchmark}
+
+    - uses: actions/checkout@v4
+      with:
+        repository: BuddyCompiler/buddy-mlir   # adjust if fork
+        path: buddy-mlir
+
+    # ------------------------------------------------------------
+    # 2) run everything in the Docker sandbox
+    # ------------------------------------------------------------
+    - name: Build & run benchmarks in container
+      working-directory: buddy-benchmark
+      run: |
+        chmod +x scripts/run_docker.sh
+        scripts/run_docker.sh
+
+    # after the script we have ./test_result in the workspace ---------
+
+    # ------------------------------------------------------------
+    # 3) keep a raw download for debugging
+    # ------------------------------------------------------------
+    - name: Upload raw logs as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vectorization-logs-${{ github.sha }}
+        path: buddy-benchmark/test_result
+        retention-days: 30
+
+    # ------------------------------------------------------------
+    # 4) convert *.log → HTML
+    # ------------------------------------------------------------
+    - name: Build mini-site
+      working-directory: buddy-benchmark
+      run: |
+        python scripts/logs2html.py test_result site
+
+    # ------------------------------------------------------------
+    # 5) publish the site to GitHub Pages
+    # ------------------------------------------------------------
+    - name: Upload site artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: buddy-benchmark/site
+
+    - name: Deploy to Pages
+      id: deploy
+      uses: actions/deploy-pages@v4
+
+    outputs:
+      page_url: ${{ steps.deploy.outputs.page_url }}

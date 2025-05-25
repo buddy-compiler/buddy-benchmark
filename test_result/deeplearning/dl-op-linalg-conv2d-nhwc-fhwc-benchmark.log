@@ -1,4 +1,4 @@
-2025-03-30T12:13:18+00:00
+2025-05-25T16:33:50+00:00
 Running ./dl-op-linalg-conv2d-nhwc-fhwc-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.36, 5.95
+Load Average: 1.00, 1.13, 3.52
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ---------------------------------------------------------------------------------------------------
 Benchmark                                                         Time             CPU   Iterations
 ---------------------------------------------------------------------------------------------------
-DL_OPS_CONV_2D_NHWC_FHWC/scalar/iterations:5                   73.5 ms         73.5 ms            5
-DL_OPS_CONV_2D_NHWC_FHWC/auto_vectorization/iterations:5       9.35 ms         9.35 ms            5
+DL_OPS_CONV_2D_NHWC_FHWC/scalar/iterations:5                   72.3 ms         72.3 ms            5
+DL_OPS_CONV_2D_NHWC_FHWC/auto_vectorization/iterations:5       9.34 ms         9.34 ms            5
 DL_OPS_CONV_2D_NHWC_FHWC/vectorization/iterations:5            1.74 ms         1.74 ms            5
 DL_OPS_CONV_2D_NHWC_FHWC/vec_tile/iterations:5                 1.73 ms         1.73 ms            5
 [34m---------- Verification ----------[0m

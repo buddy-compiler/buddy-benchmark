@@ -1,4 +1,4 @@
-2025-03-30T12:13:39+00:00
+2025-05-25T16:34:11+00:00
 Running ./dl-op-linalg-arithsubf-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.34, 5.84
+Load Average: 1.00, 1.12, 3.47
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------
 Benchmark                          Time             CPU   Iterations
 --------------------------------------------------------------------
-BM_SUBF_SCALAR                 0.029 ms        0.029 ms        23697
-BM_SUBF_AutoVectorization      0.004 ms        0.004 ms       147910
+BM_SUBF_SCALAR                 0.030 ms        0.030 ms        23752
+BM_SUBF_AutoVectorization      0.005 ms        0.005 ms       174941
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m
