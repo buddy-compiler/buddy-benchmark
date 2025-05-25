@@ -33,7 +33,7 @@ jobs:
     # ------------------------------------------------------------
     - name: Build & run benchmarks
       run: |
-        /home/quliu/buddy-complier-workspace/buddy-benchmark/scripts/run_docker.sh
+        /home/quliu/buddy-complier-workspace/run_docker.sh
 
     # ------------------------------------------------------------
     # 3-5) (UNCHANGED) upload raw logs, convert to HTML, deploy Pages
