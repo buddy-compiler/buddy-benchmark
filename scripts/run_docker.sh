@@ -23,3 +23,4 @@ docker exec "${CID}" bash -lc '
 
 # ➌ bring the logs back to the host (under ./test_result)
 docker cp "${CID}":/home/buddy-complier-workspace/buddy-benchmark/test_result ./test_result
+
