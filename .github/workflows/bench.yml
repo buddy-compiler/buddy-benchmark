@@ -17,22 +17,21 @@ jobs:
     # ------------------------------------------------------------
     # 1) check out the two source trees side-by-side
     # ------------------------------------------------------------
-    - uses: actions/checkout@v4
-      with: {path: buddy-benchmark}
-
-    - uses: actions/checkout@v4
-      with:
-        repository: BuddyCompiler/buddy-mlir   # adjust if fork
-        path: buddy-mlir
+    - name: Update local clones
+      run: |
+        set -e
+        cd /home/quliu/buddy-complier-workspace/buddy-benchmark
+        git pull --ff-only
 
     # ------------------------------------------------------------
     # 2) run everything in the Docker sandbox
     # ------------------------------------------------------------
-    - name: Build & run benchmarks in container
-      working-directory: buddy-benchmark
+    - name: Build & run benchmarks
       run: |
-        chmod +x scripts/run_docker.sh
-        scripts/run_docker.sh
+        cd /home/quliu/buddy-complier-workspace/
+        chmod +x /home/quliu/buddy-complier-workspace/buddy-benchmark/scripts/run_docker.sh
+        /home/quliu/buddy-complier-workspace/buddy-benchmark/scripts/run_docker.sh
+
 
     # after the script we have ./test_result in the workspace ---------
 
