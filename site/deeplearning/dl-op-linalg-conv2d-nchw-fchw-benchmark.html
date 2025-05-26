@@ -1,0 +1,20 @@
+<h2>deeplearning/dl-op-linalg-conv2d-nchw-fchw-benchmark.log</h2><p>2025-05-26 14:27:29 UTC</p><pre>2025-05-25T16:33:46+00:00
+Running ./dl-op-linalg-conv2d-nchw-fchw-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.00, 1.13, 3.54
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-------------------------------------------------------------------
+Benchmark                         Time             CPU   Iterations
+-------------------------------------------------------------------
+BM_Conv2DNchwFchw_SCALAR        282 ms          282 ms            2
+BM_Conv2DNchwFchw_Im2col       8.35 ms         8.35 ms           86
+-----------------------------------------------------------
+Correctness Verification:
+Transform case: [32mPASS[0m
+-----------------------------------------------------------
+</pre>

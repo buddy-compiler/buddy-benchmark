@@ -1,0 +1,23 @@
+<h2>deeplearning/dl-op-linalg-matmul-benchmark.log</h2><p>2025-05-26 14:27:29 UTC</p><pre>2025-05-25T16:33:36+00:00
+Running ./dl-op-linalg-matmul-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.00, 1.13, 3.57
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-------------------------------------------------------------------------------
+Benchmark                                     Time             CPU   Iterations
+-------------------------------------------------------------------------------
+DL_OPS_MATMUL/scalar_O0/iterations:1       3394 ms         3394 ms            1
+DL_OPS_MATMUL/scalar_O3/iterations:1       2944 ms         2944 ms            1
+DL_OPS_MATMUL/tile/iterations:1             120 ms          120 ms            1
+DL_OPS_MATMUL/vec/iterations:1              139 ms          139 ms            1
+DL_OPS_MATMUL/vec_omp/iterations:1         67.8 ms         17.8 ms            1
+[34m---------- Verification ----------[0m
+tile [32mPASS[0m
+vec [32mPASS[0m
+vec_omp [32mPASS[0m
+</pre>
