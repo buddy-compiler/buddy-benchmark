@@ -1,0 +1,22 @@
+<h2>deeplearning/dl-op-matmul-transpose-b-benchmark.log</h2><p>2025-05-26 14:41:51 UTC</p><pre>2025-05-25T16:34:22+00:00
+Running ./dl-op-matmul-transpose-b-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.00, 1.11, 3.44
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-----------------------------------------------------------------------------------------------
+Benchmark                                                     Time             CPU   Iterations
+-----------------------------------------------------------------------------------------------
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O0/iterations:5           1262 ms         1262 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3/iterations:5            311 ms          311 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3_omp/iterations:5       33.9 ms         22.0 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/vec/iterations:5                 85.3 ms         85.3 ms            5
+[34m---------- Verification ----------[0m
+scalar_O3 [32mPASS[0m
+scalar_O3_omp [32mPASS[0m
+vec [32mPASS[0m
+</pre>

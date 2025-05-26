@@ -1,0 +1,63 @@
+# .github/workflows/bench.yml
+name: Buddy-Benchmark CI
+
+on:
+  push:            # fire on any branch
+    branches: ['**']
+  pull_request:
+
+jobs:
+  bench:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+    # ------------------------------------------------------------
+    # 1) update the two local clones so they match the commit that
+    #    triggered the run (fast-forward only for safety)
+    # ------------------------------------------------------------
+    - name: Update local clones
+      run: |
+        set -e
+        for dir in buddy-benchmark buddy-mlir; do
+          cd /home/quliu/buddy-complier-workspace/$dir
+          git remote update
+          git pull --ff-only
+        done
+
+    # ------------------------------------------------------------
+    # 2) run everything in the Docker sandbox
+    # ------------------------------------------------------------
+    - name: Build & run benchmarks
+      run: |
+        /home/quliu/buddy-complier-workspace/run_docker.sh
+
+    # ------------------------------------------------------------
+    # 3-5) (UNCHANGED) upload raw logs, convert to HTML, deploy Pages
+    # ------------------------------------------------------------
+    - name: Upload raw logs as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vectorization-logs-${{ github.sha }}
+        path: /home/quliu/buddy-complier-workspace/buddy-benchmark/test_result
+        retention-days: 30
+
+    - name: Build mini-site
+      working-directory: /home/quliu/buddy-complier-workspace/buddy-benchmark
+      run: |
+        python3 scripts/logs2html.py test_result site
+
+    - name: Upload site artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: /home/quliu/buddy-complier-workspace/buddy-benchmark/site
+
+    - name: Deploy to Pages
+      id: deploy
+      uses: actions/deploy-pages@v4
+
+    outputs:
+      page_url: ${{ steps.deploy.outputs.page_url }}

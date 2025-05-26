@@ -1,0 +1,20 @@
+<h2>deeplearning/dl-op-linalg-mathrsqrt-benchmark.log</h2><p>2025-05-26 14:41:51 UTC</p><pre>2025-05-25T16:34:15+00:00
+Running ./dl-op-linalg-mathrsqrt-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.00, 1.11, 3.46
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+---------------------------------------------------------------------
+Benchmark                           Time             CPU   Iterations
+---------------------------------------------------------------------
+BM_RSQRT_SCALAR                 0.073 ms        0.073 ms         9557
+BM_RSQRT_AutoVectorization      0.004 ms        0.004 ms       161107
+-----------------------------------------------------------
+Correctness Verification:
+Transform case: [32mPASS[0m
+-----------------------------------------------------------
+</pre>
