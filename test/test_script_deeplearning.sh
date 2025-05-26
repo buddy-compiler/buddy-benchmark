@@ -117,24 +117,35 @@ for target in "${BENCHMARK_TARGETS[@]}"; do
 done
 
 ################################################################################
+################################################################################
 # 5. Run Each Benchmark & Redirect Output (Continue Even If One Fails)
 ################################################################################
 cd bin || exit 1
 
 RUN_LOG="${BENCHMARK_PATH}/test_result/deeplearning/run_results_summary.log"
-> "${RUN_LOG}"  # Clear/create the file
+> "${RUN_LOG}"        # clear / create the file
 
 echo "[Info] Running all benchmarks in ./bin..."
 for target in "${BENCHMARK_TARGETS[@]}"; do
-  if [ -f "${target}" ]; then
+  if [[ -f "${target}" ]]; then
     echo "==> Running ${target}"
-    if "./${target}" > "${BENCHMARK_PATH}/test_result/deeplearning/${target}.log" 2>&1; then
-      echo "[Success] Run of '${target}'" | tee -a "${RUN_LOG}"
-      echo "    Output saved to test_result/deeplearning/${target}.log"
+
+    # ---- NEW: dump a machine-readable report next to the plain log -----------
+    json_out="${BENCHMARK_PATH}/test_result/deeplearning/${target}.json"
+
+    if "./${target}" \
+          --benchmark_out="${json_out}" \
+          --benchmark_out_format=json \
+          >  "${BENCHMARK_PATH}/test_result/deeplearning/${target}.log" 2>&1
+    then
+      echo "[Success] Run of '${target}'"  | tee -a "${RUN_LOG}"
+      echo "         ↳ stdout/stderr → ${target}.log"  | tee -a "${RUN_LOG}"
+      echo "         ↳ gbench JSON   → ${target}.json" | tee -a "${RUN_LOG}"
     else
-      echo "[Failed]  Run of '${target}'" | tee -a "${RUN_LOG}"
-      echo "    Output saved to test_result/deeplearning/${target}.log (May contain error info)"
+      echo "[Failed]  Run of '${target}'"  | tee -a "${RUN_LOG}"
+      echo "         ↳ stdout/stderr → ${target}.log (may contain errors)" | tee -a "${RUN_LOG}"
     fi
+    # -------------------------------------------------------------------------
   else
     echo "[Missing] Executable not found for '${target}'" | tee -a "${RUN_LOG}"
   fi
