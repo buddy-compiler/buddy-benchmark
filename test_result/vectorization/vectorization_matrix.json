@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T20:28:53+00:00",
+    "date": "2025-05-26T21:31:26+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./vectorization-matrix-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [2.49609,3.41797,6.28662],
+    "load_avg": [17.2627,16.4761,8.59082],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 36693381,
-      "real_time": 1.9134156139629500e+01,
-      "cpu_time": 1.9131720268568333e+01,
+      "iterations": 36524480,
+      "real_time": 1.9617160629438615e+01,
+      "cpu_time": 1.9616760320749265e+01,
       "time_unit": "ns"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 33941913,
-      "real_time": 2.0856437909828337e+01,
-      "cpu_time": 2.0853729811870071e+01,
+      "iterations": 32313641,
+      "real_time": 2.1252938182361376e+01,
+      "cpu_time": 2.1252621114408001e+01,
       "time_unit": "ns"
     }
   ]

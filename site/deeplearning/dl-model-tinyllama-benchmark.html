@@ -1,0 +1,38 @@
+
+<style>
+body{font-family:system-ui,Arial,sans-serif;margin:2rem;max-width:80ch}
+table{border-collapse:collapse;margin:1rem 0}
+th,td{border:1px solid #bbb;padding:.3rem .6rem;text-align:right}
+th{text-align:center;background:#f0f0f0}
+tr:nth-child(even){background:#fafafa}
+details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
+summary{font-weight:600;cursor:pointer}
+</style>
+
+<h2>deeplearning/dl-model-tinyllama-benchmark.json</h2><p><em>2025-05-26 21:37:50 UTC</em></p>
+<h3>dl-model-tinyllama-benchmark.json</h3>
+<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/scalar</td><td>145312.6</td><td>145306.0</td><td>1</td></tr>
+<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/matmul_opt</td><td>9843.2</td><td>9842.8</td><td>1</td></tr>
+<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/matmul_opt_omp</td><td>7800.4</td><td>7157.2</td><td>1</td></tr></table>
+<details><summary>Console output</summary>
+<pre>2025-05-26T21:03:18+00:00
+Running ./dl-model-tinyllama-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.60, 2.10, 2.74
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+----------------------------------------------------------------------------
+Benchmark                                  Time             CPU   Iterations
+----------------------------------------------------------------------------
+DL_MODEL_TINYLLAMA/scalar             145313 ms       145306 ms            1
+DL_MODEL_TINYLLAMA/matmul_opt           9843 ms         9843 ms            1
+DL_MODEL_TINYLLAMA/matmul_opt_omp       7800 ms         7157 ms            1
+[34m---------- Verification ----------[0m
+matmul_opt [32mPASS[0m
+matmul_opt_omp [32mPASS[0m
+</pre></details>

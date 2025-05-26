@@ -38,6 +38,7 @@ def gbench_json_to_table(js_path: pathlib.Path) -> str:
 # ---------------------------------------------------------------------------
 
 for js in src.rglob("*.json"):
+    print("→ parsing", js)
     log  = js.with_suffix(".log")          # same stem, optional
     rel  = js.relative_to(src)
     page = dst / rel.with_suffix(".html")

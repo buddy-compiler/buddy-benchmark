@@ -1,4 +1,4 @@
-Vectorization Benchmark - Mon May 26 20:28:47 UTC 2025
+Vectorization Benchmark - Mon May 26 21:31:20 UTC 2025
 [Info] Starting vectorization-matrix-benchmark build...
 [Info] Running CMake configuration...
 -- The CXX compiler identification is GNU 11.4.0
@@ -39,8 +39,8 @@ Vectorization Benchmark - Mon May 26 20:28:47 UTC 2025
 [Info] Building vectorization-matrix-benchmark...
 [1/17] Generating mlir-matmul.o
 [2/17] Generating mlir-matvec.o
-[3/17] Linking CXX static library benchmarks/Vectorization/libMLIRMatVec.a
-[4/17] Linking CXX static library benchmarks/Vectorization/libMLIRMatMul.a
+[3/17] Linking CXX static library benchmarks/Vectorization/libMLIRMatMul.a
+[4/17] Linking CXX static library benchmarks/Vectorization/libMLIRMatVec.a
 [5/17] Creating directories for 'project_googlebenchmark'
 [6/17] Performing download step (git clone) for 'project_googlebenchmark'
 Cloning into 'project_googlebenchmark'...
@@ -128,23 +128,23 @@ Call Stack (most recent call first):
 -- Generating done
 -- Build files have been written to: /home/buddy-complier-workspace/buddy-benchmark/build/vendor/benchmark/src/project_googlebenchmark-build
 [10/17] Performing build step for 'project_googlebenchmark'
-[1/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark_name.cc.o
-[2/22] Building CXX object src/CMakeFiles/benchmark_main.dir/benchmark_main.cc.o
-[3/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark_api_internal.cc.o
-[4/22] Building CXX object src/CMakeFiles/benchmark.dir/sleep.cc.o
-[5/22] Building CXX object src/CMakeFiles/benchmark.dir/perf_counters.cc.o
-[6/22] Building CXX object src/CMakeFiles/benchmark.dir/colorprint.cc.o
-[7/22] Building CXX object src/CMakeFiles/benchmark.dir/timers.cc.o
-[8/22] Building CXX object src/CMakeFiles/benchmark.dir/counter.cc.o
-[9/22] Building CXX object src/CMakeFiles/benchmark.dir/reporter.cc.o
-[10/22] Building CXX object src/CMakeFiles/benchmark.dir/console_reporter.cc.o
+[1/22] Building CXX object src/CMakeFiles/benchmark_main.dir/benchmark_main.cc.o
+[2/22] Building CXX object src/CMakeFiles/benchmark.dir/colorprint.cc.o
+[3/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark_name.cc.o
+[4/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark_api_internal.cc.o
+[5/22] Building CXX object src/CMakeFiles/benchmark.dir/sleep.cc.o
+[6/22] Building CXX object src/CMakeFiles/benchmark.dir/perf_counters.cc.o
+[7/22] Building CXX object src/CMakeFiles/benchmark.dir/counter.cc.o
+[8/22] Building CXX object src/CMakeFiles/benchmark.dir/string_util.cc.o
+[9/22] Building CXX object src/CMakeFiles/benchmark.dir/timers.cc.o
+[10/22] Building CXX object src/CMakeFiles/benchmark.dir/reporter.cc.o
 [11/22] Building CXX object src/CMakeFiles/benchmark.dir/commandlineflags.cc.o
-[12/22] Building CXX object src/CMakeFiles/benchmark.dir/string_util.cc.o
+[12/22] Building CXX object src/CMakeFiles/benchmark.dir/console_reporter.cc.o
 [13/22] Building CXX object src/CMakeFiles/benchmark.dir/csv_reporter.cc.o
 [14/22] Building CXX object src/CMakeFiles/benchmark.dir/json_reporter.cc.o
 [15/22] Building CXX object src/CMakeFiles/benchmark.dir/sysinfo.cc.o
-[16/22] Building CXX object src/CMakeFiles/benchmark.dir/statistics.cc.o
-[17/22] Building CXX object src/CMakeFiles/benchmark.dir/complexity.cc.o
+[16/22] Building CXX object src/CMakeFiles/benchmark.dir/complexity.cc.o
+[17/22] Building CXX object src/CMakeFiles/benchmark.dir/statistics.cc.o
 [18/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark_runner.cc.o
 [19/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark.cc.o
 [20/22] Building CXX object src/CMakeFiles/benchmark.dir/benchmark_register.cc.o
@@ -176,11 +176,11 @@ Call Stack (most recent call first):
 [12/17] No test step for 'project_googlebenchmark'
 [13/17] Completed 'project_googlebenchmark'
 [14/17] Building CXX object benchmarks/Vectorization/CMakeFiles/vectorization-matrix-benchmark.dir/Main.cpp.o
-[15/17] Building CXX object benchmarks/Vectorization/CMakeFiles/vectorization-matrix-benchmark.dir/MLIRMatMulBenchmark.cpp.o
-[16/17] Building CXX object benchmarks/Vectorization/CMakeFiles/vectorization-matrix-benchmark.dir/MLIRMatVecBenchmark.cpp.o
+[15/17] Building CXX object benchmarks/Vectorization/CMakeFiles/vectorization-matrix-benchmark.dir/MLIRMatVecBenchmark.cpp.o
+[16/17] Building CXX object benchmarks/Vectorization/CMakeFiles/vectorization-matrix-benchmark.dir/MLIRMatMulBenchmark.cpp.o
 [17/17] Linking CXX executable bin/vectorization-matrix-benchmark
 [Info] Running vectorization-matrix-benchmark...
-2025-05-26T20:28:53+00:00
+2025-05-26T21:31:26+00:00
 Running ./vectorization-matrix-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -188,13 +188,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 2.50, 3.42, 6.29
+Load Average: 17.26, 16.48, 8.59
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------
 Benchmark              Time             CPU   Iterations
 --------------------------------------------------------
-MLIR_MatMul/1       19.1 ns         19.1 ns     36693381
-MLIR_MatVec/1       20.9 ns         20.9 ns     33941913
+MLIR_MatMul/1       19.6 ns         19.6 ns     36524480
+MLIR_MatVec/1       21.3 ns         21.3 ns     32313641
 --------------------------------------------------------
 MLIR_MatMul: MLIR MatMul Operation + Nested Loop
 [ 18 18 18 18 18 18 18 18 18 18 ]

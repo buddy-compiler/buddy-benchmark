@@ -1,0 +1,37 @@
+
+<style>
+body{font-family:system-ui,Arial,sans-serif;margin:2rem;max-width:80ch}
+table{border-collapse:collapse;margin:1rem 0}
+th,td{border:1px solid #bbb;padding:.3rem .6rem;text-align:right}
+th{text-align:center;background:#f0f0f0}
+tr:nth-child(even){background:#fafafa}
+details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
+summary{font-weight:600;cursor:pointer}
+</style>
+
+<h2>deeplearning/dl-model-whisper-benchmark.json</h2><p><em>2025-05-26 21:37:50 UTC</em></p>
+<h3>dl-model-whisper-benchmark.json</h3>
+<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_MODEL_Whisper/Auto_Vectorization</td><td>80864.4</td><td>80855.3</td><td>1</td></tr>
+<tr><td style='text-align:left'>DL_MODEL_Whisper/Buddy_Vectorization</td><td>35875.8</td><td>35871.5</td><td>1</td></tr></table>
+<details><summary>Console output</summary>
+<pre>2025-05-26T21:08:38+00:00
+Running ./dl-model-whisper-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.37, 1.45, 2.25
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-------------------------------------------------------------------------------
+Benchmark                                     Time             CPU   Iterations
+-------------------------------------------------------------------------------
+DL_MODEL_Whisper/Auto_Vectorization       80864 ms        80855 ms            1
+DL_MODEL_Whisper/Buddy_Vectorization      35876 ms        35871 ms            1
+-----------------------------------------------------------
+Correctness Verification for Output1: [32mPASS[0m
+Correctness Verification for Output2: [31mFAIL[0m
+-----------------------------------------------------------
+</pre></details>
