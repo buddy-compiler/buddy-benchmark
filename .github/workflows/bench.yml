@@ -48,6 +48,7 @@ jobs:
     - name: Build mini-site
       working-directory: /home/quliu/buddy-complier-workspace/buddy-benchmark
       run: |
+        rm -rf site
         python3 scripts/logs2html.py test_result site
 
     - name: Upload site artifact
