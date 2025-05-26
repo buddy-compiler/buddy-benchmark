@@ -82,6 +82,7 @@ echo "[Info] PYTHONPATH           = ${PYTHONPATH}"
 # 3. Prepare Build Folder and Run CMake
 ################################################################################
 cd "${BUDDY_MLIR_DIR}/../buddy-benchmark" || exit 1
+rm -rf build
 mkdir -p build
 cd build || exit 1
 
@@ -116,7 +117,6 @@ for target in "${BENCHMARK_TARGETS[@]}"; do
   fi
 done
 
-################################################################################
 ################################################################################
 # 5. Run Each Benchmark & Redirect Output (Continue Even If One Fails)
 ################################################################################

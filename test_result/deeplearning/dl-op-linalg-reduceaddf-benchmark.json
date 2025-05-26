@@ -1,0 +1,38 @@
+{
+  "context": {
+    "date": "2025-05-26T21:13:25+00:00",
+    "host_name": "4ed4bacfe45d",
+    "executable": "./dl-op-linalg-reduceaddf-benchmark",
+    "num_cpus": 24,
+    "mhz_per_cpu": 5100,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 49152,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1310720,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 31457280,
+        "num_sharing": 24
+      }
+    ],
+    "load_avg": [1.08008,1.18115,1.91162],
+    "library_build_type": "release"
+  },
+  "benchmarks": [

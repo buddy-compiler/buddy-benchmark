@@ -1,4 +1,4 @@
-2025-05-25T16:34:19+00:00
+2025-05-26T21:13:25+00:00
 Running ./dl-op-linalg-reduceaddf-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,5 +6,5 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.11, 3.44
+Load Average: 1.08, 1.18, 1.91
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.

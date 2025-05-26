@@ -1,0 +1,110 @@
+{
+  "context": {
+    "date": "2025-05-26T21:12:40+00:00",
+    "host_name": "4ed4bacfe45d",
+    "executable": "./dl-op-linalg-matmul-benchmark",
+    "num_cpus": 24,
+    "mhz_per_cpu": 5100,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 49152,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1310720,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 31457280,
+        "num_sharing": 24
+      }
+    ],
+    "load_avg": [1.00342,1.18945,1.94873],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "DL_OPS_MATMUL/scalar_O0/iterations:1",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_MATMUL/scalar_O0/iterations:1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 4.2198417354375124e+03,
+      "cpu_time": 4.2197150860000011e+03,
+      "time_unit": "ms"
+    },
+    {
+      "name": "DL_OPS_MATMUL/scalar_O3/iterations:1",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_MATMUL/scalar_O3/iterations:1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.3937856554985046e+03,
+      "cpu_time": 3.3936371459999996e+03,
+      "time_unit": "ms"
+    },
+    {
+      "name": "DL_OPS_MATMUL/tile/iterations:1",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_MATMUL/tile/iterations:1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.1714999191462994e+02,
+      "cpu_time": 1.1714971299999988e+02,
+      "time_unit": "ms"
+    },
+    {
+      "name": "DL_OPS_MATMUL/vec/iterations:1",
+      "family_index": 3,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_MATMUL/vec/iterations:1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 5.9898965060710907e+01,
+      "cpu_time": 5.9899150999999762e+01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "DL_OPS_MATMUL/vec_omp/iterations:1",
+      "family_index": 4,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_MATMUL/vec_omp/iterations:1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.0501415953040123e+01,
+      "cpu_time": 9.7919029999999907e+00,
+      "time_unit": "ms"
+    }
+  ]
+}

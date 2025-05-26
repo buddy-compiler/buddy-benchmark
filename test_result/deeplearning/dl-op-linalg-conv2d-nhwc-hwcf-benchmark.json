@@ -1,0 +1,68 @@
+{
+  "context": {
+    "date": "2025-05-26T21:12:54+00:00",
+    "host_name": "4ed4bacfe45d",
+    "executable": "./dl-op-linalg-conv2d-nhwc-hwcf-benchmark",
+    "num_cpus": 24,
+    "mhz_per_cpu": 5100,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 49152,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1310720,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 31457280,
+        "num_sharing": 24
+      }
+    ],
+    "load_avg": [1.00244,1.18262,1.93799],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_CONV_2D_NHWC_HWCF_SCALAR",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_CONV_2D_NHWC_HWCF_SCALAR",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 22,
+      "real_time": 3.2554571686143227e+01,
+      "cpu_time": 3.2554057500000006e+01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "BM_CONV_2D_NHWC_HWCF_AutoVectorization",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "BM_CONV_2D_NHWC_HWCF_AutoVectorization",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 115,
+      "real_time": 6.0713487960722139e+00,
+      "cpu_time": 6.0712789217391308e+00,
+      "time_unit": "ms"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-2025-05-25T16:33:30+00:00
+2025-05-26T21:12:34+00:00
 Running ./dl-layer-ffn-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.14, 3.58
+Load Average: 1.00, 1.20, 1.96
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------------
 Benchmark                                Time             CPU   Iterations
 --------------------------------------------------------------------------
-DL_LAYER_FFN/Scalar                  0.065 ms        0.065 ms        10714
-DL_LAYER_FFN/Auto_Vectorization      0.027 ms        0.027 ms        25753
+DL_LAYER_FFN/Scalar                  0.065 ms        0.065 ms        10758
+DL_LAYER_FFN/Auto_Vectorization      0.027 ms        0.027 ms        25878
 -----------------------------------------------------------
 Correctness Verification: [32mPASS[0m
 -----------------------------------------------------------

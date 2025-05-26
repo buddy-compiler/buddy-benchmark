@@ -1,0 +1,179 @@
+Benchmark results - Mon May 26 20:28:28 UTC 2025
+Testing SSE support
+SSE is supported.
+Running image-processing-benchmark for SSE
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png prewittKernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png prewittKernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel3x3KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel3x3KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel5x5KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel5x5KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel7x7KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel7x7KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel9x9KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel9x9KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png logKernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png logKernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Testing AVX2 support
+AVX2 is supported.
+Running image-processing-benchmark for AVX2
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png prewittKernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png prewittKernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel3x3KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel3x3KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel5x5KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel5x5KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel7x7KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel7x7KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel9x9KernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png sobel9x9KernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png laplacianKernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png logKernelAlign random3x3KernelAlignInt CONSTANT_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Running: ../benchmarks/ImageProcessing/Images/YuTu.png logKernelAlign random3x3KernelAlignInt REPLICATE_PADDING
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  Wrong format of command line arguments.
+Correct format is ./image-processing-benchmark <image path> <kernel name> <kernelmorph> <Boundary Option>
+ where image path provides path of the image to be processed, kernel name denotes the name of desired kernel as specified in kernelmorph denotes the kernel to be used for morphological operationsinclude/ImageProcessing/Kernels.h and Boundary options available are CONSTANT_PADDING, REPLICATE_PADDING.
+
+Testing AVX512 support
+CPU does not support AVX512.
+Testing NEON support
+CPU does not support NEON.

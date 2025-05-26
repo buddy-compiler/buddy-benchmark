@@ -1,29 +1,83 @@
 [Success] Run of 'dl-model-tinyllama-benchmark'
+         ↳ stdout/stderr → dl-model-tinyllama-benchmark.log
+         ↳ gbench JSON   → dl-model-tinyllama-benchmark.json
 [Success] Run of 'dl-model-mobilenetv3-benchmark'
+         ↳ stdout/stderr → dl-model-mobilenetv3-benchmark.log
+         ↳ gbench JSON   → dl-model-mobilenetv3-benchmark.json
 [Success] Run of 'dl-model-lenet-benchmark'
+         ↳ stdout/stderr → dl-model-lenet-benchmark.log
+         ↳ gbench JSON   → dl-model-lenet-benchmark.json
 [Missing] Executable not found for 'dl-model-bert-benchmark'
 [Success] Run of 'dl-model-whisper-benchmark'
+         ↳ stdout/stderr → dl-model-whisper-benchmark.log
+         ↳ gbench JSON   → dl-model-whisper-benchmark.json
 [Success] Run of 'dl-model-resnet18-benchmark'
+         ↳ stdout/stderr → dl-model-resnet18-benchmark.log
+         ↳ gbench JSON   → dl-model-resnet18-benchmark.json
 [Success] Run of 'dl-layer-ffn-benchmark'
+         ↳ stdout/stderr → dl-layer-ffn-benchmark.log
+         ↳ gbench JSON   → dl-layer-ffn-benchmark.json
 [Success] Run of 'dl-layer-selfattention-benchmark'
+         ↳ stdout/stderr → dl-layer-selfattention-benchmark.log
+         ↳ gbench JSON   → dl-layer-selfattention-benchmark.json
 [Success] Run of 'dl-layer-rmsnorm-benchmark'
+         ↳ stdout/stderr → dl-layer-rmsnorm-benchmark.log
+         ↳ gbench JSON   → dl-layer-rmsnorm-benchmark.json
 [Success] Run of 'dl-op-linalg-matmul-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-matmul-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-matmul-benchmark.json
 [Success] Run of 'dl-op-linalg-conv2d-nchw-fchw-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-conv2d-nchw-fchw-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-conv2d-nchw-fchw-benchmark.json
 [Success] Run of 'dl-op-linalg-conv2d-nhwc-hwcf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-conv2d-nhwc-hwcf-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-conv2d-nhwc-hwcf-benchmark.json
 [Success] Run of 'dl-op-linalg-conv2d-nhwc-fhwc-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-conv2d-nhwc-fhwc-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-conv2d-nhwc-fhwc-benchmark.json
 [Success] Run of 'dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark.json
 [Success] Run of 'dl-op-linalg-pooling-nhwc-sum-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-pooling-nhwc-sum-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-pooling-nhwc-sum-benchmark.json
 [Success] Run of 'dl-op-linalg-batch-matmul-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-batch-matmul-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-batch-matmul-benchmark.json
 [Success] Run of 'dl-op-linalg-arithaddf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithaddf-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-arithaddf-benchmark.json
 [Success] Run of 'dl-op-linalg-arithdivf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithdivf-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-arithdivf-benchmark.json
 [Success] Run of 'dl-op-linalg-arithmulf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithmulf-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-arithmulf-benchmark.json
 [Success] Run of 'dl-op-linalg-arithnegf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithnegf-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-arithnegf-benchmark.json
 [Success] Run of 'dl-op-linalg-arithsubf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithsubf-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-arithsubf-benchmark.json
 [Success] Run of 'dl-op-linalg-mathfpow-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-mathfpow-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-mathfpow-benchmark.json
 [Success] Run of 'dl-op-linalg-mathrsqrt-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-mathrsqrt-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-mathrsqrt-benchmark.json
 [Success] Run of 'dl-op-linalg-mathexp-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-mathexp-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-mathexp-benchmark.json
 [Failed]  Run of 'dl-op-linalg-reduceaddf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-reduceaddf-benchmark.log (may contain errors)
 [Failed]  Run of 'dl-op-linalg-reducemaxf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-reducemaxf-benchmark.log (may contain errors)
 [Success] Run of 'dl-op-linalg-softmax-exp-sum-div-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-softmax-exp-sum-div-benchmark.log
+         ↳ gbench JSON   → dl-op-linalg-softmax-exp-sum-div-benchmark.json
 [Success] Run of 'dl-op-tosa-transpose-benchmark'
+         ↳ stdout/stderr → dl-op-tosa-transpose-benchmark.log
+         ↳ gbench JSON   → dl-op-tosa-transpose-benchmark.json
 [Success] Run of 'dl-op-matmul-transpose-b-benchmark'
+         ↳ stdout/stderr → dl-op-matmul-transpose-b-benchmark.log
+         ↳ gbench JSON   → dl-op-matmul-transpose-b-benchmark.json

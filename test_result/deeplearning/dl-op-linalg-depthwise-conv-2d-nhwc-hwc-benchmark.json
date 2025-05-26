@@ -1,0 +1,82 @@
+{
+  "context": {
+    "date": "2025-05-26T21:12:56+00:00",
+    "host_name": "4ed4bacfe45d",
+    "executable": "./dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark",
+    "num_cpus": 24,
+    "mhz_per_cpu": 5100,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 49152,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1310720,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 31457280,
+        "num_sharing": 24
+      }
+    ],
+    "load_avg": [1.00195,1.1792,1.93262],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/scalar/iterations:5",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/scalar/iterations:5",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 5,
+      "real_time": 4.8418600112199783e+00,
+      "cpu_time": 4.8414392000000008e+00,
+      "time_unit": "ms"
+    },
+    {
+      "name": "DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/auto_vectorization/iterations:5",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/auto_vectorization/iterations:5",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 5,
+      "real_time": 1.6818478703498840e+00,
+      "cpu_time": 1.6818200000000005e+00,
+      "time_unit": "ms"
+    },
+    {
+      "name": "DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/vectorization/iterations:5",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/vectorization/iterations:5",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 5,
+      "real_time": 1.2000650167465210e-01,
+      "cpu_time": 1.2000399999999996e-01,
+      "time_unit": "ms"
+    }
+  ]
+}
