@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T22:08:12+00:00",
+    "date": "2025-05-26T22:14:00+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./bin/image-processing-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [2.0625,1.521,3.4751],
+    "load_avg": [20.9478,20.8682,11.709],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 137,
-      "real_time": 5.1337036229398132e+00,
-      "cpu_time": 5.1329572627737230e+00,
+      "iterations": 144,
+      "real_time": 4.8620806774124503e+00,
+      "cpu_time": 4.8617971249999998e+00,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 92,
-      "real_time": 7.5545981728836242e+00,
-      "cpu_time": 7.5545316195652177e+00,
+      "iterations": 95,
+      "real_time": 7.3647483399039819e+00,
+      "cpu_time": 7.3645103473684204e+00,
       "time_unit": "ms"
     },
     {
@@ -73,9 +73,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 1241,
-      "real_time": 5.9495814967117033e-01,
-      "cpu_time": 5.9494254391619683e-01,
+      "iterations": 1587,
+      "real_time": 4.4364659274120188e-01,
+      "cpu_time": 4.4360596030245769e-01,
       "time_unit": "ms"
     },
     {
@@ -87,9 +87,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 864,
-      "real_time": 8.1512168549967035e-01,
-      "cpu_time": 8.1501009375000022e-01,
+      "iterations": 850,
+      "real_time": 7.9619941904264335e-01,
+      "cpu_time": 7.9616357647058844e-01,
       "time_unit": "ms"
     },
     {
@@ -101,9 +101,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 548,
-      "real_time": 1.2782183135893659e+00,
-      "cpu_time": 1.2780402226277368e+00,
+      "iterations": 549,
+      "real_time": 1.2764639555322235e+00,
+      "cpu_time": 1.2764428561020034e+00,
       "time_unit": "ms"
     },
     {
@@ -115,9 +115,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 4723,
-      "real_time": 1.4875183663213251e-01,
-      "cpu_time": 1.4873103324158377e-01,
+      "iterations": 4759,
+      "real_time": 1.4590555271648464e-01,
+      "cpu_time": 1.4590127484765700e-01,
       "time_unit": "ms"
     },
     {
@@ -129,9 +129,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 2619,
-      "real_time": 2.6808699088703819e-01,
-      "cpu_time": 2.6804946315387551e-01,
+      "iterations": 2628,
+      "real_time": 2.6687351161758649e-01,
+      "cpu_time": 2.6686138660578385e-01,
       "time_unit": "ms"
     },
     {
@@ -143,9 +143,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 103122,
-      "real_time": 6.7839405446529655e-03,
-      "cpu_time": 6.7830443067434720e-03,
+      "iterations": 102952,
+      "real_time": 6.7868454739183929e-03,
+      "cpu_time": 6.7866766648535231e-03,
       "time_unit": "ms"
     },
     {
@@ -157,8 +157,192 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 46927,
-      "real_time": 1.4897604358085247e-02,
-      "cpu_time": 1.4895712084727326e-02,
+      "iterations": 48945,
+      "real_time": 1.4264975000005026e-02,
+      "cpu_time": 1.4264539462662167e-02,
+      "time_unit": "ms"
+    },
+    {
+      "name": "Buddy_Erosion2D_Constant_Padding/1",
+      "family_index": 9,
+      "per_family_instance_index": 0,
+      "run_name": "Buddy_Erosion2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 3245,
+      "real_time": 2.2328324638915539e-01,
+      "cpu_time": 2.2327703112480715e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "Buddy_Dilation2D_Constant_Padding/1",
+      "family_index": 10,
+      "per_family_instance_index": 0,
+      "run_name": "Buddy_Dilation2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2941,
+      "real_time": 2.3091911119451655e-01,
+      "cpu_time": 2.3090739714382824e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "Buddy_Opening2D_Constant_Padding/1",
+      "family_index": 11,
+      "per_family_instance_index": 0,
+      "run_name": "Buddy_Opening2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1920,
+      "real_time": 3.6398599525758374e-01,
+      "cpu_time": 3.6397573020833335e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "Buddy_Closing2D_Constant_Padding/1",
+      "family_index": 12,
+      "per_family_instance_index": 0,
+      "run_name": "Buddy_Closing2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1942,
+      "real_time": 3.6292056717078303e-01,
+      "cpu_time": 3.6289218640576670e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "Buddy_TopHat2D_Constant_Padding/1",
+      "family_index": 13,
+      "per_family_instance_index": 0,
+      "run_name": "Buddy_TopHat2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 686,
+      "real_time": 9.5260923092983907e-01,
+      "cpu_time": 9.5257817346938856e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "Buddy_BottomHat2D_Constant_Padding/1",
+      "family_index": 14,
+      "per_family_instance_index": 0,
+      "run_name": "Buddy_BottomHat2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 687,
+      "real_time": 1.0497556183232317e+00,
+      "cpu_time": 1.0497079097525470e+00,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_Erode2D_Constant_Padding/1",
+      "family_index": 15,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_Erode2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 4813,
+      "real_time": 1.4027526283645592e-01,
+      "cpu_time": 1.4027346166632040e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_Opening2D_Constant_Padding/1",
+      "family_index": 16,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_Opening2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 3185,
+      "real_time": 2.2067454829227232e-01,
+      "cpu_time": 2.2066997394034502e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_Closing2D_Constant_Padding/1",
+      "family_index": 17,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_Closing2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 3185,
+      "real_time": 2.2132610858328863e-01,
+      "cpu_time": 2.2132252841444267e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_TopHat2D_Constant_Padding/1",
+      "family_index": 18,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_TopHat2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2747,
+      "real_time": 2.5434105026101389e-01,
+      "cpu_time": 2.5433080050964629e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_BottomHat2D_Constant_Padding/1",
+      "family_index": 19,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_BottomHat2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2760,
+      "real_time": 2.5351542601550836e-01,
+      "cpu_time": 2.5350927717391269e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_MorphGrad2D_Constant_Padding/1",
+      "family_index": 20,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_MorphGrad2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2735,
+      "real_time": 2.5544877979611563e-01,
+      "cpu_time": 2.5544034881170063e-01,
+      "time_unit": "ms"
+    },
+    {
+      "name": "OpenCV_Dilate2D_Constant_Padding/1",
+      "family_index": 21,
+      "per_family_instance_index": 0,
+      "run_name": "OpenCV_Dilate2D_Constant_Padding/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 4913,
+      "real_time": 1.4221790321921954e-01,
+      "cpu_time": 1.4221190637085293e-01,
       "time_unit": "ms"
     }
+  ]
+}
