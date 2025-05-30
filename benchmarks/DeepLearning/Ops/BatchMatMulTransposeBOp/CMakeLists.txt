@@ -1,7 +1,7 @@
-add_executable(dl-op-batch-matmul-transpose-b-benchmark
+add_executable(dl-op-linalg-batch-matmul-transpose-b-benchmark
   Main.cpp
 )
-target_link_libraries(dl-op-batch-matmul-transpose-b-benchmark GoogleBenchmark)
+target_link_libraries(dl-op-linalg-batch-matmul-transpose-b-benchmark GoogleBenchmark)
 
 # CMAKE_C_FLAGS is set when configuring cmake.
 separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
@@ -47,7 +47,7 @@ add_custom_command(OUTPUT batch_matmul_transpose_b_scalar_O0.o
 
 add_library(batch_matmul_transpose_b_scalar_O0 STATIC batch_matmul_transpose_b_scalar_O0.o)
 set_target_properties(batch_matmul_transpose_b_scalar_O0 PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(dl-op-batch-matmul-transpose-b-benchmark
+target_link_libraries(dl-op-linalg-batch-matmul-transpose-b-benchmark
   batch_matmul_transpose_b_scalar_O0
 )
 
@@ -92,8 +92,8 @@ add_custom_command(OUTPUT batch_matmul_transpose_b_scalar_O3.o
 
 add_library(batch_matmul_transpose_b_scalar_O3 STATIC batch_matmul_transpose_b_scalar_O3.o)
 set_target_properties(batch_matmul_transpose_b_scalar_O3 PROPERTIES LINKER_LANGUAGE CXX)
-target_link_directories(dl-op-batch-matmul-transpose-b-benchmark PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
-target_link_libraries(dl-op-batch-matmul-transpose-b-benchmark
+target_link_directories(dl-op-linalg-batch-matmul-transpose-b-benchmark PRIVATE ${LLVM_MLIR_LIBRARY_DIR})
+target_link_libraries(dl-op-linalg-batch-matmul-transpose-b-benchmark
   batch_matmul_transpose_b_scalar_O3
 )
 
@@ -138,7 +138,7 @@ add_custom_command(OUTPUT batch_matmul_transpose_b_vec.o
 
 add_library(batch_matmul_transpose_b_vec STATIC batch_matmul_transpose_b_vec.o)
 set_target_properties(batch_matmul_transpose_b_vec PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(dl-op-batch-matmul-transpose-b-benchmark
+target_link_libraries(dl-op-linalg-batch-matmul-transpose-b-benchmark
   batch_matmul_transpose_b_vec
 )
 
