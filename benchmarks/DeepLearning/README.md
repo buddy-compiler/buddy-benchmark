@@ -51,6 +51,7 @@ The table below lists the benchmark cases at the operation level.
 | Softmax Exp Sum Div | `ninja dl-op-softmax-exp-sum-div-benchmark` | This benchmark evaluates optimization strategies for the `softmax.exp_sum_div` operation. The benchmark size can be adjusted in [this file](./Ops/SoftmaxExpSumDivOp/GoogleBenchmarkMain.cpp). |
 | TOSA Transpose | `ninja dl-op-tosa-transpose-benchmark` | This benchmark evaluates optimization strategies for the `tosa.transpose` operation. The benchmark size can be adjusted in [this file](./Ops/TransposeOp/Main.cpp). |
 | MatMul Transpose B | `ninja dl-op-matmul-transpose-b-benchmark` | This benchmark evaluates optimization strategies for the `linalg.matmul_transpose_b` operation. The benchmark size can be adjusted in [main file](./Ops/MatMulTransposeBOp/Main.cpp) and [MLIR file](./Ops/MatMulTransposeBOp/MatMulTransposeB.mlir). |
+| Linalg Batch MatMul Transpose B | `ninja dl-op-linalg-batch-matmul-transpose-b-benchmark` | This benchmark evaluates optimization strategies for the `linalg.batch_matmul_transpose_b` operation. The benchmark size can be adjusted in [main file](./Ops/BatchMatMulTransposeBOp/Main.cpp) and [MLIR file](./Ops/BatchMatMulTransposeBOp/BatchMatMulTransposeB.mlir). |
 
 ## How to Build
 
