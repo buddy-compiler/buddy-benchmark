@@ -51,6 +51,23 @@ jobs:
         rm -rf site
         python3 scripts/logs2html.py test_result site
 
+    - name: Update benchmarks/latest redirect
+      working-directory: /home/quliu/buddy-complier-workspace/buddy-benchmark/site/benchmarks
+      run: |
+        set -e
+        # -------- pick the most recent dated folder (YYYY-MM-DD) -------------
+        latest=$(ls -1d 20*/ | sort -r | head -n1 | tr -d '/')
+        echo "[Info] newest run is: $latest"
+
+        # -------- rebuild the 'latest' folder with a meta-refresh ------------
+        rm -rf latest
+        mkdir -p latest
+        cat > latest/index.html <<EOF
+        <meta http-equiv="refresh" content="0; url=../${latest}/">
+        EOF
+        echo "[Info] benchmarks/latest now points to ../${latest}/"
+
+
     - name: Upload site artifact
       uses: actions/upload-pages-artifact@v3
       with:
