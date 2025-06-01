@@ -24,15 +24,23 @@ summary{font-weight:600;cursor:pointer}
 
 def gbench_json_to_table(js_path: pathlib.Path) -> str:
     data = json.loads(js_path.read_text())["benchmarks"]
-    head = ("<tr><th>Name</th><th>Time (ns)</th>"
-            "<th>CPU (ns)</th><th>Iterations</th></tr>")
+
+    # pick the first “real” iteration row to read the time_unit
+    first = next(b for b in data if b.get("run_type") == "iteration")
+    unit  = html.escape(first.get("time_unit", "ns"))
+
+    head = (f"<tr><th>Name</th><th>Time&nbsp;({unit})</th>"
+            f"<th>CPU&nbsp;({unit})</th><th>Iterations</th></tr>")
+
     rows = "\n".join(
         f"<tr><td style='text-align:left'>{html.escape(b['name'])}</td>"
-        f"<td>{b['real_time']:.1f}</td>"
-        f"<td>{b['cpu_time']:.1f}</td>"
-        f"<td>{b['iterations']}</td></tr>"
-        for b in data if "name" in b
+        f"<td>{b['real_time']:.3g}</td>"
+        f"<td>{b['cpu_time']:.3g}</td>"
+        f"<td>{b['iterations']:,}</td></tr>"
+        for b in data
+        if b.get("run_type") == "iteration"          # ignore _mean, _stddev
     )
+
     return f"<h3>{js_path.name}</h3>\n<table>{head}\n{rows}</table>"
 
 # ---------------------------------------------------------------------------

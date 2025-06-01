@@ -49,10 +49,14 @@ export QEMU_LD_PREFIX=/usr/riscv64-linux-gnu
 ################################################################################
 cd bin
 echo "[Info] Running vectorization-matrix-benchmark..." | tee -a "${LOG_FILE}"
+json_out="${RESULT_DIR}/vectorization_matrix.json"
+log_out="${RESULT_DIR}/vectorization_matrix.log"
+
 ./vectorization-matrix-benchmark \
-  --benchmark_out="${RESULT_DIR}/vectorization_matrix.json" \
-  --benchmark_out_format=json \
-  2>&1 | tee -a "${LOG_FILE}"
+      --benchmark_out="$json_out" \
+      --benchmark_out_format=json \
+      >  "$log_out" 2>&1
+tee -a "$LOG_FILE" < "$log_out"
 
 
 echo "[Info] Benchmark completed. Log saved to ${LOG_FILE}"

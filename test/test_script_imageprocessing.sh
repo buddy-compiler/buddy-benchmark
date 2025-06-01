@@ -50,13 +50,15 @@ for feature in "${features[@]}"; do
               slug="$(echo "${feature}_${img_slug}_${kern}_${morph}_${boundary}" \
                     | tr ' /' '__')"
               json_out="${RESULT_DIR}/${slug}.json"
+              log_out="${RESULT_DIR}/${slug}.log"
               # -----------------------------------------------------------------------
 
               ./bin/image-processing-benchmark  \
                   "$img" "$kern" "$morph" "$boundary" \
                   --benchmark_out="$json_out" \
                   --benchmark_out_format=json \
-                  2>&1 | grep -v "Saved PNG file." >> "$LOG"
+                  >  "$log_out" 2>&1
+              echo "[Success] …"        | tee -a "$LOG"
             done
           done
         done
