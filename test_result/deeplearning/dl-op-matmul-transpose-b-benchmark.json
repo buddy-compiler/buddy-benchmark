@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:28+00:00",
+    "date": "2025-06-01T09:44:10+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-matmul-transpose-b-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.07324,1.17773,1.90625],
+    "load_avg": [1.00684,1.78223,3.82031],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -46,8 +46,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 1.2652646832168102e+03,
-      "cpu_time": 1.2636451276000000e+03,
+      "real_time": 1.0452035043388605e+03,
+      "cpu_time": 1.0435922366000000e+03,
       "time_unit": "ms"
     },
     {
@@ -60,8 +60,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 3.2678271271288395e+02,
-      "cpu_time": 3.2677019700000011e+02,
+      "real_time": 2.7667955197393894e+02,
+      "cpu_time": 2.7666573640000001e+02,
       "time_unit": "ms"
     },
     {
@@ -74,8 +74,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 3.0260816961526871e+01,
-      "cpu_time": 1.8804882999999961e+01,
+      "real_time": 3.0310654267668724e+01,
+      "cpu_time": 1.9424157000000086e+01,
       "time_unit": "ms"
     },
     {
@@ -88,8 +88,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 8.3582005649805069e+01,
-      "cpu_time": 8.3579965600000250e+01,
+      "real_time": 8.4920790046453476e+01,
+      "cpu_time": 8.4914559799999978e+01,
       "time_unit": "ms"
     }
   ]

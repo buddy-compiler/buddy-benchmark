@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:15+00:00",
+    "date": "2025-06-01T09:43:57+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-arithnegf-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.00049,1.16992,1.9165],
+    "load_avg": [1.00879,1.80957,3.85156],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 30765,
-      "real_time": 2.2786648212342501e-02,
-      "cpu_time": 2.2786353388590929e-02,
+      "iterations": 30522,
+      "real_time": 2.2840192988802945e-02,
+      "cpu_time": 2.2839767708538104e-02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 290149,
-      "real_time": 2.4227396805301059e-03,
-      "cpu_time": 2.4227158287638420e-03,
+      "iterations": 279150,
+      "real_time": 2.4855299081273687e-03,
+      "cpu_time": 2.4854867562242519e-03,
       "time_unit": "ms"
     }
   ]

@@ -1,4 +1,4 @@
-2025-05-26T21:13:19+00:00
+2025-06-01T09:44:01+00:00
 Running ./dl-op-linalg-mathfpow-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.17, 1.91
+Load Average: 1.01, 1.81, 3.85
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------
 Benchmark                          Time             CPU   Iterations
 --------------------------------------------------------------------
-BM_FPOW_SCALAR                 0.083 ms        0.083 ms         8096
-BM_FPOW_AutoVectorization      0.057 ms        0.057 ms        12303
+BM_FPOW_SCALAR                 0.085 ms        0.085 ms         8120
+BM_FPOW_AutoVectorization      0.057 ms        0.057 ms        12142
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

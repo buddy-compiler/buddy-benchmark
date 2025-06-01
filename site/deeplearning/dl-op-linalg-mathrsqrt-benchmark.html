@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-linalg-mathrsqrt-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-linalg-mathrsqrt-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-linalg-mathrsqrt-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>BM_RSQRT_SCALAR</td><td>0.1</td><td>0.1</td><td>9407</td></tr>
-<tr><td style='text-align:left'>BM_RSQRT_AutoVectorization</td><td>0.0</td><td>0.0</td><td>161010</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>BM_RSQRT_SCALAR</td><td>0.0728</td><td>0.0728</td><td>9,624</td></tr>
+<tr><td style='text-align:left'>BM_RSQRT_AutoVectorization</td><td>0.00434</td><td>0.00434</td><td>160,866</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:13:20+00:00
+<pre>2025-06-01T09:44:02+00:00
 Running ./dl-op-linalg-mathrsqrt-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.08, 1.18, 1.91
+Load Average: 1.01, 1.80, 3.84
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ---------------------------------------------------------------------
 Benchmark                           Time             CPU   Iterations
 ---------------------------------------------------------------------
-BM_RSQRT_SCALAR                 0.073 ms        0.073 ms         9407
-BM_RSQRT_AutoVectorization      0.004 ms        0.004 ms       161010
+BM_RSQRT_SCALAR                 0.073 ms        0.073 ms         9624
+BM_RSQRT_AutoVectorization      0.004 ms        0.004 ms       160866
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

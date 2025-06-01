@@ -1,4 +1,4 @@
-2025-05-26T21:12:40+00:00
+2025-06-01T09:43:23+00:00
 Running ./dl-op-linalg-matmul-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,16 +6,16 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.19, 1.95
+Load Average: 1.02, 1.91, 3.96
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 -------------------------------------------------------------------------------
 Benchmark                                     Time             CPU   Iterations
 -------------------------------------------------------------------------------
-DL_OPS_MATMUL/scalar_O0/iterations:1       4220 ms         4220 ms            1
-DL_OPS_MATMUL/scalar_O3/iterations:1       3394 ms         3394 ms            1
-DL_OPS_MATMUL/tile/iterations:1             117 ms          117 ms            1
-DL_OPS_MATMUL/vec/iterations:1             59.9 ms         59.9 ms            1
-DL_OPS_MATMUL/vec_omp/iterations:1         30.5 ms         9.79 ms            1
+DL_OPS_MATMUL/scalar_O0/iterations:1       4096 ms         4096 ms            1
+DL_OPS_MATMUL/scalar_O3/iterations:1       3124 ms         3124 ms            1
+DL_OPS_MATMUL/tile/iterations:1             110 ms          110 ms            1
+DL_OPS_MATMUL/vec/iterations:1             59.0 ms         59.0 ms            1
+DL_OPS_MATMUL/vec_omp/iterations:1         28.8 ms         11.0 ms            1
 [34m---------- Verification ----------[0m
 tile [32mPASS[0m
 vec [32mPASS[0m

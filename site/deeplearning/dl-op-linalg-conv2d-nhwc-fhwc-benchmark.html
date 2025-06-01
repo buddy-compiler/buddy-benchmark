@@ -7,17 +7,18 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-linalg-conv2d-nhwc-fhwc-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-linalg-conv2d-nhwc-fhwc-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-linalg-conv2d-nhwc-fhwc-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/scalar/iterations:5</td><td>73.7</td><td>73.6</td><td>5</td></tr>
-<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/auto_vectorization/iterations:5</td><td>9.3</td><td>9.3</td><td>5</td></tr>
-<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/vectorization/iterations:5</td><td>1.7</td><td>1.7</td><td>5</td></tr>
-<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/vec_tile/iterations:5</td><td>1.7</td><td>1.7</td><td>5</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/scalar/iterations:5</td><td>72.5</td><td>72.5</td><td>5</td></tr>
+<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/auto_vectorization/iterations:5</td><td>9.35</td><td>9.35</td><td>5</td></tr>
+<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/vectorization/iterations:5</td><td>1.73</td><td>1.73</td><td>5</td></tr>
+<tr><td style='text-align:left'>DL_OPS_CONV_2D_NHWC_FHWC/vec_tile/iterations:5</td><td>1.73</td><td>1.73</td><td>5</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:12:56+00:00
+<pre>2025-06-01T09:43:38+00:00
 Running ./dl-op-linalg-conv2d-nhwc-fhwc-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -25,14 +26,14 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.18, 1.93
+Load Average: 1.01, 1.87, 3.91
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ---------------------------------------------------------------------------------------------------
 Benchmark                                                         Time             CPU   Iterations
 ---------------------------------------------------------------------------------------------------
-DL_OPS_CONV_2D_NHWC_FHWC/scalar/iterations:5                   73.7 ms         73.6 ms            5
-DL_OPS_CONV_2D_NHWC_FHWC/auto_vectorization/iterations:5       9.34 ms         9.34 ms            5
-DL_OPS_CONV_2D_NHWC_FHWC/vectorization/iterations:5            1.74 ms         1.74 ms            5
+DL_OPS_CONV_2D_NHWC_FHWC/scalar/iterations:5                   72.5 ms         72.5 ms            5
+DL_OPS_CONV_2D_NHWC_FHWC/auto_vectorization/iterations:5       9.35 ms         9.35 ms            5
+DL_OPS_CONV_2D_NHWC_FHWC/vectorization/iterations:5            1.73 ms         1.73 ms            5
 DL_OPS_CONV_2D_NHWC_FHWC/vec_tile/iterations:5                 1.73 ms         1.73 ms            5
 [34m---------- Verification ----------[0m
 auto_vectorization [32mPASS[0m

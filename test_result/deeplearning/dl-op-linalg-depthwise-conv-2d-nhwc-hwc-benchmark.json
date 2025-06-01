@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:12:56+00:00",
+    "date": "2025-06-01T09:43:38+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.00195,1.1792,1.93262],
+    "load_avg": [1.01367,1.86621,3.91455],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -46,8 +46,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 4.8418600112199783e+00,
-      "cpu_time": 4.8414392000000008e+00,
+      "real_time": 7.2686385363340378e+00,
+      "cpu_time": 7.2663935999999989e+00,
       "time_unit": "ms"
     },
     {
@@ -60,8 +60,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 1.6818478703498840e+00,
-      "cpu_time": 1.6818200000000005e+00,
+      "real_time": 1.6840752214193344e+00,
+      "cpu_time": 1.6840592000000001e+00,
       "time_unit": "ms"
     },
     {
@@ -74,8 +74,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 5,
-      "real_time": 1.2000650167465210e-01,
-      "cpu_time": 1.2000399999999996e-01,
+      "real_time": 1.2709796428680420e-01,
+      "cpu_time": 1.2711200000000006e-01,
       "time_unit": "ms"
     }
   ]

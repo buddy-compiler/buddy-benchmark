@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:12:52+00:00",
+    "date": "2025-06-01T09:43:34+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-conv2d-nchw-fchw-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.00244,1.18262,1.93799],
+    "load_avg": [1.01514,1.88086,3.93066],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -46,8 +46,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 2,
-      "real_time": 2.8201012406498194e+02,
-      "cpu_time": 2.8196062250000000e+02,
+      "real_time": 2.8255500365048647e+02,
+      "cpu_time": 2.8254993450000001e+02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 62,
-      "real_time": 1.1751845959694155e+01,
-      "cpu_time": 1.1751463612903226e+01,
+      "iterations": 69,
+      "real_time": 1.0128497186562289e+01,
+      "cpu_time": 1.0128337550724638e+01,
       "time_unit": "ms"
     }
   ]

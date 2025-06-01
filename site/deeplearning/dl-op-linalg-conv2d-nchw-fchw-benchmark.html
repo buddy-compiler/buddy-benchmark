@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-linalg-conv2d-nchw-fchw-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-linalg-conv2d-nchw-fchw-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-linalg-conv2d-nchw-fchw-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>BM_Conv2DNchwFchw_SCALAR</td><td>282.0</td><td>282.0</td><td>2</td></tr>
-<tr><td style='text-align:left'>BM_Conv2DNchwFchw_Im2col</td><td>11.8</td><td>11.8</td><td>62</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>BM_Conv2DNchwFchw_SCALAR</td><td>283</td><td>283</td><td>2</td></tr>
+<tr><td style='text-align:left'>BM_Conv2DNchwFchw_Im2col</td><td>10.1</td><td>10.1</td><td>69</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:12:52+00:00
+<pre>2025-06-01T09:43:34+00:00
 Running ./dl-op-linalg-conv2d-nchw-fchw-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.18, 1.94
+Load Average: 1.02, 1.88, 3.93
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 -------------------------------------------------------------------
 Benchmark                         Time             CPU   Iterations
 -------------------------------------------------------------------
-BM_Conv2DNchwFchw_SCALAR        282 ms          282 ms            2
-BM_Conv2DNchwFchw_Im2col       11.8 ms         11.8 ms           62
+BM_Conv2DNchwFchw_SCALAR        283 ms          283 ms            2
+BM_Conv2DNchwFchw_Im2col       10.1 ms         10.1 ms           69
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

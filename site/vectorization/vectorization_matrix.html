@@ -7,10 +7,34 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>vectorization/vectorization_matrix.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>vectorization/vectorization_matrix.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>vectorization_matrix.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>MLIR_MatMul/1</td><td>19.5</td><td>19.5</td><td>35685429</td></tr>
-<tr><td style='text-align:left'>MLIR_MatVec/1</td><td>21.4</td><td>21.4</td><td>33101404</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ns)</th><th>CPU&nbsp;(ns)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>MLIR_MatMul/1</td><td>18.8</td><td>18.8</td><td>37,302,822</td></tr>
+<tr><td style='text-align:left'>MLIR_MatVec/1</td><td>20.5</td><td>20.5</td><td>35,030,976</td></tr></table>
+<details><summary>Console output</summary>
+<pre>2025-06-01T10:11:11+00:00
+Running ./vectorization-matrix-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.00, 1.09, 1.76
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+--------------------------------------------------------
+Benchmark              Time             CPU   Iterations
+--------------------------------------------------------
+MLIR_MatMul/1       18.8 ns         18.8 ns     37302822
+MLIR_MatVec/1       20.5 ns         20.5 ns     35030976
+--------------------------------------------------------
+MLIR_MatMul: MLIR MatMul Operation + Nested Loop
+[ 18 18 18 18 18 18 18 18 18 18 ]
+--------------------------------------------------------
+MLIR_MatVec: MLIR MatVec Operation
+[ 18 18 18 18 18 18 18 18 18 18 ]
+</pre></details>

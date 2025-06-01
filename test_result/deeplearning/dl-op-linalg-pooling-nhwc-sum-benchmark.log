@@ -1,4 +1,4 @@
-2025-05-26T21:12:56+00:00
+2025-06-01T09:43:38+00:00
 Running ./dl-op-linalg-pooling-nhwc-sum-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.18, 1.93
+Load Average: 1.01, 1.87, 3.91
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------------------
 Benchmark                                      Time             CPU   Iterations
 --------------------------------------------------------------------------------
-BM_POOLING_NHWC_SUM_SCALAR                 0.234 ms        0.234 ms         2972
-BM_POOLING_NHWC_SUM_AutoVectorization      0.041 ms        0.041 ms        16865
+BM_POOLING_NHWC_SUM_SCALAR                 0.233 ms        0.233 ms         2993
+BM_POOLING_NHWC_SUM_AutoVectorization      0.041 ms        0.041 ms        16954
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

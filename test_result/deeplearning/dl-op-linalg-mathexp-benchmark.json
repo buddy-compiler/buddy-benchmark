@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:22+00:00",
+    "date": "2025-06-01T09:44:04+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-mathexp-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.08008,1.18115,1.91162],
+    "load_avg": [1.00781,1.7959,3.83594],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 15289,
-      "real_time": 4.5686233631569172e-02,
-      "cpu_time": 4.5684854862973377e-02,
+      "iterations": 15072,
+      "real_time": 4.5585291086441014e-02,
+      "cpu_time": 4.5584231754246279e-02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 22195,
-      "real_time": 3.1881006680031194e-02,
-      "cpu_time": 3.1880129173237209e-02,
+      "iterations": 22245,
+      "real_time": 3.1635766251485356e-02,
+      "cpu_time": 3.1635336165430433e-02,
       "time_unit": "ms"
     }
   ]

@@ -1,4 +1,4 @@
-2025-05-26T21:13:27+00:00
+2025-06-01T09:44:09+00:00
 Running ./dl-op-tosa-transpose-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,12 +6,12 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.07, 1.18, 1.91
+Load Average: 1.01, 1.78, 3.82
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 -------------------------------------------------------------------------------------
 Benchmark                                           Time             CPU   Iterations
 -------------------------------------------------------------------------------------
-DL_OPS_TRANSPOSE_2D/scalar_O0/iterations:5       29.7 ms         20.9 ms            5
-DL_OPS_TRANSPOSE_2D/scalar_O3/iterations:5       21.9 ms         20.4 ms            5
+DL_OPS_TRANSPOSE_2D/scalar_O0/iterations:5       24.9 ms         17.7 ms            5
+DL_OPS_TRANSPOSE_2D/scalar_O3/iterations:5       17.9 ms         15.3 ms            5
 [34m---------- Verification ----------[0m
 scalar_O3 [32mPASS[0m

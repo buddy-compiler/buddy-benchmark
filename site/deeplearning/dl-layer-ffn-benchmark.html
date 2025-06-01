@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-layer-ffn-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-layer-ffn-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-layer-ffn-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>DL_LAYER_FFN/Scalar</td><td>0.1</td><td>0.1</td><td>10758</td></tr>
-<tr><td style='text-align:left'>DL_LAYER_FFN/Auto_Vectorization</td><td>0.0</td><td>0.0</td><td>25878</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_LAYER_FFN/Scalar</td><td>0.0653</td><td>0.0653</td><td>10,788</td></tr>
+<tr><td style='text-align:left'>DL_LAYER_FFN/Auto_Vectorization</td><td>0.027</td><td>0.027</td><td>25,830</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:12:34+00:00
+<pre>2025-06-01T09:43:17+00:00
 Running ./dl-layer-ffn-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.20, 1.96
+Load Average: 1.02, 1.93, 3.98
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------------
 Benchmark                                Time             CPU   Iterations
 --------------------------------------------------------------------------
-DL_LAYER_FFN/Scalar                  0.065 ms        0.065 ms        10758
-DL_LAYER_FFN/Auto_Vectorization      0.027 ms        0.027 ms        25878
+DL_LAYER_FFN/Scalar                  0.065 ms        0.065 ms        10788
+DL_LAYER_FFN/Auto_Vectorization      0.027 ms        0.027 ms        25830
 -----------------------------------------------------------
 Correctness Verification: [32mPASS[0m
 -----------------------------------------------------------

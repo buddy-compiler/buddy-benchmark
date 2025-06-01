@@ -1,0 +1,56 @@
+2025-06-01T09:59:45+00:00
+Running ./bin/image-processing-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.45, 1.75, 2.60
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+--------------------------------------------------------------------------------------------
+Benchmark                                                  Time             CPU   Iterations
+--------------------------------------------------------------------------------------------
+Eigen_Convolve2D/1                                      5.03 ms         5.03 ms          139
+MLIR_Conv2D/1                                           7.38 ms         7.38 ms           95
+Buddy_Conv2D/1                                         0.522 ms        0.521 ms         1363
+Buddy_Corr2D_Constant_Padding/1                        0.814 ms        0.814 ms          865
+OpenCV_Filter2D_Constant_Padding/1                      1.28 ms         1.28 ms          548
+Buddy_Resize2D_Nearest_Neighbour_Interpolation/1       0.146 ms        0.146 ms         4815
+Buddy_Resize2D_Bilinear_Interpolation/1                0.267 ms        0.267 ms         2628
+OpenCV_Resize2D_Nearest_Neighbour_Interpolation/1      0.007 ms        0.007 ms       102923
+OpenCV_Resize2D_Bilinear_Interpolation/1               0.014 ms        0.014 ms        48919
+Buddy_Erosion2D_Constant_Padding/1                     0.222 ms        0.222 ms         3130
+Buddy_Dilation2D_Constant_Padding/1                    0.220 ms        0.220 ms         3158
+Buddy_Opening2D_Constant_Padding/1                     0.334 ms        0.334 ms         2177
+Buddy_Closing2D_Constant_Padding/1                     0.338 ms        0.338 ms         2114
+Buddy_TopHat2D_Constant_Padding/1                      0.893 ms        0.893 ms          734
+Buddy_BottomHat2D_Constant_Padding/1                   0.899 ms        0.899 ms          761
+OpenCV_Erode2D_Constant_Padding/1                      0.139 ms        0.139 ms         5020
+OpenCV_Opening2D_Constant_Padding/1                    0.217 ms        0.217 ms         3210
+OpenCV_Closing2D_Constant_Padding/1                    0.220 ms        0.220 ms         3180
+OpenCV_TopHat2D_Constant_Padding/1                     0.255 ms        0.255 ms         2639
+OpenCV_BottomHat2D_Constant_Padding/1                  0.256 ms        0.256 ms         2732
+OpenCV_MorphGrad2D_Constant_Padding/1                  0.247 ms        0.247 ms         2827
+OpenCV_Dilate2D_Constant_Padding/1                     0.136 ms        0.136 ms         5123
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.
+Saved PNG file.

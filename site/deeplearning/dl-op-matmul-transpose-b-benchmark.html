@@ -7,17 +7,18 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-matmul-transpose-b-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-matmul-transpose-b-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-matmul-transpose-b-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/scalar_O0/iterations:5</td><td>1265.3</td><td>1263.6</td><td>5</td></tr>
-<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3/iterations:5</td><td>326.8</td><td>326.8</td><td>5</td></tr>
-<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3_omp/iterations:5</td><td>30.3</td><td>18.8</td><td>5</td></tr>
-<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/vec/iterations:5</td><td>83.6</td><td>83.6</td><td>5</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/scalar_O0/iterations:5</td><td>1.05e+03</td><td>1.04e+03</td><td>5</td></tr>
+<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3/iterations:5</td><td>277</td><td>277</td><td>5</td></tr>
+<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3_omp/iterations:5</td><td>30.3</td><td>19.4</td><td>5</td></tr>
+<tr><td style='text-align:left'>DL_OPS_MATMUL_TRANSPOSE_B/vec/iterations:5</td><td>84.9</td><td>84.9</td><td>5</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:13:28+00:00
+<pre>2025-06-01T09:44:10+00:00
 Running ./dl-op-matmul-transpose-b-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -25,15 +26,15 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.07, 1.18, 1.91
+Load Average: 1.01, 1.78, 3.82
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 -----------------------------------------------------------------------------------------------
 Benchmark                                                     Time             CPU   Iterations
 -----------------------------------------------------------------------------------------------
-DL_OPS_MATMUL_TRANSPOSE_B/scalar_O0/iterations:5           1265 ms         1264 ms            5
-DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3/iterations:5            327 ms          327 ms            5
-DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3_omp/iterations:5       30.3 ms         18.8 ms            5
-DL_OPS_MATMUL_TRANSPOSE_B/vec/iterations:5                 83.6 ms         83.6 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O0/iterations:5           1045 ms         1044 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3/iterations:5            277 ms          277 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3_omp/iterations:5       30.3 ms         19.4 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/vec/iterations:5                 84.9 ms         84.9 ms            5
 [34m---------- Verification ----------[0m
 scalar_O3 [32mPASS[0m
 scalar_O3_omp [32mPASS[0m

@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:19+00:00",
+    "date": "2025-06-01T09:44:01+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-mathfpow-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1,1.16699,1.91113],
+    "load_avg": [1.00879,1.80957,3.85156],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 8096,
-      "real_time": 8.3391365306194232e-02,
-      "cpu_time": 8.3389921689723326e-02,
+      "iterations": 8120,
+      "real_time": 8.5159794432042274e-02,
+      "cpu_time": 8.5155036699507400e-02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 12303,
-      "real_time": 5.7476819394846557e-02,
-      "cpu_time": 5.7475786474843533e-02,
+      "iterations": 12142,
+      "real_time": 5.6896000527418576e-02,
+      "cpu_time": 5.6895375061769053e-02,
       "time_unit": "ms"
     }
   ]

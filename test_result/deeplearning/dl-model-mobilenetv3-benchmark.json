@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:08:34+00:00",
+    "date": "2025-06-01T09:39:18+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-model-mobilenetv3-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.40039,1.45605,2.25537],
+    "load_avg": [2.00293,3.05371,4.85986],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 20,
-      "real_time": 3.5308412462472916e+01,
-      "cpu_time": 3.5303849899999996e+01,
+      "iterations": 18,
+      "real_time": 3.5876018926501274e+01,
+      "cpu_time": 3.5873441388888892e+01,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 21,
-      "real_time": 3.2171089379560378e+01,
-      "cpu_time": 3.2166612142857147e+01,
+      "iterations": 22,
+      "real_time": 3.2652140764350243e+01,
+      "cpu_time": 3.2651343363636357e+01,
       "time_unit": "ms"
     }
   ]

@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-linalg-arithaddf-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-linalg-arithaddf-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-linalg-arithaddf-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>BM_ADDF_SCALAR</td><td>0.0</td><td>0.0</td><td>23951</td></tr>
-<tr><td style='text-align:left'>BM_ADDF_AutoVectorization</td><td>0.0</td><td>0.0</td><td>174606</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>BM_ADDF_SCALAR</td><td>0.0299</td><td>0.0299</td><td>23,357</td></tr>
+<tr><td style='text-align:left'>BM_ADDF_AutoVectorization</td><td>0.00399</td><td>0.00399</td><td>164,695</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:13:08+00:00
+<pre>2025-06-01T09:43:50+00:00
 Running ./dl-op-linalg-arithaddf-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.17, 1.92
+Load Average: 1.01, 1.84, 3.88
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------
 Benchmark                          Time             CPU   Iterations
 --------------------------------------------------------------------
-BM_ADDF_SCALAR                 0.029 ms        0.029 ms        23951
-BM_ADDF_AutoVectorization      0.004 ms        0.004 ms       174606
+BM_ADDF_SCALAR                 0.030 ms        0.030 ms        23357
+BM_ADDF_AutoVectorization      0.004 ms        0.004 ms       164695
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

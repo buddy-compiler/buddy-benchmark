@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:20+00:00",
+    "date": "2025-06-01T09:44:02+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-mathrsqrt-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.08008,1.18115,1.91162],
+    "load_avg": [1.00781,1.7959,3.83594],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 9407,
-      "real_time": 7.2711996517919431e-02,
-      "cpu_time": 7.2711034548740297e-02,
+      "iterations": 9624,
+      "real_time": 7.2778359749172489e-02,
+      "cpu_time": 7.2776962281795518e-02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 161010,
-      "real_time": 4.3512647488525760e-03,
-      "cpu_time": 4.3511522389913680e-03,
+      "iterations": 160866,
+      "real_time": 4.3446532387546302e-03,
+      "cpu_time": 4.3446116705829702e-03,
       "time_unit": "ms"
     }
   ]

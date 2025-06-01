@@ -1,0 +1,21 @@
+2025-06-01T10:11:11+00:00
+Running ./vectorization-matrix-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 1.00, 1.09, 1.76
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+--------------------------------------------------------
+Benchmark              Time             CPU   Iterations
+--------------------------------------------------------
+MLIR_MatMul/1       18.8 ns         18.8 ns     37302822
+MLIR_MatVec/1       20.5 ns         20.5 ns     35030976
+--------------------------------------------------------
+MLIR_MatMul: MLIR MatMul Operation + Nested Loop
+[ 18 18 18 18 18 18 18 18 18 18 ]
+--------------------------------------------------------
+MLIR_MatVec: MLIR MatVec Operation
+[ 18 18 18 18 18 18 18 18 18 18 ]

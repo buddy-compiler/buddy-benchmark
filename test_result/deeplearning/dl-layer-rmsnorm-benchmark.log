@@ -1,4 +1,4 @@
-2025-05-26T21:12:38+00:00
+2025-06-01T09:43:21+00:00
 Running ./dl-layer-rmsnorm-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.19, 1.95
+Load Average: 1.02, 1.93, 3.98
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ------------------------------------------------------------------------------
 Benchmark                                    Time             CPU   Iterations
 ------------------------------------------------------------------------------
-DL_LAYER_RMSNORM/Scalar                  0.002 ms        0.002 ms       358748
-DL_LAYER_RMSNORM/Auto_Vectorization      0.001 ms        0.001 ms       753724
+DL_LAYER_RMSNORM/Scalar                  0.002 ms        0.002 ms       355522
+DL_LAYER_RMSNORM/Auto_Vectorization      0.001 ms        0.001 ms       763038
 -----------------------------------------------------------
 Correctness Verification: [32mPASS[0m
 -----------------------------------------------------------

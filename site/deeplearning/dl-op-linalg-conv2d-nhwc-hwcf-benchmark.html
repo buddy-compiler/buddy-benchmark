@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-linalg-conv2d-nhwc-hwcf-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-linalg-conv2d-nhwc-hwcf-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-linalg-conv2d-nhwc-hwcf-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>BM_CONV_2D_NHWC_HWCF_SCALAR</td><td>32.6</td><td>32.6</td><td>22</td></tr>
-<tr><td style='text-align:left'>BM_CONV_2D_NHWC_HWCF_AutoVectorization</td><td>6.1</td><td>6.1</td><td>115</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>BM_CONV_2D_NHWC_HWCF_SCALAR</td><td>32.4</td><td>32.4</td><td>21</td></tr>
+<tr><td style='text-align:left'>BM_CONV_2D_NHWC_HWCF_AutoVectorization</td><td>6.16</td><td>6.16</td><td>114</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:12:54+00:00
+<pre>2025-06-01T09:43:36+00:00
 Running ./dl-op-linalg-conv2d-nhwc-hwcf-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.18, 1.94
+Load Average: 1.02, 1.88, 3.93
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ---------------------------------------------------------------------------------
 Benchmark                                       Time             CPU   Iterations
 ---------------------------------------------------------------------------------
-BM_CONV_2D_NHWC_HWCF_SCALAR                  32.6 ms         32.6 ms           22
-BM_CONV_2D_NHWC_HWCF_AutoVectorization       6.07 ms         6.07 ms          115
+BM_CONV_2D_NHWC_HWCF_SCALAR                  32.4 ms         32.4 ms           21
+BM_CONV_2D_NHWC_HWCF_AutoVectorization       6.16 ms         6.16 ms          114
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

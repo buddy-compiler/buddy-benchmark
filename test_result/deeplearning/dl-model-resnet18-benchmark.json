@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:12:31+00:00",
+    "date": "2025-06-01T09:43:14+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-model-resnet18-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.00439,1.19629,1.95947],
+    "load_avg": [1.02197,1.94287,3.99512],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -46,8 +46,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.2581797651946545e+02,
-      "cpu_time": 7.1790319600000009e+02,
+      "real_time": 7.1908619441092014e+02,
+      "cpu_time": 7.1777358900000013e+02,
       "time_unit": "ms"
     },
     {
@@ -60,8 +60,8 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 7.2334924899041653e+02,
-      "cpu_time": 7.2326446299999998e+02,
+      "real_time": 7.2598466090857983e+02,
+      "cpu_time": 7.1803150299999993e+02,
       "time_unit": "ms"
     }
   ]

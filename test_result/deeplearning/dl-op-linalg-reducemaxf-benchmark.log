@@ -1,4 +1,4 @@
-2025-05-26T21:13:25+00:00
+2025-06-01T09:44:07+00:00
 Running ./dl-op-linalg-reducemaxf-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,5 +6,5 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.08, 1.18, 1.91
+Load Average: 1.01, 1.78, 3.82
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.

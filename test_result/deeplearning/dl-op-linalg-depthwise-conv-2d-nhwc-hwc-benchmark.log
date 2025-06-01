@@ -1,4 +1,4 @@
-2025-05-26T21:12:56+00:00
+2025-06-01T09:43:38+00:00
 Running ./dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,14 +6,14 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.18, 1.93
+Load Average: 1.01, 1.87, 3.91
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ------------------------------------------------------------------------------------------------------------
 Benchmark                                                                  Time             CPU   Iterations
 ------------------------------------------------------------------------------------------------------------
-DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/scalar/iterations:5                   4.84 ms         4.84 ms            5
+DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/scalar/iterations:5                   7.27 ms         7.27 ms            5
 DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/auto_vectorization/iterations:5       1.68 ms         1.68 ms            5
-DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/vectorization/iterations:5           0.120 ms        0.120 ms            5
+DL_OPS_DEPTHWISE_CONV_2D_NHWC_HWC/vectorization/iterations:5           0.127 ms        0.127 ms            5
 [34m---------- Verification ----------[0m
 auto_vectorization [32mPASS[0m
 vectorization [32mPASS[0m

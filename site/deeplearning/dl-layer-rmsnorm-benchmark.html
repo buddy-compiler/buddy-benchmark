@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-layer-rmsnorm-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-layer-rmsnorm-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-layer-rmsnorm-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>DL_LAYER_RMSNORM/Scalar</td><td>0.0</td><td>0.0</td><td>358748</td></tr>
-<tr><td style='text-align:left'>DL_LAYER_RMSNORM/Auto_Vectorization</td><td>0.0</td><td>0.0</td><td>753724</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_LAYER_RMSNORM/Scalar</td><td>0.00196</td><td>0.00196</td><td>355,522</td></tr>
+<tr><td style='text-align:left'>DL_LAYER_RMSNORM/Auto_Vectorization</td><td>0.000907</td><td>0.000907</td><td>763,038</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:12:38+00:00
+<pre>2025-06-01T09:43:21+00:00
 Running ./dl-layer-rmsnorm-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.19, 1.95
+Load Average: 1.02, 1.93, 3.98
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ------------------------------------------------------------------------------
 Benchmark                                    Time             CPU   Iterations
 ------------------------------------------------------------------------------
-DL_LAYER_RMSNORM/Scalar                  0.002 ms        0.002 ms       358748
-DL_LAYER_RMSNORM/Auto_Vectorization      0.001 ms        0.001 ms       753724
+DL_LAYER_RMSNORM/Scalar                  0.002 ms        0.002 ms       355522
+DL_LAYER_RMSNORM/Auto_Vectorization      0.001 ms        0.001 ms       763038
 -----------------------------------------------------------
 Correctness Verification: [32mPASS[0m
 -----------------------------------------------------------

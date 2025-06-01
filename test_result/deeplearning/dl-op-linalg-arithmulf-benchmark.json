@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:12+00:00",
+    "date": "2025-06-01T09:43:54+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-arithmulf-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.00049,1.16992,1.9165],
+    "load_avg": [1.00977,1.82324,3.86719],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 23392,
-      "real_time": 2.9420993729111028e-02,
-      "cpu_time": 2.9417276718536250e-02,
+      "iterations": 23548,
+      "real_time": 2.9561160227525248e-02,
+      "cpu_time": 2.9560279938848310e-02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 175155,
-      "real_time": 3.9999952532304437e-03,
-      "cpu_time": 3.9999198538437381e-03,
+      "iterations": 146698,
+      "real_time": 3.9905801919875427e-03,
+      "cpu_time": 3.9904828423018707e-03,
       "time_unit": "ms"
     }
   ]

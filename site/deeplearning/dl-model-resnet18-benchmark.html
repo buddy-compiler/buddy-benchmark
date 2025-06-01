@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-model-resnet18-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-model-resnet18-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-model-resnet18-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>DL_MODEL_Resnet18/Auto_Vectorization</td><td>725.8</td><td>717.9</td><td>1</td></tr>
-<tr><td style='text-align:left'>DL_MODEL_Resnet18/Buddy_Vectorization</td><td>723.3</td><td>723.3</td><td>1</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_MODEL_Resnet18/Auto_Vectorization</td><td>719</td><td>718</td><td>1</td></tr>
+<tr><td style='text-align:left'>DL_MODEL_Resnet18/Buddy_Vectorization</td><td>726</td><td>718</td><td>1</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:12:31+00:00
+<pre>2025-06-01T09:43:14+00:00
 Running ./dl-model-resnet18-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.20, 1.96
+Load Average: 1.02, 1.94, 4.00
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------------------
 Benchmark                                      Time             CPU   Iterations
 --------------------------------------------------------------------------------
-DL_MODEL_Resnet18/Auto_Vectorization         726 ms          718 ms            1
-DL_MODEL_Resnet18/Buddy_Vectorization        723 ms          723 ms            1
+DL_MODEL_Resnet18/Auto_Vectorization         719 ms          718 ms            1
+DL_MODEL_Resnet18/Buddy_Vectorization        726 ms          718 ms            1
 -----------------------------------------------------------
 Correctness Verification: [32mPASS[0m
 -----------------------------------------------------------

@@ -1,4 +1,4 @@
-2025-05-26T21:13:11+00:00
+2025-06-01T09:43:53+00:00
 Running ./dl-op-linalg-arithdivf-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.00, 1.17, 1.92
+Load Average: 1.01, 1.82, 3.87
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 --------------------------------------------------------------------
 Benchmark                          Time             CPU   Iterations
 --------------------------------------------------------------------
-BM_DIVF_SCALAR                 0.030 ms        0.030 ms        22508
-BM_DIVF_AutoVectorization      0.010 ms        0.010 ms        73818
+BM_DIVF_SCALAR                 0.029 ms        0.029 ms        23918
+BM_DIVF_AutoVectorization      0.010 ms        0.010 ms        73794
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

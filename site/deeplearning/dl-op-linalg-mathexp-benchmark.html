@@ -7,15 +7,16 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-op-linalg-mathexp-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-op-linalg-mathexp-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-op-linalg-mathexp-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>BM_EXP_SCALAR</td><td>0.0</td><td>0.0</td><td>15289</td></tr>
-<tr><td style='text-align:left'>BM_EXP_AutoVectorization</td><td>0.0</td><td>0.0</td><td>22195</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>BM_EXP_SCALAR</td><td>0.0456</td><td>0.0456</td><td>15,072</td></tr>
+<tr><td style='text-align:left'>BM_EXP_AutoVectorization</td><td>0.0316</td><td>0.0316</td><td>22,245</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:13:22+00:00
+<pre>2025-06-01T09:44:04+00:00
 Running ./dl-op-linalg-mathexp-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -23,13 +24,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.08, 1.18, 1.91
+Load Average: 1.01, 1.80, 3.84
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 -------------------------------------------------------------------
 Benchmark                         Time             CPU   Iterations
 -------------------------------------------------------------------
-BM_EXP_SCALAR                 0.046 ms        0.046 ms        15289
-BM_EXP_AutoVectorization      0.032 ms        0.032 ms        22195
+BM_EXP_SCALAR                 0.046 ms        0.046 ms        15072
+BM_EXP_AutoVectorization      0.032 ms        0.032 ms        22245
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

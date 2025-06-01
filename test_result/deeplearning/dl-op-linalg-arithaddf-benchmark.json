@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-05-26T21:13:08+00:00",
+    "date": "2025-06-01T09:43:50+00:00",
     "host_name": "4ed4bacfe45d",
     "executable": "./dl-op-linalg-arithaddf-benchmark",
     "num_cpus": 24,
@@ -32,7 +32,7 @@
         "num_sharing": 24
       }
     ],
-    "load_avg": [1.00098,1.17285,1.92188],
+    "load_avg": [1.01074,1.8374,3.88281],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,9 +45,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 23951,
-      "real_time": 2.9350469685000002e-02,
-      "cpu_time": 2.9346575633585240e-02,
+      "iterations": 23357,
+      "real_time": 2.9862665965978977e-02,
+      "cpu_time": 2.9862255341011262e-02,
       "time_unit": "ms"
     },
     {
@@ -59,9 +59,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 174606,
-      "real_time": 4.2519020574317591e-03,
-      "cpu_time": 4.2513099836202651e-03,
+      "iterations": 164695,
+      "real_time": 3.9880004303424737e-03,
+      "cpu_time": 3.9879427426454967e-03,
       "time_unit": "ms"
     }
   ]

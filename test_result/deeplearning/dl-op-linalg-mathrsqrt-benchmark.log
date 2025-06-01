@@ -1,4 +1,4 @@
-2025-05-26T21:13:20+00:00
+2025-06-01T09:44:02+00:00
 Running ./dl-op-linalg-mathrsqrt-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -6,13 +6,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.08, 1.18, 1.91
+Load Average: 1.01, 1.80, 3.84
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ---------------------------------------------------------------------
 Benchmark                           Time             CPU   Iterations
 ---------------------------------------------------------------------
-BM_RSQRT_SCALAR                 0.073 ms        0.073 ms         9407
-BM_RSQRT_AutoVectorization      0.004 ms        0.004 ms       161010
+BM_RSQRT_SCALAR                 0.073 ms        0.073 ms         9624
+BM_RSQRT_AutoVectorization      0.004 ms        0.004 ms       160866
 -----------------------------------------------------------
 Correctness Verification:
 Transform case: [32mPASS[0m

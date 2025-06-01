@@ -7,16 +7,17 @@ th{text-align:center;background:#f0f0f0}
 tr:nth-child(even){background:#fafafa}
 details{border:1px solid #ccc;border-radius:.4rem;padding:.6rem}
 summary{font-weight:600;cursor:pointer}
+.err{border:2px solid #c00;background:#fee;padding:1rem;border-radius:.5rem}
 </style>
 
-<h2>deeplearning/dl-model-tinyllama-benchmark.json</h2><p><em>2025-05-26 22:41:02 UTC</em></p>
+<h2>deeplearning/dl-model-tinyllama-benchmark.json</h2><p><em>2025-06-01 10:22:14 UTC</em></p>
 <h3>dl-model-tinyllama-benchmark.json</h3>
-<table><tr><th>Name</th><th>Time (ns)</th><th>CPU (ns)</th><th>Iterations</th></tr>
-<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/scalar</td><td>145312.6</td><td>145306.0</td><td>1</td></tr>
-<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/matmul_opt</td><td>9843.2</td><td>9842.8</td><td>1</td></tr>
-<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/matmul_opt_omp</td><td>7800.4</td><td>7157.2</td><td>1</td></tr></table>
+<table><tr><th>Name</th><th>Time&nbsp;(ms)</th><th>CPU&nbsp;(ms)</th><th>Iterations</th></tr>
+<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/scalar</td><td>1.73e+05</td><td>1.73e+05</td><td>1</td></tr>
+<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/matmul_opt</td><td>1.05e+04</td><td>1.05e+04</td><td>1</td></tr>
+<tr><td style='text-align:left'>DL_MODEL_TINYLLAMA/matmul_opt_omp</td><td>8.22e+03</td><td>7.61e+03</td><td>1</td></tr></table>
 <details><summary>Console output</summary>
-<pre>2025-05-26T21:03:18+00:00
+<pre>2025-06-01T09:33:00+00:00
 Running ./dl-model-tinyllama-benchmark
 Run on (24 X 5100 MHz CPU s)
 CPU Caches:
@@ -24,14 +25,14 @@ CPU Caches:
   L1 Instruction 32 KiB (x12)
   L2 Unified 1280 KiB (x12)
   L3 Unified 30720 KiB (x1)
-Load Average: 1.60, 2.10, 2.74
+Load Average: 2.76, 5.10, 6.18
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ----------------------------------------------------------------------------
 Benchmark                                  Time             CPU   Iterations
 ----------------------------------------------------------------------------
-DL_MODEL_TINYLLAMA/scalar             145313 ms       145306 ms            1
-DL_MODEL_TINYLLAMA/matmul_opt           9843 ms         9843 ms            1
-DL_MODEL_TINYLLAMA/matmul_opt_omp       7800 ms         7157 ms            1
+DL_MODEL_TINYLLAMA/scalar             172638 ms       172634 ms            1
+DL_MODEL_TINYLLAMA/matmul_opt          10491 ms        10491 ms            1
+DL_MODEL_TINYLLAMA/matmul_opt_omp       8219 ms         7607 ms            1
 [34m---------- Verification ----------[0m
 matmul_opt [32mPASS[0m
 matmul_opt_omp [32mPASS[0m
