@@ -75,7 +75,7 @@ jobs:
 
     - name: Push to buddy-compiler.github.io
       uses: peaceiris/actions-gh-pages@v4
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       with:
         personal_token: ${{ secrets.BUDDY_SITE_PAT }}
         external_repository: buddy-compiler/buddy-compiler.github.io
