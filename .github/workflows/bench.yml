@@ -56,9 +56,15 @@ jobs:
       with:
         path: /home/quliu/buddy-complier-workspace/buddy-benchmark/site
 
-    - name: Deploy to Pages
-      id: deploy
-      uses: actions/deploy-pages@v4
+    - name: Push to buddy-compiler.github.io
+      uses: peaceiris/actions-gh-pages@v4
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      with:
+        personal_token: ${{ secrets.BUDDY_SITE_PAT }}
+        external_repository: buddy-compiler/buddy-compiler.github.io
+        publish_dir: /home/quliu/buddy-complier-workspace/buddy-benchmark/site
+        destination_dir: benchmarks/${{ github.sha }}
+        publish_branch: main
+        keep_files: true
+        commit_message: Deploy benchmark results for ${{ github.sha }} (from ${{ github.repository }})
 
-    outputs:
-      page_url: ${{ steps.deploy.outputs.page_url }}

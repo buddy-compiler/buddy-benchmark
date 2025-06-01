@@ -88,11 +88,14 @@ for js in src.rglob("*.json"):
 # ---------------------------------------------------------------------------
 # rebuild index
 # ---------------------------------------------------------------------------
-links = "\n".join(
-    f'<li><a href="{p.relative_to(dst).as_posix()}">'
-    f'{p.relative_to(dst).as_posix()}</a></li>'
-    for p in sorted(dst.rglob("*.html"))
-    if p.name != "index.html"
+run_dir = dst / "benchmarks" / datetime.date.today().isoformat()
+run_dir.mkdir(parents=True, exist_ok=True)
+
+# ---------------------------------------------------------------------------
+# rebuild index  (leave the links = … block exactly as it is)
+# ---------------------------------------------------------------------------
+
+# ⬇︎ replace the old line that wrote to “dst/index.html”
+(run_dir / "index.html").write_text(
+    CSS + f"<h1>Buddy-Benchmark results</h1><ul>\n{links}\n</ul>"
 )
-(dst / "index.html").write_text(
-    CSS + "<h1>Buddy-Benchmark results</h1><ul>\n" + links + "\n</ul>")
