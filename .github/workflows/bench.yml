@@ -75,13 +75,13 @@ jobs:
 
     - name: Push to buddy-compiler.github.io
       uses: peaceiris/actions-gh-pages@v4
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       with:
         personal_token: ${{ secrets.BUDDY_SITE_PAT }}
         external_repository: buddy-compiler/buddy-compiler.github.io
         publish_dir: /home/quliu/buddy-complier-workspace/buddy-benchmark/site
         destination_dir: benchmarks/${{ github.sha }}
-        publish_branch: main
+        publish_branch: master
         keep_files: true
         commit_message: Deploy benchmark results for ${{ github.sha }} (from ${{ github.repository }})
 
