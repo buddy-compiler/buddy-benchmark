@@ -18,13 +18,12 @@ add_custom_command(
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
       -pass-pipeline
       "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
-                empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, arith-bufferize, \
-                func.func(linalg-bufferize, tensor-bufferize), func-bufferize)" |
+                empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg)" |
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt
       -pass-pipeline
       "builtin.module(func.func(buffer-deallocation-simplification, convert-linalg-to-loops), \
                 eliminate-empty-tensors, func.func(llvm-request-c-wrappers), \
-                convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
+                convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, convert-cf-to-llvm, \
                 convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
                 convert-func-to-llvm, reconcile-unrealized-casts)" |
     ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_auto_vectorization.ll
@@ -51,23 +50,20 @@ add_custom_command(
       -eliminate-empty-tensors
       -convert-elementwise-to-linalg
       -empty-tensor-to-alloc-tensor
-      -one-shot-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -convert-linalg-to-affine-loops
       -affine-loop-fusion
       -affine-parallelize
-      -lower-affine
-      -func-bufferize-dynamic-offset
-      -tensor-bufferize
-      -convert-linalg-to-loops
-      -finalizing-bufferize
       -convert-vector-to-scf
       -expand-strided-metadata
+      -lower-affine
       -cse
       -convert-vector-to-llvm
       -memref-expand
       -convert-arith-to-llvm
       -finalize-memref-to-llvm
       -convert-scf-to-cf
+      -convert-cf-to-llvm 
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -convert-math-to-llvm
@@ -94,13 +90,12 @@ add_custom_command(
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
       -pass-pipeline
       "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
-                empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, arith-bufferize, \
-                func.func(linalg-bufferize, tensor-bufferize), func-bufferize)" |
+                empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg)" |
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt
       -pass-pipeline
       "builtin.module(func.func(buffer-deallocation-simplification, convert-linalg-to-loops), \
                 eliminate-empty-tensors, func.func(llvm-request-c-wrappers), \
-                convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
+                convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, convert-cf-to-llvm, \
                 convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
                 convert-func-to-llvm, reconcile-unrealized-casts)" |
     ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_buddy_vectorization.ll
@@ -127,24 +122,21 @@ add_custom_command(
       -eliminate-empty-tensors
       -convert-elementwise-to-linalg
       -empty-tensor-to-alloc-tensor
-      -one-shot-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -batchmatmul-optimize
       -convert-linalg-to-affine-loops
       -affine-loop-fusion
       -affine-parallelize
-      -lower-affine
-      -func-bufferize-dynamic-offset
-      -tensor-bufferize
-      -convert-linalg-to-loops
-      -finalizing-bufferize
       -convert-vector-to-scf
       -expand-strided-metadata
+      -lower-affine
       -cse
       -convert-vector-to-llvm
       -memref-expand
       -convert-arith-to-llvm
       -finalize-memref-to-llvm
       -convert-scf-to-cf
+      -convert-cf-to-llvm 
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -convert-math-to-llvm
