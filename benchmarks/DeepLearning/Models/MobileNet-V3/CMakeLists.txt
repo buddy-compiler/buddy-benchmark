@@ -59,18 +59,15 @@ add_custom_command(
       -linalg-named-op-conversion
       -convert-math-to-llvm
       -convert-math-to-libm
-      -one-shot-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -convert-linalg-to-affine-loops
-      -lower-affine
-      -func-bufferize
-      -tensor-bufferize
-      -arith-bufferize
-      -finalizing-bufferize
       -convert-vector-to-scf
       -expand-strided-metadata
+      -lower-affine
       -convert-vector-to-llvm
       -finalize-memref-to-llvm
       -convert-scf-to-cf
+      -convert-cf-to-llvm
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -convert-func-to-llvm
@@ -132,20 +129,17 @@ add_custom_command(
       -linalg-named-op-conversion
       -convert-math-to-llvm
       -convert-math-to-libm
-      -one-shot-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -conv-nhwc-fhwc-optimize # conv-nhwc-fhwc optimization
       -depthwise-conv-nhwc-hwc-optimize # depthwise-conv-nhwc-hwc optimization
       -convert-linalg-to-affine-loops
-      -lower-affine
-      -func-bufferize
-      -tensor-bufferize
-      -arith-bufferize
-      -finalizing-bufferize
       -convert-vector-to-scf
       -expand-strided-metadata
+      -lower-affine
       -convert-vector-to-llvm
       -finalize-memref-to-llvm
       -convert-scf-to-cf
+      -convert-cf-to-llvm
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -convert-func-to-llvm

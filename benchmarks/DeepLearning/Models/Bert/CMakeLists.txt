@@ -18,13 +18,12 @@ add_custom_command(
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
       -pass-pipeline
       "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
-                empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, arith-bufferize, \
-                func.func(linalg-bufferize, tensor-bufferize), func-bufferize)" |
+                empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg)" |
     ${LLVM_MLIR_BINARY_DIR}/mlir-opt
       -pass-pipeline
       "builtin.module(func.func(buffer-deallocation-simplification, convert-linalg-to-loops), \
                 eliminate-empty-tensors, func.func(llvm-request-c-wrappers), \
-                convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
+                convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, convert-cf-to-llvm, \
                 convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
                 convert-func-to-llvm, reconcile-unrealized-casts)" |
     ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_auto_vectorization.ll
@@ -43,25 +42,21 @@ add_custom_command(
     cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
     sed -e {s/@subgraph0/@subgraph0_auto_vectorization/} |
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt 
-      -pass-pipeline "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, func-bufferize-dynamic-offset, arith-bufferize, func.func(linalg-bufferize, tensor-bufferize))" |
+      -pass-pipeline "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg)" |
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
       -convert-elementwise-to-linalg
-      -func-bufferize-dynamic-offset
-      -arith-bufferize
-      -func-bufferize
-      -tensor-bufferize
-      -linalg-bufferize
-      -finalizing-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -convert-linalg-to-loops
-      -lower-affine
       -convert-scf-to-cf
+      -convert-cf-to-llvm
       -llvm-request-c-wrappers
       -convert-math-to-llvm
       -convert-math-to-libm
-      -convert-arith-to-llvm
       -convert-func-to-llvm
       -expand-strided-metadata
+      -lower-affine
       -finalize-memref-to-llvm
+      -convert-arith-to-llvm
       -reconcile-unrealized-casts |
     ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_auto_vectorization.ll
   COMMAND
@@ -83,13 +78,12 @@ add_custom_command(
       ${LLVM_MLIR_BINARY_DIR}/mlir-opt 
         -pass-pipeline
         "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), \
-                  empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, arith-bufferize, \
-                  func.func(linalg-bufferize, tensor-bufferize), func-bufferize)" |
+                  empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg)" |
       ${LLVM_MLIR_BINARY_DIR}/mlir-opt
         -pass-pipeline
         "builtin.module(func.func(buffer-deallocation-simplification, convert-linalg-to-loops), \
                   eliminate-empty-tensors, func.func(llvm-request-c-wrappers), \
-                  convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, \
+                  convert-math-to-llvm, convert-math-to-libm, convert-scf-to-cf, convert-cf-to-llvm, \
                   convert-arith-to-llvm, expand-strided-metadata, finalize-memref-to-llvm, \
                   convert-func-to-llvm, reconcile-unrealized-casts)" |
       ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o forward_buddy_vectorization.ll
@@ -107,28 +101,26 @@ add_custom_command(
     cat ${CMAKE_CURRENT_SOURCE_DIR}/subgraph0.mlir |
     sed -e {s/@subgraph0/@subgraph0_buddy_vectorization/} |
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
-      -pass-pipeline "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg, func-bufferize-dynamic-offset, arith-bufferize, func.func(linalg-bufferize, tensor-bufferize))" |
+      -pass-pipeline "builtin.module(func.func(tosa-to-linalg-named, tosa-to-linalg, tosa-to-tensor, tosa-to-arith), empty-tensor-to-alloc-tensor, convert-elementwise-to-linalg)" |
     ${BUDDY_MLIR_BINARY_DIR}/buddy-opt
       -convert-elementwise-to-linalg
-      -func-bufferize-dynamic-offset
-      -arith-bufferize
-      -func-bufferize
-      -tensor-bufferize
-      -linalg-bufferize
-      -finalizing-bufferize
+      -arith-expand
+      -one-shot-bufferize="bufferize-function-boundaries"
       -batchmatmul-optimize
       -convert-linalg-to-affine-loops
       -lower-affine
       -convert-vector-to-scf
       -convert-scf-to-cf
+      -convert-cf-to-llvm
       -llvm-request-c-wrappers
       -convert-vector-to-llvm
       -convert-math-to-llvm
       -convert-math-to-libm
-      -convert-arith-to-llvm
       -convert-func-to-llvm
       -expand-strided-metadata
+      -lower-affine
       -finalize-memref-to-llvm
+      -convert-arith-to-llvm
       -reconcile-unrealized-casts |
     ${LLVM_MLIR_BINARY_DIR}/mlir-translate -mlir-to-llvmir -o subgraph0_buddy_vectorization.ll
   COMMAND 

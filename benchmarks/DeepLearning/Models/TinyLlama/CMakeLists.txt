@@ -57,19 +57,17 @@ add_custom_command(
       -eliminate-empty-tensors
       -empty-tensor-to-alloc-tensor
       -convert-elementwise-to-linalg
-      -one-shot-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -convert-linalg-to-affine-loops
-      -lower-affine
-      -func-bufferize
-      -tensor-bufferize
-      -arith-bufferize
-      -buffer-deallocation
-      -finalizing-bufferize
+      -affine-loop-fusion
+      -affine-parallelize
       -convert-vector-to-scf
       -expand-strided-metadata
+      -lower-affine
       -convert-vector-to-llvm
       -finalize-memref-to-llvm
-      -convert-scf-to-cf
+      -convert-scf-to-cf      
+      -convert-cf-to-llvm
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -convert-math-to-llvm
@@ -131,21 +129,19 @@ add_custom_command(
       -eliminate-empty-tensors
       -empty-tensor-to-alloc-tensor
       -convert-elementwise-to-linalg
-      -one-shot-bufferize
+      -one-shot-bufferize="bufferize-function-boundaries"
       -matmul-parallel-vectorization-optimize # matmul optimization
       -batchmatmul-optimize # batchmatmul optimization
       -convert-linalg-to-affine-loops
-      -lower-affine
-      -func-bufferize
-      -tensor-bufferize
-      -arith-bufferize
-      -buffer-deallocation
-      -finalizing-bufferize
+      -affine-loop-fusion
+      -affine-parallelize
       -convert-vector-to-scf
       -expand-strided-metadata
+      -lower-affine
       -convert-vector-to-llvm
       -finalize-memref-to-llvm
-      -convert-scf-to-cf
+      -convert-scf-to-cf      
+      -convert-cf-to-llvm
       -llvm-request-c-wrappers
       -convert-arith-to-llvm
       -convert-math-to-llvm
@@ -203,22 +199,18 @@ add_custom_command(
     -eliminate-empty-tensors
     -empty-tensor-to-alloc-tensor
     -convert-elementwise-to-linalg
-    -one-shot-bufferize
+    -one-shot-bufferize="bufferize-function-boundaries"
     -matmul-parallel-vectorization-optimize #  # matmul optimization
     -batchmatmul-optimize #  # batchmatmul optimization
     -convert-linalg-to-affine-loops
-    -lower-affine
     -convert-scf-to-openmp # openmp support
-    -func-bufferize
-    -tensor-bufferize
-    -arith-bufferize
-    -buffer-deallocation
-    -finalizing-bufferize
     -convert-vector-to-scf
     -expand-strided-metadata
+    -lower-affine
     -convert-vector-to-llvm
     -finalize-memref-to-llvm
-    -convert-scf-to-cf
+    -convert-scf-to-cf      
+    -convert-cf-to-llvm
     -llvm-request-c-wrappers
     -convert-openmp-to-llvm # openmp support
     -convert-arith-to-llvm
