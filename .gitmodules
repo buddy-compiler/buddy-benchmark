@@ -1,12 +1,16 @@
 [submodule "thirdparty/opencv"]
 	path = thirdparty/opencv
 	url = https://github.com/opencv/opencv.git
+	ignore = all
 [submodule "thirdparty/Halide"]
 	path = thirdparty/Halide
 	url = https://github.com/halide/Halide.git
+	ignore = all
 [submodule "thirdparty/eigen"]
 	path = thirdparty/eigen
 	url = https://gitlab.com/libeigen/eigen.git
+	ignore = all
 [submodule "thirdparty/kfr"]
 	path = thirdparty/kfr
 	url = https://github.com/kfrlib/kfr.git
+	ignore = all

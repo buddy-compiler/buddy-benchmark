@@ -80,18 +80,18 @@ void registerBenchmarkOpenCVResize2D();
 
 // Run benchmarks.
 int main(int argc, char **argv) {
-  if (argc != 5) {
-    throw std::invalid_argument(
-        "Wrong format of command line arguments.\n"
-        "Correct format is ./image-processing-benchmark <image path> <kernel "
-        "name> <kernelmorph> <Boundary Option>\n where "
-        "image path provides path of the image to be processed, kernel name "
-        "denotes the name "
-        "of desired kernel as specified in "
-        "kernelmorph denotes the kernel to be used for morphological operations"
-        "include/ImageProcessing/Kernels.h and Boundary options available "
-        "are CONSTANT_PADDING, REPLICATE_PADDING.\n");
-  }
+  // if (argc != 5) {
+  //   throw std::invalid_argument(
+  //       "Wrong format of command line arguments.\n"
+  //       "Correct format is ./image-processing-benchmark <image path> <kernel "
+  //       "name> <kernelmorph> <Boundary Option>\n where "
+  //       "image path provides path of the image to be processed, kernel name "
+  //       "denotes the name "
+  //       "of desired kernel as specified in "
+  //       "kernelmorph denotes the kernel to be used for morphological operations"
+  //       "include/ImageProcessing/Kernels.h and Boundary options available "
+  //       "are CONSTANT_PADDING, REPLICATE_PADDING.\n");
+  // }
 
   Img<float, 2> img = dip::imread<float, 2>(argv[1], dip::IMGRD_GRAYSCALE);
 

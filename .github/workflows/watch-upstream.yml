@@ -1,0 +1,96 @@
+name: Watch upstream and trigger bench on change
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to push state branch
+  actions: write    # to dispatch workflows
+
+concurrency:
+  group: watch-upstream
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: main  # adjust if your default branch differs
+          fetch-depth: 0
+
+      - name: Create/switch to automation-state branch
+        run: |
+          set -e
+          git fetch origin automation-state || true
+          if git show-ref --verify --quiet refs/remotes/origin/automation-state; then
+            # Start from the remote state branch to avoid non-ff push
+            git checkout -B automation-state origin/automation-state
+          else
+            # First run: create a new state branch from current HEAD
+            git checkout -B automation-state
+          fi
+
+      - name: Get upstream HEAD SHAs
+        id: head
+        run: |
+          set -e
+          MLIR_SHA=$(git ls-remote https://github.com/buddy-compiler/buddy-mlir.git refs/heads/main | awk '{print $1}')
+          BENCH_UP_SHA=$(git ls-remote https://github.com/buddy-compiler/buddy-benchmark.git refs/heads/main | awk '{print $1}')
+          echo "mlir=${MLIR_SHA}" >> $GITHUB_OUTPUT
+          echo "bench=${BENCH_UP_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Load previous SHAs
+        id: prev
+        run: |
+          echo "prev_mlir=$(cat mlir.sha 2>/dev/null || echo none)" >> $GITHUB_OUTPUT
+          echo "prev_bench=$(cat bench.sha 2>/dev/null || echo none)" >> $GITHUB_OUTPUT
+
+      - name: Decide if changed
+        id: decide
+        run: |
+          changed=false
+          if [ "${{ steps.head.outputs.mlir }}" != "${{ steps.prev.outputs.prev_mlir }}" ] || \
+             [ "${{ steps.head.outputs.bench }}" != "${{ steps.prev.outputs.prev_bench }}" ]; then
+            changed=true
+          fi
+          echo "changed=$changed" >> $GITHUB_OUTPUT
+
+      - name: Determine which repo changed
+        if: steps.decide.outputs.changed == 'true'
+        id: which
+        run: |
+          if [ "${{ steps.head.outputs.mlir }}" != "${{ steps.prev.outputs.prev_mlir }}" ]; then
+            echo "repo=mlir" >> $GITHUB_OUTPUT
+            echo "sha=${{ steps.head.outputs.mlir }}" >> $GITHUB_OUTPUT
+          else
+            echo "repo=benchmark" >> $GITHUB_OUTPUT
+            echo "sha=${{ steps.head.outputs.bench }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update state branch
+        if: steps.decide.outputs.changed == 'true'
+        run: |
+          set -e
+          printf "%s" "${{ steps.head.outputs.mlir }}" > mlir.sha
+          printf "%s" "${{ steps.head.outputs.bench }}" > bench.sha
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mlir.sha bench.sha
+          git commit -m "state: mlir=${{ steps.head.outputs.mlir }} bench=${{ steps.head.outputs.bench }}" || echo "no changes"
+          # Re-sync and push with lease to avoid non-ff failures if remote advanced
+          git fetch origin automation-state || true
+          git rebase origin/automation-state || true
+          git push --force-with-lease=refs/heads/automation-state origin HEAD:automation-state
+
+      - name: Dispatch bench.yml in this repo
+        if: steps.decide.outputs.changed == 'true'
+        run: |
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/bench.yml/dispatches \
+            -d '{"ref":"main","inputs":{"upstream_repo":"${{ steps.which.outputs.repo }}","upstream_sha":"${{ steps.which.outputs.sha }}"}}'

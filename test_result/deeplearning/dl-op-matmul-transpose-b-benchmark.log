@@ -1,0 +1,21 @@
+2025-09-07T12:46:24+00:00
+Running ./dl-op-matmul-transpose-b-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 4.61, 3.68, 5.14
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-----------------------------------------------------------------------------------------------
+Benchmark                                                     Time             CPU   Iterations
+-----------------------------------------------------------------------------------------------
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O0/iterations:5           1096 ms         1094 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3/iterations:5            296 ms          296 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/scalar_O3_omp/iterations:5       36.3 ms         24.1 ms            5
+DL_OPS_MATMUL_TRANSPOSE_B/vec/iterations:5                 95.4 ms         95.3 ms            5
+[34m---------- Verification ----------[0m
+scalar_O3 [32mPASS[0m
+scalar_O3_omp [32mPASS[0m
+vec [32mPASS[0m

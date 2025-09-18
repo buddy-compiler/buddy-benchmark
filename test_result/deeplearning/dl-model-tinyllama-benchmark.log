@@ -1,0 +1,19 @@
+2025-09-07T12:35:22+00:00
+Running ./dl-model-tinyllama-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 4.90, 5.53, 6.99
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+----------------------------------------------------------------------------
+Benchmark                                  Time             CPU   Iterations
+----------------------------------------------------------------------------
+DL_MODEL_TINYLLAMA/scalar             171201 ms       171198 ms            1
+DL_MODEL_TINYLLAMA/matmul_opt          11144 ms        11135 ms            1
+DL_MODEL_TINYLLAMA/matmul_opt_omp       8335 ms         7733 ms            1
+[34m---------- Verification ----------[0m
+matmul_opt [32mPASS[0m
+matmul_opt_omp [32mPASS[0m

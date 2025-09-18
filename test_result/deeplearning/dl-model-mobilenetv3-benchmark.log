@@ -1,0 +1,19 @@
+2025-09-07T12:41:45+00:00
+Running ./dl-model-mobilenetv3-benchmark
+Run on (24 X 5100 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x12)
+  L1 Instruction 32 KiB (x12)
+  L2 Unified 1280 KiB (x12)
+  L3 Unified 30720 KiB (x1)
+Load Average: 3.67, 4.13, 5.81
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-----------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations
+-----------------------------------------------------------------------------------
+BM_MobileNet_V3/BM_MobileNet_V3_scalar         39.2 ms         39.2 ms           17
+BM_MobileNet_V3/BM_MobileNet_V3_conv_opt       34.7 ms         34.7 ms           20
+-----------------------------------------------------------
+Correctness Verification:
+Transform case: [32mPASS[0m
+-----------------------------------------------------------

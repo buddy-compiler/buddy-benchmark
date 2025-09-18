@@ -1,0 +1,49 @@
+[Missing] Executable not found for 'dl-model-tinyllama-benchmark'
+[Missing] Executable not found for 'dl-model-mobilenetv3-benchmark'
+[Failed]  Run of 'dl-model-lenet-benchmark'
+         ↳ stdout/stderr → dl-model-lenet-benchmark.log (may contain errors)
+[Missing] Executable not found for 'dl-model-bert-benchmark'
+[Missing] Executable not found for 'dl-model-whisper-benchmark'
+[Missing] Executable not found for 'dl-model-resnet18-benchmark'
+[Failed]  Run of 'dl-layer-ffn-benchmark'
+         ↳ stdout/stderr → dl-layer-ffn-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-layer-selfattention-benchmark'
+         ↳ stdout/stderr → dl-layer-selfattention-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-layer-rmsnorm-benchmark'
+         ↳ stdout/stderr → dl-layer-rmsnorm-benchmark.log (may contain errors)
+[Missing] Executable not found for 'dl-op-linalg-matmul-benchmark'
+[Failed]  Run of 'dl-op-linalg-conv2d-nchw-fchw-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-conv2d-nchw-fchw-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-conv2d-nhwc-hwcf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-conv2d-nhwc-hwcf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-conv2d-nhwc-fhwc-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-conv2d-nhwc-fhwc-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-depthwise-conv-2d-nhwc-hwc-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-pooling-nhwc-sum-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-pooling-nhwc-sum-benchmark.log (may contain errors)
+[Missing] Executable not found for 'dl-op-linalg-batch-matmul-benchmark'
+[Failed]  Run of 'dl-op-linalg-arithaddf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithaddf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-arithdivf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithdivf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-arithmulf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithmulf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-arithnegf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithnegf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-arithsubf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-arithsubf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-mathfpow-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-mathfpow-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-mathrsqrt-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-mathrsqrt-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-mathexp-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-mathexp-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-reduceaddf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-reduceaddf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-reducemaxf-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-reducemaxf-benchmark.log (may contain errors)
+[Failed]  Run of 'dl-op-linalg-softmax-exp-sum-div-benchmark'
+         ↳ stdout/stderr → dl-op-linalg-softmax-exp-sum-div-benchmark.log (may contain errors)
+[Missing] Executable not found for 'dl-op-tosa-transpose-benchmark'
+[Missing] Executable not found for 'dl-op-matmul-transpose-b-benchmark'

@@ -1,0 +1,169 @@
+# .github/workflows/bench.yml
+name: Buddy-Benchmark CI
+
+on:
+  push:            # fire on any branch
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      upstream_repo:
+        description: "Which repo changed (mlir|benchmark)"
+        required: false
+      upstream_sha:
+        description: "Upstream commit SHA for result folder"
+        required: false
+
+jobs:
+  bench:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+    # ------------------------------------------------------------
+    # 1) update the two local clones so they match the commit that
+    #    triggered the run (fast-forward only for safety)
+    # ------------------------------------------------------------
+    - name: Update local clones
+      run: |
+        set -e
+        for dir in buddy-benchmark buddy-mlir; do
+          cd /home/quliu/buddy-complier-workspace/$dir
+          git remote update
+          git pull --ff-only
+        done
+
+    # ------------------------------------------------------------
+    # 2) run everything in the Docker sandbox
+    # ------------------------------------------------------------
+    - name: Build & run benchmarks
+      run: |
+        set -e
+        TEST_DIR=/home/quliu/buddy-complier-workspace/buddy-benchmark/test_result
+        if [ -d "$TEST_DIR" ] && [ "$(find "$TEST_DIR" -type f | wc -l)" -gt 0 ]; then
+          echo "[Skip] $TEST_DIR already has benchmark outputs; skipping build/run."
+          echo "[Info] File count: $(find "$TEST_DIR" -type f | wc -l)"
+        else
+          echo "[Run] No existing results detected; running benchmarks in Docker."
+          /home/quliu/buddy-complier-workspace/run_docker.sh
+        fi
+        # ------------------------------------------------------------
+    # 2½) decide which date folder we’re about to publish
+    # ------------------------------------------------------------
+    - name: Set BENCH_DATE and BENCH_DIR
+      run: |
+        bench_date=$(date +'%Y-%m-%d')
+        # Prefer a passed upstream SHA, otherwise use this workflow's SHA
+        run_sha="${{ github.event.inputs.upstream_sha || github.sha }}"
+        echo "BENCH_DATE=$bench_date" >> "$GITHUB_ENV"
+        echo "BENCH_DIR=$HOME/buddy-complier-workspace/buddy-benchmark/site/benchmarks/$bench_date/${run_sha}" >> "$GITHUB_ENV"
+
+    # ------------------------------------------------------------
+    # 3-5) (UNCHANGED) upload raw logs, convert to HTML, deploy Pages
+    # ------------------------------------------------------------
+    - name: Upload raw logs as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vectorization-logs-${{ github.sha }}
+        path: /home/quliu/buddy-complier-workspace/buddy-benchmark/test_result
+        retention-days: 30
+
+    - name: Build mini-site
+      working-directory: /home/quliu/buddy-complier-workspace/buddy-benchmark
+      run: |
+        rm -rf site
+        mkdir -p "${{ env.BENCH_DIR }}"
+        python3 scripts/logs2html.py test_result "${{ env.BENCH_DIR }}/"
+
+    - name: Update benchmarks/latest redirect
+      working-directory: /home/quliu/buddy-complier-workspace/buddy-benchmark/site/benchmarks
+      run: |
+        set -e
+        # -------- pick the most recent dated folder (YYYY-MM-DD) -------------
+        latest=$(ls -1d 20*/ | sort -r | head -n1 | tr -d '/')
+        echo "[Info] newest run is: $latest"
+
+        # -------- rebuild the 'latest' folder with a meta-refresh ------------
+        rm -rf latest
+        mkdir -p latest
+        printf '%s\n' "<meta http-equiv=\"refresh\" content=\"0; url=../${latest}/\">" > latest/index.html
+        echo "[Info] benchmarks/latest now points to ../${latest}/"
+
+    # ------------------------------------------------------------
+    # 4) make /benchmarks/ point to the most recent run as well
+    # ------------------------------------------------------------
+    # (Removed) previous redirect-only index; replaced by full listing below
+
+    - name: Upload site artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: /home/quliu/buddy-complier-workspace/buddy-benchmark/site
+
+    - name: Build landing page for this run
+      run: |
+        run_root="${{ env.BENCH_DIR }}"
+        mkdir -p "$run_root"
+
+        {
+          printf '%s\n' \
+            '---' \
+            'layout: default' \
+            'title: Benchmark run' \
+            'nav_exclude: true' \
+            '---' \
+            '' \
+            '<h1>Benchmark results</h1>' \
+            '' \
+            '<ul>' \
+            '{% for f in site.static_files %}' \
+            '  {% if f.path contains page.dir and f.name != "index.html" and f.extname == ".html" %}' \
+            '    <li><a href="{{ f.path }}">{{ f.name }}</a></li>' \
+            '  {% endif %}' \
+            '{% endfor %}' \
+            '</ul>'
+        } > "$run_root/index.html"
+
+
+    - name: Build top-level benchmarks index (list all runs)
+      working-directory: /home/quliu/buddy-complier-workspace/buddy-benchmark/site
+      run: |
+        set -e
+        out=benchmarks/index.html
+        mkdir -p benchmarks
+        {
+          printf '%s\n' \
+            '---' \
+            'layout: default' \
+            'title: Benchmarks' \
+            'nav_exclude: true' \
+            '---' \
+            '<h1>Benchmark runs</h1>' \
+            '<p>Select a date and commit:</p>'
+
+          # List dates newest first
+          for d in $(ls -1d benchmarks/20*/ | sort -r); do
+            d=${d%/}
+            echo "<h2>${d#benchmarks/}</h2>"
+            echo "<ul>"
+            # List shas newest first if timestamps exist; otherwise lexicographic
+            for sha in $(ls -1d "$d"/*/ 2>/dev/null | sort -r); do
+              sha=${sha%/}
+              rel=${sha#benchmarks/}
+              echo "  <li><a href=\"/benchmarks/${rel}/\">${rel}</a></li>"
+            done
+            echo "</ul>"
+          done
+        } > "$out"
+
+    - name: Push benchmark results
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        personal_token: ${{ secrets.BUDDY_SITE_PAT }}
+        external_repository: buddy-compiler/buddy-compiler.github.io
+        publish_dir: /home/quliu/buddy-complier-workspace/buddy-benchmark/site   # <- root of generated site
+        publish_branch: master
+        keep_files: true          # keep earlier runs
+        enable_jekyll: true

@@ -3,3 +3,14 @@
 
 # vscode configurations
 /.vscode
+
+# Third-party checkouts and external repos
+/thirdparty/
+
+# Generated sites and results
+/site/
+/test_result/
+
+# Local Python/venv stuff
+__pycache__/
+.venv/
