@@ -10,3 +10,10 @@
 [submodule "thirdparty/kfr"]
 	path = thirdparty/kfr
 	url = https://github.com/kfrlib/kfr.git
+
+[submodule "benchmarks/Intrinsic/3rdparty/benchmark"]
+	path = benchmarks/Intrinsic/3rdparty/benchmark
+	url = https://github.com/google/benchmark.git
+[submodule "benchmarks/Intrinsic/3rdparty/googletest"]
+	path = benchmarks/Intrinsic/3rdparty/googletest
+	url = https://github.com/google/googletest.git
