@@ -41,11 +41,11 @@ add_library(ArithAddfAutoVectorization STATIC addf_auto_vectorization.o)
 set_target_properties(ArithAddfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add the executable for the benchmark
-add_executable(dl-op-linalg-arithaddf-benchmark
+add_executable(dl-op-linalg-arith-addf-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-arithaddf-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-arith-addf-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
@@ -53,7 +53,7 @@ set_target_properties(dl-op-linalg-arithaddf-benchmark PROPERTIES
 set(BenchmarkTool GoogleBenchmark)
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-arithaddf-benchmark
+target_link_libraries(dl-op-linalg-arith-addf-benchmark
   ${BenchmarkTool}
   ArithAddfScalar
   ArithAddfAutoVectorization

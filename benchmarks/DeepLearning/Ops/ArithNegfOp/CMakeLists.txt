@@ -41,11 +41,11 @@ add_library(ArithNegfAutoVectorization STATIC negf_auto_vectorization.o)
 set_target_properties(ArithNegfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add the executable for the benchmark
-add_executable(dl-op-linalg-arithnegf-benchmark
+add_executable(dl-op-linalg-arith-negf-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-arithnegf-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-arith-negf-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
@@ -53,7 +53,7 @@ set_target_properties(dl-op-linalg-arithnegf-benchmark PROPERTIES
 set(BenchmarkTool GoogleBenchmark)
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-arithnegf-benchmark
+target_link_libraries(dl-op-linalg-arith-negf-benchmark
   ${BenchmarkTool}
   ArithNegfScalar
   ArithNegfAutoVectorization

@@ -8,7 +8,7 @@ separate_arguments(CLANG_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")
 
 add_custom_command(OUTPUT transpose_scalar_O0.o
   COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/Transpose2D.mlir |
-          sed -e {s/@transpose_2d_placeholder/@transpose_2d_scalar_O0/} |
+          sed -e "s/@transpose_2d_placeholder/@transpose_2d_scalar_O0/" |
           ${LLVM_MLIR_BINARY_DIR}/mlir-opt
             -pass-pipeline 
             "builtin.module(func.func(tosa-to-linalg-named),func.func(tosa-to-linalg),func.func(tosa-to-tensor),func.func(tosa-to-arith))" |

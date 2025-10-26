@@ -41,11 +41,11 @@ add_library(ArithMulfAutoVectorization STATIC mulf_auto_vectorization.o)
 set_target_properties(ArithMulfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add the executable for the benchmark
-add_executable(dl-op-linalg-arithmulf-benchmark
+add_executable(dl-op-linalg-arith-mulf-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-arithmulf-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-arith-mulf-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
@@ -53,7 +53,7 @@ set_target_properties(dl-op-linalg-arithmulf-benchmark PROPERTIES
 set(BenchmarkTool GoogleBenchmark)
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-arithmulf-benchmark
+target_link_libraries(dl-op-linalg-arith-mulf-benchmark
   ${BenchmarkTool}
   ArithMulfScalar
   ArithMulfAutoVectorization

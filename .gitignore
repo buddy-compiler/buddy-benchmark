@@ -3,3 +3,14 @@
 
 # vscode configurations
 /.vscode
+
+# Mac system auto-generated files
+.DS_Store
+*.DS_Store
+
+# Local cache directory
+.cache/
+
+# .DS_Store in specific subdirectories
+/validation/*/.DS_Store
+/thirdparty/*/.DS_Store

@@ -41,11 +41,11 @@ add_library(MathRsqrtAutoVectorization STATIC rsqrt_auto_vectorization.o)
 set_target_properties(MathRsqrtAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add the executable for the benchmark
-add_executable(dl-op-linalg-mathrsqrt-benchmark
+add_executable(dl-op-linalg-math-rsqrt-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-mathrsqrt-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-math-rsqrt-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
@@ -53,7 +53,7 @@ set_target_properties(dl-op-linalg-mathrsqrt-benchmark PROPERTIES
 set(BenchmarkTool GoogleBenchmark)
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-mathrsqrt-benchmark
+target_link_libraries(dl-op-linalg-math-rsqrt-benchmark
   ${BenchmarkTool}
   MathRsqrtScalar
   MathRsqrtAutoVectorization

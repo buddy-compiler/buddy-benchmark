@@ -41,11 +41,11 @@ add_library(ArithDivfAutoVectorization STATIC divf_auto_vectorization.o)
 set_target_properties(ArithDivfAutoVectorization PROPERTIES LINKER_LANGUAGE CXX)
 
 # Add the executable for the benchmark
-add_executable(dl-op-linalg-arithdivf-benchmark
+add_executable(dl-op-linalg-arith-divf-benchmark
   GoogleBenchmarkMain.cpp
 )
 
-set_target_properties(dl-op-linalg-arithdivf-benchmark PROPERTIES
+set_target_properties(dl-op-linalg-arith-divf-benchmark PROPERTIES
   LINK_FLAGS "-static"
 )
 
@@ -53,7 +53,7 @@ set_target_properties(dl-op-linalg-arithdivf-benchmark PROPERTIES
 set(BenchmarkTool GoogleBenchmark)
 
 # Link the benchmark executable with the necessary libraries
-target_link_libraries(dl-op-linalg-arithdivf-benchmark
+target_link_libraries(dl-op-linalg-arith-divf-benchmark
   ${BenchmarkTool}
   ArithDivfScalar
   ArithDivfAutoVectorization
