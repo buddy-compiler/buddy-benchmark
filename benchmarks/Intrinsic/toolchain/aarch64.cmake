@@ -1,0 +1,21 @@
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+
+if(NOT DEFINED TOOLCHAIN_COMPILER_LOCATION_HINT)
+  set(TOOLCHAIN_COMPILER_LOCATION_HINT /opt/aarch64/bin)
+endif()
+
+find_program(CMAKE_C_COMPILER
+    NAMES aarch64-none-linux-gnu-gcc
+    PATHS ${TOOLCHAIN_COMPILER_LOCATION_HINT}
+    )
+
+find_program(CMAKE_CXX_COMPILER
+    NAMES aarch64-none-linux-gnu-g++
+    PATHS ${TOOLCHAIN_COMPILER_LOCATION_HINT}
+    )
+
+find_program(CMAKE_LINKER
+    NAMES aarch64-none-linux-gnu-ld
+    PATHS ${TOOLCHAIN_COMPILER_LOCATION_HINT}
+    )
