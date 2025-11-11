@@ -20,13 +20,15 @@
 
 #include <benchmark/benchmark.h>
 
-void verification();
+void matmul_verification();
+void batch_matmul_verification();
 
 int main(int argc, char **argv) {
   // Run benchmark.
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
   // Run correctness verification.
-  verification();
+  matmul_verification();
+  batch_matmul_verification();
   return 0;
 }
